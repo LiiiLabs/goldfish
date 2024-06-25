@@ -1,0 +1,38 @@
+version: '1.0'
+name: ci-ubuntu
+displayName: ci-ubuntu
+triggers:
+  trigger: auto
+  pr:
+    branches:
+      precise:
+        - main
+  push:
+    branches:
+      precise:
+        - main
+
+stages:
+  - name: build_and_test 
+    displayName: build_and_test
+    strategy: fast
+    trigger: auto
+    executor: []
+    steps:
+      - step: build@gcc
+        name: build
+        displayName: Run S7 SRFI tests
+        gccVersion: '9.4'
+        commands:
+          - wget -O /tmp/s7 https://gitee.com/XmacsLabs/s7-scheme-binary/releases/download/v20230413.3/s7_ubuntu_focal
+          - sha256sum /tmp/s7 | grep 3d8051123d00658f99e3970352730cf3cdff896aed6d64bcf86cefbbc840f8a1
+          - cd srfi
+          - chmod +x /tmp/s7
+          - /tmp/s7 srfi-78-test.scm
+        caches: [
+          build/.build_cache,
+        ]
+        notify: []
+        strategy:
+          retry: '0'
+          stepTimeout: 30
