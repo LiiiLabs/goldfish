@@ -26,12 +26,10 @@ stages:
         commands:
           - wget -O /tmp/s7 https://gitee.com/XmacsLabs/s7-scheme-binary/releases/download/v20230413.3/s7_ubuntu_focal
           - sha256sum /tmp/s7 | grep 3d8051123d00658f99e3970352730cf3cdff896aed6d64bcf86cefbbc840f8a1
-          - cd srfi
           - chmod +x /tmp/s7
-          - /tmp/s7 srfi-78-test.scm
-        caches: [
-          build/.build_cache,
-        ]
+          - cd srfi
+          - ls *test.scm | xargs -I% /tmp/s7 %
+        caches: []
         notify: []
         strategy:
           retry: '0'
