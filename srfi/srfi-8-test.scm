@@ -14,8 +14,10 @@
 ; under the License.
 ;
 
-(autoload 'check "srfi-78.scm")
-(autoload 'receive "srfi-8.scm")
+(import (srfi srfi-8)
+        (srfi srfi-78))
+
+(check-set-mode! 'report-failed)
 
 (check
   (receive (a b) (values 1 2) (+ a b))

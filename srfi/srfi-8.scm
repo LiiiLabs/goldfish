@@ -14,11 +14,15 @@
 ; under the License.
 ;
 
-(provide 'srfi-8)
-(provide 'receive)
+(define-library (srfi srfi-8)
+(export receive)              
+(begin
 
 (define-macro (receive formals expression . body)
   `(call-with-values
     (lambda () (values ,expression))
     (lambda ,formals ,@body)))
+
+) ; end of begin
+) ; end of define-library
 

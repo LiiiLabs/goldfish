@@ -11,35 +11,15 @@
 ;;; Copyright (c) 2024 The S7 SRFI Authors
 ;;; Follow the same License as the original one
 
-(provide 'srfi-1)
-(provide 'null-list?)
-(provide 'first)
-(provide 'second)
-(provide 'third)
-(provide 'fourth)
-(provide 'fifth)
-(provide 'sixth)
-(provide 'seventh)
-(provide 'eighth)
-(provide 'ninth)
-(provide 'tenth)
-(provide 'take)
-(provide 'drop)
-(provide 'take-right)
-(provide 'drop-right)
-(provide 'count)
-(provide 'fold)
-(provide 'fold-right)
-(provide 'reduce)
-(provide 'reduce-right)
-(provide 'filter)
-(provide 'partition)
-(provide 'remove)
-(provide 'find)
-(provide 'take-while)
-(provide 'drop-while)
-(provide 'check-report)
-(provide 'check-reset!)
+(define-library (srfi srfi-1)
+(export
+  null-list?
+  first second third fourth fifth
+  sixth seventh eighth ninth tenth
+  take drop take-right drop-right count fold fold-right
+  reduce reduce-right filter partition remove find
+  take-while drop-while)
+(begin
 
 (define (null-list? l)
   (cond ((pair? l) #f)
@@ -163,3 +143,5 @@
           (drop-while pred (cdr l))
           l)))
 
+) ; end of begin
+) ; end of define-library
