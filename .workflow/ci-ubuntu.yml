@@ -24,8 +24,8 @@ stages:
         displayName: Run S7 SRFI tests
         gccVersion: '9.4'
         commands:
-          - wget -O /tmp/s7 https://gitee.com/XmacsLabs/s7-scheme-binary/releases/download/v20230413.3/s7_ubuntu_focal
-          - sha256sum /tmp/s7 | grep 3d8051123d00658f99e3970352730cf3cdff896aed6d64bcf86cefbbc840f8a1
+          - wget -O /tmp/s7 https://gitee.com/XmacsLabs/s7-scheme-binary/releases/download/v20230413.4/s7_ubuntu_focal
+          - sha256sum /tmp/s7 | grep 871c6e351b51a87eece7aa8051f88917762c3d4c3798a3818dd752235e119d97
           - chmod +x /tmp/s7
           - cd srfi
           - ls *test.scm | xargs -I% /tmp/s7 %
