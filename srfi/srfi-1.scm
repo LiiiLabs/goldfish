@@ -18,6 +18,7 @@
   sixth seventh eighth ninth tenth
   take drop take-right drop-right count fold fold-right
   reduce reduce-right filter partition remove find
+  delete delete-duplicates
   take-while drop-while)
 (begin
 
@@ -142,6 +143,38 @@
       (if (pred (car l))
           (drop-while pred (cdr l))
           l)))
+
+(define (%extract-maybe-equal maybe-equal)
+  (let ((my-equal (if (null-list? maybe-equal)
+                      =
+                      (car maybe-equal))))
+    (if (procedure? my-equal)
+        my-equal
+        (error 'wrong-type-arg "maybe-equal must be procedure"))))
+(define (delete x l . maybe-equal)
+  (let ((my-equal (%extract-maybe-equal maybe-equal)))
+    (filter (lambda (y) (not (my-equal x y))) l)))
+
+;;; right-duplicate deletion
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; delete-duplicates delete-duplicates!
+;;;
+;;; Beware -- these are N^2 algorithms. To efficiently remove duplicates
+;;; in long lists, sort the list to bring duplicates together, then use a
+;;; linear-time algorithm to kill the dups. Or use an algorithm based on
+;;; element-marking. The former gives you O(n lg n), the latter is linear.
+
+(define (delete-duplicates lis . maybe-equal)
+  (let ((my-equal (%extract-maybe-equal maybe-equal)))
+    (let recur ((lis lis))
+      (if (null-list? lis)
+          lis
+          (let* ((x (car lis))
+                 (tail (cdr lis))
+                 (new-tail (recur (delete x tail my-equal))))
+            (if (eq? tail new-tail)
+                lis
+                (cons x new-tail)))))))
 
 ) ; end of begin
 ) ; end of define-library
