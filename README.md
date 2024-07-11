@@ -10,4 +10,7 @@
 |-----|-------|
 | (scheme case-lambda) | 提供`case-lambda` |
 | (srfi srfi-8) | 提供`receive` |
+| (srfi srfi-9) | 提供`define-record-type` |
 | (srfi srfi-16) | 提供`case-lambda`，是`(scheme case-lambda)`的接口 |
+| (srfi srfi-39) | 参数化对象 |
+
