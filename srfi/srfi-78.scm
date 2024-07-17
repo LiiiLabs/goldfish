@@ -124,7 +124,7 @@
        (= check:correct expected-total-count)))
 
 (define (check-failed?)
-  (> (length check:failed) 1))
+  (>= (length check:failed) 1))
 
 (define (check:proc expression thunk equal expected-result)
   (case check:mode
