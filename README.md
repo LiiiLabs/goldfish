@@ -9,16 +9,19 @@
 ## R7RS标准库
 | 模块 | 功能 | 
 |-----|-------|
-| (scheme case-lambda) | 提供`case-lambda` |
+| `(scheme base)` | 基础库 |
+| `(scheme case-lambda)` | 提供`case-lambda` |
+| `(scheme file)` | 文件操作 |
 
 ## Scheme SRFI
 
 | 模块 | 状态 | 功能  |
 |------|------|-------|
-| (srfi srfi-1)   | 部分实现 | 列表函数库 |
-| (srfi srfi-8)   | 完整实现 | 提供`receive` |
-| (srfi srfi-9)   | 完整实现 | 提供`define-record-type` |
-| (srfi srfi-16)  | 完整实现 | 提供`case-lambda`，是`(scheme case-lambda)`的接口 |
-| (srfi srfi-39)  | 完整实现 | 参数化对象 |
-| (srfi srfi-78)  | 部分实现 | 轻量级测试框架`check` |
+| `(srfi srfi-1)`   | 部分 | 列表函数库 |
+| `(srfi srfi-8)`   | 完整 | 提供`receive` |
+| `(srfi srfi-9)`   | 完整 | 提供`define-record-type` |
+| `(srfi srfi-13)`  | 完整 | 字符串函数库 | 
+| `(srfi srfi-16)`  | 完整 | 提供`case-lambda`，是`(scheme case-lambda)`的接口 |
+| `(srfi srfi-39)`  | 完整 | 参数化对象 |
+| `(srfi srfi-78)`  | 部分 | 轻量级测试框架`check` |
 
