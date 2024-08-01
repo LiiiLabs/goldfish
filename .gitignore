@@ -1,3 +1,4 @@
 .xmake/
 build/
-bin/
+bin/goldfish
+goldfish/**/*-test.scm

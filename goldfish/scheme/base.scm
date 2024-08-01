@@ -19,6 +19,9 @@
   square
   ; String
   string-copy
+  ; Vector
+  vector->string
+  string->vector
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?
@@ -41,6 +44,20 @@
         ((= (length start_end) 2)
          (substring str (car start_end) (cadr start_end)))
         (else (error 'wrong-number-of-args))))
+
+; 0-clause BSD
+; Bill Schottstaedt
+; from S7 source repo: r7rs.scm
+(define* (vector->string v (start 0) end) 
+  (let ((stop (or end (length v)))) 
+    (copy v (make-string (- stop start)) start stop)))
+
+; 0-clause BSD
+; Bill Schottstaedt
+; from S7 source repo: r7rs.scm
+(define* (string->vector s (start 0) end)
+  (let ((stop (or end (length s)))) 
+    (copy s (make-vector (- stop start)) start stop)))
 
 (define (string-map p . args) (apply string (apply map p args)))
 

@@ -19,7 +19,8 @@
   take drop take-right drop-right count fold fold-right
   reduce reduce-right filter partition remove find
   delete delete-duplicates
-  take-while drop-while)
+  take-while drop-while
+  last-pair last)
 (begin
 
 ; 0 clause BSD, from S7 repo stuff.scm
@@ -94,6 +95,13 @@
     (if (pair? lead)
         (cons (car lag) (recur (cdr lag) (cdr lead)))
         '())))
+
+(define (last-pair l)
+  (if (pair? (cdr l))
+      (last-pair (cdr l)) l))
+
+(define (last l)
+  (car (last-pair l)))
 
 (define (count pred list1 . lists)
   (let lp ((lis list1) (i 0))
