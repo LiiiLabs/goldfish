@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           DEBIAN_FRONTEND=noninteractive apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y gcc git 7zip unzip curl
+          DEBIAN_FRONTEND=noninteractive apt-get install -y gcc git 7zip unzip curl make
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
