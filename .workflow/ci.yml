@@ -27,7 +27,7 @@ stages:
       - step: build@gcc
         name: build
         displayName: Run S7 SRFI tests
-        gccVersion: '9.4'
+        gccVersion: '10.3'
         commands:
           - wget https://gitee.com/XmacsLabs/mogan/attach_files/1813514/download -O /tmp/xmake.deb
           - sha1sum /tmp/xmake.deb | grep ac3629bd0fa66f179aef35dc00b7a1c89735651a
