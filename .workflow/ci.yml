@@ -24,11 +24,14 @@ stages:
         displayName: Run S7 SRFI tests
         gccVersion: '9.4'
         commands:
-          - wget -O /tmp/s7 https://gitee.com/XmacsLabs/s7-scheme-binary/releases/download/v20230413.4/s7_ubuntu_focal
-          - sha256sum /tmp/s7 | grep 871c6e351b51a87eece7aa8051f88917762c3d4c3798a3818dd752235e119d97
-          - chmod +x /tmp/s7
-          - cd srfi
-          - ls *test.scm | xargs -I% /tmp/s7 %
+          - wget https://gitee.com/XmacsLabs/mogan/attach_files/1813514/download -O /tmp/xmake.deb
+          - sha1sum /tmp/xmake.deb | grep ac3629bd0fa66f179aef35dc00b7a1c89735651a
+          - apt install /tmp/xmake.deb
+          - sed -i '/github\.com/d' xmake/packages/s/s7/xmake.lua
+          - xmake repo -u
+          - xmake config -vD --yes
+          - xmake b goldfish
+          - find tests | grep "test.scm" | xargs -I% bin/goldfish %
         caches: []
         notify: []
         strategy:
