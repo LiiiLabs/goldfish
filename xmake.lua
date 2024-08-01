@@ -14,6 +14,7 @@ add_requires("s7 "..S7_VERSION, {system=false})
 
 target ("goldfish") do
     set_languages("c++17")
+    set_targetdir("$(projectdir)/bin/")
     add_files ("src/goldfish.cpp")
     add_packages("s7")
 end
