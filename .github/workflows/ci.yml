@@ -1,4 +1,4 @@
-name: Build on Debian bookworm
+name: CI on Debian bookworm
 on:
   push:
     branches: [ main ]
@@ -55,3 +55,5 @@ jobs:
         run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
       - name: build
         run: xmake build --yes -vD goldfish
+      - name: run tests
+        run: find tests | grep "test.scm" | xargs -I% bin/goldfish %
