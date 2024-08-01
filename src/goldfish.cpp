@@ -49,7 +49,7 @@ main (int argc, char** argv) {
         << "The load path for Goldfish Scheme Standard Library does not exist"
         << std::endl;
   }
-  if (!exists (gf_root)) {
+  if (!exists (gf_boot)) {
     std::cerr << "The boot.scm for Goldfish Scheme does not exist" << std::endl;
   }
 
