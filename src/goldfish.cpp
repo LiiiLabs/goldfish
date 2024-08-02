@@ -40,6 +40,11 @@ void display_help() {
        << "Load the scheme code and evaluate it" << endl;
 }
 
+void display_version() {
+  cout << "Goldfish Scheme " << goldfish_version << " by LiiiLabs" << endl;
+  cout << "based on S7 Scheme " << S7_VERSION << "(" << S7_DATE << ")" << endl;
+}
+
 int main(int argc, char **argv) {
   // Check if the standard library and boot.scm exists
   const path gf_root = path(argv[0]).parent_path().parent_path();
@@ -68,9 +73,7 @@ int main(int argc, char **argv) {
     display_help();
   } else if (args.size() == 1) {
     if (args[0] == "--version") {
-      cout << "Goldfish Scheme " << goldfish_version << "by LiiiLabs" << endl;
-      cout << "based on S7 Scheme " << S7_VERSION << "(" << S7_DATE << ")"
-           << endl;
+      display_version();
     } else {
       if (!s7_load(sc, args[0].c_str())) {
         cerr << "error" << endl;
