@@ -56,12 +56,12 @@ void goldfish_eval_file(s7_scheme *sc, string path) {
     cerr << "Failed to load " << path << endl;
     exit(-1);
   }
-  cout << s7_object_to_c_string(sc, result) << endl;
+  cout << "=> " << s7_object_to_c_string(sc, result) << endl;
 }
 
 void goldfish_eval_code(s7_scheme *sc, string code) {
   s7_pointer x = s7_eval_c_string(sc, code.c_str());
-  cout << s7_object_to_c_string(sc, x) << endl;
+  cout << "=> " << s7_object_to_c_string(sc, x) << endl;
 }
 
 int main(int argc, char **argv) {
