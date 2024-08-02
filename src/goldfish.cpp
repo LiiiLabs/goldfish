@@ -44,7 +44,7 @@ void display_help() {
 
 void display_version() {
   cout << "Goldfish Scheme " << goldfish_version << " by LiiiLabs" << endl;
-  cout << "based on S7 Scheme " << S7_VERSION << "(" << S7_DATE << ")" << endl;
+  cout << "based on S7 Scheme " << S7_VERSION << " (" << S7_DATE << ")" << endl;
 }
 
 void display_for_invalid_options() {
