@@ -36,15 +36,15 @@ void display_help() {
        << "display version" << endl;
   cout << "-e       \t"
        << "-e '(+ 1 2)'" << endl;
-  cout << "-l FILE\t"
+  cout << "-l FILE  \t"
        << "Load the scheme code on path" << endl;
-  cout << "FILE\t"
+  cout << "FILE     \t"
        << "Load the scheme code on path and print the evaluated result" << endl;
 }
 
 void display_version() {
   cout << "Goldfish Scheme " << goldfish_version << " by LiiiLabs" << endl;
-  cout << "based on S7 Scheme " << S7_VERSION << "(" << S7_DATE << ")" << endl;
+  cout << "based on S7 Scheme " << S7_VERSION << " (" << S7_DATE << ")" << endl;
 }
 
 void display_for_invalid_options() {
