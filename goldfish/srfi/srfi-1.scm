@@ -8,7 +8,7 @@
 ;;; hold me liable for its use. Please send bug reports to shivers@ai.mit.edu.
 ;;;     -Olin
 ;;;
-;;; Copyright (c) 2024 The S7 SRFI Authors
+;;; Copyright (c) 2024 The Goldfish Scheme Authors
 ;;; Follow the same License as the original one
 
 (define-library (srfi srfi-1)
