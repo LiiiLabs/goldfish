@@ -2,3 +2,5 @@
 build/
 bin/goldfish
 goldfish/**/*-test.scm
+compile_commands.json
+.cache/
