@@ -50,6 +50,17 @@ void display_for_invalid_options() {
   display_help();
 }
 
+void goldfish_eval_file(s7_scheme *sc, string path) {
+  if (!s7_load(sc, path.c_str())) {
+    cerr << "error" << endl;
+  }
+}
+
+void goldfish_eval_code(s7_scheme *sc, string code) {
+  s7_pointer x = s7_eval_c_string(sc, code.c_str());
+  cout << s7_object_to_c_string(sc, x) << endl;
+}
+
 int main(int argc, char **argv) {
   // Check if the standard library and boot.scm exists
   const path gf_root = path(argv[0]).parent_path().parent_path();
@@ -78,19 +89,16 @@ int main(int argc, char **argv) {
   vector<string> args(argv + 1, argv + argc);
   if (args.size() == 0) {
     display_help();
-  } else if (args.size() == 1) {
+  } else if (args.size() == 1 && args[0].size() > 0 && args[0][0] == '-') {
     if (args[0] == "--version") {
       display_version();
-    } else if (args[0].size() > 0 && args[0][0] == '-') {
-      display_for_invalid_options();
     } else {
-      if (!s7_load(sc, args[0].c_str())) {
-        cerr << "error" << endl;
-      }
+      display_for_invalid_options();
     }
   } else if (args.size() == 2 && args[0] == "-e") {
-    s7_pointer x = s7_eval_c_string(sc, args[1].c_str());
-    cout << s7_object_to_c_string(sc, x) << endl;
+    goldfish_eval_code(sc, args[1]);
+  } else if (args.size() == 1 && args[0].size() > 0 && args[0][0] != '-') {
+    goldfish_eval_file(sc, args[0]);
   } else {
     display_for_invalid_options();
   }
