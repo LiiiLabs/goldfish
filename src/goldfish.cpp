@@ -36,9 +36,9 @@ void display_help() {
        << "display version" << endl;
   cout << "-e       \t"
        << "-e '(+ 1 2)'" << endl;
-  cout << "-l FILE\t"
+  cout << "-l FILE  \t"
        << "Load the scheme code on path" << endl;
-  cout << "FILE\t"
+  cout << "FILE     \t"
        << "Load the scheme code on path and print the evaluated result" << endl;
 }
 

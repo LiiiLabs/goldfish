@@ -19,4 +19,7 @@ target ("goldfish") do
     set_targetdir("$(projectdir)/bin/")
     add_files ("src/goldfish.cpp")
     add_packages("s7")
+
+    add_installfiles("goldfish/(scheme/*.scm)", {prefixdir = "goldfish"})
+    add_installfiles("goldfish/(srfi/*.scm)", {prefixdir = "goldfish"})
 end
