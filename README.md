@@ -1,11 +1,11 @@
 # Goldfish Scheme
 Goldfish Scheme is a Scheme interpreter with the following features:
-+ R7RS compatible
++ R7RS-small compatible
 + SRFI provided
 + Small and fast
 
 ## Why we created Goldfish Scheme
-Goldfish Scheme is implemented to overcome the defects of S7 Scheme:
+Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://ccrma.stanford.edu/software/s7/):
 1. Distribute the ready-to-use Goldfish Scheme interpreter and structured REPL on Linux/macOS/Windows
 2. Try to implement the [R7RS-small](https://small.r7rs.org) standard
 3. Try to provide the useful SRFI in R7RS library format
@@ -15,9 +15,6 @@ The implementation of Goldfish aims to follow the rules of simplicity. Currently
 Just like S7 Scheme, [`src/goldfish.hpp`](src/goldfish.hpp) and [`src/goldfish.cpp`](src/goldfish.cpp) are the only key source code needed to build the goldfish interpreter binary.
 If you download the `s7.c` `s7.h` by yourself, just invoke `gcc` or `clang` to build goldfish. `xmake` as a build tool is nice to have but not a requirement.
 
-## Versioning
-Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Scheme y, and z is the patch version. To clarify, the first version of Goldfish
-Scheme is `17.10.0`, it means that is is using the `C++ 17` standard, based on `S7 Scheme 10.x`, the patch version is `0`.
 
 ## Installation
 Goldfish Scheme is bundled in Mogan Research (since v1.2.8), just [install Mogan Research](https://mogan.app/guide/Install.html) to install Goldfish Scheme.
@@ -121,4 +118,12 @@ Notice, the FILE and the eval result is separated by ` => `.
 | `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
 | `(srfi srfi-39)`  | Complete | Parameter objects |
 | `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
+
+## Versioning
+Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Scheme y, and z is the patch version. To clarify, the first version of Goldfish
+Scheme is `17.10.0`, it means that is is using the `C++ 17` standard, based on `S7 Scheme 10.x`, the patch version is `0`.
+
+## License
+Goldfish Scheme is licensed under Apache 2.0, for some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicited claimed in the related source files.
+
 
