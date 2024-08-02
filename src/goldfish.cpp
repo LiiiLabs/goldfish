@@ -45,6 +45,11 @@ void display_version() {
   cout << "based on S7 Scheme " << S7_VERSION << "(" << S7_DATE << ")" << endl;
 }
 
+void display_for_invalid_options() {
+  cerr << "Invalid command line options!" << endl << endl;
+  display_help();
+}
+
 int main(int argc, char **argv) {
   // Check if the standard library and boot.scm exists
   const path gf_root = path(argv[0]).parent_path().parent_path();
@@ -53,9 +58,11 @@ int main(int argc, char **argv) {
   if (!exists(gf_lib)) {
     cerr << "The load path for Goldfish Scheme Standard Library does not exist"
          << endl;
+    exit(-1);
   }
   if (!exists(gf_boot)) {
     cerr << "The boot.scm for Goldfish Scheme does not exist" << endl;
+    exit(-1);
   }
 
   // Init the underlying S7 Scheme and add the load_path
@@ -75,8 +82,7 @@ int main(int argc, char **argv) {
     if (args[0] == "--version") {
       display_version();
     } else if (args[0].size() > 0 && args[0][0] == '-') {
-      cerr << "Invalid command line options!" << endl << endl;
-      display_help();
+      display_for_invalid_options();
     } else {
       if (!s7_load(sc, args[0].c_str())) {
         cerr << "error" << endl;
@@ -86,8 +92,7 @@ int main(int argc, char **argv) {
     s7_pointer x = s7_eval_c_string(sc, args[1].c_str());
     cout << s7_object_to_c_string(sc, x) << endl;
   } else {
-    cerr << "Invalid command line options!" << endl;
-    display_help();
+    display_for_invalid_options();
   }
   return 0;
 }
