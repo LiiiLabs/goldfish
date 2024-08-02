@@ -89,7 +89,8 @@ int main(int argc, char **argv) {
   s7_load(sc, gf_boot.string().c_str());
   s7_add_to_load_path(sc, gf_lib.string().c_str());
 
-  // Glues for the Standard Library
+  // Glues
+  glue_goldfish(sc);
   glue_scheme_time(sc);
 
   // Command options
