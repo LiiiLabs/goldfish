@@ -51,9 +51,12 @@ void display_for_invalid_options() {
 }
 
 void goldfish_eval_file(s7_scheme *sc, string path) {
-  if (!s7_load(sc, path.c_str())) {
-    cerr << "error" << endl;
+  s7_pointer result = s7_load(sc, path.c_str());
+  if (!result) {
+    cerr << "Failed to load " << path << endl;
+    exit(-1);
   }
+  cout << s7_object_to_c_string(sc, result) << endl;
 }
 
 void goldfish_eval_code(s7_scheme *sc, string code) {
