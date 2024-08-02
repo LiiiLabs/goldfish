@@ -4,7 +4,28 @@ Goldfish Scheme is a Scheme interpreter with the following features:
 + SRFI provided
 + Small and fast
 
+## Why we created Goldfish Scheme
+Goldfish Scheme is implemented to overcome the defects of S7 Scheme:
+1. Distribute ready-to-use the Goldfish Scheme interpreter and structured REPL on Linux/macOS/Windows
+2. Try to implement the [R7RS-small](https://small.r7rs.org) standard
+3. Try to provide the useful SRFI in R7RS library format
+
+The implementation of Goldfish aims to follow the rules of simplicity. Currently, Goldfish Scheme only depends on S7 Scheme and C++ 17 standard library.
+
+Just like S7 Scheme, `src/goldfish.hpp` and `src/goldfish.cpp` are the only key source code needed to build the goldfish interpreter binary.
+If you download the `s7.c` `s7.h` by yourself, just invode `gcc` or `clang` build goldfish. `xmake` as a build tool is nice to have but not a requirement.
+
+## Versioning
+Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Scheme y, and z is the patch version. To clarify, the first version of Goldfish
+Scheme is `17.10.0`, it means that is is using the `C++ Standard 17`, based on `S7 Scheme 10.x`, the patch version is `0`.
+
 ## Installation
+Goldfish Scheme is bundled in Mogan Research (since v1.2.8), just [install Mogan Research](https://mogan.app/guide/Install.html) to install Goldfish Scheme.
+
+Besides the Goldfish Scheme interpreter, a nice structured [Goldfish Scheme REPL](https://mogan.app/guide/plugin_goldfish.html) is availabe in Mogan Research.
+
+The following guide will help you build and install Goldfish step by step.
+
 ### GNU/Linux
 Here are commandlines to build it on Debian bookworm:
 ```
