@@ -105,9 +105,10 @@ Notice, the FILE and the eval result is separated by ` => `.
 ## R7RS Standard Libraries
 | Library | Description | 
 |-----|-------|
-| `(scheme base)` | Base routines |
+| `(scheme base)` | Base library |
 | `(scheme case-lambda)` | Provide `case-lambda` |
 | `(scheme file)` | File operations |
+| `(scheme time)` | Time library |
 
 ## SRFI
 
