@@ -12,7 +12,7 @@ Goldfish Scheme is implemented to overcome the defects of S7 Scheme:
 
 The implementation of Goldfish aims to follow the rules of simplicity. Currently, Goldfish Scheme only depends on S7 Scheme and C++ 17 standard library.
 
-Just like S7 Scheme, `src/goldfish.hpp` and `src/goldfish.cpp` are the only key source code needed to build the goldfish interpreter binary.
+Just like S7 Scheme, [`src/goldfish.hpp`](src/goldfish.hpp) and [`src/goldfish.cpp`](src/goldfish.cpp) are the only key source code needed to build the goldfish interpreter binary.
 If you download the `s7.c` `s7.h` by yourself, just invode `gcc` or `clang` build goldfish. `xmake` as a build tool is nice to have but not a requirement.
 
 ## Versioning
