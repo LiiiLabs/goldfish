@@ -36,8 +36,10 @@ void display_help() {
        << "display version" << endl;
   cout << "-e       \t"
        << "-e '(+ 1 2)'" << endl;
-  cout << "filename \t"
-       << "Load the scheme code and evaluate it" << endl;
+  cout << "-l FILE\t"
+       << "Load the scheme code on path" << endl;
+  cout << "FILE\t"
+       << "Load the scheme code on path and print the evaluated result" << endl;
 }
 
 void display_version() {
@@ -50,18 +52,20 @@ void display_for_invalid_options() {
   display_help();
 }
 
-void goldfish_eval_file(s7_scheme *sc, string path) {
+void goldfish_eval_file(s7_scheme *sc, string path, bool quiet) {
   s7_pointer result = s7_load(sc, path.c_str());
   if (!result) {
     cerr << "Failed to load " << path << endl;
     exit(-1);
   }
-  cout << "=> " << s7_object_to_c_string(sc, result) << endl;
+  if (!quiet) {
+    cout << path << " => " << s7_object_to_c_string(sc, result) << endl;
+  }
 }
 
 void goldfish_eval_code(s7_scheme *sc, string code) {
   s7_pointer x = s7_eval_c_string(sc, code.c_str());
-  cout << "=> " << s7_object_to_c_string(sc, x) << endl;
+  cout << s7_object_to_c_string(sc, x) << endl;
 }
 
 int main(int argc, char **argv) {
@@ -100,8 +104,10 @@ int main(int argc, char **argv) {
     }
   } else if (args.size() == 2 && args[0] == "-e") {
     goldfish_eval_code(sc, args[1]);
+  } else if (args.size() == 2 && args[0] == "-l") {
+    goldfish_eval_file(sc, args[1], true);
   } else if (args.size() == 1 && args[0].size() > 0 && args[0][0] != '-') {
-    goldfish_eval_file(sc, args[0]);
+    goldfish_eval_file(sc, args[0], false);
   } else {
     display_for_invalid_options();
   }
