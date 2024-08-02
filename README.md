@@ -1,27 +1,46 @@
-# 金鱼标准库
-[金鱼Scheme](https://gitee.com/LiiiLabs/goldfish)是三鲤发起的一个基于S7 Scheme的Scheme解释器。
+# Goldfish Scheme
+Goldfish Scheme is a Scheme interpreter with the following features:
++ R7RS compatible
++ SRFI provided
++ Small and fast
 
-金鱼标准库分为：
-+ R7RS标准库
-+ 部分Scheme SRFI的金鱼Scheme实现
-+ 金鱼扩展库
+## Installation
+### GNU/Linux
+Here are commandlines to build it on Debian bookworm:
+```
+sudo apt install xmake git unzip curl build-essential
+git clone https://gitee.com/LiiiLabs/goldfish.git
+# git clone https://github.com/LiiiLabs/goldfish.git
+cd goldfish
+xmake b goldfish
+bin/goldfish --version
+```
+You can also install it to `/opt`:
+```
+sudo xmake i -o /opt/goldfish --root
+/opt/goldfish/bin/goldfish
+```
+For uninstallation, just:
+```
+sudo rm -rf /opt/goldfish
+```
 
-## R7RS标准库
-| 模块 | 功能 | 
+## R7RS Standard Libraries
+| Library | Description | 
 |-----|-------|
-| `(scheme base)` | 基础库 |
-| `(scheme case-lambda)` | 提供`case-lambda` |
-| `(scheme file)` | 文件操作 |
+| `(scheme base)` | Base routines |
+| `(scheme case-lambda)` | Provide `case-lambda` |
+| `(scheme file)` | File operations |
 
-## Scheme SRFI
+## SRFI
 
-| 模块 | 状态 | 功能  |
+| Library | Status | Description  |
 |------|------|-------|
-| `(srfi srfi-1)`   | 部分 | 列表函数库 |
-| `(srfi srfi-8)`   | 完整 | 提供`receive` |
-| `(srfi srfi-9)`   | 完整 | 提供`define-record-type` |
-| `(srfi srfi-13)`  | 完整 | 字符串函数库 | 
-| `(srfi srfi-16)`  | 完整 | 提供`case-lambda`，是`(scheme case-lambda)`的接口 |
-| `(srfi srfi-39)`  | 完整 | 参数化对象 |
-| `(srfi srfi-78)`  | 部分 | 轻量级测试框架`check` |
+| `(srfi srfi-1)`   | Part | List Library |
+| `(srfi srfi-8)`   | Complete | Provide `receive` |
+| `(srfi srfi-9)`   | Complete | Provide `define-record-type` |
+| `(srfi srfi-13)`  | Complete | String Library | 
+| `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
+| `(srfi srfi-39)`  | Complete | Parameter objects |
+| `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
 
