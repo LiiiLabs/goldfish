@@ -25,6 +25,62 @@ For uninstallation, just:
 sudo rm -rf /opt/goldfish
 ```
 
+## Commandlinefu
+This section assumes you have executed `xmake b goldfish` sucessfully and `bin/goldfish` is available.
+
+Without any options, it will print the help message:
+```
+> bin/goldfish 
+Goldfish Scheme 17.10.0 by LiiiLabs
+--version       display version
+-e              -e '(+ 1 2)'
+-l FILE         Load the scheme code on path
+FILE            Load the scheme code on path and print the evaluated result
+```
+
+`--version` will print the Goldfish Scheme version and the underlying S7 Scheme version:
+```
+> bin/goldfish --version
+Goldfish Scheme 17.10.0 by LiiiLabs
+based on S7 Scheme 10.11 (2-July-2024)
+```
+
+`-e` helps you evaluate the scheme code on the fly:
+```
+> bin/goldfish -e "(+ 1 2)"
+3
+> bin/goldfish -e "(begin (import (srfi srfi-1)) (first (list 1 2 3)))"
+1
+```
+
+`-l` helps you load the FILE:
+```
+> bin/goldfish -l tests/demo_error.scm 
+
+;car argument, (), is nil but should be a pair
+;    (list)
+;    tests/demo_error.scm, line 1, position: 10
+; (list)
+
+> bin/goldfish -l tests/demo_no_error.scm
+>
+```
+
+If no options provided, it will load the FILE and print the eval result:
+```
+> bin/goldfish  tests/demo_no_error.scm 
+tests/demo_no_error.scm => 3
+> bin/goldfish  tests/demo_error.scm 
+
+;car argument, (), is nil but should be a pair
+;    (list)
+;    tests/demo_error.scm, line 1, position: 10
+; (list)
+
+tests/demo_error.scm => wrong-type-arg
+```
+Notice, the FILE and the eval result is separated by ` => `.
+
 ## R7RS Standard Libraries
 | Library | Description | 
 |-----|-------|
