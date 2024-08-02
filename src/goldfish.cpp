@@ -74,6 +74,9 @@ int main(int argc, char **argv) {
   } else if (args.size() == 1) {
     if (args[0] == "--version") {
       display_version();
+    } else if (args[0].size() > 0 && args[0][0] == '-') {
+      cerr << "Invalid command line options!" << endl << endl;
+      display_help();
     } else {
       if (!s7_load(sc, args[0].c_str())) {
         cerr << "error" << endl;
