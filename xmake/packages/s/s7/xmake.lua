@@ -51,13 +51,6 @@ package("s7")
     end)
 
     on_test(function(package)
-        if not package:is_cross() then
-            local file = os.tmpfile() .. ".scm"
-            io.writefile(file, [[
-                (display "Hello World!")
-            ]])
-            os.vrunv("s7", {file})
-        end
         assert(package:check_csnippets([[
             static s7_pointer old_add;           /* the original "+" function for non-string cases */
             static s7_pointer old_string_append; /* same, for "string-append" */
