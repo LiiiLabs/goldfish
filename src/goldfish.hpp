@@ -15,8 +15,14 @@
 //
 
 #include <chrono>
+#include <iostream>
 #include <s7.h>
 #include <string>
+#include <tbox/tbox.h>
+
+inline void glue_goldfish (s7_scheme* sc);
+inline void glue_scheme_time (s7_scheme* sc);
+inline void glue_scheme_process_context (s7_scheme* sc);
 
 const int patch_version= 0;                // Goldfish Patch Version
 const int minor_version= S7_MAJOR_VERSION; // S7 Major Version
@@ -68,4 +74,45 @@ glue_scheme_time (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_current_second),
              s7_make_typed_function (sc, s_current_second, f_current_second, 0,
                                      0, false, d_current_second, NULL));
+}
+
+// Glues for (scheme process-context)
+static s7_pointer
+f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
+#ifdef _MSC_VER
+  std::string path_sep= ";";
+#else
+  std::string path_sep= ":";
+#endif
+  std::string          ret;
+  tb_size_t            size       = 0;
+  const char*          key        = s7_string (s7_car (args));
+  tb_environment_ref_t environment= tb_environment_init ();
+  if (environment) {
+    size= tb_environment_load (environment, key);
+    if (size >= 1) {
+      tb_for_all_if (tb_char_t const*, value, environment, value) {
+        ret.append (value).append (path_sep);
+      }
+    }
+  }
+  tb_environment_exit (environment);
+  if (size == 0) { // env key not found
+    return s7_make_boolean (sc, false);
+  }
+  else {
+    return s7_make_string (sc, ret.substr (0, ret.size () - 1).c_str ());
+  }
+}
+
+inline void
+glue_scheme_process_context (s7_scheme* sc) {
+  s7_pointer  cur_env                   = s7_curlet (sc);
+  const char* s_get_environment_variable= "g_get-environment-variable";
+  const char* d_get_environment_variable=
+      "(g_get-environemt-variable string) => string";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_get_environment_variable),
+             s7_make_typed_function (sc, s_get_environment_variable,
+                                     f_get_environment_variable, 1, 0, false,
+                                     d_get_environment_variable, NULL));
 }
