@@ -39,9 +39,14 @@
     "tests/srfi/srfi-39-test.scm"
     "tests/liii/os-test.scm"))
 
+(define (goldfish-cmd)
+  (if (os-windows?)
+    "bin\\goldfish -l "
+    "bin/goldfish -l "))
+
 (let ((ret-l
        (map (lambda (x) (begin (newline) (display "> ") (display x) (newline) (os-call x)))
-         (map (lambda (x) (string-append "bin/goldfish -l " x))
+         (map (lambda (x) (string-append (goldfish-cmd) x))
            (all-tests)))))
   (when (find (lambda (x) (not (= x 0))) ret-l)
     (exit -1)))
