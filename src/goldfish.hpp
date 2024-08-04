@@ -129,7 +129,7 @@ f_os_type (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_LINUX
   return s7_make_string (sc, "Linux");
 #endif
-#ifdef TB_CONFIG_OS_MACOS
+#ifdef TB_CONFIG_OS_MACOSX
   return s7_make_string (sc, "Darwin");
 #endif
 #ifdef TB_CONFIG_OS_WINDOWS

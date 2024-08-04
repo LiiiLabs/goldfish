@@ -28,13 +28,16 @@
   (g_os-type))
 
 (define (os-windows?)
-  (string=? (os-type) "Windows"))
+  (let ((name (os-type)))
+    (and name (string=? name "Windows"))))
 
 (define (os-linux?)
-  (string=? (os-type) "Linux"))
+  (let ((name (os-type)))
+    (and name (string=? name "Linux"))))
 
 (define (os-macos?)
-  (string=? (os-type) "Darwin"))
+  (let ((name (os-type)))
+    (and name (string=? name "Darwin"))))
 
 ) ; end of begin
 ) ; end of define-library
