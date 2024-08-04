@@ -1,0 +1,39 @@
+name: Build on windows
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  windowsbuild:
+    runs-on: windows-2019
+    env:
+        # Force xmake to a specific folder (for cache)
+        XMAKE_GLOBALDIR: ${{ github.workspace }}/.xmake-global
+    steps:
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: v2.8.9
+      - name: update repo
+        run: xmake repo -u
+      - name: git crlf
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - name: cache xmake
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+            ${{ github.workspace }}/build/.build_cache
+          key: ${{ runner.os }}-xmake-${{ hashFiles('**/xmake.lua') }}
+      - name: config
+        run: xmake config --yes -vD
+      - name: build
+        run: xmake build --yes -vD goldfish
+      - name: test
+        run: bin/goldfish -l tests/test_all.scm

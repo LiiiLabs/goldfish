@@ -24,3 +24,5 @@
   =>
   3)
 
+(check-report)
+(if (check-failed?) (exit -1))

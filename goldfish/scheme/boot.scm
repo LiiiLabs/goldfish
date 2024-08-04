@@ -1,6 +1,11 @@
 ; 0-clause BSD
 ; Adapted from S7 Scheme's r7rs.scm
 
+(define (file-exists? path)
+  (if (string? path)
+    (g_file-exists? path)
+    (error 'wrong-type-arg "(file-exists? path): path should be string")))
+
 (define-macro (define-library libname . body) ; |(lib name)| -> environment
   `(define ,(symbol (object->string libname))
      (with-let (sublet (unlet)

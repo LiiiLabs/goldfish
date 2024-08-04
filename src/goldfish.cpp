@@ -29,6 +29,11 @@ using std::vector;
 using std::filesystem::exists;
 using std::filesystem::path;
 
+using goldfish::glue_goldfish;
+using goldfish::glue_liii_os;
+using goldfish::glue_scheme_process_context;
+using goldfish::glue_scheme_time;
+
 void
 display_help () {
   cout << "Goldfish Scheme " << goldfish_version << " by LiiiLabs" << endl;

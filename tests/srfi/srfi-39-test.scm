@@ -31,3 +31,5 @@
 
 (check (mp) => "initial value")
 
+(check-report)
+(if (check-failed?) (exit -1))

@@ -47,5 +47,5 @@ jobs:
         run: xmake build --yes -vD goldfish
 
       - name: run tests
-        run: find tests | grep "test.scm" | xargs -I% bin/goldfish %
+        run: bin/goldfish -l tests/test_all.scm
 
