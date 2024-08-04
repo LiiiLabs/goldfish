@@ -20,8 +20,19 @@
 
 (check-set-mode! 'report-failed)
 
-; (let ((t1 (current-second)))
-;   (os-call "sleep 10")
-;   (let ((t2 (current-second)))
-;     (check (floor (- t2 t1)) => 10)))
-;
+
+(when (os-linux?)
+  (check (os-type) => "Linux")
+
+  (let ((t1 (current-second)))
+    (os-call "sleep 3")
+    (let ((t2 (current-second)))
+      (check (> (ceiling (- t2 t1)) 3) => #t))))
+
+(when (os-macos?)
+  (check (os-type) => "Darwin"))
+
+(when (os-windows?)
+  (check (os-type) => "Windows"))
+
+(check-report)

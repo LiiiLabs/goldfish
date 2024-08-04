@@ -15,7 +15,7 @@
 ;
 
 (define-library (liii os)
-(export os-call)
+(export os-call os-arch os-type os-windows? os-linux? os-macos?)
 (begin
 
 (define (os-call command)
@@ -23,5 +23,18 @@
 
 (define (os-arch)
   (g_os-arch))
+
+(define (os-type)
+  (g_os-type))
+
+(define (os-windows?)
+  (string=? (os-type) "Windows"))
+
+(define (os-linux?)
+  (string=? (os-type) "Linux"))
+
+(define (os-macos?)
+  (string=? (os-type) "Darwin"))
+
 ) ; end of begin
 ) ; end of define-library

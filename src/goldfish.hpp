@@ -125,6 +125,20 @@ glue_scheme_process_context (s7_scheme* sc) {
 
 // Glue for (liii os)
 static s7_pointer
+f_os_type (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_LINUX
+  return s7_make_string (sc, "Linux");
+#endif
+#ifdef TB_CONFIG_OS_MACOS
+  return s7_make_string (sc, "Darwin");
+#endif
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_string (sc, "Windows");
+#endif
+  return s7_make_boolean (sc, false);
+}
+
+static s7_pointer
 f_os_arch (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, TB_ARCH_STRING);
 }
@@ -161,15 +175,21 @@ inline void
 glue_liii_os (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
 
-  const char* s_os_call= "g_os-call";
-  const char* d_os_call= "(g_os-call string) => int";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
-             s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
-                                     d_os_call, NULL));
+  const char* s_os_type= "g_os-type";
+  const char* d_os_type= "(g_os-type) => string";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
+             s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
+                                     d_os_type, NULL));
 
   const char* s_os_arch= "g_os-arch";
   const char* d_os_arch= "(g_os-arch) => string";
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
              s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
                                      d_os_arch, NULL));
+
+  const char* s_os_call= "g_os-call";
+  const char* d_os_call= "(g_os-call string) => int";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
+             s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
+                                     d_os_call, NULL));
 }
