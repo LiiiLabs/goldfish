@@ -15,7 +15,6 @@
 //
 
 #include "goldfish.hpp"
-#include "s7.h"
 
 #include <filesystem>
 #include <iostream>
@@ -95,9 +94,13 @@ main (int argc, char** argv) {
   s7_load (sc, gf_boot.string ().c_str ());
   s7_add_to_load_path (sc, gf_lib.string ().c_str ());
 
+  // Init tbox
+  if (!tb_init (tb_null, tb_null)) exit (-1);
+
   // Glues
   glue_goldfish (sc);
   glue_scheme_time (sc);
+  glue_scheme_process_context (sc);
 
   // Command options
   vector<string> args (argv + 1, argv + argc);
