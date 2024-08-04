@@ -165,7 +165,7 @@ f_os_call (s7_scheme* sc, s7_pointer args) {
   int ret;
 
 #if _MSC_VER
-  ret= (int) tb_process_run_cmd (cmd_c, &attr);
+  ret= (int) std::system (cmd_c);
 #else
   wordexp_t   p;
   ret= wordexp (cmd_c, &p, 0);
