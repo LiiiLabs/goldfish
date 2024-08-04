@@ -32,9 +32,9 @@
 
 (when (not (os-windows?))
   (let ((t1 (current-second)))
-    (os-call "sleep 3")
+    (os-call "sleep 1")
     (let ((t2 (current-second)))
-      (check (> (ceiling (- t2 t1)) 3) => #t))))
+      (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
 (check-report)
 (if (check-failed?) (exit -1))

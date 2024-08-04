@@ -32,3 +32,5 @@
 (check ((my-func) 3 4) => 7)
 (check ((my-func) 1 2 3 4) => 10)
 
+(check-report)
+(if (check-failed?) (exit -1))
