@@ -15,6 +15,7 @@
 //
 
 #include <chrono>
+#include <filesystem>
 #include <iostream>
 #include <s7.h>
 #include <string>
@@ -24,11 +25,6 @@
 #include <errno.h>
 #include <wordexp.h>
 #endif
-
-inline void glue_goldfish (s7_scheme* sc);
-inline void glue_scheme_time (s7_scheme* sc);
-inline void glue_scheme_process_context (s7_scheme* sc);
-inline void glue_liii_os (s7_scheme* sc);
 
 const int patch_version= 0;                // Goldfish Patch Version
 const int minor_version= S7_MAJOR_VERSION; // S7 Major Version
@@ -41,10 +37,22 @@ const std::string goldfish_version=
         .append (".")
         .append (std::to_string (patch_version));
 
+namespace goldfish {
+using std::filesystem::exists;
+using std::filesystem::path;
+
 // Glues for Goldfish
 static s7_pointer
 f_version (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, goldfish_version.c_str ());
+}
+
+static s7_pointer
+f_file_exists (s7_scheme* sc, s7_pointer args) {
+  const char* path_c= s7_string (s7_car (args));
+  auto        p     = path (path_c);
+  bool        ret   = exists (p);
+  return s7_make_boolean (sc, ret);
 }
 
 inline void
@@ -57,6 +65,12 @@ glue_goldfish (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_version),
              s7_make_typed_function (sc, s_version, f_version, 0, 0, false,
                                      d_version, NULL));
+
+  const char* s_file_exists= "g_file-exists?";
+  const char* d_file_exists= "(g_file-exists? string) => boolean";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_file_exists),
+             s7_make_typed_function (sc, s_file_exists, f_file_exists, 1, 0,
+                                     false, d_file_exists, NULL));
 }
 
 // Glues for (scheme time)
@@ -193,3 +207,5 @@ glue_liii_os (s7_scheme* sc) {
              s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
                                      d_os_call, NULL));
 }
+
+} // namespace goldfish
