@@ -52,7 +52,7 @@ jobs:
         with:
           path: |
             tmp/build/.build_cache
-          key: ${{ runner.os }}-build-qt6-${{ hashFiles('**/packages.lua') }}
+          key: ${{ runner.os }}-build-qt6-${{ hashFiles('**/xmake.lua') }}
 
       - name: config
         run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
