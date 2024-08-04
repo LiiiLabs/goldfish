@@ -21,5 +21,7 @@
 (define (os-call command)
   (g_os-call command))
 
+(define (os-arch)
+  (g_os-arch))
 ) ; end of begin
 ) ; end of define-library

@@ -125,6 +125,11 @@ glue_scheme_process_context (s7_scheme* sc) {
 
 // Glue for (liii os)
 static s7_pointer
+f_os_arch (s7_scheme* sc, s7_pointer args) {
+  return s7_make_string (sc, TB_ARCH_STRING);
+}
+
+static s7_pointer
 f_os_call (s7_scheme* sc, s7_pointer args) {
   const char*       cmd_c= s7_string (s7_car (args));
   tb_process_attr_t attr = {tb_null};
@@ -154,10 +159,17 @@ f_os_call (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_liii_os (s7_scheme* sc) {
-  s7_pointer  cur_env  = s7_curlet (sc);
+  s7_pointer cur_env= s7_curlet (sc);
+
   const char* s_os_call= "g_os-call";
   const char* d_os_call= "(g_os-call string) => int";
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
              s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
                                      d_os_call, NULL));
+
+  const char* s_os_arch= "g_os-arch";
+  const char* d_os_arch= "(g_os-arch) => string";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
+             s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
+                                     d_os_arch, NULL));
 }
