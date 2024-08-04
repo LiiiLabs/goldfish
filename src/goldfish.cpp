@@ -101,6 +101,7 @@ main (int argc, char** argv) {
   glue_goldfish (sc);
   glue_scheme_time (sc);
   glue_scheme_process_context (sc);
+  glue_liii_os (sc);
 
   // Command options
   vector<string> args (argv + 1, argv + argc);
