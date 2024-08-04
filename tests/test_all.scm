@@ -41,11 +41,11 @@
 
 (define (goldfish-cmd)
   (if (os-windows?)
-    "bin\\goldfish -l "
-    "bin/goldfish -l "))
+    "bin\\goldfish "
+    "bin/goldfish "))
 
 (let ((ret-l
-       (map (lambda (x) (begin (newline) (display "> ") (display x) (newline) (os-call x)))
+       (map (lambda (x) (os-call x))
          (map (lambda (x) (string-append (goldfish-cmd) x))
            (all-tests)))))
   (when (find (lambda (x) (not (= x 0))) ret-l)
