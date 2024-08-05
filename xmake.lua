@@ -15,7 +15,7 @@ local S7_VERSION = "20240702"
 add_requires("s7 "..S7_VERSION, {system=false})
 
 local TBOX_VERSION = "1.7.5"
-tbox_configs = {["force-utf8"]=true}
+tbox_configs = {hash=true, ["force-utf8"]=true}
 add_requires("tbox " .. TBOX_VERSION, {system=false, configs=tbox_configs})
 
 target ("goldfish") do
