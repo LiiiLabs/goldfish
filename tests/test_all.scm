@@ -24,6 +24,14 @@
   (check (file-exists? "/tmp") => #t)
   (check (file-exists? "/not_exists") => #f))
 
+(when (os-linux?)
+  (check (file-exists? "/root") => #t)
+  (check
+    (catch 'read-error
+      (lambda () (file-exists? "/root/.bashrc"))
+      (lambda args #t))
+    => #t))
+
 (when (os-windows?)
   (check (file-exists? "C:") => #t))
 

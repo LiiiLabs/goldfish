@@ -39,6 +39,7 @@ const std::string goldfish_version=
 
 namespace goldfish {
 using std::filesystem::exists;
+using std::filesystem::filesystem_error;
 using std::filesystem::path;
 
 // Glues for Goldfish
@@ -51,7 +52,13 @@ static s7_pointer
 f_file_exists (s7_scheme* sc, s7_pointer args) {
   const char* path_c= s7_string (s7_car (args));
   auto        p     = path (path_c);
-  bool        ret   = exists (p);
+  bool        ret   = false;
+  try {
+    ret= exists (p);
+  } catch (filesystem_error const& ex) {
+    return s7_error (sc, s7_make_symbol (sc, "read-error"),
+                     s7_make_string (sc, ex.what ()));
+  }
   return s7_make_boolean (sc, ret);
 }
 
