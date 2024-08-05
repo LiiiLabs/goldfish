@@ -123,6 +123,6 @@ Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Sch
 Scheme is `17.10.0`, it means that it is using the `C++ 17` standard, based on `S7 Scheme 10.x`, the patch version is `0`.
 
 ## License
-Goldfish Scheme is licensed under Apache 2.0, for some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicited claimed in the related source files.
+Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicited claimed in the related source files.
 
 

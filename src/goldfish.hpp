@@ -26,7 +26,7 @@
 #include <wordexp.h>
 #endif
 
-const int patch_version= 0;                // Goldfish Patch Version
+const int patch_version= 1;                // Goldfish Patch Version
 const int minor_version= S7_MAJOR_VERSION; // S7 Major Version
 const int major_version= 17;               // C++ Standard version
 
