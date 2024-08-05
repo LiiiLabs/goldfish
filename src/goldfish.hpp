@@ -236,4 +236,21 @@ glue_liii_os (s7_scheme* sc) {
                                      d_os_call, NULL));
 }
 
+static s7_pointer
+f_uuid4 (s7_scheme* sc, s7_pointer args) {
+  tb_char_t        uuid[37];
+  const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
+  return s7_make_string (sc, ret);
+}
+
+inline void
+glue_liii_uuid (s7_scheme* sc) {
+  s7_pointer  cur_env= s7_curlet (sc);
+  const char* s_uuid4= "g_uuid4";
+  const char* d_uuid4= "(g_uuid4) => string";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
+             s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
+                                     NULL));
+}
+
 } // namespace goldfish

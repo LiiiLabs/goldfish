@@ -31,6 +31,7 @@ using std::filesystem::path;
 
 using goldfish::glue_goldfish;
 using goldfish::glue_liii_os;
+using goldfish::glue_liii_uuid;
 using goldfish::glue_scheme_process_context;
 using goldfish::glue_scheme_time;
 
@@ -107,6 +108,7 @@ main (int argc, char** argv) {
   glue_scheme_time (sc);
   glue_scheme_process_context (sc);
   glue_liii_os (sc);
+  glue_liii_uuid (sc);
 
   // Command options
   vector<string> args (argv + 1, argv + argc);
