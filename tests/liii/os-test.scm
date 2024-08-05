@@ -36,5 +36,11 @@
     (let ((t2 (current-second)))
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
+(when (os-windows?)
+  (check (os-temp-dir) => "C:\\Windows\\TEMP\\"))
+
+(when (os-linux?)
+  (check (os-temp-dir) => "/tmp"))
+
 (check-report)
 (if (check-failed?) (exit -1))

@@ -42,6 +42,7 @@ using std::filesystem::exists;
 using std::filesystem::filesystem_error;
 using std::filesystem::path;
 using std::filesystem::remove;
+using std::filesystem::temp_directory_path;
 
 // Glues for Goldfish
 static s7_pointer
@@ -213,27 +214,38 @@ f_os_call (s7_scheme* sc, s7_pointer args) {
   return s7_make_integer (sc, ret);
 }
 
+static s7_pointer
+f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
+  auto        temp_dir_path= temp_directory_path ().string ();
+  const char* temp_dir     = temp_dir_path.c_str ();
+  return s7_make_string (sc, temp_dir);
+}
+
 inline void
 glue_liii_os (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
 
-  const char* s_os_type= "g_os-type";
-  const char* d_os_type= "(g_os-type) => string";
+  const char* s_os_type    = "g_os-type";
+  const char* d_os_type    = "(g_os-type) => string";
+  const char* s_os_arch    = "g_os-arch";
+  const char* d_os_arch    = "(g_os-arch) => string";
+  const char* s_os_call    = "g_os-call";
+  const char* d_os_call    = "(g_os-call string) => int";
+  const char* s_os_temp_dir= "g_os-temp-dir";
+  const char* d_os_temp_dir= "(g_os-temp-dir) => string";
+
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
              s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
                                      d_os_type, NULL));
-
-  const char* s_os_arch= "g_os-arch";
-  const char* d_os_arch= "(g_os-arch) => string";
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
              s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
                                      d_os_arch, NULL));
-
-  const char* s_os_call= "g_os-call";
-  const char* d_os_call= "(g_os-call string) => int";
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
              s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
                                      d_os_call, NULL));
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_temp_dir),
+             s7_make_typed_function (sc, s_os_temp_dir, f_os_temp_dir, 0, 0,
+                                     false, d_os_call, NULL));
 }
 
 static s7_pointer
