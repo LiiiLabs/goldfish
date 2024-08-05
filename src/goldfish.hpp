@@ -41,6 +41,7 @@ namespace goldfish {
 using std::filesystem::exists;
 using std::filesystem::filesystem_error;
 using std::filesystem::path;
+using std::filesystem::remove;
 
 // Glues for Goldfish
 static s7_pointer
@@ -62,22 +63,42 @@ f_file_exists (s7_scheme* sc, s7_pointer args) {
   return s7_make_boolean (sc, ret);
 }
 
+static s7_pointer
+f_delete_file (s7_scheme* sc, s7_pointer args) {
+  const char* path_c= s7_string (s7_car (args));
+  auto        p     = path (path_c);
+  try {
+    remove (p);
+  } catch (filesystem_error const& ex) {
+    return s7_error (sc, s7_make_symbol (sc, "io-error"),
+                     s7_make_string (sc, ex.what ()));
+  }
+
+  return s7_make_boolean (sc, s7_make_symbol (sc, "<#unspecified>"));
+}
+
 inline void
 glue_goldfish (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
 
-  const char* s_version= "version";
-  const char* d_version= "(version) => string, return the "
-                         "goldfish version";
+  const char* s_version    = "version";
+  const char* d_version    = "(version) => string";
+  const char* s_file_exists= "g_file-exists?";
+  const char* d_file_exists= "(g_file-exists? string) => boolean";
+  const char* s_delete_file= "g_delete-file";
+  const char* d_delete_file= "(g_delete-file string) => <#unspecified>";
+
   s7_define (sc, cur_env, s7_make_symbol (sc, s_version),
              s7_make_typed_function (sc, s_version, f_version, 0, 0, false,
                                      d_version, NULL));
 
-  const char* s_file_exists= "g_file-exists?";
-  const char* d_file_exists= "(g_file-exists? string) => boolean";
   s7_define (sc, cur_env, s7_make_symbol (sc, s_file_exists),
              s7_make_typed_function (sc, s_file_exists, f_file_exists, 1, 0,
                                      false, d_file_exists, NULL));
+
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_delete_file),
+             s7_make_typed_function (sc, s_delete_file, f_delete_file, 1, 0,
+                                     false, d_delete_file, NULL));
 }
 
 // Glues for (scheme time)

@@ -14,31 +14,12 @@
 ; under the License.
 ;
 
-(import (srfi srfi-78)
-        (srfi srfi-1)
-        (liii os))
-
-(check-set-mode! 'report-failed)
-
-(when (not (os-windows?))
-  (check (file-exists? "/tmp") => #t)
-  (check (file-exists? "/not_exists") => #f))
-
-(when (os-linux?)
-  (check (file-exists? "/root") => #t)
-  (check
-    (catch 'read-error
-      (lambda () (file-exists? "/root/.bashrc"))
-      (lambda args #t))
-    => #t))
-
-(when (os-windows?)
-  (check (file-exists? "C:") => #t))
-
-(check-report)
+(import (liii os)
+        (srfi srfi-1))
 
 (define (all-tests)
   (list
+    "tests/scheme/boot-test.scm"
     "tests/scheme/case-lambda-test.scm"
     "tests/scheme/process-context-test.scm"
     "tests/srfi/srfi-8-test.scm"
