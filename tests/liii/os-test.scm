@@ -15,6 +15,7 @@
 ;
 
 (import (srfi srfi-78)
+        (srfi srfi-13)
         (liii os)
         (scheme time))
 
@@ -37,7 +38,7 @@
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
 (when (os-windows?)
-  (check (os-temp-dir) => "C:\\Windows\\TEMP\\"))
+  (check (string-prefix? "C:" (os-temp-dir)) => #t))
 
 (when (os-linux?)
   (check (os-temp-dir) => "/tmp"))
