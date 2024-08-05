@@ -26,7 +26,8 @@
     "tests/srfi/srfi-9-test.scm"
     "tests/srfi/srfi-16-test.scm"
     "tests/srfi/srfi-39-test.scm"
-    "tests/liii/os-test.scm"))
+    "tests/liii/os-test.scm"
+    "tests/liii/uuid-test.scm"))
 
 (define (goldfish-cmd)
   (if (os-windows?)
