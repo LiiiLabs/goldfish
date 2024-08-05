@@ -15,7 +15,7 @@
 ;
 
 (define-library (liii os)
-(export os-call os-arch os-type os-windows? os-linux? os-macos?)
+(export os-call os-arch os-type os-windows? os-linux? os-macos? os-temp-dir)
 (begin
 
 (define (os-call command)
@@ -38,6 +38,9 @@
 (define (os-macos?)
   (let ((name (os-type)))
     (and name (string=? name "Darwin"))))
+
+(define (os-temp-dir)
+  (g_os-temp-dir))
 
 ) ; end of begin
 ) ; end of define-library

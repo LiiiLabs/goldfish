@@ -15,6 +15,7 @@
 ;
 
 (import (srfi srfi-78)
+        (srfi srfi-13)
         (liii os)
         (scheme time))
 
@@ -35,6 +36,12 @@
     (os-call "sleep 1")
     (let ((t2 (current-second)))
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
+
+(when (os-windows?)
+  (check (string-prefix? "C:" (os-temp-dir)) => #t))
+
+(when (os-linux?)
+  (check (os-temp-dir) => "/tmp"))
 
 (check-report)
 (if (check-failed?) (exit -1))
