@@ -1,0 +1,48 @@
+version: '1.0'
+name: ci-debian
+displayName: ci-debian
+triggers:
+  trigger: auto
+  pr:
+    branches:
+      precise:
+        - main
+  push:
+    branches:
+      precise:
+        - main
+
+variables:
+  XMAKE_MAIN_REPO: 'https://gitee.com/tboox/xmake-repo.git'
+  XMAKE_BINARY_REPO: 'https://gitee.com/xmake-mirror/build-artifacts.git'
+  XMAKE_ROOT: y
+
+
+stages:
+  - name: build_and_test
+    displayName: build_and_test
+    strategy: fast
+    trigger: auto
+    executor: []
+    steps:
+      - step: execute@docker
+        name: execute_by_docker
+        displayName: 构建并测试金鱼Scheme
+        certificate: ''
+        image: hub.atomgit.com/amd64/debian:bookworm
+        command:
+          - bash .workflow/ustc_debian822_setup.sh
+          - apt-get update
+          - apt-get install -y xmake git 7zip unzip curl build-essential
+          - xmake repo --update
+          - sed -i '/github\.com/d' xmake/packages/s/s7/xmake.lua
+          - sed -i '/github\.com/d' xmake/packages/t/tbox/xmake.lua
+          - xmake build --yes -vD goldfish
+          - bin/goldfish -l tests/test_all.scm
+        caches: [
+          build/.build_cache,
+        ]
+        notify: []
+        strategy:
+          retry: '0'
+          stepTimeout: 15
