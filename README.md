@@ -88,6 +88,9 @@ based on S7 Scheme 10.11 (2-July-2024)
 3
 > bin/goldfish -e "(begin (import (srfi srfi-1)) (first (list 1 2 3)))"
 1
+> bin/goldfish -e "(begin (import (liii sys)) (display (argv)) (newline))" 1 2 3
+("bin/goldfish" "-e" "(begin (import (liii sys)) (display (argv)) (newline))" "1" "2" 3)
+#\newline
 ```
 
 `-l` helps you load the FILE:
@@ -100,7 +103,8 @@ based on S7 Scheme 10.11 (2-July-2024)
 ; (list)
 
 > bin/goldfish -l tests/demo_no_error.scm
->
+> bin/goldfish -l tests/demo_argv.scm 1 2 3
+("bin/goldfish" "tests/demo_argv.scm" "1" "2" "3")
 ```
 
 If no options provided, it will load the FILE and print the eval result:
@@ -115,6 +119,9 @@ tests/demo_no_error.scm => 3
 ; (list)
 
 tests/demo_error.scm => wrong-type-arg
+> bin/goldfish tests/demo_argv.scm 1 2 3
+("bin/goldfish" "tests/demo_argv.scm" "1" "2" "3")
+tests/demo_argv.scm => #\newline
 ```
 Notice, the FILE and the eval result are separated by ` => `.
 
