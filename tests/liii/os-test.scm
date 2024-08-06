@@ -43,5 +43,9 @@
 (when (os-linux?)
   (check (os-temp-dir) => "/tmp"))
 
+(when (not (os-windows?))
+  (check (mkdir "/tmp") => #f)
+  (check (mkdir "/tmp/test_124") => #t))
+
 (check-report)
 (if (check-failed?) (exit -1))
