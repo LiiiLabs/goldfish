@@ -1,18 +1,38 @@
 # Goldfish Scheme
 Goldfish Scheme is a Scheme interpreter with the following features:
 + R7RS-small compatible
-+ SRFI provided
++ Python-like standard library
 + Small and fast
 
-## Why we created Goldfish Scheme
-Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://ccrma.stanford.edu/software/s7/):
-1. Distribute the ready-to-use Goldfish Scheme interpreter and structured REPL on Linux/macOS/Windows
-2. Try to implement the [R7RS-small](https://small.r7rs.org) standard
-3. Try to provide the useful SRFI in R7RS library format
 
-The implementation of Goldfish aims to follow the rules of simplicity. Currently, Goldfish Scheme only depends on S7 Scheme, tbox and C++ 17 standard library.
+## Standard Library
+### Python-like standard library
 
-Just like S7 Scheme, [`src/goldfish.hpp`](src/goldfish.hpp) and [`src/goldfish.cpp`](src/goldfish.cpp) are the only key source code needed to build the goldfish interpreter binary.
+| Library | Description | Example functions |
+|---|---|---|
+| [(liii os)](goldfish/liii/os.scm) | Library looks like Python os module | `getenv`, `mkdir` |
+| [(liii uuid)](goldfish/liii/uuid.scm) | UUID generation | `uuid4` |
+| [(liii sys)](goldfish/liii/sys.scm) | Library looks like Python sys module | `argv` |
+
+### SRFI
+
+| Library | Status | Description  |
+|------|------|-------|
+| `(srfi srfi-1)`   | Part | List Library |
+| `(srfi srfi-8)`   | Complete | Provide `receive` |
+| `(srfi srfi-9)`   | Complete | Provide `define-record-type` |
+| `(srfi srfi-13)`  | Complete | String Library | 
+| `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
+| `(srfi srfi-39)`  | Complete | Parameter objects |
+| `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
+
+### R7RS Standard Libraries
+| Library | Description | 
+|-----|-------|
+| `(scheme base)` | Base library |
+| `(scheme case-lambda)` | Provide `case-lambda` |
+| `(scheme file)` | File operations |
+| `(scheme time)` | Time library |
 
 
 ## Installation
@@ -98,29 +118,20 @@ tests/demo_error.scm => wrong-type-arg
 ```
 Notice, the FILE and the eval result are separated by ` => `.
 
-## R7RS Standard Libraries
-| Library | Description | 
-|-----|-------|
-| `(scheme base)` | Base library |
-| `(scheme case-lambda)` | Provide `case-lambda` |
-| `(scheme file)` | File operations |
-| `(scheme time)` | Time library |
-
-## SRFI
-
-| Library | Status | Description  |
-|------|------|-------|
-| `(srfi srfi-1)`   | Part | List Library |
-| `(srfi srfi-8)`   | Complete | Provide `receive` |
-| `(srfi srfi-9)`   | Complete | Provide `define-record-type` |
-| `(srfi srfi-13)`  | Complete | String Library | 
-| `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
-| `(srfi srfi-39)`  | Complete | Parameter objects |
-| `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
 
 ## Versioning
 Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Scheme y, and z is the patch version. To clarify, the first version of Goldfish
 Scheme is `17.10.0`, it means that it is using the `C++ 17` standard, based on `S7 Scheme 10.x`, the patch version is `0`.
+
+## Why we created Goldfish Scheme
+Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://ccrma.stanford.edu/software/s7/):
+1. Distribute the ready-to-use Goldfish Scheme interpreter and structured REPL on Linux/macOS/Windows
+2. Try to implement the [R7RS-small](https://small.r7rs.org) standard
+3. Try to provide the useful SRFI in R7RS library format
+
+The implementation of Goldfish aims to follow the rules of simplicity. Currently, Goldfish Scheme only depends on S7 Scheme, tbox and C++ 17 standard library.
+
+Just like S7 Scheme, [`src/goldfish.hpp`](src/goldfish.hpp) and [`src/goldfish.cpp`](src/goldfish.cpp) are the only key source code needed to build the goldfish interpreter binary.
 
 ## License
 Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicited claimed in the related source files.
