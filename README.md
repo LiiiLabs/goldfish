@@ -4,6 +4,11 @@ Goldfish Scheme is a Scheme interpreter with the following features:
 + Python-like standard library
 + Small and fast
 
+## Simplicity is Beauty
+Goldfish Scheme still follows the same principle of simplicity as S7 Scheme. Currently, Goldfish Scheme only depends on [S7 Scheme](https://ccrma.stanford.edu/software/s7/), [tbox](https://gitee.com/tboox/tbox) and C++ 17 standard library.
+
+Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp](src/goldfish.cpp) are the only key source code needed to build the goldfish interpreter binary.
+
 
 ## Standard Library
 ### Python-like standard library
@@ -135,10 +140,6 @@ Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://cc
 1. Distribute the ready-to-use Goldfish Scheme interpreter and structured REPL on Linux/macOS/Windows
 2. Try to implement the [R7RS-small](https://small.r7rs.org) standard
 3. Try to provide the useful SRFI in R7RS library format
-
-The implementation of Goldfish aims to follow the rules of simplicity. Currently, Goldfish Scheme only depends on S7 Scheme, tbox and C++ 17 standard library.
-
-Just like S7 Scheme, [`src/goldfish.hpp`](src/goldfish.hpp) and [`src/goldfish.cpp`](src/goldfish.cpp) are the only key source code needed to build the goldfish interpreter binary.
 
 ## License
 Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicited claimed in the related source files.
