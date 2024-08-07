@@ -11,12 +11,22 @@ set_project("Goldfish Scheme")
 -- repo
 add_repositories("goldfish-repo xmake")
 
+option("tbox")
+    set_description("Use tbox installed via apt")
+    set_default(false)
+    set_values(false, true)
+option_end()
+
 local S7_VERSION = "20240702"
 add_requires("s7 "..S7_VERSION, {system=false})
 
 local TBOX_VERSION = "1.7.5"
-tbox_configs = {hash=true, ["force-utf8"]=true}
-add_requires("tbox " .. TBOX_VERSION, {system=false, configs=tbox_configs})
+if has_config("tbox") then
+    add_requires("apt::libtbox-dev", {alias="tbox"})
+else
+    tbox_configs = {hash=true, ["force-utf8"]=true}
+    add_requires("tbox " .. TBOX_VERSION, {system=false, configs=tbox_configs})
+end
 
 target ("goldfish") do
     set_languages("c++17")

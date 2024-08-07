@@ -50,7 +50,7 @@ The following guide will help you build and install Goldfish step by step.
 ### GNU/Linux
 Here are commandlines to build it on Debian bookworm:
 ```
-sudo apt install xmake git unzip curl build-essential
+sudo apt install xmake git unzip curl g++
 git clone https://gitee.com/LiiiLabs/goldfish.git
 # git clone https://github.com/LiiiLabs/goldfish.git
 cd goldfish

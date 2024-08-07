@@ -47,7 +47,7 @@
 以下是在 Debian bookworm 上构建的命令行指南：
 
 ```bash
-sudo apt install xmake git unzip curl build-essential
+sudo apt install xmake git unzip curl g++
 git clone https://gitee.com/LiiiLabs/goldfish.git
 # git clone https://github.com/LiiiLabs/goldfish.git
 cd goldfish

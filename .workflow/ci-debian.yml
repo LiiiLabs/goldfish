@@ -14,6 +14,7 @@ triggers:
         - src/
         - xmake/packages/
         - xmake.lua
+        - .workflow/
   pr:
     branches:
       precise:
@@ -25,6 +26,7 @@ triggers:
         - src/
         - xmake/packages/
         - xmake.lua
+        - .workflow/
 variables:
   XMAKE_MAIN_REPO: https://gitee.com/tboox/xmake-repo.git
   XMAKE_BINARY_REPO: https://gitee.com/xmake-mirror/build-artifacts.git
@@ -45,9 +47,11 @@ stages:
           - bash .workflow/ustc_debian822_setup.sh
           - apt-get update
           - apt-get install -y xmake git 7zip unzip curl g++
+          - apt install -y -t bookworm-backports libtbox-dev
           - xmake repo --update
           - sed -i '/github\.com/d' xmake/packages/s/s7/xmake.lua
           - sed -i '/github\.com/d' xmake/packages/t/tbox/xmake.lua
+          - xmake config --tbox=y --yes -vD
           - xmake build --yes -vD goldfish
           - bin/goldfish -l tests/test_all.scm
         notify: []
