@@ -48,10 +48,10 @@
 
 (define (%check-dir-andthen path f)
   (cond ((not (file-exists? path))
-         (error-file-not-found
+         (file-not-found-error
            (string-append "No such file or directory: '" path "'")))
         ((not (isdir path))
-         (error-not-a-directory
+         (not-a-directory-error
            (string-append "Not a directory: '" path "'")))
         (else (f path))))
 
@@ -60,7 +60,7 @@
 
 (define (mkdir path)
   (if (file-exists? path)
-    (error-file-exists (string-append "File exists: '" path "'"))
+    (file-exists-error (string-append "File exists: '" path "'"))
     (g_mkdir path)))
 
 (define (rmdir path)

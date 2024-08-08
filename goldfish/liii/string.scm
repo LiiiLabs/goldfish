@@ -14,16 +14,22 @@
 ; under the License.
 ;
 
-(import (srfi srfi-78)
-        (scheme process-context)
-        (srfi srfi-13)
-        (liii os))
-
-(check-set-mode! 'report-failed)
-
-; (check (get-environment-variable "USER") => "da")
-(when (os-linux?)
-  (check (string-prefix? "/home" (get-environment-variable "HOME"))
-         => #t))
-
-(check-report)
+(define-library (liii string)
+(export
+  string-null? string-copy string-join
+  string-every string-any
+  string-take string-take-right string-drop string-drop-right
+  string-pad string-pad-right
+  string-trim string-trim-right string-trim-both
+  string-prefix? string-suffix?
+  string-index string-index-right
+  string-contains string-count
+  string-reverse
+  string-tokenize
+)
+(import (srfi srfi-13)
+        (srfi srfi-1)
+        (liii error))
+(begin
+) ; end of begin
+) ; end of library

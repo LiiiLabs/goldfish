@@ -14,16 +14,10 @@
 ; under the License.
 ;
 
-(import (srfi srfi-78)
-        (scheme process-context)
-        (srfi srfi-13)
-        (liii os))
+(import (liii check)
+        (liii error))
 
-(check-set-mode! 'report-failed)
-
-; (check (get-environment-variable "USER") => "da")
-(when (os-linux?)
-  (check (string-prefix? "/home" (get-environment-variable "HOME"))
-         => #t))
+(check (mk-string " " (list 1 2 3)) => "1 2 3")
+(check (mk-string " " (list )) => "")
 
 (check-report)

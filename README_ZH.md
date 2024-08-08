@@ -20,7 +20,7 @@
 | [(liii os)](goldfish/liii/os.scm) | 库类似于 Python 的 `os` 模块 | `getenv`, `mkdir` |
 | [(liii uuid)](goldfish/liii/uuid.scm) | UUID 生成 | `uuid4` |
 | [(liii sys)](goldfish/liii/sys.scm) | 库类似于 Python 的 `sys` 模块 | `argv` |
-| [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `error-os`函数抛出`'os-error`，类似Python的OSError |
+| [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `os-error`函数抛出`'os-error`，类似Python的OSError |
 | [(liii check)](goldfish/liii/check.scm) | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch` | 
 
 ### SRFI
