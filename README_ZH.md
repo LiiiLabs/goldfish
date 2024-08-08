@@ -1,4 +1,6 @@
 # 金鱼Scheme
+> 让Scheme和Python一样易用且实用！
+
 金鱼Scheme 是一个 Scheme 解释器，具有以下特性：
 + 兼容 R7RS-small 标准
 + 提供类似 Python 的标准库

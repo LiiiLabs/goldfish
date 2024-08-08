@@ -1,4 +1,6 @@
 # Goldfish Scheme
+> Make Scheme as easy to use and practical as Python!
+
 Goldfish Scheme is a Scheme interpreter with the following features:
 + R7RS-small compatible
 + Python-like standard library
