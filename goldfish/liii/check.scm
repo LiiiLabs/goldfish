@@ -14,23 +14,18 @@
 ; under the License.
 ;
 
-(define-library (liii error)
-(export error-file-not-found error-os error-not-a-directory
-  error-file-exists)
-(import (scheme process-context))
+(define-library (liii check)
+(export check check-set-mode! check:proc
+  check-catch check-report check-failed?)
+(import (srfi srfi-78))
 (begin
 
-(define (error-file-not-found msg)
-  (error 'file-not-found-error msg))
+(define (check-catch error-id thunk)
+  (check
+    (catch error-id
+      (lambda () (thunk))
+      (lambda args error-id))
+    => error-id))
 
-(define (error-os msg)
-  (error 'os-error msg))
-
-(define (error-not-a-directory msg)
-  (error 'not-a-directory-error msg))
-
-(define (error-file-exists msg)
-  (error 'file-exists-error msg))
-
-) ; begin
-) ; define-library
+) ; end of begin
+) ; end of define-library

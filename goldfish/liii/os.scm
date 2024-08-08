@@ -46,29 +46,34 @@
 (define (os-temp-dir)
   (g_os-temp-dir))
 
+(define (%check-dir-andthen path f)
+  (cond ((not (file-exists? path))
+         (error-file-not-found
+           (string-append "No such file or directory: '" path "'")))
+        ((not (isdir path))
+         (error-not-a-directory
+           (string-append "Not a directory: '" path "'")))
+        (else (f path))))
+
 (define (isdir path)
   (g_isdir path))
 
 (define (mkdir path)
-  (g_mkdir path))
+  (if (file-exists? path)
+    (error-file-exists (string-append "File exists: '" path "'"))
+    (g_mkdir path)))
 
 (define (rmdir path)
-  (cond ((not (file-exists? path))
-         (error-file-not-found (string-append "No such file or directory: '" path "'")))
-        ((not (isdir path))
-         (error-not-a-directory (string-append "Not a directory: '" path "'")))
-        (else (delete-file path))))
+  (%check-dir-andthen path delete-file))
+
+(define (listdir path)
+  (%check-dir-andthen path g_listdir))
 
 (define (getenv key)
   (get-environment-variable key))
 
 (define (getcwd)
   (g_getcwd))
-
-(define (listdir dir)
-  (if (file-exists? dir)
-      (g_listdir dir)
-      (error error-file-not-found (string-append dir " does not exist"))))
 
 ) ; end of begin
 ) ; end of define-library

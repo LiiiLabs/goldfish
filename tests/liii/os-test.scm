@@ -14,7 +14,7 @@
 ; under the License.
 ;
 
-(import (srfi srfi-78)
+(import (liii check)
         (srfi srfi-13)
         (liii os)
         (scheme time))
@@ -46,7 +46,8 @@
 (check (isdir (os-temp-dir)) => #t)
 
 (when (not (os-windows?))
-  (check (mkdir "/tmp") => #f)
+  (check-catch 'file-exists-error
+    (lambda () (mkdir "/tmp")))
   (check (begin
            (let ((test_dir "/tmp/test_124"))
              (when (file-exists? test_dir)
