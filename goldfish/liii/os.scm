@@ -17,7 +17,7 @@
 (define-library (liii os)
 (export
   os-call os-arch os-type os-windows? os-linux? os-macos? os-temp-dir
-  mkdir getenv getcwd)
+  mkdir getenv getcwd listdir)
 (import (scheme process-context))
 (begin
 
@@ -53,6 +53,11 @@
 
 (define (getcwd)
   (g_getcwd))
+
+(define (listdir dir)
+  (if (file-exists? dir)
+      (g_listdir dir)
+      (error 'io-error (string-append dir " does not exist"))))
 
 ) ; end of begin
 ) ; end of define-library

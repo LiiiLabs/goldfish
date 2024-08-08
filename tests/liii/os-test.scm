@@ -49,5 +49,7 @@
 
 (check (string-null? (getcwd)) => #f)
 
+(check (> (vector-length (listdir (os-temp-dir))) 0) => #t)
+
 (check-report)
 (if (check-failed?) (exit -1))

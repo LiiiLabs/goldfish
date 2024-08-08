@@ -48,6 +48,18 @@ using std::filesystem::filesystem_error;
 using std::filesystem::path;
 using std::filesystem::remove;
 using std::filesystem::temp_directory_path;
+using std::filesystem::directory_iterator;
+using std::vector;
+using std::string;
+
+inline s7_pointer string_vector_to_s7_vector (s7_scheme* sc, vector<string> v) {
+  int N= v.size();
+  s7_pointer ret= s7_make_vector(sc, N);
+  for (int i=0; i<N; i++) {
+    s7_vector_set (sc, ret, i, s7_make_string (sc, v[i].c_str()));
+  }
+  return ret;
+}
 
 // Glues for Goldfish
 static s7_pointer
@@ -263,6 +275,18 @@ f_getcwd (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, cwd.string ().c_str ());
 }
 
+static s7_pointer
+f_listdir (s7_scheme* sc, s7_pointer args) {
+  const char* path_c= s7_string (s7_car (args));
+  path path(path_c);
+  vector<string> entries;
+  s7_pointer ret= s7_make_vector(sc, 0);
+  for (const auto& entry : std::filesystem::directory_iterator(path)) {
+      entries.push_back(entry.path().filename().string());
+  }
+  return string_vector_to_s7_vector (sc, entries);
+}
+
 inline void
 glue_liii_os (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
@@ -279,6 +303,8 @@ glue_liii_os (s7_scheme* sc) {
   const char* d_mkdir      = "(g_mkdir string) => boolean";
   const char* s_getcwd     = "g_getcwd";
   const char* d_getcwd     = "(g_getcwd) => string";
+  const char* s_listdir    = "g_listdir";
+  const char* d_listdir    = "(g_listdir) => vector";
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
              s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
@@ -298,6 +324,8 @@ glue_liii_os (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_getcwd),
              s7_make_typed_function (sc, s_getcwd, f_getcwd, 0, 0, false,
                                      d_getcwd, NULL));
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_listdir),
+             s7_make_typed_function (sc, s_listdir, f_listdir, 1, 0, false, d_listdir, NULL));
 }
 
 static s7_pointer
