@@ -14,7 +14,7 @@
 ; under the License.
 ;
 
-(import (srfi srfi-78)
+(import (liii check)
         (srfi srfi-13)
         (liii os)
         (scheme time))
@@ -43,11 +43,25 @@
 (when (os-linux?)
   (check (os-temp-dir) => "/tmp"))
 
+(check (isdir (os-temp-dir)) => #t)
+
 (when (not (os-windows?))
-  (check (mkdir "/tmp") => #f)
-  (check (mkdir "/tmp/test_124") => #t))
+  (check-catch 'file-exists-error
+    (lambda () (mkdir "/tmp")))
+  (check (begin
+           (let ((test_dir "/tmp/test_124"))
+             (when (file-exists? test_dir)
+               (rmdir "/tmp/test_124"))
+             (mkdir "/tmp/test_124")))
+    => #t))
 
 (check (string-null? (getcwd)) => #f)
+
+(when (not (os-windows?))
+  (check (> (vector-length (listdir "/usr")) 0) => #t))
+
+(when (os-windows?)
+  (check (> (vector-length (listdir "C:")) 0) => #t))
 
 (check-report)
 (if (check-failed?) (exit -1))
