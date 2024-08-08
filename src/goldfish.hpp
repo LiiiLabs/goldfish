@@ -42,6 +42,7 @@ const std::string goldfish_version=
 
 namespace goldfish {
 using std::filesystem::create_directory;
+using std::filesystem::current_path;
 using std::filesystem::exists;
 using std::filesystem::filesystem_error;
 using std::filesystem::path;
@@ -256,6 +257,12 @@ f_mkdir (s7_scheme* sc, s7_pointer args) {
   return s7_make_boolean (sc, ret);
 }
 
+static s7_pointer
+f_getcwd (s7_scheme* sc, s7_pointer args) {
+  path cwd= current_path ();
+  return s7_make_string (sc, cwd.string ().c_str ());
+}
+
 inline void
 glue_liii_os (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
@@ -270,6 +277,8 @@ glue_liii_os (s7_scheme* sc) {
   const char* d_os_temp_dir= "(g_os-temp-dir) => string";
   const char* s_mkdir      = "g_mkdir";
   const char* d_mkdir      = "(g_mkdir string) => boolean";
+  const char* s_getcwd     = "g_getcwd";
+  const char* d_getcwd     = "(g_getcwd) => string";
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
              s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
@@ -286,6 +295,9 @@ glue_liii_os (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_mkdir),
              s7_make_typed_function (sc, s_mkdir, f_mkdir, 1, 0, false, d_mkdir,
                                      NULL));
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_getcwd),
+             s7_make_typed_function (sc, s_getcwd, f_getcwd, 0, 0, false,
+                                     d_getcwd, NULL));
 }
 
 static s7_pointer

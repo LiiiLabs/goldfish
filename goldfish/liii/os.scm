@@ -17,7 +17,7 @@
 (define-library (liii os)
 (export
   os-call os-arch os-type os-windows? os-linux? os-macos? os-temp-dir
-  mkdir getenv)
+  mkdir getenv getcwd)
 (import (scheme process-context))
 (begin
 
@@ -50,6 +50,9 @@
 
 (define (getenv key)
   (get-environment-variable key))
+
+(define (getcwd)
+  (g_getcwd))
 
 ) ; end of begin
 ) ; end of define-library

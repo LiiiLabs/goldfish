@@ -47,5 +47,7 @@
   (check (mkdir "/tmp") => #f)
   (check (mkdir "/tmp/test_124") => #t))
 
+(check (string-null? (string-length (getcwd))) => #f)
+
 (check-report)
 (if (check-failed?) (exit -1))
