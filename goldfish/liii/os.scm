@@ -18,7 +18,8 @@
 (export
   os-call os-arch os-type os-windows? os-linux? os-macos? os-temp-dir
   isdir mkdir rmdir getenv getcwd listdir)
-(import (scheme process-context))
+(import (scheme process-context)
+        (liii error))
 (begin
 
 (define (os-call command)
@@ -52,7 +53,11 @@
   (g_mkdir path))
 
 (define (rmdir path)
-  (delete-file path))
+  (cond ((not (file-exists? path))
+         (error-file-not-found (string-append "No such file or directory: '" path "'")))
+        ((not (isdir path))
+         (error-not-a-directory (string-append "Not a directory: '" path "'")))
+        (else (delete-file path))))
 
 (define (getenv key)
   (get-environment-variable key))
@@ -63,7 +68,7 @@
 (define (listdir dir)
   (if (file-exists? dir)
       (g_listdir dir)
-      (error 'io-error (string-append dir " does not exist"))))
+      (error error-file-not-found (string-append dir " does not exist"))))
 
 ) ; end of begin
 ) ; end of define-library
