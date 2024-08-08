@@ -10,13 +10,16 @@
 与 S7 Scheme 类似，[src/goldfish.hpp](src/goldfish.hpp) 和 [src/goldfish.cpp](src/goldfish.cpp) 是构建金鱼Scheme解释器二进制文件所需的唯一关键源代码。
 
 ## 标准库
-### 类似 Python 的标准库
+### 金鱼标准库
+形如`(liii xyz)`的是金鱼标准库，模仿Python标准库的函数接口和实现方式，降低用户的学习成本。
 
 | 库 | 描述 | 示例函数 |
 | --- | --- | --- |
 | [(liii os)](goldfish/liii/os.scm) | 库类似于 Python 的 `os` 模块 | `getenv`, `mkdir` |
 | [(liii uuid)](goldfish/liii/uuid.scm) | UUID 生成 | `uuid4` |
 | [(liii sys)](goldfish/liii/sys.scm) | 库类似于 Python 的 `sys` 模块 | `argv` |
+| [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `error-os`函数抛出`'os-error`，类似Python的OSError |
+| [(liii check)](goldfish/liii/check.scm) | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch` | 
 
 ### SRFI
 
