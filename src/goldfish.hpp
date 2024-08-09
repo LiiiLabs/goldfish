@@ -20,8 +20,13 @@
 #include <string>
 #include <tbox/platform/file.h>
 #include <tbox/tbox.h>
-#include <unistd.h>
 #include <vector>
+
+#ifdef TB_CONFIG_OS_WINDOWS
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 
 #if !defined(_MSC_VER)
 #include <errno.h>
@@ -262,7 +267,11 @@ static s7_pointer
 f_access (s7_scheme* sc, s7_pointer args) {
   const char* path_c= s7_string (s7_car (args));
   int         mode  = s7_integer ((s7_cadr (args)));
-  bool        ret   = (access (path_c, mode) == 0);
+#ifdef TB_CONFIG_OS_WINDOWS
+  bool ret= (_access (path_c, mode) == 0);
+#else
+  bool ret= (access (path_c, mode) == 0);
+#endif
   return s7_make_boolean (sc, ret);
 }
 
