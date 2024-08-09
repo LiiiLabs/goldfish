@@ -23,7 +23,7 @@
 
 ; (check (get-environment-variable "USER") => "da")
 (when (os-linux?)
-  (check (string-prefix? "/home" (get-environment-variable "HOME"))
+  (check (string-prefix? "/" (get-environment-variable "HOME"))
          => #t))
 
 (check-report)

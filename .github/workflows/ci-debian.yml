@@ -47,13 +47,6 @@ jobs:
             ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
           key: ${{ runner.os }}-xrepo-${{ hashFiles('**/xmake.lua') }}
 
-      - name: cache xmake
-        uses: actions/cache@v3
-        with:
-          path: |
-            tmp/build/.build_cache
-          key: ${{ runner.os }}-build-qt6-${{ hashFiles('**/xmake.lua') }}
-
       - name: config
         run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
 
