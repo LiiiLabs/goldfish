@@ -29,7 +29,7 @@ else
 end
 
 target ("goldfish") do
-    set_languages("c++17")
+    set_languages("c++98")
     set_targetdir("$(projectdir)/bin/")
     add_files ("src/goldfish.cpp")
     add_packages("s7")
