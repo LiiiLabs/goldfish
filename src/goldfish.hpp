@@ -14,11 +14,13 @@
 // under the License.
 //
 
+#include <cstdlib>
 #include <iostream>
 #include <s7.h>
 #include <string>
 #include <tbox/platform/file.h>
 #include <tbox/tbox.h>
+#include <unistd.h>
 #include <vector>
 
 #if !defined(_MSC_VER)
@@ -52,12 +54,6 @@ f_version (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
-f_file_exists (s7_scheme* sc, s7_pointer args) {
-  const char* path_c= s7_string (s7_car (args));
-  return s7_make_boolean (sc, tb_file_access (path_c, TB_FILE_MODE_RO));
-}
-
-static s7_pointer
 f_delete_file (s7_scheme* sc, s7_pointer args) {
   const char* path_c= s7_string (s7_car (args));
   return s7_make_boolean (sc, tb_file_remove (path_c));
@@ -69,18 +65,12 @@ glue_goldfish (s7_scheme* sc) {
 
   const char* s_version    = "version";
   const char* d_version    = "(version) => string";
-  const char* s_file_exists= "g_file-exists?";
-  const char* d_file_exists= "(g_file-exists? string) => boolean";
   const char* s_delete_file= "g_delete-file";
   const char* d_delete_file= "(g_delete-file string) => boolean";
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_version),
              s7_make_typed_function (sc, s_version, f_version, 0, 0, false,
                                      d_version, NULL));
-
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_file_exists),
-             s7_make_typed_function (sc, s_file_exists, f_file_exists, 1, 0,
-                                     false, d_file_exists, NULL));
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_delete_file),
              s7_make_typed_function (sc, s_delete_file, f_delete_file, 1, 0,
@@ -224,8 +214,18 @@ f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
 
 static s7_pointer
 f_isdir (s7_scheme* sc, s7_pointer args) {
-  const char* dir_c= s7_string (s7_car (args));
-  return s7_make_boolean (sc, tb_directory_remove (dir_c));
+  const char*    dir_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  bool           ret= false;
+  if (tb_file_info (dir_c, &info)) {
+    switch (info.type) {
+    case TB_FILE_TYPE_DIRECTORY:
+      ret= true;
+    default:
+      ret= false;
+    }
+  }
+  return s7_make_boolean (sc, ret);
 }
 
 static s7_pointer
@@ -261,6 +261,14 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
   return string_vector_to_s7_vector (sc, entries);
 }
 
+static s7_pointer
+f_access (s7_scheme* sc, s7_pointer args) {
+  const char* path_c= s7_string (s7_car (args));
+  int         mode  = s7_integer ((s7_cadr (args)));
+  bool        ret   = (access (path_c, mode) == 0);
+  return s7_make_boolean (sc, ret);
+}
+
 inline void
 glue_liii_os (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
@@ -281,6 +289,8 @@ glue_liii_os (s7_scheme* sc) {
   const char* d_listdir    = "(g_listdir) => vector";
   const char* s_getcwd     = "g_getcwd";
   const char* d_getcwd     = "(g_getcwd) => string";
+  const char* s_access     = "g_access";
+  const char* d_access     = "(g_access string integer) => boolean";
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
              s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
@@ -306,6 +316,9 @@ glue_liii_os (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_getcwd),
              s7_make_typed_function (sc, s_getcwd, f_getcwd, 0, 0, false,
                                      d_getcwd, NULL));
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_access),
+             s7_make_typed_function (sc, s_access, f_access, 2, 0, false,
+                                     d_access, NULL));
 }
 
 static s7_pointer

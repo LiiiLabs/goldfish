@@ -25,20 +25,15 @@
   (check (file-exists? "/not_exists") => #f))
 
 (when (os-linux?)
-  (check (file-exists? "/root") => #t)
-  (check
-    (catch 'read-error
-      (lambda () (file-exists? "/root/.bashrc"))
-      (lambda args #t))
-    => #t))
+  (check (file-exists? "/root") => #f)
+  (check (file-exists? "/root/.bashrc") => #f))
 
 (when (os-windows?)
   (check (file-exists? "C:") => #t))
 
-
 (when (os-linux?)
   (check
-    (catch 'io-error
+    (catch 'read-error
       (lambda () (delete-file "/root"))
       (lambda args #t))
     => #t))
