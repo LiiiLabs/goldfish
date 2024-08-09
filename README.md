@@ -7,7 +7,7 @@ Goldfish Scheme is a Scheme interpreter with the following features:
 + Small and fast
 
 ## Simplicity is Beauty
-Goldfish Scheme still follows the same principle of simplicity as S7 Scheme. Currently, Goldfish Scheme only depends on [S7 Scheme](https://ccrma.stanford.edu/software/s7/), [tbox](https://gitee.com/tboox/tbox) and C++ 17 standard library.
+Goldfish Scheme still follows the same principle of simplicity as S7 Scheme. Currently, Goldfish Scheme only depends on [S7 Scheme](https://ccrma.stanford.edu/software/s7/), [tbox](https://gitee.com/tboox/tbox) and C++ standard library defined in C++ 98.
 
 Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp](src/goldfish.cpp) are the only key source code needed to build the goldfish interpreter binary.
 
@@ -17,9 +17,15 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 
 | Library | Description | Example functions |
 |---|---|---|
+| [(liii list)](goldfish/liii/list.scm) | List Library | `list-view`, `fold` |
+| [(liii string)](goldfish/liii/string.scm) | String Library | `string-join` |
+| [(liii check)](goldfish/liii/check.scm) | Test framework based on SRFI-78 | `check`, `check-catch` |
+| [(liii error)](goldfish/liii/error.scm) | Python like Errors  |  `os-error` to raise `'os-error` just like OSError in Python |
+| [(liii sys)](goldfish/liii/sys.scm) | Library looks like Python sys module | `argv` |
 | [(liii os)](goldfish/liii/os.scm) | Library looks like Python os module | `getenv`, `mkdir` |
 | [(liii uuid)](goldfish/liii/uuid.scm) | UUID generation | `uuid4` |
-| [(liii sys)](goldfish/liii/sys.scm) | Library looks like Python sys module | `argv` |
+
+
 
 ### SRFI
 
@@ -134,8 +140,8 @@ Notice, the FILE and the eval result are separated by ` => `.
 
 
 ## Versioning
-Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Scheme y, and z is the patch version. To clarify, the first version of Goldfish
-Scheme is `17.10.0`, it means that it is using the `C++ 17` standard, based on `S7 Scheme 10.x`, the patch version is `0`.
+Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Scheme y, and z is the patch version. To clarify, the second version of Goldfish
+Scheme is `17.10.1`, it means that it is using `tbox 1.7.x`, based on `S7 Scheme 10.x`, the patch version is `1`.
 
 ## Why we created Goldfish Scheme
 Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://ccrma.stanford.edu/software/s7/):
