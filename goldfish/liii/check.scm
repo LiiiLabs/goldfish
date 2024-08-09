@@ -17,7 +17,9 @@
 (define-library (liii check)
 (export check check-set-mode! check:proc
   check-catch check-report check-failed?)
-(import (srfi srfi-78))
+(import (srfi srfi-78)
+        (rename (srfi srfi-78)
+          (check-report srfi-78-check-report)))
 (begin
 
 (define (check-catch error-id thunk)
@@ -26,6 +28,13 @@
       (lambda () (thunk))
       (lambda args error-id))
     => error-id))
+
+(define (check-report . msg)
+  (if (not (null? msg))
+    (begin
+      (display (car msg))))
+  (srfi-78-check-report)
+  (if (check-failed?) (exit -1)))
 
 ) ; end of begin
 ) ; end of define-library

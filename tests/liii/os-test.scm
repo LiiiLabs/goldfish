@@ -64,4 +64,3 @@
   (check (> (vector-length (listdir "C:")) 0) => #t))
 
 (check-report)
-(if (check-failed?) (exit -1))

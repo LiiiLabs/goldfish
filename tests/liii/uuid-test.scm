@@ -14,12 +14,11 @@
 ; under the License.
 ;
 
-(import (srfi srfi-78)
+(import (liii check)
         (liii uuid))
 
 (check-set-mode! 'report-failed)
 
 (check (string-length (uuid4)) => 36)
 
-(check-report)
-(if (check-failed?) (exit -1))
+(check-report "\n\nCheck report of uuid-test.scm =>")
