@@ -17,7 +17,7 @@
 (define-library (liii os)
 (export
   os-call os-arch os-type os-windows? os-linux? os-macos? os-temp-dir
-  isdir mkdir rmdir getenv getcwd listdir access)
+  isdir mkdir rmdir getenv getcwd listdir access getlogin)
 (import (scheme process-context)
         (liii error))
 (begin
@@ -81,6 +81,11 @@
 
 (define (getcwd)
   (g_getcwd))
+
+(define (getlogin)
+  (if (os-windows?)
+      (getenv "USERNAME")
+      (g_getlogin)))
 
 ) ; end of begin
 ) ; end of define-library

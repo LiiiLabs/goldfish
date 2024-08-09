@@ -14,8 +14,7 @@
 ; under the License.
 ;
 
-(import (srfi srfi-78)
-        (srfi srfi-1)
+(import (liii list)
         (liii check)
         (liii os))
 
@@ -25,13 +24,13 @@
   (check (file-exists? "/tmp") => #t)
   (check (file-exists? "/not_exists") => #f))
 
-(when (and (os-linux?) (not (string=? "/root" (getenv "HOME"))))
+(when (and (os-linux?) (not (string=? "root" (getlogin))))
   (check-catch 'permission-error (lambda () (file-exists? "/root"))))
 
 (when (os-windows?)
   (check (file-exists? "C:") => #t))
 
-(when (and (os-linux?) (not (string=? "/root" (getenv "HOME"))))
+(when (and (os-linux?) (not (string=? "root" (getlogin))))
   (check-catch 'permission-error (lambda () (delete-file "/root"))))
 
 (when (not (os-windows?))
@@ -42,5 +41,4 @@
   (delete-file "/tmp/test_delete_file")
   (check (file-exists? "/tmp/test_delete_file") => #f))
 
-(check-report)
-(if (check-failed?) (exit -1))
+(check-report "\n\nCheck report of boot-test.scm => ")

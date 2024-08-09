@@ -25,6 +25,7 @@
 #ifdef TB_CONFIG_OS_WINDOWS
 #include <io.h>
 #else
+#include <pwd.h>
 #include <unistd.h>
 #endif
 
@@ -276,9 +277,20 @@ f_access (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_WINDOWS
   bool ret= (_access (path_c, mode) == 0);
 #else
-  bool ret= (access (path_c, mode) == 0);
+  bool           ret= (access (path_c, mode) == 0);
 #endif
   return s7_make_boolean (sc, ret);
+}
+
+static s7_pointer
+f_getlogin (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_boolean (sc, false);
+#else
+  uid_t          uid= getuid ();
+  struct passwd* pwd= getpwuid (uid);
+  return s7_make_string (sc, pwd->pw_name);
+#endif
 }
 
 inline void
@@ -303,6 +315,8 @@ glue_liii_os (s7_scheme* sc) {
   const char* d_getcwd     = "(g_getcwd) => string";
   const char* s_access     = "g_access";
   const char* d_access     = "(g_access string integer) => boolean";
+  const char* s_getlogin   = "g_getlogin";
+  const char* d_getlogin   = "(g_getlogin) => string";
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
              s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
@@ -330,6 +344,9 @@ glue_liii_os (s7_scheme* sc) {
                                      d_getcwd, NULL));
   s7_define (sc, cur_env, s7_make_symbol (sc, s_access),
              s7_make_typed_function (sc, s_access, f_access, 2, 0, false,
+                                     d_access, NULL));
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_getlogin),
+             s7_make_typed_function (sc, s_getlogin, f_getlogin, 0, 0, false,
                                      d_access, NULL));
 }
 
