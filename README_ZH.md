@@ -7,7 +7,7 @@
 + 小巧且快速
 
 ## 以简为美
-金鱼Scheme仍旧遵循和 S7 Scheme 一样的简约的原则。目前，它仅依赖于 [S7 Scheme](https://ccrma.stanford.edu/software/s7/) 、[tbox](https://gitee.com/tboox/tbox) 和 C++ 17 标准库。
+金鱼Scheme仍旧遵循和 S7 Scheme 一样的简约的原则。目前，它仅依赖于 [S7 Scheme](https://ccrma.stanford.edu/software/s7/) 、[tbox](https://gitee.com/tboox/tbox) 和 C++98 范围内的标准库。
 
 与 S7 Scheme 类似，[src/goldfish.hpp](src/goldfish.hpp) 和 [src/goldfish.cpp](src/goldfish.cpp) 是构建金鱼Scheme解释器二进制文件所需的唯一关键源代码。
 
@@ -143,7 +143,7 @@ tests/demo_argv.scm => #\newline
 注意，文件和求值结果之间用 `=>` 分隔。
 
 ## 版本命名规则
-金鱼Scheme `x.y.z` 表示它使用的是 C++ 标准 `x`，基于 S7 Scheme `y`，而 `z` 是补丁版本。例如，金鱼Scheme 的第一个版本是 `17.10.0`，表示它使用 `C++ 17` 标准，基于 `S7 Scheme 10.x`，补丁版本是 `0`。
+金鱼Scheme `x.y.z` 表示它使用的是 C++ 标准 `x`，基于 S7 Scheme `y`，而 `z` 是补丁版本。例如，金鱼Scheme 的第二个版本是 `17.10.1`，表示它使用`tbox 1.7.x`，基于 `S7 Scheme 10.x`，补丁版本是 `1`。
 
 ## 为什么我们创建了金鱼Scheme
 金鱼Scheme 是为了克服 S7 Scheme 的缺陷而实现的：
