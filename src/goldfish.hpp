@@ -218,11 +218,8 @@ f_isdir (s7_scheme* sc, s7_pointer args) {
   tb_file_info_t info;
   bool           ret= false;
   if (tb_file_info (dir_c, &info)) {
-    switch (info.type) {
-    case TB_FILE_TYPE_DIRECTORY:
+    if (info.type == TB_FILE_TYPE_DIRECTORY) {
       ret= true;
-    default:
-      ret= false;
     }
   }
   return s7_make_boolean (sc, ret);

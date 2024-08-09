@@ -1,6 +1,23 @@
 ; 0-clause BSD
 ; Adapted from S7 Scheme's r7rs.scm
 
+(define (file-exists? path)
+  (if (string? path)
+    (if (not (g_access path 0)) ; F_OK
+      #f
+      (if (g_access path 4) ; R_OK
+          #t
+          (error 'permission-error (string-append "No permission: " path))))
+    (error 'type-error "(file-exists? path): path should be string")))
+
+(define (delete-file path)
+  (if (not (string? path))
+    (error 'type-error "(delete-file path): path should be string")
+    (if (not (file-exists? path))
+      (error 'read-error (string-append path " does not exist"))
+      (g_delete-file path))))
+
+
 (define-macro (define-library libname . body) ; |(lib name)| -> environment
   `(define ,(symbol (object->string libname))
      (with-let (sublet (unlet)

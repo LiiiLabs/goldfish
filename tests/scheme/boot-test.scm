@@ -16,6 +16,7 @@
 
 (import (srfi srfi-78)
         (srfi srfi-1)
+        (liii check)
         (liii os))
 
 (check-set-mode! 'report-failed)
@@ -25,18 +26,13 @@
   (check (file-exists? "/not_exists") => #f))
 
 (when (os-linux?)
-  (check (file-exists? "/root") => #f)
-  (check (file-exists? "/root/.bashrc") => #f))
+  (check-catch 'permission-error (lambda () (file-exists? "/root"))))
 
 (when (os-windows?)
   (check (file-exists? "C:") => #t))
 
 (when (os-linux?)
-  (check
-    (catch 'read-error
-      (lambda () (delete-file "/root"))
-      (lambda args #t))
-    => #t))
+  (check-catch 'permission-error (lambda () (delete-file "/root"))))
 
 (when (not (os-windows?))
   (with-output-to-file "/tmp/test_delete_file"
