@@ -24,6 +24,7 @@
 
 #ifdef TB_CONFIG_OS_WINDOWS
 #include <io.h>
+#include <windows.h>
 #else
 #include <pwd.h>
 #include <unistd.h>
@@ -293,6 +294,15 @@ f_getlogin (s7_scheme* sc, s7_pointer args) {
 #endif
 }
 
+static s7_pointer
+f_getpid (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_WINDOWS
+  return GetCurrentProcessId ();
+#else
+  return s7_make_integer (sc, getpid ());
+#endif
+}
+
 inline void
 glue_liii_os (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
@@ -317,6 +327,8 @@ glue_liii_os (s7_scheme* sc) {
   const char* d_access     = "(g_access string integer) => boolean";
   const char* s_getlogin   = "g_getlogin";
   const char* d_getlogin   = "(g_getlogin) => string";
+  const char* s_getpid     = "g_getpid";
+  const char* d_getpid     = "(g_getpid) => integer";
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
              s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
@@ -348,6 +360,9 @@ glue_liii_os (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_getlogin),
              s7_make_typed_function (sc, s_getlogin, f_getlogin, 0, 0, false,
                                      d_access, NULL));
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_getpid),
+             s7_make_typed_function (sc, s_getpid, f_getpid, 0, 0, false,
+                                     d_getpid, NULL));
 }
 
 static s7_pointer
