@@ -297,7 +297,7 @@ f_getlogin (s7_scheme* sc, s7_pointer args) {
 static s7_pointer
 f_getpid (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_WINDOWS
-  return GetCurrentProcessId ();
+  return s7_make_integer (sc, (int) GetCurrentProcessId ());
 #else
   return s7_make_integer (sc, getpid ());
 #endif
