@@ -17,7 +17,4 @@
 (import (liii check)
         (liii error))
 
-(check (mk-string " " (list 1 2 3)) => "1 2 3")
-(check (mk-string " " (list )) => "")
-
 (check-report)

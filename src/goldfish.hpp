@@ -260,6 +260,12 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
   vector<string> entries;
   s7_pointer     ret= s7_make_vector (sc, 0);
   tb_directory_walk (path_c, 0, tb_false, tb_directory_walk_func, &entries);
+
+  int entries_N= entries.size ();
+  int path_N   = string (path_c).size ();
+  for (int i= 0; i < entries_N; i++) {
+    entries[i]= entries[i].substr (path_N + 1);
+  }
   return string_vector_to_s7_vector (sc, entries);
 }
 

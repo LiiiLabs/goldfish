@@ -14,20 +14,22 @@
 ; under the License.
 ;
 
-(import (liii os)
+(import (liii list)
+        (liii string)
+        (liii os)
         (srfi srfi-1))
 
+(define (listdir2 dir)
+  (map (lambda (x) (string-append dir "/" x))
+    (vector->list (listdir dir))))
+
+; (display (listdir2 "tests"))
 (define (all-tests)
-  (list
-    "tests/scheme/boot-test.scm"
-    "tests/scheme/case-lambda-test.scm"
-    "tests/scheme/process-context-test.scm"
-    "tests/srfi/srfi-8-test.scm"
-    "tests/srfi/srfi-9-test.scm"
-    "tests/srfi/srfi-16-test.scm"
-    "tests/srfi/srfi-39-test.scm"
-    "tests/liii/os-test.scm"
-    "tests/liii/uuid-test.scm"))
+  (((apply list-view (listdir2 "tests"))
+    filter isdir
+    flatmap listdir2
+    filter (lambda (x) (not (isdir x)))
+    filter (lambda (x) (not (string-suffix? "srfi-78-test.scm" x))))))
 
 (define (goldfish-cmd)
   (if (os-windows?)
