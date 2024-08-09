@@ -16,7 +16,6 @@
 
 (define-library (scheme file)
 (export open-binary-input-file open-binary-output-file)
-(import (liii os))
 (begin
   
 (define open-binary-input-file open-input-file)
