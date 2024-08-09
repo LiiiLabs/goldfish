@@ -30,6 +30,10 @@ end
 
 target ("goldfish") do
     set_languages("c++98")
+    if is_plat("linux") then
+        -- for Ubuntu 20.04
+        add_syslinks("stdc++")
+    end
     set_targetdir("$(projectdir)/bin/")
     add_files ("src/goldfish.cpp")
     add_packages("s7")
