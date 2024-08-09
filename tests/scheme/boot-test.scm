@@ -25,13 +25,13 @@
   (check (file-exists? "/tmp") => #t)
   (check (file-exists? "/not_exists") => #f))
 
-(when (and (os-linux?) (not (string=? "root" (getenv "USER"))))
+(when (and (os-linux?) (not (string=? "/root" (getenv "HOME"))))
   (check-catch 'permission-error (lambda () (file-exists? "/root"))))
 
 (when (os-windows?)
   (check (file-exists? "C:") => #t))
 
-(when (and (os-linux?) (not (string=? "root" (getenv "USER"))))
+(when (and (os-linux?) (not (string=? "/root" (getenv "HOME"))))
   (check-catch 'permission-error (lambda () (delete-file "/root"))))
 
 (when (not (os-windows?))

@@ -120,6 +120,11 @@ main (int argc, char** argv) {
   sc= s7_init ();
   s7_load (sc, gf_boot);
   s7_add_to_load_path (sc, gf_lib);
+  const char* errmsg= NULL;
+  s7_pointer  old_port=
+      s7_set_current_error_port (sc, s7_open_output_string (sc));
+  int gc_loc= -1;
+  if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
 
   // Init tbox
   if (!tb_init (tb_null, tb_null)) exit (-1);
@@ -156,5 +161,13 @@ main (int argc, char** argv) {
   else {
     display_for_invalid_options ();
   }
-  return 0;
+
+  errmsg= s7_get_output_string (sc, s7_current_error_port (sc));
+  if ((errmsg) && (*errmsg)) cout << errmsg;
+  s7_close_output_port (sc, s7_current_error_port (sc));
+  s7_set_current_error_port (sc, old_port);
+  if (gc_loc != -1) s7_gc_unprotect_at (sc, gc_loc);
+
+  if ((errmsg) && (*errmsg)) return -1;
+  else return 0;
 }
