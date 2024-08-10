@@ -18,5 +18,5 @@
 
 int
 main (int argc, char** argv) {
-  return repl_for_community_edition (argc, argv);
+  return goldfish::repl_for_community_edition (argc, argv);
 }
