@@ -23,6 +23,7 @@
 | [(liii check)](goldfish/liii/check.scm) | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch` |
 | [(liii sys)](goldfish/liii/sys.scm) | 库类似于 Python 的 `sys` 模块 | `argv` |
 | [(liii os)](goldfish/liii/os.scm) | 库类似于 Python 的 `os` 模块 | `getenv`, `mkdir` |
+| [(liii path)](goldfish/liii/path.scm) | 路径函数库 | `path-dir?`, `path-file?` |
 | [(liii uuid)](goldfish/liii/uuid.scm) | UUID 生成 | `uuid4` |
 
 ### SRFI
@@ -145,7 +146,7 @@ tests/demo_argv.scm => #\newline
 注意，文件和求值结果之间用 `=>` 分隔。
 
 ## 版本命名规则
-金鱼Scheme `x.y.z` 表示它使用的是 C++ 标准 `x`，基于 S7 Scheme `y`，而 `z` 是补丁版本。例如，金鱼Scheme 的第二个版本是 `17.10.1`，表示它使用`tbox 1.7.x`，基于 `S7 Scheme 10.x`，补丁版本是 `1`。
+金鱼Scheme `x.y.z` 表示它使用的是 tbox 版本 `x`，基于 S7 Scheme `y`，而 `z` 是补丁版本。例如，金鱼Scheme 的第二个版本是 `17.10.1`，表示它使用`tbox 1.7.x`，基于 `S7 Scheme 10.x`，补丁版本是 `1`。
 
 ## 为什么我们创建了金鱼Scheme
 金鱼Scheme 是为了克服 S7 Scheme 的缺陷而实现的：

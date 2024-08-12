@@ -23,6 +23,7 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 | [(liii error)](goldfish/liii/error.scm) | Python like Errors  |  `os-error` to raise `'os-error` just like OSError in Python |
 | [(liii sys)](goldfish/liii/sys.scm) | Library looks like Python sys module | `argv` |
 | [(liii os)](goldfish/liii/os.scm) | Library looks like Python os module | `getenv`, `mkdir` |
+| [(liii path)](goldfish/liii/path.scm) | Path Library | `path-dir?`, `path-file?` |
 | [(liii uuid)](goldfish/liii/uuid.scm) | UUID generation | `uuid4` |
 
 
@@ -140,8 +141,7 @@ Notice, the FILE and the eval result are separated by ` => `.
 
 
 ## Versioning
-Goldfish Scheme x.y.z means that it is using the C++ Standard x, based on S7 Scheme y, and z is the patch version. To clarify, the second version of Goldfish
-Scheme is `17.10.1`, it means that it is using `tbox 1.7.x`, based on `S7 Scheme 10.x`, the patch version is `1`.
+Goldfish Scheme x.y.z means that it is using the tbox x, based on S7 Scheme y, and z is the patch version. To clarify, the second version of Goldfish Scheme is `17.10.1`, it means that it is using `tbox 1.7.x`, based on `S7 Scheme 10.x`, the patch version is `1`.
 
 ## Why we created Goldfish Scheme
 Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://ccrma.stanford.edu/software/s7/):
