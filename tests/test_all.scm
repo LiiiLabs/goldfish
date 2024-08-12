@@ -17,7 +17,7 @@
 (import (liii list)
         (liii string)
         (liii os)
-        (srfi srfi-1))
+        (liii path))
 
 (define (listdir2 dir)
   (map (lambda (x) (string-append dir "/" x))
@@ -26,9 +26,9 @@
 ; (display (listdir2 "tests"))
 (define (all-tests)
   (((apply list-view (listdir2 "tests"))
-    filter isdir
+    filter path-dir?
     flatmap listdir2
-    filter (lambda (x) (not (isdir x)))
+    filter (lambda (x) (path-file? x))
     filter (lambda (x) (not (string-suffix? "srfi-78-test.scm" x))))))
 
 (define (goldfish-cmd)

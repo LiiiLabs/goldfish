@@ -230,7 +230,24 @@ f_isdir (s7_scheme* sc, s7_pointer args) {
   tb_file_info_t info;
   bool           ret= false;
   if (tb_file_info (dir_c, &info)) {
-    if (info.type == TB_FILE_TYPE_DIRECTORY) {
+    switch (info.type) {
+    case TB_FILE_TYPE_DIRECTORY:
+    case TB_FILE_TYPE_DOT:
+    case TB_FILE_TYPE_DOT2:
+      ret= true;
+    }
+  }
+  return s7_make_boolean (sc, ret);
+}
+
+static s7_pointer
+f_isfile (s7_scheme* sc, s7_pointer args) {
+  const char*    dir_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  bool           ret= false;
+  if (tb_file_info (dir_c, &info)) {
+    switch (info.type) {
+    case TB_FILE_TYPE_FILE:
       ret= true;
     }
   }
@@ -322,6 +339,8 @@ glue_liii_os (s7_scheme* sc) {
   const char* d_os_temp_dir= "(g_os-temp-dir) => string";
   const char* s_isdir      = "g_isdir";
   const char* d_isdir      = "(g_isdir string) => boolean";
+  const char* s_isfile     = "g_isfile";
+  const char* d_isfile     = "(g_isfile string) => boolean";
   const char* s_mkdir      = "g_mkdir";
   const char* d_mkdir      = "(g_mkdir string) => boolean";
   const char* s_listdir    = "g_listdir";
@@ -350,6 +369,9 @@ glue_liii_os (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_isdir),
              s7_make_typed_function (sc, s_isdir, f_isdir, 1, 0, false, d_isdir,
                                      NULL));
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_isfile),
+             s7_make_typed_function (sc, s_isfile, f_isfile, 1, 0, false,
+                                     d_isfile, NULL));
   s7_define (sc, cur_env, s7_make_symbol (sc, s_mkdir),
              s7_make_typed_function (sc, s_mkdir, f_mkdir, 1, 0, false, d_mkdir,
                                      NULL));

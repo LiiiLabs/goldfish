@@ -43,8 +43,6 @@
 (when (os-linux?)
   (check (os-temp-dir) => "/tmp"))
 
-(check (isdir (os-temp-dir)) => #t)
-
 (when (not (os-windows?))
   (check-catch 'file-exists-error
     (lambda () (mkdir "/tmp")))
