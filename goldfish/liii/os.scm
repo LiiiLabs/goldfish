@@ -57,13 +57,10 @@
   (cond ((not (file-exists? path))
          (file-not-found-error
            (string-append "No such file or directory: '" path "'")))
-        ((not (isdir path))
+        ((not (g_isdir path))
          (not-a-directory-error
            (string-append "Not a directory: '" path "'")))
         (else (f path))))
-
-(define (isdir path)
-  (g_isdir path))
 
 (define (mkdir path)
   (if (file-exists? path)
