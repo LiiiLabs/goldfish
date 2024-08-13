@@ -41,4 +41,11 @@
   (delete-file "/tmp/test_delete_file")
   (check (file-exists? "/tmp/test_delete_file") => #f))
 
+(define (sum start end)
+  (if (= start end)
+      start
+      (+ (sum start (- end 1)) end)))
+
+(check (sum 2 4) => 9)
+
 (check-report "\n\nCheck report of boot-test.scm => ")
