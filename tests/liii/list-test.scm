@@ -29,4 +29,35 @@
         map (lambda (x) (* x x))))
        => (list 4 9 16))
 
+
+(check (not-null-list? (list 1)) => #t)
+(check (list-not-null? (list 1)) => #t)
+(check (list-null? (list 1)) => #f)
+
+(check (not-null-list? (list 1 2 3)) => #t)
+(check (list-not-null? (list 1 2 3)) => #t)
+(check (list-null? (list 1 2 3)) => #f)
+
+(check (not-null-list? '(a)) => #t)
+(check (list-not-null? '(a)) => #t)
+(check (list-null? '(a)) => #f)
+
+(check (not-null-list? '(a b c)) => #t)
+(check (list-not-null? '(a b c)) => #t)
+(check (list-null? '(a b c)) => #f)
+
+(check (not-null-list? ()) => #f)
+(check (list-not-null? ()) => #f)
+(check (list-null? ()) => #t)
+
+; '(a) is a pair and a list
+; '(a . b) is a pair but not a list
+(check (not-null-list? '(a . b)) => #f)
+(check (list-not-null? '(a . b)) => #f)
+(check (list-null? '(a . b)) => #f)
+
+(check-catch 'type-error (lambda () (not-null-list? 1)))
+(check (list-not-null? 1) => #f)
+(check (list-null? 1) => #f)
+
 (check-report)
