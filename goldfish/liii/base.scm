@@ -15,13 +15,16 @@
 ;
 
 (define-library (liii base)
-(export == !=)
+(export == != display*)
 (begin
 
 (define == equal?)
 
 (define (!= left right)
   (not (equal? left right)))
+
+(define (display* . params)
+  (for-each display params))
 
 ) ; end of begin
 )

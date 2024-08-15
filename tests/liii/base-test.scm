@@ -20,4 +20,10 @@
 (check (== (list 1 2) (list 1 2)) => #t)
 (check (!= (list 1 2) (list 1 2)) => #f)
 
+(check
+  (with-output-to-string
+    (lambda ()
+      (display* "hello world" "\n")))
+  => "hello world\n")
+
 (check-report)
