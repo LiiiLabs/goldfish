@@ -17,6 +17,7 @@
 
 | 库 | 描述 | 示例函数 |
 | --- | --- | --- |
+| [(liii base)](goldfish/liii/base.scm) | 基础库 | `==`, `!=`, `display*` |
 | [(liii list)](goldfish/liii/list.scm) | 列表函数库 | `list-view`, `fold` |
 | [(liii string)](goldfish/liii/string.scm) | 字符串函数库 | `string-join` |
 | [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `os-error`函数抛出`'os-error`，类似Python的OSError |
