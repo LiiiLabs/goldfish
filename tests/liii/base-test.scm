@@ -17,6 +17,8 @@
 (import (liii check)
         (liii base))
 
+(check-set-mode! 'report-failed)
+
 (check (== (list 1 2) (list 1 2)) => #t)
 (check (!= (list 1 2) (list 1 2)) => #f)
 
@@ -25,5 +27,12 @@
     (lambda ()
       (display* "hello world" "\n")))
   => "hello world\n")
+
+(check (in? 1 (list )) => #f)
+(check (in? 1 (list 3 2 1)) => #t)
+(check (in? #\x "texmacs") => #t)
+(check (in? 1 (vector )) => #f)
+(check (in? 1 (vector 3 2 1)) => #t)
+(check-catch 'type-error (lambda () (in? 1 "123")))
 
 (check-report)

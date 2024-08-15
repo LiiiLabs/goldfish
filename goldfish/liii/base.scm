@@ -15,7 +15,7 @@
 ;
 
 (define-library (liii base)
-(export == != display*)
+(export == != display* in?)
 (begin
 
 (define == equal?)
@@ -25,6 +25,19 @@
 
 (define (display* . params)
   (for-each display params))
+
+(define (in? elem l)
+  (cond ((list? l) (not (not (member elem l))))
+        ((vector? l)
+         (let loop ((i (- (vector-length l) 1)))
+           (if (< i 0)
+               #f
+               (if (== elem (vector-ref l i))
+                   #t
+                   (loop (- i 1))))))
+        ((and (char? elem) (string? l))
+         (in? elem (string->list l)))
+        (else (error 'type-error "type mismatch"))))
 
 ) ; end of begin
 )
