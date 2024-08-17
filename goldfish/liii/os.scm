@@ -82,6 +82,9 @@
 (define (getenv key)
   (get-environment-variable key))
 
+(define (unsetenv key)
+  (g_unsetenv key))
+
 (define (getcwd)
   (g_getcwd))
 
