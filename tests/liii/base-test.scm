@@ -35,4 +35,7 @@
 (check (in? 1 (vector 3 2 1)) => #t)
 (check-catch 'type-error (lambda () (in? 1 "123")))
 
+(check (let1 x 1 x) => 1)
+(check (let1 x 1 (+ x 1)) => 2)
+
 (check-report)
