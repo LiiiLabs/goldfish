@@ -45,7 +45,7 @@
 
 (when (not (os-windows?))
   (check-catch 'file-exists-error
-    (lambda () (mkdir "/tmp")))
+    (mkdir "/tmp"))
   (check (begin
            (let ((test_dir "/tmp/test_124"))
              (when (file-exists? test_dir)

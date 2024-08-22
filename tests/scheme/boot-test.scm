@@ -25,13 +25,13 @@
   (check (file-exists? "/not_exists") => #f))
 
 (when (and (os-linux?) (not (string=? "root" (getlogin))))
-  (check-catch 'permission-error (lambda () (file-exists? "/root"))))
+  (check-catch 'permission-error (file-exists? "/root")))
 
 (when (os-windows?)
   (check (file-exists? "C:") => #t))
 
 (when (and (os-linux?) (not (string=? "root" (getlogin))))
-  (check-catch 'permission-error (lambda () (delete-file "/root"))))
+  (check-catch 'permission-error (delete-file "/root")))
 
 (when (not (os-windows?))
   (with-output-to-file "/tmp/test_delete_file"
