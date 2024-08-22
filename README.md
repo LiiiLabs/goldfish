@@ -17,15 +17,18 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 
 | Library | Description | Example functions |
 |---|---|---|
-| [(liii list)](goldfish/liii/list.scm) | List Library | `list-view`, `fold` |
+| [(liii base)](goldfish/liii/base.scm) | Basic routines | `==`, `!=`, `display*` |
+| [(liii case)](goldfish/liii/case.scm) | Pattern matching | `case*` |
+| [(liii error)](goldfish/liii/error.scm) | Python like Errors  |  `os-error` to raise `'os-error` just like OSError in Python |
 | [(liii string)](goldfish/liii/string.scm) | String Library | `string-join` |
 | [(liii check)](goldfish/liii/check.scm) | Test framework based on SRFI-78 | `check`, `check-catch` |
-| [(liii error)](goldfish/liii/error.scm) | Python like Errors  |  `os-error` to raise `'os-error` just like OSError in Python |
+| [(liii list)](goldfish/liii/list.scm) | List Library | `list-view`, `fold` |
+| [(liii stack)](goldfish/liii/stack.scm) | Stack Library | `stack-pop!`, `stack-push!` |
+| [(liii hash-table)](goldfish/liii/hash-table.scm) | Hash Table Library | `hash-table-empty?`, `hash-table-contains?` | 
 | [(liii sys)](goldfish/liii/sys.scm) | Library looks like Python sys module | `argv` |
 | [(liii os)](goldfish/liii/os.scm) | Library looks like Python os module | `getenv`, `mkdir` |
 | [(liii path)](goldfish/liii/path.scm) | Path Library | `path-dir?`, `path-file?` |
 | [(liii uuid)](goldfish/liii/uuid.scm) | UUID generation | `uuid4` |
-
 
 
 ### SRFI
@@ -39,6 +42,9 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 | `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
 | `(srfi srfi-39)`  | Complete | Parameter objects |
 | `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
+| `(srfi srfi-125)` | Part | Hash Table |
+| `(srfi srfi-133)` | Part | Vector |
+| `(srfi srfi-216)` | Part | SICP |
 
 ### R7RS Standard Libraries
 | Library | Description | 

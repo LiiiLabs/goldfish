@@ -18,8 +18,11 @@
 | 库 | 描述 | 示例函数 |
 | --- | --- | --- |
 | [(liii base)](goldfish/liii/base.scm) | 基础库 | `==`, `!=`, `display*` |
-| [(liii list)](goldfish/liii/list.scm) | 列表函数库 | `list-view`, `fold` |
+| [(liii case)](goldfish/liii/case.scm) | 模式匹配 | `case*` |
 | [(liii string)](goldfish/liii/string.scm) | 字符串函数库 | `string-join` |
+| [(liii list)](goldfish/liii/list.scm) | 列表函数库 | `list-view`, `fold` |
+| [(liii stack)](goldfish/liii/stack.scm) | 栈 | `stack-pop!`, `stack-push!` |
+| [(liii hash-table)](goldfish/liii/hash-table.scm) | 哈希表 | `hash-table-empty?`, `hash-table-contains?` | 
 | [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `os-error`函数抛出`'os-error`，类似Python的OSError |
 | [(liii check)](goldfish/liii/check.scm) | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch` |
 | [(liii sys)](goldfish/liii/sys.scm) | 库类似于 Python 的 `sys` 模块 | `argv` |
@@ -38,6 +41,10 @@
 | `(srfi srfi-16)` | 完整 | 提供 `case-lambda` |
 | `(srfi srfi-39)` | 完整 | 参数对象 |
 | `(srfi srfi-78)` | 部分 | 轻量级测试框架 |
+| `(srfi srfi-125)` | 部分 | 哈希表 |
+| `(srfi srfi-133)` | 部分 | 向量 |
+| `(srfi srfi-216)` | 部分 | SICP |
+
 
 ### R7RS 标准库
 
