@@ -44,5 +44,13 @@
 (check-true ((compose not zero?) 1))
 (check-false ((compose not zero?) 0))
 
+(define add3
+  (typed-lambda
+    ((i integer?) (x real?) z)
+    (+ i x z)))
+
+(check (add3 1 2 3) => 6)
+(check-catch 'type-error (add3 1.2 2 3))
+
 (check-report)
 
