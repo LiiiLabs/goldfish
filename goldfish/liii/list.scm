@@ -37,10 +37,13 @@
   list-null? list-not-null? not-null-list?
   length=?
 )
-(import (srfi srfi-1))
+(import (srfi srfi-1)
+        (liii error))
 (begin
 
 (define (length=? x scheme-list)
+  (when (< x 0)
+    (value-error "length=?: expected non-negative integer x but received ~d" x))
   (cond ((and (= x 0) (null? scheme-list)) #t)
         ((or (= x 0) (null? scheme-list)) #f)
         (else (length=? (- x 1) (cdr scheme-list)))))
