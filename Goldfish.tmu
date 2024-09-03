@@ -1,0 +1,540 @@
+<TMU|<tuple|1.0.3|1.2.9.1>>
+
+<style|<tuple|generic|chinese|literate>>
+
+<\body>
+  文档许可证暂时没有确定！
+
+  <chapter|(liii list)>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/liii/list.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  Liii List函数库是金鱼标准库中的List函数库，其中的大部分函数来自函数库<scm|(srfi srfi-1)>，小部分是三鲤自己设计的函数。来自SRFI 1的，我们只是在Liii List中导出相关函数名，相关实现和单元测试都在SRFI 1中维护。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define-library (liii list)
+
+    (export
+
+    \ \ ; SRFI 1: Constructors
+
+    \ \ circular-list iota
+
+    \ \ ; SRFI 1: Predicates
+
+    \ \ null-list? circular-list?
+
+    \ \ ; SRFI 1: Selectors
+
+    \ \ first second third fourth fifth sixth seventh eighth ninth tenth
+
+    \ \ take drop take-right drop-right
+
+    \ \ last-pair last
+
+    \ \ ; SRFI 1: fold, unfold & map
+
+    \ \ count fold fold-right reduce reduce-right
+
+    \ \ filter partition remove
+
+    \ \ ; SRFI 1: Searching
+
+    \ \ find any every list-index
+
+    \ \ take-while drop-while
+
+    \ \ ; SRFI 1: deleting
+
+    \ \ delete
+
+    \ \ ; Liii List extensions
+
+    \ \ list-view flatmap
+
+    \ \ list-null? list-not-null? not-null-list?
+
+    \ \ length=?
+
+    )
+
+    (import (srfi srfi-1))
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|false|true>
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii check))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <\session|elvish|default>
+    <\output>
+      Elvish 0.19.2
+    </output>
+
+    <\unfolded-io|Elvish] >
+      cd ~/git/liii; bin/scheme tests/goldfish/liii/list-test.scm
+    <|unfolded-io>
+      \;
+
+      ; *** checks *** : 24 correct, 0 failed.
+
+      tests/goldfish/liii/list-test.scm =\<gtr\> #\<less\>unspecified\<gtr\>
+    </unfolded-io>
+
+    <\input|Elvish] >
+      \;
+    </input>
+  </session>
+
+  <section|实现>
+
+  <paragraph|length=?><scm|(x l) =\<gtr\> boolean>
+
+  <\description>
+    <item*|x>期望的列表长度，如果长度为负数，该函数会抛出<scm|value-error>
+
+    <item*|l>列表
+  </description>
+
+  快速判断一个列表<scm|l>的长度是否为<scm|x>。由于<scm|(= x (length l))>这种判断方式的复杂度是<math|O<around*|(|n|)>>，故而需要<scm|length=?>这种快速的判断方式。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (length=? 3 (list 1 2 3)) =\<gtr\> #t)
+
+    (check (length=? 2 (list 1 2 3)) =\<gtr\> #f)
+
+    (check (length=? 4 (list 1 2 3)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (length=? x scheme-list)
+
+    \ \ (cond ((and (= x 0) (null? scheme-list)) #t)
+
+    \ \ \ \ \ \ \ \ ((or (= x 0) (null? scheme-list)) #f)
+
+    \ \ \ \ \ \ \ \ (else (length=? (- x 1) (cdr scheme-list)))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|list-view><index|list-view>
+
+  由于Scheme的List和数据的流向是相反的：
+
+  <\scm-code>
+    (map (lambda (x) (* x x))
+
+    \ \ \ \ \ (map (lambda (x) (+ x 1))
+
+    \ \ \ \ \ \ \ \ \ \ (list 1 2 3)))
+  </scm-code>
+
+  \;
+
+  所以我们实现了<scm|list-view>，采用和Scala的List类似的语法来处理数据：
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check ((list-view (list 1 2 3))) =\<gtr\> (list 1 2 3))
+
+    \;
+
+    (check (((list-view (list 1 2 3))
+
+    \ \ \ \ \ \ \ \ map (lambda (x) (+ x 1)))) =\<gtr\> (list 2 3 4))
+
+    \;
+
+    (check (((list-view (list 1 2 3))
+
+    \ \ \ \ \ \ \ \ map (lambda (x) (+ x 1))
+
+    \ \ \ \ \ \ \ \ map (lambda (x) (* x x))))
+
+    \ \ \ \ \ \ \ =\<gtr\> (list 4 9 16))
+
+    \;
+  </scm-chunk>
+
+  <scm|(list-view 1 2 3)>得到的是函数，需要在外面再加一层括号才能得到<scm|(list 1 2 3)>。
+
+  <\big-figure|<wide-tabular|<tformat|<table|<row|<\cell>
+    <\scm-code>
+      (map (lambda (x) (* x x))
+
+      \ \ \ \ \ (map (lambda (x) (+ x 1))
+
+      \ \ \ \ \ \ \ \ \ \ (list 1 2 3)))
+    </scm-code>
+  </cell>|<\cell>
+    <\scm-code>
+      (((list-view 1 2 3)
+
+      \ \ \ \ \ \ \ \ map (lambda (x) (+ x 1))
+
+      \ \ \ \ \ \ \ \ map (lambda (x) (* x x))))
+    </scm-code>
+  </cell>>>>>>
+    使用list处理数据和使用list-view处理数据的对比
+  </big-figure>
+
+  实现list-view时需要考虑三种情况和一种例外情况。
+
+  <\description>
+    <item*|无参数>也就是直接在list-view得到的结果外面添加括号，此时得到的是list-view对应的list
+
+    <item*|有两个参数>这里举例说明，<scm|((list-view 1 2 3) map (lambda (x) (+ x 1)))>实际的计算过程是：
+
+    <\enumerate>
+      <item>计算并得到结果<scm|(map (lambda (x) (+ x 1)) (list 1 2 3)) =\<gtr\> (list 2 3 4)>
+
+      <item>将计算结果包装到 <scm|list-view> 里面，这里使用了<scm|apply>这个内置函数
+    </enumerate>
+
+    其实也是树的转换：
+
+    <\big-figure|<scm|<tree|(list-view 1 2 3)|map|(lambda (x) (+ x 1))>><space|2em><math|\<Rightarrow\>><space|2em><scm|<tree|map|(lambda (x) (+ x 1))|(list 1 2 3)>>>
+      原理的可视化
+    </big-figure>
+
+    <item*|偶数个参数>在上述两个递归退出条件写好的情况下，在思考这种一般的情况。
+
+    需要计算<scm|((list-view 1 2 3) hf1 f1 hf2 f2 ... hfn fn)>，其中hf指的是high-order function，也就是高阶函数。也就是需要计算：
+
+    <\scm>
+      ((((list-view 1 2 3) hf1 f1) hf2 f2) ... hfn fn)
+    </scm>
+
+    \;
+  </description>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (list-view scheme-list)
+
+    \ \ (define (f-inner-reducer scheme-list filter filter-func rest-funcs)
+
+    \ \ \ \ (cond ((null? rest-funcs) (list-view (filter filter-func scheme-list)))
+
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ (f-inner-reducer (filter filter-func scheme-list)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car rest-funcs)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cadr rest-funcs)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr rest-funcs)))))
+
+    \ \ (define (f-inner . funcs)
+
+    \ \ \ \ (cond ((null? funcs) scheme-list)
+
+    \ \ \ \ \ \ \ \ \ \ ((length=? 2 funcs)
+
+    \ \ \ \ \ \ \ \ \ \ \ (list-view ((car funcs) (cadr funcs) scheme-list)))
+
+    \ \ \ \ \ \ \ \ \ \ ((even? (length funcs))
+
+    \ \ \ \ \ \ \ \ \ \ \ (f-inner-reducer scheme-list
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car funcs)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cadr funcs)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr funcs)))
+
+    \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "list-view only accepts even number of args"))))
+
+    \ \ f-inner)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|flatmap><index|flatmap>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (flatmap f seq)
+
+    \ \ (fold-right append () (map f seq)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|not-null-list?><index|not-null-list?>
+
+  <scm|null-list?>的反面，会抛出异常。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (not-null-list? l)
+
+    \ \ (cond ((pair? l)
+
+    \ \ \ \ \ \ \ \ \ (or (null? (cdr l)) (pair? (cdr l))))
+
+    \ \ \ \ \ \ \ \ ((null? l) #f)
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ (error 'type-error "type mismatch"))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|list-null?><index|null-list?>
+
+  <scm|null-list?>的没有异常的版本，只要不是<scm|list>，都是<scm|#f>。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (list-null? l)
+
+    \ \ (and (not (pair? l)) (null? l)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|list-not-null?><index|list-not-null?>
+
+  <scm|not-null-list?>的没有异常的版本。
+
+  \;
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (list-not-null? l)
+
+    \ \ (and (pair? l)
+
+    \ \ \ \ \ \ \ (or (null? (cdr l)) (pair? (cdr l)))))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (not-null-list? (list 1)) =\<gtr\> #t)
+
+    (check (list-not-null? (list 1)) =\<gtr\> #t)
+
+    (check (list-null? (list 1)) =\<gtr\> #f)
+
+    \;
+
+    (check (not-null-list? (list 1 2 3)) =\<gtr\> #t)
+
+    (check (list-not-null? (list 1 2 3)) =\<gtr\> #t)
+
+    (check (list-null? (list 1 2 3)) =\<gtr\> #f)
+
+    \;
+
+    (check (not-null-list? '(a)) =\<gtr\> #t)
+
+    (check (list-not-null? '(a)) =\<gtr\> #t)
+
+    (check (list-null? '(a)) =\<gtr\> #f)
+
+    \;
+
+    (check (not-null-list? '(a b c)) =\<gtr\> #t)
+
+    (check (list-not-null? '(a b c)) =\<gtr\> #t)
+
+    (check (list-null? '(a b c)) =\<gtr\> #f)
+
+    \;
+
+    (check (not-null-list? ()) =\<gtr\> #f)
+
+    (check (list-not-null? ()) =\<gtr\> #f)
+
+    (check (list-null? ()) =\<gtr\> #t)
+
+    \;
+
+    ; '(a) is a pair and a list
+
+    ; '(a . b) is a pair but not a list
+
+    (check (not-null-list? '(a . b)) =\<gtr\> #f)
+
+    (check (list-not-null? '(a . b)) =\<gtr\> #f)
+
+    (check (list-null? '(a . b)) =\<gtr\> #f)
+
+    \;
+
+    (check-catch 'type-error (not-null-list? 1))
+
+    (check (list-not-null? 1) =\<gtr\> #f)
+
+    (check (list-null? 1) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+</body>
+
+<\initial>
+  <\collection>
+    <associate|page-medium|paper>
+    <associate|page-screen-margin|false>
+  </collection>
+</initial>
+
+<\references>
+  <\collection>
+    <associate|auto-1|<tuple|1|1|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-10|<tuple|2|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-11|<tuple|3|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-12|<tuple|flatmap|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-13|<tuple|4|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-14|<tuple|not-null-list?|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-15|<tuple|5|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-16|<tuple|null-list?|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-17|<tuple|6|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-18|<tuple|list-not-null?|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-19|<tuple|5|?|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-2|<tuple|1|1|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-3|<tuple|2|1|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-4|<tuple|3|2|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-5|<tuple|4|2|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-6|<tuple|1|2|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-7|<tuple|2|2|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-8|<tuple|list-view|2|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|auto-9|<tuple|1|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-1|<tuple|goldfish/liii/list.scm|1|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-2|<tuple|goldfish/liii/list.scm|1|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-3|<tuple|goldfish/liii/list.scm|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-4|<tuple|goldfish/liii/list.scm|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-5|<tuple|goldfish/liii/list.scm|3|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-6|<tuple|goldfish/liii/list.scm|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-7|<tuple|goldfish/liii/list.scm|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-8|<tuple|goldfish/liii/list.scm|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-goldfish/liii/list.scm-9|<tuple|goldfish/liii/list.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-tests/goldfish/liii/list-test.scm-1|<tuple|tests/goldfish/liii/list-test.scm|2|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-tests/goldfish/liii/list-test.scm-2|<tuple|tests/goldfish/liii/list-test.scm|2|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-tests/goldfish/liii/list-test.scm-3|<tuple|tests/goldfish/liii/list-test.scm|4|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-tests/goldfish/liii/list-test.scm-4|<tuple|tests/goldfish/liii/list-test.scm|5|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+    <associate|chunk-tests/goldfish/liii/list-test.scm-5|<tuple|tests/goldfish/liii/list-test.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_47.tm>>
+  </collection>
+</references>
+
+<\auxiliary>
+  <\collection>
+    <\associate|figure>
+      <tuple|normal|<\surround|<hidden-binding|<tuple>|1>|>
+        使用list处理数据和使用list-view处理数据的对比
+      </surround>|<pageref|auto-8>>
+
+      <tuple|normal|<\surround|<hidden-binding|<tuple>|2>|>
+        原理的可视化
+      </surround>|<pageref|auto-9>>
+    </associate>
+    <\associate|idx>
+      <tuple|<tuple|list-view>|<pageref|auto-7>>
+
+      <tuple|<tuple|flatmap>|<pageref|auto-11>>
+
+      <tuple|<tuple|not-null-list?>|<pageref|auto-13>>
+
+      <tuple|<tuple|null-list?>|<pageref|auto-15>>
+
+      <tuple|<tuple|list-not-null?>|<pageref|auto-17>>
+    </associate>
+    <\associate|toc>
+      <vspace*|2fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|font-size|<quote|1.19>|1<space|2spc>(liii list)> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-1><vspace|1fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>许可证> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-2><vspace|0.5fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|2<space|2spc>接口> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-3><vspace|0.5fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|3<space|2spc>测试> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-4><vspace|0.5fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|4<space|2spc>实现> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-5><vspace|0.5fn>
+
+      <with|par-left|<quote|3tab>|list-view <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-6>>
+
+      <with|par-left|<quote|3tab>|flatmap <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-10>>
+
+      <with|par-left|<quote|3tab>|not-null-list? <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-12>>
+
+      <with|par-left|<quote|3tab>|list-null? <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-14>>
+
+      <with|par-left|<quote|3tab>|list-not-null? <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-16>>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|5<space|2spc>结尾> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-18><vspace|0.5fn>
+    </associate>
+  </collection>
+</auxiliary>

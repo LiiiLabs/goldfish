@@ -25,7 +25,7 @@
 
 ; (display (listdir2 "tests"))
 (define (all-tests)
-  (((list-view (listdir2 "tests"))
+  (((list-view (listdir2 "tests/goldfish"))
     filter path-dir?
     flatmap listdir2
     filter (lambda (x) (path-file? x))
