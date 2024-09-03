@@ -40,7 +40,7 @@
 (import (srfi srfi-1))
 (begin
 
-(define (length= x scheme-list)
+(define (length=? x scheme-list)
   (cond ((and (= x 0) (null? scheme-list)) #t)
         ((or (= x 0) (null? scheme-list)) #f)
         (else (length= (- x 1) (cdr scheme-list)))))
