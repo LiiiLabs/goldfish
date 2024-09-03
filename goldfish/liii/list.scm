@@ -43,7 +43,7 @@
 
 (define (length=? x scheme-list)
   (when (< x 0)
-    (value-error "x: expected non-negative integer but received ~d" x))
+    (value-error "length=?: expected non-negative integer x but received ~d" x))
   (cond ((and (= x 0) (null? scheme-list)) #t)
         ((or (= x 0) (null? scheme-list)) #f)
         (else (length=? (- x 1) (cdr scheme-list)))))

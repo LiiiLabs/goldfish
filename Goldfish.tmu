@@ -184,7 +184,7 @@
 
     \ \ (when (\<less\> x 0)
 
-    \ \ \ \ (value-error "x: expected non-negative integer but received ~d" x))
+    \ \ \ \ (value-error "length=?: expected non-negative integer x but received ~d" x))
 
     \ \ (cond ((and (= x 0) (null? scheme-list)) #t)
 
