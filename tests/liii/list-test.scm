@@ -3,9 +3,9 @@
 
 (check-set-mode! 'report-failed)
 
-(check ((length= 3 (list 1 2 3))) => #t)
-(check ((length= 2 (list 1 2 3))) => #f)
-(check ((length= 4 (list 1 2 3))) => #f)
+(check (length= 3 (list 1 2 3)) => #t)
+(check (length= 2 (list 1 2 3)) => #f)
+(check (length= 4 (list 1 2 3)) => #f)
 
 (check ((list-view (list 1 2 3))) => (list 1 2 3))
 
