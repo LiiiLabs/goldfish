@@ -55,7 +55,7 @@
                             (cddr rest-funcs)))))
   (define (f-inner . funcs)
     (cond ((null? funcs) scheme-list)
-          ((length=? 2 scheme-list)
+          ((length=? 2 funcs)
            (list-view ((car funcs) (cadr funcs) scheme-list)))
           ((even? (length funcs))
            (f-inner-reducer scheme-list
