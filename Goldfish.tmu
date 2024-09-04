@@ -797,7 +797,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|last-pair><index|last-pari>
+  <paragraph|last-pair><index|last-pair>
 
   <scm|last-pair>是一个函数，以序对形式返回列表的最后一个元素，参数必须是序对，空列表报错。
 
@@ -2005,6 +2005,600 @@
     \;
   </scm-chunk>
 
+  <chapter|(liii stack)>
+
+  栈是一个先进后出（FILO）的数据结构。
+
+  这个函数库是三鲤自定义的库，参考了C++和Java的栈相关的函数库的接口。
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/liii/stack.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define-library (liii stack)
+
+    (import (srfi srfi-9)
+
+    \ \ \ \ \ \ \ \ (liii base)
+
+    \ \ \ \ \ \ \ \ (liii error))
+
+    (export
+
+    \ stack
+
+    \ stack? stack-empty?
+
+    \ stack-size stack-top
+
+    \ stack-push! stack-pop!
+
+    \ stack-\<gtr\>list
+
+    )
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/stack-test.scm|false|false>
+    (import (liii stack)
+
+    \ \ \ \ \ \ \ \ (liii check))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (define stack1 (stack))
+
+    (check (stack-empty? stack1) =\<gtr\> #t)
+
+    (check (stack-\<gtr\>list stack1) =\<gtr\> '())
+
+    (check-catch 'value-error (stack-pop! stack1))
+
+    \;
+
+    (stack-push! stack1 1)
+
+    (check (stack-\<gtr\>list stack1) =\<gtr\> '(1))
+
+    (check (stack-top stack1) =\<gtr\> 1)
+
+    (check (stack-size stack1) =\<gtr\> 1)
+
+    (check (stack-pop! stack1) =\<gtr\> 1)
+
+    (check (stack-empty? stack1) =\<gtr\> #t)
+
+    (check (stack-size stack1) =\<gtr\> 0)
+
+    \;
+
+    (define stack2 (stack 1 2 3))
+
+    (check (stack-\<gtr\>list stack2) =\<gtr\> '(1 2 3))
+
+    (check (stack-size stack2) =\<gtr\> 3)
+
+    (check (stack-pop! stack2) =\<gtr\> 1)
+
+    (check (stack-pop! stack2) =\<gtr\> 2)
+
+    (check (stack-pop! stack2) =\<gtr\> 3)
+
+    \;
+
+    (define stack3 (stack ))
+
+    (stack-push! stack3 1)
+
+    (stack-push! stack3 2)
+
+    (stack-push! stack3 3)
+
+    (check (stack-pop! stack3) =\<gtr\> 3)
+
+    (check (stack-pop! stack3) =\<gtr\> 2)
+
+    (check (stack-pop! stack3) =\<gtr\> 1)
+
+    \;
+
+    (check-catch 'type-error (stack-empty? 1))
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define-record-type :stack
+
+    \ \ (make-stack data)
+
+    \ \ stack?
+
+    \ \ (data get-data set-data!))
+
+    \;
+
+    (define (%stack-check-parameter st)
+
+    \ \ (when (not (stack? st))
+
+    \ \ \ \ (error 'type-error "Parameter st is not a stack")))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack><index|stack><scm|(x1 x2 ...) =\<gtr\> stack>
+
+  传入参数，构造一个栈，第一个参数是栈顶。如果没有参数，则构造的是空栈。
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define (stack . l)
+
+    \ \ (if (null? l)
+
+    \ \ \ \ \ \ (make-stack '())
+
+    \ \ \ \ \ \ (make-stack l)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack-empty?><index|stack-empty?><scm|(st) =\<gtr\> bool>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define (stack-empty? st)
+
+    \ \ (%stack-check-parameter st)
+
+    \ \ (null? (get-data st)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack-size><index|stack-size><scm|(st) =\<gtr\> int>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define (stack-size st)
+
+    \ \ (%stack-check-parameter st)
+
+    \ \ (length (get-data st)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack-top><index|stack-top><scm|(st) =\<gtr\> x>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define (stack-top st)
+
+    \ \ (%stack-check-parameter st)
+
+    \ \ (car (get-data st)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack-push!><index|stack-push!><scm|(st x) =\<gtr\> #\<less\>unspecified\<gtr\>>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define (stack-push! st elem)
+
+    \ \ (%stack-check-parameter st)
+
+    \ \ (set-data! st (cons elem (get-data st))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack-pop!><index|stack-pop!><scm|(st) =\<gtr\> x>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define (stack-pop! st)
+
+    \ \ (%stack-check-parameter st)
+
+    \ \ (when (stack-empty? st)
+
+    \ \ \ \ (error 'value-error "Failed to stack-pop! on empty stack"))
+
+    \ \ (let1 data (get-data st)
+
+    \ \ \ \ (set-data! st (cdr data))
+
+    \ \ \ \ (car data)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack-\<gtr\>list><index|stack-\<gtr\>list><scm|(st) =\<gtr\> list>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (define (stack-\<gtr\>list st)
+
+    \ \ (%stack-check-parameter st)
+
+    \ \ (get-data st))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </scm-chunk>
+
+  <chapter|(liii queue)>
+
+  这个函数库是三鲤自定义的库，参考了C++和Java的队列相关的函数库的接口。目前基于Scheme的列表实现，从队列取出数据的复杂度是<math|O<around*|(|1|)>>，从队列存入数据的复杂度是<math|O<around*|(|n|)>>。
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/liii/queue.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/queue-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define-library (liii queue)
+
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii base)
+
+    \ \ \ \ \ \ \ \ (srfi srfi-9)
+
+    \ \ \ \ \ \ \ \ (liii error))
+
+    (export
+
+    \ \ queue
+
+    \ \ queue? queue-empty?
+
+    \ \ queue-size queue-front queue-back
+
+    \ \ queue-pop! queue-push!
+
+    \ \ queue-\<gtr\>list)
+
+    (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/queue-test.scm|true|true>
+    (import (liii queue)
+
+    \ \ \ \ \ \ \ \ (liii base)
+
+    \ \ \ \ \ \ \ \ (liii check))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (let1 q1 (queue)
+
+    \ \ (check-true (queue-empty? q1))
+
+    \ \ (check (queue-size q1) =\<gtr\> 0)
+
+    \ \ (check-catch 'value-error (queue-pop! q1))
+
+    \;
+
+    \ \ (queue-push! q1 1)
+
+    \ \ (check (queue-size q1) =\<gtr\> 1)
+
+    \ \ (check (queue-front q1) =\<gtr\> 1)
+
+    \ \ (check (queue-back q1) =\<gtr\> 1)
+
+    \ \ (check (queue-pop! q1) =\<gtr\> 1)
+
+    \ \ (check-true (queue-empty? q1))
+
+    )
+
+    \;
+
+    (let1 q2 (queue 1 2 3)
+
+    \ \ (check (queue-size q2) =\<gtr\> 3)
+
+    \ \ (check (queue-front q2) =\<gtr\> 1)
+
+    \ \ (check (queue-back q2) =\<gtr\> 3)
+
+    \ \ (check (queue-pop! q2) =\<gtr\> 1)
+
+    \ \ (check (queue-pop! q2) =\<gtr\> 2)
+
+    \ \ (check (queue-pop! q2) =\<gtr\> 3)
+
+    )
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define-record-type :queue
+
+    \ \ (make-queue data)
+
+    \ \ queue?
+
+    \ \ (data get-data set-data!))
+
+    \;
+
+    (define (%queue-assert-type q)
+
+    \ \ (when (not (queue? q))
+
+    \ \ \ \ (type-error "Parameter q is not a queue")))
+
+    \;
+
+    (define (%queue-assert-value q)
+
+    \ \ (when (queue-empty? q)
+
+    \ \ \ \ (value-error "q must be non-empty")))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue><index|queue>
+
+  第一个参数是队列的头部，最后一个参数是队列的尾部。
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue . l)
+
+    \ \ (if (null? l)
+
+    \ \ \ \ \ \ (make-queue '())
+
+    \ \ \ \ \ \ (make-queue l)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue-empty?><index|queue-empty?><scm|(queue) =\<gtr\> bool>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue-empty? q)
+
+    \ \ (%queue-assert-type q)
+
+    \ \ (null? (get-data q)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue-size><index|queue-size><scm|(queue) =\<gtr\> int>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue-size q)
+
+    \ \ (%queue-assert-type q)
+
+    \ \ (length (get-data q)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue-front><index|queue-front><scm|(queue) =\<gtr\> x>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue-front q)
+
+    \ \ (%queue-assert-type q)
+
+    \ \ (%queue-assert-value q)
+
+    \ \ (first (get-data q)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue-back><index|queue-back><scm|(queue) =\<gtr\> x>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue-back q)
+
+    \ \ (%queue-assert-type q)
+
+    \ \ (%queue-assert-value q)
+
+    \ \ (last (get-data q)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue-push!><index|queue-push!><scm|(queue x) =\<gtr\> queue>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue-push! q x)
+
+    \ \ (%queue-assert-type q)
+
+    \ \ (let1 data (get-data q)
+
+    \ \ \ \ (set-data! q (append data (list x)))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue-pop!><index|queue-pop!><scm|(queue) =\<gtr\> x>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue-pop! q)
+
+    \ \ (%queue-assert-type q)
+
+    \ \ (%queue-assert-value q)
+
+    \ \ (let1 data (get-data q)
+
+    \ \ \ \ (set-data! q (cdr data))
+
+    \ \ \ \ (car data)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|queue-\<gtr\>list><index|queue-\<gtr\>list><scm|(queue) =\<gtr\> list>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|true>
+    (define (queue-\<gtr\>list q)
+
+    \ \ (get-data q))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/liii/queue.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/queue-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
   <\the-index|idx>
     <index+1|any|<pageref|auto-78>>
 
@@ -2048,7 +2642,7 @@
 
     <index+1|last|<pageref|auto-48>>
 
-    <index+1|last-pari|<pageref|auto-46>>
+    <index+1|last-pair|<pageref|auto-46>>
 
     <index+1|length=?|<pageref|auto-88>>
 
@@ -2066,6 +2660,22 @@
 
     <index+1|partition|<pageref|auto-65>>
 
+    <index+1|queue|<pageref|auto-128>>
+
+    <index+1|queue-back|<pageref|auto-136>>
+
+    <index+1|queue-empty?|<pageref|auto-130>>
+
+    <index+1|queue-front|<pageref|auto-134>>
+
+    <index+1|queue-\<gtr\>list|<pageref|auto-142>>
+
+    <index+1|queue-pop!|<pageref|auto-140>>
+
+    <index+1|queue-push!|<pageref|auto-138>>
+
+    <index+1|queue-size|<pageref|auto-132>>
+
     <index+1|reduce|<pageref|auto-58>>
 
     <index+1|reduce-right|<pageref|auto-60>>
@@ -2077,6 +2687,20 @@
     <index+1|seventh|<pageref|auto-30>>
 
     <index+1|sixth|<pageref|auto-28>>
+
+    <index+1|stack|<pageref|auto-108>>
+
+    <index+1|stack-empty?|<pageref|auto-110>>
+
+    <index+1|stack-\<gtr\>list|<pageref|auto-120>>
+
+    <index+1|stack-pop!|<pageref|auto-118>>
+
+    <index+1|stack-push!|<pageref|auto-116>>
+
+    <index+1|stack-size|<pageref|auto-112>>
+
+    <index+1|stack-top|<pageref|auto-114>>
 
     <index+1|take|<pageref|auto-38>>
 
