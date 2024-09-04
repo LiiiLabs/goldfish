@@ -1233,7 +1233,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|make-vector><scm|(make-vector k [fill])>，返回长度为k的向量，如果提供了fill，则采用fill作为每一个元素的初始值，否则每一个元素的初始值是未指定。
+  <paragraph|make-vector><scm|(make-vector k [fill])>
+
+  返回长度为k的向量，如果提供了fill，则采用fill作为每一个元素的初始值，否则每一个元素的初始值是未指定。
 
   <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
     (check (make-vector 1 1) =\<gtr\> (vector 1))
@@ -1249,7 +1251,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|vector><scm|(vector obj . . . )>，返回一个新分配的向量，其元素包含给定的参数。类似于<scm|list>。
+  <paragraph|vector><scm|(vector obj . . . )>
+
+  返回一个新分配的向量，其元素包含给定的参数。类似于<scm|list>。
 
   <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
     (check (vector 'a 'b 'c) =\<gtr\> #(a b c))
@@ -1259,90 +1263,92 @@
     \;
   </scm-chunk>
 
+  <paragraph|vector-length><scm|(vector-length v)>
+
+  以整数返回向量中元素的数量。
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (check (vector-length #(1 2 3)) =\<gtr\> 3)
+
+    (check (vector-length #()) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-ref><scm|(vector-ref v k )>
+
+  返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (check (vector-ref #(1 2 3) 0) =\<gtr\> 1)
+
+    (check (vector-ref #(1 2 3) 2) =\<gtr\> 3)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-ref #(1 2 3) 3))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \ \ 
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-ref #() 0))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \ \ 
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (vector-ref #(1 2 3) 2.0))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \ \ 
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (vector-ref #(1 2 3) "2"))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
   \;
 
   <\description>
-    <item*|vector?>
+    \;
 
-    <item*|make-vector>
-
-    <item*|vector>
-
-    <item*|vector-length><scm|(vector-length v)>，以整数返回向量中元素的数量。
-
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (check (vector-length #(1 2 3)) =\<gtr\> 3)
-
-      (check (vector-length #()) =\<gtr\> 0)
-
-      \;
-    </scm-chunk>
-
-    <item*|vector-ref><scm|(vector-ref v k )>，返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
-
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (check (vector-ref #(1 2 3) 0) =\<gtr\> 1)
-
-      (check (vector-ref #(1 2 3) 2) =\<gtr\> 3)
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-ref #(1 2 3) 3))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \ \ 
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-ref #() 0))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \ \ 
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (vector-ref #(1 2 3) 2.0))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \ \ 
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (vector-ref #(1 2 3) "2"))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
+    \;
 
     <item*|vector-set!><scm|(vector-set! v k obj )>，该函数将对象 obj 存储到向量中索引为 k 的元素里。注意，返回的不是向量，而是那个 obj。当 k 不是向量的有效索引，报错。
 
