@@ -1,6 +1,6 @@
 <TMU|<tuple|1.0.3|1.2.9.1>>
 
-<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile>>
+<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
 <\body>
   <\hide-preamble>
@@ -581,349 +581,7 @@
 
   <section|序对和列表>
 
-  <paragraph|pair?><index|pair?><scm|(obj) =\<gtr\> bool>
-
-  当且仅当obj是序对时，返回真。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (pair? '(a . b)) =\<gtr\> #t)
-
-    (check (pair? '(a b c)) =\<gtr\> #t)
-
-    (check (pair? '()) =\<gtr\> #f)
-
-    (check (pair? '#(a b)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|car><index|car>
-
-  <scm|car>是一个S7内置函数，用于返回序对的<scm|\<less\>car\<gtr\>>部分<\footnote>
-    一个序对由<scm|\<less\>car\<gtr\>>部分与<scm|\<less\>cdr\<gtr\>>部分组成，形如：<scm|(\<less\>car\<gtr\> . \<less\>cdr\<gtr\>)>
-  </footnote>。<scm|car>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (car '(a b c . d)) =\<gtr\> 'a)
-
-    \;
-
-    (check (car '(a b c)) =\<gtr\> 'a)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (car '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|cdr><index|cdr>
-
-  <scm|cdr>是一个S7内置函数，用于返回序对的<scm|\<less\>cdr\<gtr\>>部分。<scm|cdr>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (cdr '(a b c . d)) =\<gtr\> '(b c . d))
-
-    \;
-
-    (check (cdr '(a b c)) =\<gtr\> '(b c))
-
-    \ \ 
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (cdr '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|caar><index|caar>
-
-  <scm|(caar pair) =\<gtr\> obj>
-
-  <scm|caar>是一个S7内置函数，用于返回序对<scm|\<less\>car\<gtr\>>部分的<scm|\<less\>car\<gtr\>>部分。参数必须是序对，且该序对的<scm|\<less\>car\<gtr\>>部分的内容也要是序对，否则报错。特别地，空列表不是序对，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (caar '((a . b) . c)) =\<gtr\> 'a)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (caar '(a b . c)))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (caar '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|null?><index|null?><scm|(null? obj) =\<gtr\> bool>
-
-  当且仅当obj是空列表的时候，返回值为真。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (null? '()) =\<gtr\> #t)
-
-    (check (null? '(1)) =\<gtr\> #f)
-
-    (check (null? '(1 2)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (make-list 3 #\\a) =\<gtr\> (list #\\a #\\a #\\a))
-
-    (check (make-list 3) =\<gtr\> (list #f #f #f))
-
-    \;
-
-    (check (make-list 0) =\<gtr\> (list ))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|length><index|length>
-
-  <scm|(length list) -\<gtr\> int>，<scm|length>是一个S7内置函数，它接收一个列表为参数，返回该列表中元素的数量。如果参数不是列表，返回0。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (length ()) =\<gtr\> 0)
-
-    (check (length '(a b c)) =\<gtr\> 3)
-
-    (check (length '(a (b) (c d e))) =\<gtr\> 3)
-
-    \;
-
-    (check (length 2) =\<gtr\> #f)
-
-    (check (length '(a . b)) =\<gtr\> -1)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|append><index|append>
-
-  <scm|append>是一个S7内置函数，它接收多个列表为参数，按顺序拼接在一起，返回一个新的列表。<scm|append>没有参数时，返回空列表。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (append '(a) '(b c d)) =\<gtr\> '(a b c d))
-
-    (check (append '(a b) 'c) =\<gtr\> '(a b . c))
-
-    \;
-
-    (check (append () 'c) =\<gtr\> 'c)
-
-    (check (append) =\<gtr\> '())
-
-    \;
-  </scm-chunk>
-
-  <paragraph|list-ref><index|list-ref>
-
-  <scm|list-ref>是一个S7内置函数，接收一个列表和一个称为索引值的非负整数k为参数，通过索引值k返回列表的第k个元素（从0开始计数）。当参数为空列表时，报错。当k为负数，报错。当k大于等于列表中元素数时，报错。
-
-  注意<scm|(cons '(1 2) '(3 4))>其实是一个列表，但这个列表的元素不都是整数。这个例子容易理解成结果是一个序对且不是列表。
-
-  <\session|goldfish|default>
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      (cons '(1 2) '(3 4))
-    <|unfolded-io>
-      ((1 2) 3 4)
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (list-ref (cons '(1 2) '(3 4)) 1) =\<gtr\> 3)
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (list-ref '(a b c) 2) =\<gtr\> 'c)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (list-ref '() 0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (list-ref '(a b c) -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (list-ref '(a b c) 3))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|memq><index|memq>
-
-  <scm|memq>是一个S7内置函数，和<scm|member>类似，但判断元素等价的谓词是<scm|eq?>。也就是说，检查的是两个元素在是否是同一个实例，即它们是否具有相同的内存地址。
-
-  对比使用<scm|equal?>的<scm|member>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“严格”，适用于判断的元素类型最少，速度最快，适用于判断布尔值（<scm|#t>、<scm|#f>）、符号、整数（浮点数和复数不行）、函数（的值）这些类型的元素是否在列表中。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (memq #f '(1 #f 2 3)) =\<gtr\> '(#f 2 3))
-
-    (check (memq 'a '(1 a 2 3)) =\<gtr\> '(a 2 3))
-
-    (check (memq 2 '(1 2 3)) =\<gtr\> '(2 3))
-
-    \;
-
-    (check (memq 2.0 '(1 2.0 3)) =\<gtr\> #f)
-
-    (check (memq 2+0i '(1 2+0i 3)) =\<gtr\> #f)
-
-    \;
-
-    (define num1 3)
-
-    (define num2 3)
-
-    (check (memq num1 '(3 num2)) =\<gtr\> '(3 num2))
-
-    (check (memq 3 '(num1 num2)) =\<gtr\> #f)
-
-    (check (memq 'num1 '(num1 num2)) =\<gtr\> '(num1 num2))
-
-    \;
-
-    (check (memq (+ 1 1) '(1 2 3)) =\<gtr\> '(2 3))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|memv><index|memv>
-
-  <scm|memv>是一个S7内置函数，和<scm|member>类似，但判断元素元素的谓词是<scm|eqv?>。也就是说，检查的是两个元素是否相同或在数值上等价。
-
-  比使用<scm|equal?>的<scm|member>“严格”，但比使用<scm|<scm|eq?>>的<scm|memq>“宽松”，适用于判断的元素类型次全（<scm|memv>能实现的功能<scm|member>都能实现），速度中等，适用于判断数值类元素（整数、浮点数、复数）是否在列表中。但是注意，即使数值相同也不视为同一元素。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (memv 2 '(1 2 3)) =\<gtr\> '(2 3))
-
-    (check (memv 2.0 '(1 2.0 3)) =\<gtr\> '(2.0 3))
-
-    (check (memv 2+0i '(1 2+0i 3)) =\<gtr\> '(2+0i 3))
-
-    \;
-
-    (check (memv 2 '(1 2.0 3)) =\<gtr\> #f)
-
-    (check (memv 2 '(1 2+0i 3)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|member><index|member>
-
-  <scm|member>是一个S7内置函数，接收一个元素和一个列表为参数，返回包含该元素的第一个子列表。当元素不在列表中，返回<scm|#f>。当列表为空列表，返回<scm|#f>。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (member 2 '(1 2 3)) =\<gtr\> '(2 3))
-
-    (check (member 0 '(1 2 3)) =\<gtr\> #f)
-
-    (check (member 0 '()) =\<gtr\> #f)
-
-    \ 
-  </scm-chunk>
-
-  注意，判断两个元素等价的谓词是<scm|equal?>。也就是说，检查的是两个元素在结构和内容上是否等价。
-
-  对比使用<scm|eq?>的<scm|memq>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“宽松”，适用判断的元素类型最全，但速度最慢（因为它会递归地比较复合数据结构的每个部分），建议用于判断字符串、序对、列表这些类型的元素是否在列表中，如果无需判断这些类型，建议选用<scm|memv>或<scm|memq>。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (member "1" '(0 "1" 2 3)) =\<gtr\> '("1" 2 3))
-
-    (check (member '(1 . 2) '(0 (1 . 2) 3)) =\<gtr\> '((1 . 2) 3))
-
-    (check (member '(1 2) '(0 (1 2) 3)) =\<gtr\> '((1 2) 3))
-
-    \;
-  </scm-chunk>
+  见<chapter-ref|chapter:liii_list>
 
   <section|字符>
 
@@ -2723,7 +2381,7 @@
 
   \;
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check-report)
 
     \;
@@ -3005,7 +2663,7 @@
     \;
   </scm-chunk>
 
-  <chapter|(liii list)>
+  <chapter|(liii list)><label|chapter:liii_list>
 
   <section|许可证>
 
@@ -3168,6 +2826,8 @@
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     (define-library (srfi srfi-1)
 
+    (import (liii error))
+
     (export
 
     \ \ circular-list iota circular-list? null-list?
@@ -3211,9 +2871,33 @@
 
   <section|SRFI-1>
 
-  SRFI-1中有一部分函数已经在R7RS的<scm|(scheme base)>库里面了。本节不包含R7RS定义的那些函数。
+  SRFI-1中有一部分函数已经在R7RS的<scm|(scheme base)>库里面了。本节包含了R7RS定义的<scm|(scheme base)>里面和列表相关的函数，这些函数的实现和测试均在<shell|base.scm>和<shell|base-test.scm>中维护。用户可以通过<scm|(import (liii base))>导入这些函数，或者使用<scm|(import (liii list))>导入这些函数。
 
   <subsection|构造器>
+
+  <paragraph|cons><index|cons>
+
+  S7 Scheme内置的R7RS中定义的函数。
+
+  <paragraph|list><index|list>
+
+  S7 Scheme内置的R7RS中定义的函数。
+
+  <paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
+
+  S7 Scheme内置的R7RS中定义的函数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (make-list 3 #\\a) =\<gtr\> (list #\\a #\\a #\\a))
+
+    (check (make-list 3) =\<gtr\> (list #f #f #f))
+
+    \;
+
+    (check (make-list 0) =\<gtr\> (list ))
+
+    \;
+  </scm-chunk>
 
   <paragraph|circular-list><index|circular-list>
 
@@ -3236,13 +2920,15 @@
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     ; 0 clause BSD, from S7 repo stuff.scm
 
-    (define* (iota n (start 0) (incr 1))\ 
+    (define* (iota n (start 0) (incr 1))
 
-    \ \ (if (or (not (integer? n)) (\<less\> n 0))
+    \ \ (when (not (integer? n))
 
-    \ \ \ \ (error 'wrong-type-arg
+    \ \ \ \ (type-error "iota: n must be a integer"))
 
-    \ \ \ \ \ \ \ \ \ \ \ "iota length ~A should be a non-negative integer" n))
+    \ \ (when (\<less\> n 0)
+
+    \ \ \ \ (value-error "iota: n must be postive but received ~d" n))
 
     \ \ (let ((lst (make-list n)))
 
@@ -3268,20 +2954,44 @@
 
     \;
 
-    (check
+    (check-catch 'value-error (iota -1))
 
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (iota -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'type-error (iota 'a))
 
     \;
   </scm-chunk>
 
   <subsection|谓词>
+
+  <paragraph|pair?><index|pair?><scm|(obj) =\<gtr\> bool>
+
+  <scm|pair?>是S7 Scheme内置的R7RS定义的函数：当且仅当obj是序对时，返回真。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (pair? '(a . b)) =\<gtr\> #t)
+
+    (check (pair? '(a b c)) =\<gtr\> #t)
+
+    (check (pair? '()) =\<gtr\> #f)
+
+    (check (pair? '#(a b)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|null?><index|null?><scm|(obj) =\<gtr\> bool>
+
+  <scm|null?>是S7 Scheme内置的R7RS定义的函数：当且仅当obj是空列表的时候，返回值为真。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (null? '()) =\<gtr\> #t)
+
+    (check (null? '(1)) =\<gtr\> #f)
+
+    (check (null? '(1 2)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
 
   <paragraph|circular-list?><index|circular-list?>
 
@@ -3362,6 +3072,116 @@
   如果已经确定需要判别的对象是列表，使用<scm|null-list?>更加合适。<scm|null?>无法分辨非空的序对和非空的列表，命名上偏模糊，不推荐使用。
 
   <subsection|选择器>
+
+  <paragraph|car><index|car>
+
+  <scm|car>是S7 Scheme内置的R7RS定义的函数，用于返回序对的<scm|\<less\>car\<gtr\>>部分<\footnote>
+    一个序对由<scm|\<less\>car\<gtr\>>部分与<scm|\<less\>cdr\<gtr\>>部分组成，形如：<scm|(\<less\>car\<gtr\> . \<less\>cdr\<gtr\>)>
+  </footnote>。<scm|car>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (car '(a b c . d)) =\<gtr\> 'a)
+
+    \;
+
+    (check (car '(a b c)) =\<gtr\> 'a)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (car '()))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|cdr><index|cdr>
+
+  <scm|cdr>是S7 Scheme内置的R7RS定义的函数，用于返回序对的<scm|\<less\>cdr\<gtr\>>部分。<scm|cdr>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (cdr '(a b c . d)) =\<gtr\> '(b c . d))
+
+    \;
+
+    (check (cdr '(a b c)) =\<gtr\> '(b c))
+
+    \ \ 
+
+    (check-catch 'wrong-type-arg (cdr '()))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|caar><index|caar><scm|(caar pair) =\<gtr\> obj>
+
+  <scm|caar>是S7 Scheme内置的R7RS定义的函数，用于返回序对<scm|\<less\>car\<gtr\>>部分的<scm|\<less\>car\<gtr\>>部分。参数必须是序对，且该序对的<scm|\<less\>car\<gtr\>>部分的内容也要是序对，否则报错。特别地，空列表不是序对，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (caar '((a . b) . c)) =\<gtr\> 'a)
+
+    \;
+
+    (check-catch 'wrong-type-arg (caar '(a b . c)))
+
+    \;
+
+    (check-catch 'wrong-type-arg (caar '()))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|list-ref><index|list-ref>
+
+  <scm|list-ref>是S7 Scheme内置的R7RS定义的函数，接收一个列表和一个称为索引值的非负整数k为参数，通过索引值k返回列表的第k个元素（从0开始计数）。当参数为空列表时，报错。当k为负数，报错。当k大于等于列表中元素数时，报错。
+
+  注意<scm|(cons '(1 2) '(3 4))>其实是一个列表，但这个列表的元素不都是整数。这个例子容易理解成结果是一个序对且不是列表。
+
+  <\session|goldfish|default>
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (cons '(1 2) '(3 4))
+    <|unfolded-io>
+      ((1 2) 3 4)
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (list-ref (cons '(1 2) '(3 4)) 1) =\<gtr\> 3)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (list-ref '(a b c) 2) =\<gtr\> 'c)
+
+    \;
+
+    (check-catch 'wrong-type-arg (list-ref '() 0))
+
+    \;
+
+    (check-catch 'out-of-range (list-ref '(a b c) -1))
+
+    (check-catch 'out-of-range (list-ref '(a b c) 3))
+
+    \;
+  </scm-chunk>
 
   <paragraph|first><index|first>
 
@@ -3867,6 +3687,44 @@
 
   <subsection|常用函数>
 
+  <paragraph|length><index|length><scm|(l) -\<gtr\> integer>
+
+  <scm|length>是一个S7内置的R7RS定义的函数，它接收一个列表为参数，返回该列表中元素的数量。如果参数不是列表，返回0。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (length ()) =\<gtr\> 0)
+
+    (check (length '(a b c)) =\<gtr\> 3)
+
+    (check (length '(a (b) (c d e))) =\<gtr\> 3)
+
+    \;
+
+    (check (length 2) =\<gtr\> #f)
+
+    (check (length '(a . b)) =\<gtr\> -1)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|append><index|append>
+
+  <scm|append>是一个S7内置的R7RS定义的函数，它接收多个列表为参数，按顺序拼接在一起，返回一个新的列表。<scm|append>没有参数时，返回空列表。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (append '(a) '(b c d)) =\<gtr\> '(a b c d))
+
+    (check (append '(a b) 'c) =\<gtr\> '(a b . c))
+
+    \;
+
+    (check (append () 'c) =\<gtr\> 'c)
+
+    (check (append) =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
   <paragraph|count><index|count>
 
   <scm|count>是一个高阶函数，它接收两个参数：一个谓词和一个列表；返回满足谓词条件的元素在列表中出现的次数。
@@ -4266,6 +4124,94 @@
   </scm-chunk>
 
   <subsection|搜索>
+
+  <paragraph|memq><index|memq>
+
+  <scm|memq>是一个S7内置函数，和<scm|member>类似，但判断元素等价的谓词是<scm|eq?>。也就是说，检查的是两个元素在是否是同一个实例，即它们是否具有相同的内存地址。
+
+  对比使用<scm|equal?>的<scm|member>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“严格”，适用于判断的元素类型最少，速度最快，适用于判断布尔值（<scm|#t>、<scm|#f>）、符号、整数（浮点数和复数不行）、函数（的值）这些类型的元素是否在列表中。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (memq #f '(1 #f 2 3)) =\<gtr\> '(#f 2 3))
+
+    (check (memq 'a '(1 a 2 3)) =\<gtr\> '(a 2 3))
+
+    (check (memq 2 '(1 2 3)) =\<gtr\> '(2 3))
+
+    \;
+
+    (check (memq 2.0 '(1 2.0 3)) =\<gtr\> #f)
+
+    (check (memq 2+0i '(1 2+0i 3)) =\<gtr\> #f)
+
+    \;
+
+    (define num1 3)
+
+    (define num2 3)
+
+    (check (memq num1 '(3 num2)) =\<gtr\> '(3 num2))
+
+    (check (memq 3 '(num1 num2)) =\<gtr\> #f)
+
+    (check (memq 'num1 '(num1 num2)) =\<gtr\> '(num1 num2))
+
+    \;
+
+    (check (memq (+ 1 1) '(1 2 3)) =\<gtr\> '(2 3))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|memv><index|memv>
+
+  <scm|memv>是一个S7内置函数，和<scm|member>类似，但判断元素元素的谓词是<scm|eqv?>。也就是说，检查的是两个元素是否相同或在数值上等价。
+
+  比使用<scm|equal?>的<scm|member>“严格”，但比使用<scm|<scm|eq?>>的<scm|memq>“宽松”，适用于判断的元素类型次全（<scm|memv>能实现的功能<scm|member>都能实现），速度中等，适用于判断数值类元素（整数、浮点数、复数）是否在列表中。但是注意，即使数值相同也不视为同一元素。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (memv 2 '(1 2 3)) =\<gtr\> '(2 3))
+
+    (check (memv 2.0 '(1 2.0 3)) =\<gtr\> '(2.0 3))
+
+    (check (memv 2+0i '(1 2+0i 3)) =\<gtr\> '(2+0i 3))
+
+    \;
+
+    (check (memv 2 '(1 2.0 3)) =\<gtr\> #f)
+
+    (check (memv 2 '(1 2+0i 3)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|member><index|member>
+
+  <scm|member>是一个S7内置函数，接收一个元素和一个列表为参数，返回包含该元素的第一个子列表。当元素不在列表中，返回<scm|#f>。当列表为空列表，返回<scm|#f>。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (member 2 '(1 2 3)) =\<gtr\> '(2 3))
+
+    (check (member 0 '(1 2 3)) =\<gtr\> #f)
+
+    (check (member 0 '()) =\<gtr\> #f)
+
+    \ 
+  </scm-chunk>
+
+  注意，判断两个元素等价的谓词是<scm|equal?>。也就是说，检查的是两个元素在结构和内容上是否等价。
+
+  对比使用<scm|eq?>的<scm|memq>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“宽松”，适用判断的元素类型最全，但速度最慢（因为它会递归地比较复合数据结构的每个部分），建议用于判断字符串、序对、列表这些类型的元素是否在列表中，如果无需判断这些类型，建议选用<scm|memv>或<scm|memq>。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (check (member "1" '(0 "1" 2 3)) =\<gtr\> '("1" 2 3))
+
+    (check (member '(1 . 2) '(0 (1 . 2) 3)) =\<gtr\> '((1 . 2) 3))
+
+    (check (member '(1 2) '(0 (1 2) 3)) =\<gtr\> '((1 2) 3))
+
+    \;
+  </scm-chunk>
 
   <paragraph|find><index|find>
 
@@ -6300,301 +6246,305 @@
   </scm-chunk>
 
   <\the-index|idx>
-    <index+1|!=|<pageref|auto-177>>
+    <index+1|!=|<pageref|auto-153>>
 
-    <index+1|==|<pageref|auto-175>>
+    <index+1|==|<pageref|auto-151>>
 
-    <index+1|???|<pageref|auto-213>>
+    <index+1|???|<pageref|auto-189>>
 
-    <index+1|any|<pageref|auto-292>>
+    <index+1|any|<pageref|auto-296>>
 
-    <index+1|append|<pageref|auto-37>>
+    <index+1|append|<pageref|auto-261>>
 
-    <index+1|apply|<pageref|auto-100>>
+    <index+1|apply|<pageref|auto-76>>
 
-    <index+1|binary-port?|<pageref|auto-143>>
+    <index+1|binary-port?|<pageref|auto-119>>
 
-    <index+1|caar|<pageref|auto-29>>
+    <index+1|caar|<pageref|auto-222>>
 
-    <index+1|call-with-port|<pageref|auto-133>>
+    <index+1|call-with-port|<pageref|auto-109>>
 
-    <index+1|car|<pageref|auto-25>>
+    <index+1|car|<pageref|auto-218>>
 
     <index+1|case|<pageref|auto-9>>
 
-    <index+1|cdr|<pageref|auto-27>>
+    <index+1|cdr|<pageref|auto-220>>
 
-    <index+1|char?|<pageref|auto-48>>
+    <index+1|char?|<pageref|auto-24>>
 
-    <index+1|char=?|<pageref|auto-50>>
+    <index+1|char=?|<pageref|auto-26>>
 
-    <index+1|circular-list|<pageref|auto-222>>
+    <index+1|circular-list|<pageref|auto-204>>
 
-    <index+1|circular-list?|<pageref|auto-227>>
+    <index+1|circular-list?|<pageref|auto-213>>
 
-    <index+1|close-input-port|<pageref|auto-151>>
+    <index+1|close-input-port|<pageref|auto-127>>
 
-    <index+1|close-output-port|<pageref|auto-153>>
+    <index+1|close-output-port|<pageref|auto-129>>
 
-    <index+1|close-port|<pageref|auto-149>>
+    <index+1|close-port|<pageref|auto-125>>
 
-    <index+1|compose|<pageref|auto-187>>
+    <index+1|compose|<pageref|auto-163>>
 
-    <index+1|count|<pageref|auto-265>>
+    <index+1|cons|<pageref|auto-198>>
+
+    <index+1|count|<pageref|auto-263>>
 
     <index+1|define-record-type|<pageref|auto-14>>
 
-    <index+1|delete|<pageref|auto-297>>
+    <index+1|delete|<pageref|auto-301>>
 
-    <index+1|delete-duplicates|<pageref|auto-299>>
+    <index+1|delete-duplicates|<pageref|auto-303>>
 
-    <index+1|display*|<pageref|auto-179>>
+    <index+1|display*|<pageref|auto-155>>
 
-    <index+1|drop|<pageref|auto-254>>
+    <index+1|drop|<pageref|auto-248>>
 
-    <index+1|drop-right|<pageref|auto-258>>
+    <index+1|drop-right|<pageref|auto-252>>
 
-    <index+1|drop-while|<pageref|auto-288>>
+    <index+1|drop-while|<pageref|auto-292>>
 
-    <index+1|eighth|<pageref|auto-246>>
+    <index+1|eighth|<pageref|auto-240>>
 
-    <index+1|eof-object|<pageref|auto-161>>
+    <index+1|eof-object|<pageref|auto-137>>
 
-    <index+1|every|<pageref|auto-294>>
+    <index+1|every|<pageref|auto-298>>
 
-    <index+1|fifth|<pageref|auto-240>>
+    <index+1|fifth|<pageref|auto-234>>
 
-    <index+1|file-error?|<pageref|auto-129>>
+    <index+1|file-error?|<pageref|auto-105>>
 
-    <index+1|file-exists-error|<pageref|auto-205>>
+    <index+1|file-exists-error|<pageref|auto-181>>
 
-    <index+1|file-not-found-error|<pageref|auto-201>>
+    <index+1|file-not-found-error|<pageref|auto-177>>
 
-    <index+1|filter|<pageref|auto-277>>
+    <index+1|filter|<pageref|auto-275>>
 
-    <index+1|find|<pageref|auto-284>>
+    <index+1|find|<pageref|auto-288>>
 
-    <index+1|first|<pageref|auto-232>>
+    <index+1|first|<pageref|auto-226>>
 
-    <index+1|flatmap|<pageref|auto-308>>
+    <index+1|flatmap|<pageref|auto-312>>
 
-    <index+1|fold|<pageref|auto-268>>
+    <index+1|fold|<pageref|auto-266>>
 
-    <index+1|fold-right|<pageref|auto-270>>
+    <index+1|fold-right|<pageref|auto-268>>
 
-    <index+1|for-each|<pageref|auto-111>>
+    <index+1|for-each|<pageref|auto-87>>
 
-    <index+1|fourth|<pageref|auto-238>>
+    <index+1|fourth|<pageref|auto-232>>
 
-    <index+1|guard|<pageref|auto-125>>
+    <index+1|guard|<pageref|auto-101>>
 
-    <index+1|hash-table?|<pageref|auto-370>>
+    <index+1|hash-table?|<pageref|auto-374>>
 
-    <index+1|hash-table=?|<pageref|auto-380>>
+    <index+1|hash-table=?|<pageref|auto-384>>
 
-    <index+1|hash-table-clear!|<pageref|auto-404>>
+    <index+1|hash-table-clear!|<pageref|auto-408>>
 
-    <index+1|hash-table-contains?|<pageref|auto-372>>
+    <index+1|hash-table-contains?|<pageref|auto-376>>
 
-    <index+1|hash-table-delete!|<pageref|auto-396>>
+    <index+1|hash-table-delete!|<pageref|auto-400>>
 
-    <index+1|hash-table-empty?|<pageref|auto-376>>
+    <index+1|hash-table-empty?|<pageref|auto-380>>
 
-    <index+1|hash-table-\<gtr\>alist|<pageref|auto-422>>
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-426>>
 
-    <index+1|hash-table-keys|<pageref|auto-413>>
+    <index+1|hash-table-keys|<pageref|auto-417>>
 
-    <index+1|hash-table-ref|<pageref|auto-385>>
+    <index+1|hash-table-ref|<pageref|auto-389>>
 
-    <index+1|hash-table-ref/default|<pageref|auto-387>>
+    <index+1|hash-table-ref/default|<pageref|auto-391>>
 
-    <index+1|hash-table-set!|<pageref|auto-392>>
+    <index+1|hash-table-set!|<pageref|auto-396>>
 
-    <index+1|hash-table-size|<pageref|auto-409>>
+    <index+1|hash-table-size|<pageref|auto-413>>
 
-    <index+1|hash-table-update!|<pageref|auto-400>>
+    <index+1|hash-table-update!|<pageref|auto-404>>
 
-    <index+1|hash-table-values|<pageref|auto-417>>
+    <index+1|hash-table-values|<pageref|auto-421>>
 
-    <index+1|identity|<pageref|auto-185>>
+    <index+1|identity|<pageref|auto-161>>
 
-    <index+1|in?|<pageref|auto-181>>
+    <index+1|in?|<pageref|auto-157>>
 
-    <index+1|input-port?|<pageref|auto-135>>
+    <index+1|input-port?|<pageref|auto-111>>
 
-    <index+1|input-port-open?|<pageref|auto-145>>
+    <index+1|input-port-open?|<pageref|auto-121>>
 
-    <index+1|iota|<pageref|auto-224>>
+    <index+1|iota|<pageref|auto-206>>
 
-    <index+1|last|<pageref|auto-262>>
+    <index+1|last|<pageref|auto-256>>
 
-    <index+1|last-pair|<pageref|auto-260>>
+    <index+1|last-pair|<pageref|auto-254>>
 
-    <index+1|length|<pageref|auto-35>>
+    <index+1|length|<pageref|auto-259>>
 
-    <index+1|length=?|<pageref|auto-302>>
+    <index+1|length=?|<pageref|auto-306>>
 
-    <index+1|let1|<pageref|auto-183>>
+    <index+1|let1|<pageref|auto-159>>
 
     <index+1|let-values|<pageref|auto-11>>
 
-    <index+1|list-\<gtr\>string|<pageref|auto-63>>
+    <index+1|list|<pageref|auto-200>>
 
-    <index+1|list-\<gtr\>vector|<pageref|auto-82>>
+    <index+1|list-\<gtr\>string|<pageref|auto-39>>
 
-    <index+1|list-index|<pageref|auto-290>>
+    <index+1|list-\<gtr\>vector|<pageref|auto-58>>
 
-    <index+1|list-not-null?|<pageref|auto-314>>
+    <index+1|list-index|<pageref|auto-294>>
 
-    <index+1|list-ref|<pageref|auto-39>>
+    <index+1|list-not-null?|<pageref|auto-318>>
 
-    <index+1|list-view|<pageref|auto-304>>
+    <index+1|list-ref|<pageref|auto-224>>
 
-    <index+1|make-list|<pageref|auto-33>>
+    <index+1|list-view|<pageref|auto-308>>
 
-    <index+1|make-vector|<pageref|auto-70>>
+    <index+1|make-list|<pageref|auto-202>>
 
-    <index+1|map|<pageref|auto-103>>
+    <index+1|make-vector|<pageref|auto-46>>
 
-    <index+1|member|<pageref|auto-45>>
+    <index+1|map|<pageref|auto-79>>
 
-    <index+1|memq|<pageref|auto-41>>
+    <index+1|member|<pageref|auto-286>>
 
-    <index+1|memv|<pageref|auto-43>>
+    <index+1|memq|<pageref|auto-282>>
 
-    <index+1|ninth|<pageref|auto-248>>
+    <index+1|memv|<pageref|auto-284>>
 
-    <index+1|not-a-directory-error|<pageref|auto-203>>
+    <index+1|ninth|<pageref|auto-242>>
 
-    <index+1|not-null-list?|<pageref|auto-310>>
+    <index+1|not-a-directory-error|<pageref|auto-179>>
 
-    <index+1|null?|<pageref|auto-31>>
+    <index+1|not-null-list?|<pageref|auto-314>>
 
-    <index+1|null-list?|<pageref|auto-229>>
+    <index+1|null?|<pageref|auto-211>>
 
-    <index+1|os-error|<pageref|auto-199>>
+    <index+1|null-list?|<pageref|auto-215>>
 
-    <index+1|output-port?|<pageref|auto-137>>
+    <index+1|os-error|<pageref|auto-175>>
 
-    <index+1|output-port-open?|<pageref|auto-147>>
+    <index+1|output-port?|<pageref|auto-113>>
 
-    <index+1|pair?|<pageref|auto-23>>
+    <index+1|output-port-open?|<pageref|auto-123>>
 
-    <index+1|partition|<pageref|auto-279>>
+    <index+1|pair?|<pageref|auto-209>>
 
-    <index+1|port?|<pageref|auto-139>>
+    <index+1|partition|<pageref|auto-277>>
 
-    <index+1|procedure?|<pageref|auto-98>>
+    <index+1|port?|<pageref|auto-115>>
 
-    <index+1|queue|<pageref|auto-342>>
+    <index+1|procedure?|<pageref|auto-74>>
 
-    <index+1|queue-back|<pageref|auto-350>>
+    <index+1|queue|<pageref|auto-346>>
 
-    <index+1|queue-empty?|<pageref|auto-344>>
+    <index+1|queue-back|<pageref|auto-354>>
 
-    <index+1|queue-front|<pageref|auto-348>>
+    <index+1|queue-empty?|<pageref|auto-348>>
 
-    <index+1|queue-\<gtr\>list|<pageref|auto-356>>
+    <index+1|queue-front|<pageref|auto-352>>
 
-    <index+1|queue-pop!|<pageref|auto-354>>
+    <index+1|queue-\<gtr\>list|<pageref|auto-360>>
 
-    <index+1|queue-push!|<pageref|auto-352>>
+    <index+1|queue-pop!|<pageref|auto-358>>
 
-    <index+1|queue-size|<pageref|auto-346>>
+    <index+1|queue-push!|<pageref|auto-356>>
 
-    <index+1|read-error?|<pageref|auto-127>>
+    <index+1|queue-size|<pageref|auto-350>>
 
-    <index+1|reduce|<pageref|auto-272>>
+    <index+1|read-error?|<pageref|auto-103>>
 
-    <index+1|reduce-right|<pageref|auto-274>>
+    <index+1|reduce|<pageref|auto-270>>
 
-    <index+1|remove|<pageref|auto-281>>
+    <index+1|reduce-right|<pageref|auto-272>>
 
-    <index+1|second|<pageref|auto-234>>
+    <index+1|remove|<pageref|auto-279>>
 
-    <index+1|seventh|<pageref|auto-244>>
+    <index+1|second|<pageref|auto-228>>
 
-    <index+1|sixth|<pageref|auto-242>>
+    <index+1|seventh|<pageref|auto-238>>
+
+    <index+1|sixth|<pageref|auto-236>>
 
     <index+1|square|<pageref|auto-20>>
 
-    <index+1|stack|<pageref|auto-322>>
+    <index+1|stack|<pageref|auto-326>>
 
-    <index+1|stack-empty?|<pageref|auto-324>>
+    <index+1|stack-empty?|<pageref|auto-328>>
 
-    <index+1|stack-\<gtr\>list|<pageref|auto-334>>
+    <index+1|stack-\<gtr\>list|<pageref|auto-338>>
 
-    <index+1|stack-pop!|<pageref|auto-332>>
+    <index+1|stack-pop!|<pageref|auto-336>>
 
-    <index+1|stack-push!|<pageref|auto-330>>
+    <index+1|stack-push!|<pageref|auto-334>>
 
-    <index+1|stack-size|<pageref|auto-326>>
+    <index+1|stack-size|<pageref|auto-330>>
 
-    <index+1|stack-top|<pageref|auto-328>>
+    <index+1|stack-top|<pageref|auto-332>>
 
-    <index+1|string?|<pageref|auto-53>>
+    <index+1|string?|<pageref|auto-29>>
 
-    <index+1|string-append|<pageref|auto-59>>
+    <index+1|string-append|<pageref|auto-35>>
 
-    <index+1|string-copy|<pageref|auto-65>>
+    <index+1|string-copy|<pageref|auto-41>>
 
-    <index+1|string-for-each|<pageref|auto-113>>
+    <index+1|string-for-each|<pageref|auto-89>>
 
-    <index+1|string-\<gtr\>list|<pageref|auto-61>>
+    <index+1|string-\<gtr\>list|<pageref|auto-37>>
 
-    <index+1|string-\<gtr\>vector|<pageref|auto-86>>
+    <index+1|string-\<gtr\>vector|<pageref|auto-62>>
 
-    <index+1|string-length|<pageref|auto-55>>
+    <index+1|string-length|<pageref|auto-31>>
 
-    <index+1|string-map|<pageref|auto-105>>
+    <index+1|string-map|<pageref|auto-81>>
 
-    <index+1|string-ref|<pageref|auto-57>>
+    <index+1|string-ref|<pageref|auto-33>>
 
-    <index+1|take|<pageref|auto-252>>
+    <index+1|take|<pageref|auto-246>>
 
-    <index+1|take-right|<pageref|auto-256>>
+    <index+1|take-right|<pageref|auto-250>>
 
-    <index+1|take-while|<pageref|auto-286>>
+    <index+1|take-while|<pageref|auto-290>>
 
-    <index+1|tenth|<pageref|auto-250>>
+    <index+1|tenth|<pageref|auto-244>>
 
-    <index+1|textual-port?|<pageref|auto-141>>
+    <index+1|textual-port?|<pageref|auto-117>>
 
-    <index+1|third|<pageref|auto-236>>
+    <index+1|third|<pageref|auto-230>>
 
-    <index+1|timeout-error|<pageref|auto-207>>
+    <index+1|timeout-error|<pageref|auto-183>>
 
-    <index+1|typed-lambda|<pageref|auto-189>>
+    <index+1|typed-lambda|<pageref|auto-165>>
 
-    <index+1|type-error|<pageref|auto-209>>
+    <index+1|type-error|<pageref|auto-185>>
 
-    <index+1|value-error|<pageref|auto-211>>
+    <index+1|value-error|<pageref|auto-187>>
 
-    <index+1|vector?|<pageref|auto-68>>
+    <index+1|vector?|<pageref|auto-44>>
 
-    <index+1|vector|<pageref|auto-72>>
+    <index+1|vector|<pageref|auto-48>>
 
-    <index+1|vector-append|<pageref|auto-92>>
+    <index+1|vector-append|<pageref|auto-68>>
 
-    <index+1|vector-copy|<pageref|auto-88>>
+    <index+1|vector-copy|<pageref|auto-64>>
 
-    <index+1|vector-copy!|<pageref|auto-90>>
+    <index+1|vector-copy!|<pageref|auto-66>>
 
-    <index+1|vector-fill!|<pageref|auto-94>>
+    <index+1|vector-fill!|<pageref|auto-70>>
 
-    <index+1|vector-for-each|<pageref|auto-115>>
+    <index+1|vector-for-each|<pageref|auto-91>>
 
-    <index+1|vector-\<gtr\>list|<pageref|auto-80>>
+    <index+1|vector-\<gtr\>list|<pageref|auto-56>>
 
-    <index+1|vector-\<gtr\>string|<pageref|auto-84>>
+    <index+1|vector-\<gtr\>string|<pageref|auto-60>>
 
-    <index+1|vector-length|<pageref|auto-74>>
+    <index+1|vector-length|<pageref|auto-50>>
 
-    <index+1|vector-map|<pageref|auto-109>>
+    <index+1|vector-map|<pageref|auto-85>>
 
-    <index+1|vector-ref|<pageref|auto-76>>
+    <index+1|vector-ref|<pageref|auto-52>>
 
-    <index+1|vector-set!|<pageref|auto-78>>
+    <index+1|vector-set!|<pageref|auto-54>>
   </the-index>
 </body>
 

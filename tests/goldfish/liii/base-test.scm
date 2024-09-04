@@ -83,126 +83,6 @@
 
 (check (square 2) => 4)
 
-(check (pair? '(a . b)) => #t)
-(check (pair? '(a b c)) => #t)
-(check (pair? '()) => #f)
-(check (pair? '#(a b)) => #f)
-
-(check (car '(a b c . d)) => 'a)
-
-(check (car '(a b c)) => 'a)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (car '()))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (cdr '(a b c . d)) => '(b c . d))
-
-(check (cdr '(a b c)) => '(b c))
-  
-(check
-  (catch 'wrong-type-arg
-    (lambda () (cdr '()))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (caar '((a . b) . c)) => 'a)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (caar '(a b . c)))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (caar '()))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (null? '()) => #t)
-(check (null? '(1)) => #f)
-(check (null? '(1 2)) => #f)
-
-(check (make-list 3 #\a) => (list #\a #\a #\a))
-(check (make-list 3) => (list #f #f #f))
-
-(check (make-list 0) => (list ))
-
-(check (length ()) => 0)
-(check (length '(a b c)) => 3)
-(check (length '(a (b) (c d e))) => 3)
-
-(check (length 2) => #f)
-(check (length '(a . b)) => -1)
-
-(check (append '(a) '(b c d)) => '(a b c d))
-(check (append '(a b) 'c) => '(a b . c))
-
-(check (append () 'c) => 'c)
-(check (append) => '())
-
-(check (list-ref (cons '(1 2) '(3 4)) 1) => 3)
-
-(check (list-ref '(a b c) 2) => 'c)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (list-ref '() 0))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (list-ref '(a b c) -1))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (list-ref '(a b c) 3))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (memq #f '(1 #f 2 3)) => '(#f 2 3))
-(check (memq 'a '(1 a 2 3)) => '(a 2 3))
-(check (memq 2 '(1 2 3)) => '(2 3))
-
-(check (memq 2.0 '(1 2.0 3)) => #f)
-(check (memq 2+0i '(1 2+0i 3)) => #f)
-
-(define num1 3)
-(define num2 3)
-(check (memq num1 '(3 num2)) => '(3 num2))
-(check (memq 3 '(num1 num2)) => #f)
-(check (memq 'num1 '(num1 num2)) => '(num1 num2))
-
-(check (memq (+ 1 1) '(1 2 3)) => '(2 3))
-
-(check (memv 2 '(1 2 3)) => '(2 3))
-(check (memv 2.0 '(1 2.0 3)) => '(2.0 3))
-(check (memv 2+0i '(1 2+0i 3)) => '(2+0i 3))
-
-(check (memv 2 '(1 2.0 3)) => #f)
-(check (memv 2 '(1 2+0i 3)) => #f)
-
-(check (member 2 '(1 2 3)) => '(2 3))
-(check (member 0 '(1 2 3)) => #f)
-(check (member 0 '()) => #f)
- 
-(check (member "1" '(0 "1" 2 3)) => '("1" 2 3))
-(check (member '(1 . 2) '(0 (1 . 2) 3)) => '((1 . 2) 3))
-(check (member '(1 2) '(0 (1 2) 3)) => '((1 2) 3))
-
 (check (char? #\A) => #t)
 (check (char? 1) => #f)
 
@@ -653,4 +533,93 @@
 (check-catch 'type-error (add3 1.2 2 3))
 
 (check-report)
+
+(check (make-list 3 #\a) => (list #\a #\a #\a))
+(check (make-list 3) => (list #f #f #f))
+
+(check (make-list 0) => (list ))
+
+(check (pair? '(a . b)) => #t)
+(check (pair? '(a b c)) => #t)
+(check (pair? '()) => #f)
+(check (pair? '#(a b)) => #f)
+
+(check (null? '()) => #t)
+(check (null? '(1)) => #f)
+(check (null? '(1 2)) => #f)
+
+(check (car '(a b c . d)) => 'a)
+
+(check (car '(a b c)) => 'a)
+
+(check
+  (catch 'wrong-type-arg
+    (lambda () (car '()))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (cdr '(a b c . d)) => '(b c . d))
+
+(check (cdr '(a b c)) => '(b c))
+  
+(check-catch 'wrong-type-arg (cdr '()))
+
+(check (caar '((a . b) . c)) => 'a)
+
+(check-catch 'wrong-type-arg (caar '(a b . c)))
+
+(check-catch 'wrong-type-arg (caar '()))
+
+(check (list-ref (cons '(1 2) '(3 4)) 1) => 3)
+
+(check (list-ref '(a b c) 2) => 'c)
+
+(check-catch 'wrong-type-arg (list-ref '() 0))
+
+(check-catch 'out-of-range (list-ref '(a b c) -1))
+(check-catch 'out-of-range (list-ref '(a b c) 3))
+
+(check (length ()) => 0)
+(check (length '(a b c)) => 3)
+(check (length '(a (b) (c d e))) => 3)
+
+(check (length 2) => #f)
+(check (length '(a . b)) => -1)
+
+(check (append '(a) '(b c d)) => '(a b c d))
+(check (append '(a b) 'c) => '(a b . c))
+
+(check (append () 'c) => 'c)
+(check (append) => '())
+
+(check (memq #f '(1 #f 2 3)) => '(#f 2 3))
+(check (memq 'a '(1 a 2 3)) => '(a 2 3))
+(check (memq 2 '(1 2 3)) => '(2 3))
+
+(check (memq 2.0 '(1 2.0 3)) => #f)
+(check (memq 2+0i '(1 2+0i 3)) => #f)
+
+(define num1 3)
+(define num2 3)
+(check (memq num1 '(3 num2)) => '(3 num2))
+(check (memq 3 '(num1 num2)) => #f)
+(check (memq 'num1 '(num1 num2)) => '(num1 num2))
+
+(check (memq (+ 1 1) '(1 2 3)) => '(2 3))
+
+(check (memv 2 '(1 2 3)) => '(2 3))
+(check (memv 2.0 '(1 2.0 3)) => '(2.0 3))
+(check (memv 2+0i '(1 2+0i 3)) => '(2+0i 3))
+
+(check (memv 2 '(1 2.0 3)) => #f)
+(check (memv 2 '(1 2+0i 3)) => #f)
+
+(check (member 2 '(1 2 3)) => '(2 3))
+(check (member 0 '(1 2 3)) => #f)
+(check (member 0 '()) => #f)
+ 
+(check (member "1" '(0 "1" 2 3)) => '("1" 2 3))
+(check (member '(1 . 2) '(0 (1 . 2) 3)) => '((1 . 2) 3))
+(check (member '(1 2) '(0 (1 2) 3)) => '((1 2) 3))
 
