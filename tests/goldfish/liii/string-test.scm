@@ -511,15 +511,8 @@
   =>
   #t)
 
-(check
-  (string-trim-right "  2 4  " 0 4)
-  =>
-  "  2")
-
-(check
-  (string-trim-right "  2 4  " 0 7)
-  =>
-  "  2 4")
+(check (string-trim-right "  2 4  " 0 4) => "  2")
+(check (string-trim-right "  2 4  " 0 7) => "  2 4")
 
 (check
   (catch 'out-of-range
@@ -528,25 +521,10 @@
   =>
   #t)
 
-(check
-  (string-trim-right "  2 4  " #\ )
-  =>
-  "  2 4")
-
-(check
-  (string-trim-right "-- 2 4 --" #\-)
-  =>
-  "-- 2 4 ")
-
-(check
-  (string-trim-right "012-" #\- 1)
-  =>
-  "12")
-
-(check
-  (string-trim-right "012-4" #\- 0 4)
-  =>
-  "012")
+(check (string-trim-right "  2 4  " #\ ) => "  2 4")
+(check (string-trim-right "-- 2 4 --" #\-) => "-- 2 4 ")
+(check (string-trim-right "012-" #\- 1) => "12")
+(check (string-trim-right "012-4" #\- 0 4) => "012")
 
 (check (string-trim-both "  2 4  ") => "2 4")
 (check (string-trim-both "--2 4--" #\-) => "2 4")
