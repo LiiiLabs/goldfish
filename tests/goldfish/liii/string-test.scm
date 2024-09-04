@@ -14,9 +14,6 @@
 ; under the License.
 ;
 
-; Copyright (c) 2024 Da, Nian @ Liii Network Inc.
-; All right reserved.
-
 (import (liii check)
         (liii string))
 
@@ -34,29 +31,9 @@
 (check (string-join '() ":" 'prefix) => "")
 (check (string-join '() ":" 'suffix) => "")
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-join '() ":" 'strict-infix))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-join '() ":" 2))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-join '() ":" 'no-such-grammer))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'value-error (string-join '() ":" 'strict-infix))
+(check-catch 'type-error (string-join '() ":" 2))
+(check-catch 'value-error (string-join '() ":" 'no-such-grammer))
 
 (check
   (catch 'wrong-number-of-args
@@ -447,28 +424,11 @@
 
 (check (string-trim "  2 4  ") => "2 4  ")
 (check (string-trim "  2 4  " 2) => "2 4  ")
+(check (string-trim "  2 4  " 3) => "4  ")
+(check (string-trim "  2 4  " 4) => "4  ")
+(check (string-trim "  2 4  " 5) => "")
 
-(check
-  (string-trim "  2 4  " 3)
-  =>
-  "4  ")
-
-(check
-  (string-trim "  2 4  " 4)
-  =>
-  "4  ")
-
-(check
-  (string-trim "  2 4  " 5)
-  =>
-  "")
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-trim "  2 4  " 8))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-trim "  2 4  " 8))
 
 (check
   (string-trim "  2 4  " 0 4)
@@ -653,5 +613,4 @@
   => `("22" "333"))
 
 (check-report)
-(if (check-failed?) (exit -1))
 

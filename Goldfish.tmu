@@ -2776,12 +2776,6 @@
   <section|测试>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    ; Copyright (c) 2024 Da, Nian @ Liii Network Inc.
-
-    ; All right reserved.
-
-    \;
-
     (import (liii check)
 
     \ \ \ \ \ \ \ \ (liii string))
@@ -2829,7 +2823,9 @@
 
   <section|列表-字符串转换>
 
-  <paragraph|string-join><index|string-join>
+  <paragraph|string-join><index|string-join><scm|(l [delim [grammer]]) =\<gtr\> string>
+
+  <subparagraph|实现>
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define (string-join l . delim+grammer)
@@ -2858,7 +2854,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ (error 'wrong-number-of-args "optional params in string-join"))
 
-    \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "optional params in string-join"))))
+    \ \ \ \ \ \ \ \ \ \ (else (error 'type-error "optional params in string-join"))))
 
     \ \ 
 
@@ -2896,7 +2892,7 @@
 
     \ \ \ \ \ \ \ (if (null-list? l)
 
-    \ \ \ \ \ \ \ \ \ \ \ (error 'wrong-type-arg "empty list not allowed")
+    \ \ \ \ \ \ \ \ \ \ \ (error 'value-error "empty list not allowed")
 
     \ \ \ \ \ \ \ \ \ \ \ ret))
 
@@ -2908,12 +2904,12 @@
 
     \ \ \ \ \ \ \ \ (if (null-list? l) "" (string-append delim ret)))
 
-    \ \ \ \ \ \ (else (error 'wrong-type-arg "invalid grammer")))))
+    \ \ \ \ \ \ (else (error 'value-error "invalid grammer")))))
 
     \;
   </scm-chunk>
 
-  测试用例
+  <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-join '("a" "b" "c")) =\<gtr\> "abc")
@@ -2940,51 +2936,11 @@
 
     \;
 
-    (check
+    (check-catch 'value-error (string-join '() ":" 'strict-infix))
 
-    \ \ (catch 'wrong-type-arg
+    (check-catch 'type-error (string-join '() ":" 2))
 
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-join '() ":" 'strict-infix))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-join '() ":" 2))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-join '() ":" 'no-such-grammer))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'value-error (string-join '() ":" 'no-such-grammer))
 
     \;
 
@@ -4062,49 +4018,15 @@
 
     (check (string-trim " \ 2 4 \ " 2) =\<gtr\> "2 4 \ ")
 
-    \;
+    (check (string-trim " \ 2 4 \ " 3) =\<gtr\> "4 \ ")
 
-    (check
+    (check (string-trim " \ 2 4 \ " 4) =\<gtr\> "4 \ ")
 
-    \ \ (string-trim " \ 2 4 \ " 3)
-
-    \ \ =\<gtr\>
-
-    \ \ "4 \ ")
+    (check (string-trim " \ 2 4 \ " 5) =\<gtr\> "")
 
     \;
 
-    (check
-
-    \ \ (string-trim " \ 2 4 \ " 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "4 \ ")
-
-    \;
-
-    (check
-
-    \ \ (string-trim " \ 2 4 \ " 5)
-
-    \ \ =\<gtr\>
-
-    \ \ "")
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-trim " \ 2 4 \ " 8))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-trim " \ 2 4 \ " 8))
 
     \;
 
@@ -4822,8 +4744,6 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
     (check-report)
 
-    (if (check-failed?) (exit -1))
-
     \;
   </scm-chunk>
 
@@ -5310,13 +5230,13 @@
   注意<scm|(cons '(1 2) '(3 4))>其实是一个列表，但这个列表的元素不都是整数。这个例子容易理解成结果是一个序对且不是列表。
 
   <\session|goldfish|default>
-    <\unfolded-io>
+    <\folded-io>
       \<gtr\>\ 
-    <|unfolded-io>
+    <|folded-io>
       (cons '(1 2) '(3 4))
-    <|unfolded-io>
+    <|folded-io>
       ((1 2) 3 4)
-    </unfolded-io>
+    </folded-io>
 
     <\input>
       \<gtr\>\ 
