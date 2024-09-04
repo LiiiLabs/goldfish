@@ -3009,7 +3009,7 @@
 
   <section|谓词>
 
-  <paragraph|string-null?>
+  <paragraph|string-null?><index|string-null?><scm|(str) =\<gtr\> boolean>
 
   <scm|<code|<code*|string-null?>>>是一个谓词函数，当且仅当参数字符串为空（即长度为0）时返回<scm|#t>，否则都返回<scm|#f>，也就是说，当参数是非字符串或长度不为0的字符串时，返回<scm|#f>。
 
@@ -3037,7 +3037,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|string-every>
+  <paragraph|string-every><index|string-every>
 
   <scm|string-every>是一个谓词函数，它接收一个字符串<scm|str>和一个评估规则<scm|criterion>为参数，以及最多2个非负整数为可选参数<scm|. start_end>用于指定搜索的起始位置和结束位置，检查指定范围内字符串中的每个字符是否都满足评估规则<scm|criterion>。
 
@@ -3068,31 +3068,11 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check
-
-    \ \ (string-every\ 
-
-    \ \ \ \ #\\x
-
-    \ \ \ \ "xxxxxx")
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-true (string-every #\\x "xxxxxx"))
 
     \;
 
-    (check
-
-    \ \ (string-every\ 
-
-    \ \ \ \ #\\x
-
-    \ \ \ \ "xxx0xx")
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
+    (check-false (string-every #\\x "xxx0xx"))
 
     \;
 
@@ -3413,728 +3393,700 @@
     \;
   </scm-chunk>
 
-  <\description>
-    <item*|string-null?>
+  <paragraph|string-any><index|string-any>
+
+  <scm|string-any>是一个谓词函数，它接收一个谓词和一个字符串为参数，用于检查字符串中是否存在字符都满足谓词。注意，这里的谓词必须是字符属性测试函数，否则报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-any char/pred? str . start+end)
+
+    \ \ (define (string-any-sub pred? str)
+
+    \ \ \ \ (let
+
+    \ \ \ \ \ \ loop ((i 0) (len (string-length str)))
+
+    \ \ \ \ \ \ (if (= i len)
+
+    \ \ \ \ \ \ \ \ \ \ #f \ \ 
+
+    \ \ \ \ \ \ \ \ \ \ (or (pred? (string-ref str i))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) len)))))
+
+    \ \ 
+
+    \ \ (let ((str_sub (%string-from-range str start+end))
+
+    \ \ \ \ \ \ \ \ (criterion (%make-criterion char/pred?)))
+
+    \ \ \ \ (string-any-sub criterion str_sub)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-true (string-any #\\0 "xxx0xx"))
 
     \;
 
-    <item*|string-every>
+    (check-false (string-any #\\0 "xxxxxx"))
 
-    <item*|string-any><scm|string-any>是一个谓词函数，它接收一个谓词和一个字符串为参数，用于检查字符串中是否存在字符都满足谓词。注意，这里的谓词必须是字符属性测试函数，否则报错。
+    \;
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-any char/pred? str . start+end)
+    (check
 
-      \ \ (define (string-any-sub pred? str)
+    \ \ (string-any\ 
 
-      \ \ \ \ (let
+    \ \ \ \ char-numeric?
 
-      \ \ \ \ \ \ loop ((i 0) (len (string-length str)))
+    \ \ \ \ "xxx0xx")
 
-      \ \ \ \ \ \ (if (= i len)
+    \ \ =\<gtr\>
 
-      \ \ \ \ \ \ \ \ \ \ #f \ \ 
+    \ \ #t)
 
-      \ \ \ \ \ \ \ \ \ \ (or (pred? (string-ref str i))\ 
+    \;
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) len)))))
+    (check
 
-      \ \ 
+    \ \ (string-any
 
-      \ \ (let ((str_sub (%string-from-range str start+end))
+    \ \ \ \ char-numeric?
 
-      \ \ \ \ \ \ \ \ (criterion (%make-criterion char/pred?)))
+    \ \ \ \ "xxxxxx")
 
-      \ \ \ \ (string-any-sub criterion str_sub)))
+    \ \ =\<gtr\>
 
-      \;
-    </scm-chunk>
+    \ \ #f)
 
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
+    \;
+  </scm-chunk>
 
-      \ \ (string-any\ 
+  注意，评估规则<scm|criterion>必须是谓词或字符，否则报错。
 
-      \ \ \ \ #\\0
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
 
-      \ \ \ \ "xxx0xx")
+    \ \ (catch 'wrong-type-arg
 
-      \ \ =\<gtr\>
+    \ \ \ \ (lambda ()\ 
 
-      \ \ #t)
+    \ \ \ \ \ \ (string-every
 
-      \;
+    \ \ \ \ \ \ \ \ \ 0
 
-      (check
+    \ \ \ \ \ \ \ \ \ "xxx0xx"))
 
-      \ \ (string-any\ 
+    \ \ \ \ (lambda args #t))
 
-      \ \ \ \ #\\0
+    \ \ =\<gtr\>
 
-      \ \ \ \ "xxxxxx")
+    \ \ #t)
 
-      \ \ =\<gtr\>
+    \;
 
-      \ \ #f)
+    (check
 
-      \;
+    \ \ (catch 'wrong-type-arg
 
-      (check
+    \ \ \ \ (lambda ()\ 
 
-      \ \ (string-any\ 
+    \ \ \ \ \ \ (string-any
 
-      \ \ \ \ char-numeric?
+    \ \ \ \ \ \ \ \ \ (lambda (n) (= n 0))
 
-      \ \ \ \ "xxx0xx")
+    \ \ \ \ \ \ \ \ \ "xxx0xx"))
 
-      \ \ =\<gtr\>
+    \ \ \ \ (lambda args #t))
 
-      \ \ #t)
+    \ \ =\<gtr\>
 
-      \;
+    \ \ #t)
 
-      (check
+    \;
 
-      \ \ (string-any
+    (check
 
-      \ \ \ \ char-numeric?
+    \ \ (catch 'wrong-type-arg
 
-      \ \ \ \ "xxxxxx")
+    \ \ \ \ (lambda ()\ 
 
-      \ \ =\<gtr\>
+    \ \ \ \ \ \ (string-every
 
-      \ \ #f)
+    \ \ \ \ \ \ \ \ \ "0"
 
-      \;
-    </scm-chunk>
+    \ \ \ \ \ \ \ \ \ "xxx0xx"))
 
-    注意，评估规则<scm|criterion>必须是谓词或字符，否则报错。
+    \ \ \ \ (lambda args #t))
 
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
+    \ \ =\<gtr\>
 
-      \ \ (catch 'wrong-type-arg
+    \ \ #t)
 
-      \ \ \ \ (lambda ()\ 
+    \;
+  </scm-chunk>
 
-      \ \ \ \ \ \ (string-every
+  对于可选参数：
 
-      \ \ \ \ \ \ \ \ \ 0
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
 
-      \ \ \ \ \ \ \ \ \ "xxx0xx"))
+    \ \ (string-any\ 
 
-      \ \ \ \ (lambda args #t))
+    \ \ \ \ <code*|char-alphabetic?>
 
-      \ \ =\<gtr\>
+    \ \ \ \ "01c345"
 
-      \ \ #t)
+    \ \ \ \ 2)
 
-      \;
+    \ \ =\<gtr\>
 
-      (check
+    \ \ #t)
 
-      \ \ (catch 'wrong-type-arg
+    \;
 
-      \ \ \ \ (lambda ()\ 
+    (check
 
-      \ \ \ \ \ \ (string-any
+    \ \ (string-any\ 
 
-      \ \ \ \ \ \ \ \ \ (lambda (n) (= n 0))
+    \ \ \ \ <code*|char-alphabetic?>
 
-      \ \ \ \ \ \ \ \ \ "xxx0xx"))
+    \ \ \ \ "01c345"
 
-      \ \ \ \ (lambda args #t))
+    \ \ \ \ 3)
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\>
 
-      \ \ #t)
+    \ \ #f)
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (catch 'wrong-type-arg
+    \ \ (string-any\ 
 
-      \ \ \ \ (lambda ()\ 
+    \ \ \ \ <code*|char-alphabetic?>
 
-      \ \ \ \ \ \ (string-every
+    \ \ \ \ "01c345"
 
-      \ \ \ \ \ \ \ \ \ "0"
+    \ \ \ \ 2
 
-      \ \ \ \ \ \ \ \ \ "xxx0xx"))
+    \ \ \ \ 4)
 
-      \ \ \ \ (lambda args #t))
+    \ \ =\<gtr\>
 
-      \ \ =\<gtr\>
+    \ \ #t)
 
-      \ \ #t)
+    \;
 
-      \;
-    </scm-chunk>
+    (check
 
-    对于可选参数：
+    \ \ (string-any\ 
 
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
+    \ \ \ \ <code*|char-alphabetic?>
 
-      \ \ (string-any\ 
+    \ \ \ \ "01c345"
 
-      \ \ \ \ <code*|char-alphabetic?>
+    \ \ \ \ 2
 
-      \ \ \ \ "01c345"
+    \ \ \ \ 2)
 
-      \ \ \ \ 2)
+    \ \ =\<gtr\>
 
-      \ \ =\<gtr\>
+    \ \ #f)
 
-      \ \ #t)
+    \;
 
-      \;
+    (check
 
-      (check
+    \ \ (string-any\ 
 
-      \ \ (string-any\ 
+    \ \ \ \ <code*|char-alphabetic?>
 
-      \ \ \ \ <code*|char-alphabetic?>
+    \ \ \ \ "01c345"
 
-      \ \ \ \ "01c345"
+    \ \ \ \ 3
 
-      \ \ \ \ 3)
+    \ \ \ \ 4)
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\>
 
-      \ \ #f)
+    \ \ #f)
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (string-any\ 
+    \ \ (string-any\ 
 
-      \ \ \ \ <code*|char-alphabetic?>
+    \ \ \ \ char-alphabetic?
 
-      \ \ \ \ "01c345"
+    \ \ \ \ "01c345"
 
-      \ \ \ \ 2
+    \ \ \ \ 2
 
-      \ \ \ \ 4)
+    \ \ \ \ 6)
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\>
 
-      \ \ #t)
+    \ \ #t)
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (string-any\ 
+    \ \ (catch 'out-of-range
 
-      \ \ \ \ <code*|char-alphabetic?>
+    \ \ \ \ (lambda ()\ 
 
-      \ \ \ \ "01c345"
+    \ \ \ \ \ \ (string-any\ 
 
-      \ \ \ \ 2
+    \ \ \ \ \ \ \ \ \ char-alphabetic?
 
-      \ \ \ \ 2)
+    \ \ \ \ \ \ \ \ "01c345"
 
-      \ \ =\<gtr\>
+    \ \ \ \ \ \ \ \ 2
 
-      \ \ #f)
+    \ \ \ \ \ \ \ \ 7))
 
-      \;
+    \ \ \ \ (lambda args #t))
 
-      (check
+    \ \ =\<gtr\>
 
-      \ \ (string-any\ 
+    \ \ #t)
 
-      \ \ \ \ <code*|char-alphabetic?>
+    \;
 
-      \ \ \ \ "01c345"
+    (check
 
-      \ \ \ \ 3
+    \ \ (catch 'out-of-range
 
-      \ \ \ \ 4)
+    \ \ \ \ (lambda ()\ 
 
-      \ \ =\<gtr\>
+    \ \ \ \ \ \ (string-any\ 
 
-      \ \ #f)
+    \ \ \ \ \ \ \ \ \ char-alphabetic?
 
-      \;
+    \ \ \ \ \ \ \ \ "01c345"
 
-      (check
+    \ \ \ \ \ \ \ 2
 
-      \ \ (string-any\ 
+    \ \ \ \ \ \ \ 1))
 
-      \ \ \ \ char-alphabetic?
+    \ \ \ \ (lambda args #t))
 
-      \ \ \ \ "01c345"
+    \ \ =\<gtr\>
 
-      \ \ \ \ 2
+    \ \ #t)
 
-      \ \ \ \ 6)
+    \;
 
-      \ \ =\<gtr\>
+    (check
 
-      \ \ #t)
+    \ \ (catch 'wrong-number-of-args
 
-      \;
+    \ \ \ \ (lambda ()\ 
 
-      (check
+    \ \ \ \ \ \ (string-any\ 
 
-      \ \ (catch 'out-of-range
+    \ \ \ \ \ \ \ \ \ char-alphabetic?
 
-      \ \ \ \ (lambda ()\ 
+    \ \ \ \ \ \ \ \ "01c345"
 
-      \ \ \ \ \ \ (string-any\ 
+    \ \ \ \ \ \ \ 2
 
-      \ \ \ \ \ \ \ \ \ char-alphabetic?
+    \ \ \ \ \ \ \ 7
 
-      \ \ \ \ \ \ \ \ "01c345"
+    \ \ \ \ \ \ \ 1))
 
-      \ \ \ \ \ \ \ \ 2
+    \ \ \ \ (lambda args #t))
 
-      \ \ \ \ \ \ \ \ 7))
+    \ \ =\<gtr\>
 
-      \ \ \ \ (lambda args #t))
+    \ \ #t)
 
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-any\ 
-
-      \ \ \ \ \ \ \ \ \ char-alphabetic?
-
-      \ \ \ \ \ \ \ \ "01c345"
-
-      \ \ \ \ \ \ \ 2
-
-      \ \ \ \ \ \ \ 1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-number-of-args
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-any\ 
-
-      \ \ \ \ \ \ \ \ \ char-alphabetic?
-
-      \ \ \ \ \ \ \ \ "01c345"
-
-      \ \ \ \ \ \ \ 2
-
-      \ \ \ \ \ \ \ 7
-
-      \ \ \ \ \ \ \ 1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-  </description>
+    \;
+  </scm-chunk>
 
   <section|选择器>
 
+  <paragraph|string-take><index|string-take>
+
+  <scm|string-take>是一个函数，接收一个字符串和一个非负整数k为参数，返回字符串的前k个字符组成的新字符串。当字符串字符数量不足k个，报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-take str k)
+
+    \ \ (list-\<gtr\>string (take (string-\<gtr\>list str) k)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-take "MathAgape" 4) =\<gtr\> "Math")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-take "MathAgape" 20))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-take-right><scm|string-take-right>是一个函数，接收一个字符串和一个非负整数k为参数，取出字符串的后k个字符组成新字符串，返回这个新字符串。当字符串字符数量不足k个，报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-take-right str k)
+
+    \ \ (list-\<gtr\>string (take-right (string-\<gtr\>list str) k)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-take-right "MathAgape" 1)
+
+    \ \ =\<gtr\>
+
+    \ \ "e")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-take-right "MathAgape" 20))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-drop>
+
+  <scm|string-drop>是一个函数，接收一个字符串和一个非负整数k为参数，返回去掉字符串前k个字符组成的新字符串。当字符串字符数量不足k个，报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-drop str k)
+
+    \ \ (list-\<gtr\>string (drop (string-\<gtr\>list str) k)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-drop "MathAgape" 8)
+
+    \ \ =\<gtr\>
+
+    \ \ "e")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-drop "MathAgape" 20))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-drop-right>
+
+  <scm|string-drop-right>是一个函数，接收一个字符串和一个非负整数k为参数，去掉字符串的后k个字符组成新字符串，返回这个新字符串。当字符串字符数量不足k个，报错。当k为负数，报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-drop-right str k)
+
+    \ \ (list-\<gtr\>string (drop-right (string-\<gtr\>list str) k)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-drop-right "MathAgape" 5)
+
+    \ \ =\<gtr\>
+
+    \ \ "Math")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-drop "MathAgape" 20))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-pad>
+
+  <scm|string-pad>是一个函数，接收一个字符串、一个指定长度（非负整数）为参数，从左填充空格字符直到指定长度，返回这个新字符。当指定长度等于字符串长度，返回的字符串和原字符串内容相同。当指定长度小于字符串长度，则从左去掉字符直到指定长度，返回这个新字符。当参数的指定长度为负数时，报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-pad str len . char+start+end)
+
+    \ \ (define (string-pad-sub str len ch)
+
+    \ \ \ \ (let ((orig-len (string-length str)))
+
+    \ \ \ \ \ \ (if (\<less\> len orig-len)
+
+    \ \ \ \ \ \ \ \ \ \ (string-take-right str len)
+
+    \ \ \ \ \ \ \ \ \ \ (string-append (make-string (- len orig-len) ch) str))))
+
+    \ \ 
+
+    \ \ (cond ((null-list? char+start+end)
+
+    \ \ \ \ \ \ \ \ \ (string-pad-sub str len #\\ ))
+
+    \ \ \ \ \ \ \ \ ((list? char+start+end)
+
+    \ \ \ \ \ \ \ \ \ (string-pad-sub
+
+    \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str (cdr char+start+end))
+
+    \ \ \ \ \ \ \ \ \ \ \ len
+
+    \ \ \ \ \ \ \ \ \ \ \ (car char+start+end)))
+
+    \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "string-pad"))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-pad "MathAgape" 15)
+
+    \ \ =\<gtr\>
+
+    \ \ " \ \ \ \ \ MathAgape")
+
+    \;
+
+    (check
+
+    \ \ (string-pad "MathAgape" 12 #\\1)
+
+    \ \ =\<gtr\>
+
+    \ \ "111MathAgape")
+
+    \;
+
+    (check
+
+    \ \ (string-pad "MathAgape" 6 #\\1 0 4)
+
+    \ \ =\<gtr\>
+
+    \ \ "11Math")
+
+    \;
+
+    (check
+
+    \ \ (string-pad "MathAgape" 9)
+
+    \ \ =\<gtr\>
+
+    \ \ "MathAgape")
+
+    \;
+
+    (check
+
+    \ \ (string-pad "MathAgape" 5)
+
+    \ \ =\<gtr\>
+
+    \ \ "Agape")
+
+    \;
+
+    (check
+
+    \ \ (string-pad "MathAgape" 2 #\\1 0 4)
+
+    \ \ =\<gtr\>
+
+    \ \ "th")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-pad "MathAgape" -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-pad-right>
+
+  <scm|string-pad-right>是一个函数，接收一个字符串、一个指定长度（非负整数）为参数，从右填充空格字符直到指定长度，返回这个新字符。当指定长度等于字符串长度，返回的字符串和原字符串内容相同。当指定长度小于字符串长度，则从右去掉字符直到指定长度，返回这个新字符。当参数的指定长度为负数时，报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-pad-right str len . char+start+end)
+
+    \ \ (define (string-pad-right-sub str len ch)
+
+    \ \ \ \ (let ((orig-len (string-length str)))
+
+    \ \ \ \ \ \ (if (\<less\> len orig-len)
+
+    \ \ \ \ \ \ \ \ \ \ (string-take str len)
+
+    \ \ \ \ \ \ \ \ \ \ (string-append str (make-string (- len orig-len) ch)))))
+
+    \ \ 
+
+    \ \ (cond ((null-list? char+start+end)
+
+    \ \ \ \ \ \ \ \ \ (string-pad-right-sub str len #\\ ))
+
+    \ \ \ \ \ \ \ \ ((list? char+start+end)
+
+    \ \ \ \ \ \ \ \ \ (string-pad-right-sub
+
+    \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str (cdr char+start+end))
+
+    \ \ \ \ \ \ \ \ \ \ \ len
+
+    \ \ \ \ \ \ \ \ \ \ \ (car char+start+end)))
+
+    \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "string-pad"))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-pad-right "MathAgape" 15) =\<gtr\> "MathAgape \ \ \ \ \ ")
+
+    \;
+
+    (check (string-pad-right "MathAgape" 12 #\\1) =\<gtr\> "MathAgape111")
+
+    \;
+
+    (check
+
+    \ \ (string-pad-right "MathAgape" 6 #\\1 0 4)
+
+    \ \ =\<gtr\>
+
+    \ \ "Math11")
+
+    \;
+
+    (check
+
+    \ \ (string-pad-right "MathAgape" 9)
+
+    \ \ =\<gtr\>
+
+    \ \ "MathAgape")
+
+    \;
+
+    (check
+
+    \ \ (string-pad-right "MathAgape" 9 #\\1)
+
+    \ \ =\<gtr\>
+
+    \ \ "MathAgape")
+
+    \;
+
+    (check
+
+    \ \ (string-pad-right "MathAgape" 4)
+
+    \ \ =\<gtr\>
+
+    \ \ "Math")
+
+    \;
+
+    (check
+
+    \ \ (string-pad "MathAgape" 2 #\\1 0 4)
+
+    \ \ =\<gtr\>
+
+    \ \ "th")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-pad-right "MathAgape" -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
   <\description>
-    <item*|string-take><scm|string-take>是一个函数，接收一个字符串和一个非负整数k为参数，返回字符串的前k个字符组成的新字符串。当字符串字符数量不足k个，报错。
+    \;
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-take str k)
-
-      \ \ (list-\<gtr\>string (take (string-\<gtr\>list str) k)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-take "MathAgape" 4)
-
-      \ \ =\<gtr\>
-
-      \ \ "Math")
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (string-take "MathAgape" 20))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    <item*|string-take-right><scm|string-take-right>是一个函数，接收一个字符串和一个非负整数k为参数，取出字符串的后k个字符组成新字符串，返回这个新字符串。当字符串字符数量不足k个，报错。
-
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-take-right str k)
-
-      \ \ (list-\<gtr\>string (take-right (string-\<gtr\>list str) k)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-take-right "MathAgape" 1)
-
-      \ \ =\<gtr\>
-
-      \ \ "e")
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (string-take-right "MathAgape" 20))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    <item*|string-drop><scm|string-drop>是一个函数，接收一个字符串和一个非负整数k为参数，返回去掉字符串前k个字符组成的新字符串。当字符串字符数量不足k个，报错。
-
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-drop str k)
-
-      \ \ (list-\<gtr\>string (drop (string-\<gtr\>list str) k)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-drop "MathAgape" 8)
-
-      \ \ =\<gtr\>
-
-      \ \ "e")
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (string-drop "MathAgape" 20))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    <item*|string-drop-right><scm|string-drop-right>是一个函数，接收一个字符串和一个非负整数k为参数，去掉字符串的后k个字符组成新字符串，返回这个新字符串。当字符串字符数量不足k个，报错。当k为负数，报错。
-
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-drop-right str k)
-
-      \ \ (list-\<gtr\>string (drop-right (string-\<gtr\>list str) k)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-drop-right "MathAgape" 5)
-
-      \ \ =\<gtr\>
-
-      \ \ "Math")
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (string-drop "MathAgape" 20))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    <item*|string-pad><scm|string-pad>是一个函数，接收一个字符串、一个指定长度（非负整数）为参数，从左填充空格字符直到指定长度，返回这个新字符。当指定长度等于字符串长度，返回的字符串和原字符串内容相同。当指定长度小于字符串长度，则从左去掉字符直到指定长度，返回这个新字符。当参数的指定长度为负数时，报错。
-
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-pad str len . char+start+end)
-
-      \ \ (define (string-pad-sub str len ch)
-
-      \ \ \ \ (let ((orig-len (string-length str)))
-
-      \ \ \ \ \ \ (if (\<less\> len orig-len)
-
-      \ \ \ \ \ \ \ \ \ \ (string-take-right str len)
-
-      \ \ \ \ \ \ \ \ \ \ (string-append (make-string (- len orig-len) ch) str))))
-
-      \ \ 
-
-      \ \ (cond ((null-list? char+start+end)
-
-      \ \ \ \ \ \ \ \ \ (string-pad-sub str len #\\ ))
-
-      \ \ \ \ \ \ \ \ ((list? char+start+end)
-
-      \ \ \ \ \ \ \ \ \ (string-pad-sub
-
-      \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str (cdr char+start+end))
-
-      \ \ \ \ \ \ \ \ \ \ \ len
-
-      \ \ \ \ \ \ \ \ \ \ \ (car char+start+end)))
-
-      \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "string-pad"))))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-pad "MathAgape" 15)
-
-      \ \ =\<gtr\>
-
-      \ \ " \ \ \ \ \ MathAgape")
-
-      \;
-
-      (check
-
-      \ \ (string-pad "MathAgape" 12 #\\1)
-
-      \ \ =\<gtr\>
-
-      \ \ "111MathAgape")
-
-      \;
-
-      (check
-
-      \ \ (string-pad "MathAgape" 6 #\\1 0 4)
-
-      \ \ =\<gtr\>
-
-      \ \ "11Math")
-
-      \;
-
-      (check
-
-      \ \ (string-pad "MathAgape" 9)
-
-      \ \ =\<gtr\>
-
-      \ \ "MathAgape")
-
-      \;
-
-      (check
-
-      \ \ (string-pad "MathAgape" 5)
-
-      \ \ =\<gtr\>
-
-      \ \ "Agape")
-
-      \;
-
-      (check
-
-      \ \ (string-pad "MathAgape" 2 #\\1 0 4)
-
-      \ \ =\<gtr\>
-
-      \ \ "th")
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (string-pad "MathAgape" -1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    <item*|string-pad-right><scm|string-pad-right>是一个函数，接收一个字符串、一个指定长度（非负整数）为参数，从右填充空格字符直到指定长度，返回这个新字符。当指定长度等于字符串长度，返回的字符串和原字符串内容相同。当指定长度小于字符串长度，则从右去掉字符直到指定长度，返回这个新字符。当参数的指定长度为负数时，报错。
-
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-pad-right str len . char+start+end)
-
-      \ \ (define (string-pad-right-sub str len ch)
-
-      \ \ \ \ (let ((orig-len (string-length str)))
-
-      \ \ \ \ \ \ (if (\<less\> len orig-len)
-
-      \ \ \ \ \ \ \ \ \ \ (string-take str len)
-
-      \ \ \ \ \ \ \ \ \ \ (string-append str (make-string (- len orig-len) ch)))))
-
-      \ \ 
-
-      \ \ (cond ((null-list? char+start+end)
-
-      \ \ \ \ \ \ \ \ \ (string-pad-right-sub str len #\\ ))
-
-      \ \ \ \ \ \ \ \ ((list? char+start+end)
-
-      \ \ \ \ \ \ \ \ \ (string-pad-right-sub
-
-      \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str (cdr char+start+end))
-
-      \ \ \ \ \ \ \ \ \ \ \ len
-
-      \ \ \ \ \ \ \ \ \ \ \ (car char+start+end)))
-
-      \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "string-pad"))))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-pad-right "MathAgape" 15)
-
-      \ \ =\<gtr\>
-
-      \ \ "MathAgape \ \ \ \ \ ")
-
-      \;
-
-      (check
-
-      \ \ (string-pad-right "MathAgape" 12 #\\1)
-
-      \ \ =\<gtr\>
-
-      \ \ "MathAgape111")
-
-      \;
-
-      (check
-
-      \ \ (string-pad-right "MathAgape" 6 #\\1 0 4)
-
-      \ \ =\<gtr\>
-
-      \ \ "Math11")
-
-      \;
-
-      (check
-
-      \ \ (string-pad-right "MathAgape" 9)
-
-      \ \ =\<gtr\>
-
-      \ \ "MathAgape")
-
-      \;
-
-      (check
-
-      \ \ (string-pad-right "MathAgape" 9 #\\1)
-
-      \ \ =\<gtr\>
-
-      \ \ "MathAgape")
-
-      \;
-
-      (check
-
-      \ \ (string-pad-right "MathAgape" 4)
-
-      \ \ =\<gtr\>
-
-      \ \ "Math")
-
-      \;
-
-      (check
-
-      \ \ (string-pad "MathAgape" 2 #\\1 0 4)
-
-      \ \ =\<gtr\>
-
-      \ \ "th")
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (string-pad-right "MathAgape" -1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
+    \;
 
     <item*|string-trim><scm|string-trim>是一个函数，用于去除字符串左端的空白字符。空白字符通常包括空格、制表符、换行符等。当原字符串只包含空白字符，返回空字符串。
 
@@ -4711,78 +4663,56 @@
 
   <section|搜索>
 
+  <paragraph|string-index><index|string-index>
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-index str char/pred? . start+end)
+
+    \ \ (define (string-index-sub str pred?)
+
+    \ \ \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ (cond ((\<gtr\>= i (string-length str)) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((pred? (string-ref str i)) i)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
+
+    \ \ 
+
+    \ \ (let* ((start (if (null-list? start+end) 0 (car start+end)))
+
+    \ \ \ \ \ \ \ \ \ (str-sub (%string-from-range str start+end))
+
+    \ \ \ \ \ \ \ \ \ (pred? (%make-criterion char/pred?))
+
+    \ \ \ \ \ \ \ \ \ (ret (string-index-sub str-sub pred?)))
+
+    \ \ \ \ (if ret (+ start ret) ret)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-index "0123456789" #\\2) =\<gtr\> 2)
+
+    \;
+
+    (check (string-index "0123456789" #\\2 2) =\<gtr\> 2)
+
+    \;
+
+    (check (string-index "0123456789" #\\2 3) =\<gtr\> #f)
+
+    \;
+
+    (check (string-index "01x3456789" char-alphabetic?) =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
   <\description>
-    <item*|string-index>
-
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-index str char/pred? . start+end)
-
-      \ \ (define (string-index-sub str pred?)
-
-      \ \ \ \ (let loop ((i 0))
-
-      \ \ \ \ \ \ (cond ((\<gtr\>= i (string-length str)) #f)
-
-      \ \ \ \ \ \ \ \ \ \ \ \ ((pred? (string-ref str i)) i)
-
-      \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
-
-      \ \ 
-
-      \ \ (let* ((start (if (null-list? start+end) 0 (car start+end)))
-
-      \ \ \ \ \ \ \ \ \ (str-sub (%string-from-range str start+end))
-
-      \ \ \ \ \ \ \ \ \ (pred? (%make-criterion char/pred?))
-
-      \ \ \ \ \ \ \ \ \ (ret (string-index-sub str-sub pred?)))
-
-      \ \ \ \ (if ret (+ start ret) ret)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-index "0123456789" #\\2)
-
-      \ \ =\<gtr\>
-
-      \ \ 2)
-
-      \;
-
-      (check
-
-      \ \ (string-index "0123456789" #\\2 2)
-
-      \ \ =\<gtr\>
-
-      \ \ 2)
-
-      \;
-
-      (check
-
-      \ \ (string-index "0123456789" #\\2 3)
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-
-      (check
-
-      \ \ (string-index "01x3456789" char-alphabetic?)
-
-      \ \ =\<gtr\>
-
-      \ \ 2)
-
-      \;
-    </scm-chunk>
+    \;
 
     <item*|string-index-right>
 

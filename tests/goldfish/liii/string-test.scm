@@ -73,19 +73,9 @@
 
 (check-false (string-null? 'not-a-string))
 
-(check
-  (string-every 
-    #\x
-    "xxxxxx")
-  =>
-  #t)
+(check-true (string-every #\x "xxxxxx"))
 
-(check
-  (string-every 
-    #\x
-    "xxx0xx")
-  =>
-  #f)
+(check-false (string-every #\x "xxx0xx"))
 
 (check
   (string-every 
@@ -239,19 +229,9 @@
   =>
   #t)
 
-(check
-  (string-any 
-    #\0
-    "xxx0xx")
-  =>
-  #t)
+(check-true (string-any #\0 "xxx0xx"))
 
-(check
-  (string-any 
-    #\0
-    "xxxxxx")
-  =>
-  #f)
+(check-false (string-any #\0 "xxxxxx"))
 
 (check
   (string-any 
@@ -386,10 +366,7 @@
   =>
   #t)
 
-(check
-  (string-take "MathAgape" 4)
-  =>
-  "Math")
+(check (string-take "MathAgape" 4) => "Math")
 
 (check
   (catch 'wrong-type-arg
@@ -471,15 +448,9 @@
   =>
   #t)
 
-(check
-  (string-pad-right "MathAgape" 15)
-  =>
-  "MathAgape      ")
+(check (string-pad-right "MathAgape" 15) => "MathAgape      ")
 
-(check
-  (string-pad-right "MathAgape" 12 #\1)
-  =>
-  "MathAgape111")
+(check (string-pad-right "MathAgape" 12 #\1) => "MathAgape111")
 
 (check
   (string-pad-right "MathAgape" 6 #\1 0 4)
@@ -717,25 +688,13 @@
   =>
   #f)
 
-(check
-  (string-index "0123456789" #\2)
-  =>
-  2)
+(check (string-index "0123456789" #\2) => 2)
 
-(check
-  (string-index "0123456789" #\2 2)
-  =>
-  2)
+(check (string-index "0123456789" #\2 2) => 2)
 
-(check
-  (string-index "0123456789" #\2 3)
-  =>
-  #f)
+(check (string-index "0123456789" #\2 3) => #f)
 
-(check
-  (string-index "01x3456789" char-alphabetic?)
-  =>
-  2)
+(check (string-index "01x3456789" char-alphabetic?) => 2)
 
 (check
   (string-index-right "0123456789" #\8)
