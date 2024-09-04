@@ -15,7 +15,8 @@
 ;
 
 (import (liii check)
-        (liii base))
+        (liii base)
+        (liii list))
 
 (check-set-mode! 'report-failed)
 

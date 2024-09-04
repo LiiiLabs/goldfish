@@ -192,11 +192,11 @@
     (if res (close-port port))
     res))
 
+(define (port? p) (or (input-port? p) (output-port? p)))
+
 (define textual-port? port?)
 
 (define binary-port? port?)
-
-(define (port? p) (or (input-port? p) (output-port? p)))
 
 (define (input-port-open? p) (not (port-closed? p)))
 

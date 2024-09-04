@@ -246,7 +246,9 @@
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (import (liii check)
 
-    \ \ \ \ \ \ \ \ (liii base))
+    \ \ \ \ \ \ \ \ (liii base)
+
+    \ \ \ \ \ \ \ \ (liii list))
 
     \;
 
@@ -265,7 +267,7 @@
 
   <paragraph|case><index|case>
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|false|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (case '+
 
     \ \ \ \ \ \ \ \ \ ((+ -) 'p0)
@@ -2339,6 +2341,14 @@
 
   S7内置函数。
 
+  <paragraph|port?><index|port?>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (port? p) (or (input-port? p) (output-port? p)))
+
+    \;
+  </scm-chunk>
+
   <paragraph|textual-port?><index|textual-port?>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
@@ -2351,14 +2361,6 @@
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define binary-port? port?)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|port?><index|port?>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define (port? p) (or (input-port? p) (output-port? p)))
 
     \;
   </scm-chunk>
@@ -2425,7 +2427,7 @@
 
   <subparagraph|测试>
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (eof-object) =\<gtr\> #\<less\>eof\<gtr\>)
 
     \;
