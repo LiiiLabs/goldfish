@@ -1,6 +1,6 @@
 <TMU|<tuple|1.0.3|1.2.9.1>>
 
-<style|<tuple|book|chinese|literate|goldfish|reduced-margins>>
+<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile>>
 
 <\body>
   <\hide-preamble>
@@ -1219,7 +1219,7 @@
 
   <section|向量>
 
-  <paragraph|vector?><scm|(vector? obj) =\<gtr\> bool>
+  <paragraph|vector?><index|vector?><scm|(vector? obj) =\<gtr\> bool>
 
   如果obj是一个向量返回<scm|#t>，否则返回<scm|#f>。
 
@@ -1233,7 +1233,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|make-vector><scm|(make-vector k [fill])>
+  <paragraph|make-vector><index|make-vector><scm|(make-vector k [fill])>
 
   返回长度为k的向量，如果提供了fill，则采用fill作为每一个元素的初始值，否则每一个元素的初始值是未指定。
 
@@ -1251,7 +1251,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|vector><scm|(vector obj . . . )>
+  <paragraph|vector><index|vector><scm|(vector obj . . . )>
 
   返回一个新分配的向量，其元素包含给定的参数。类似于<scm|list>。
 
@@ -1263,7 +1263,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|vector-length><scm|(vector-length v)>
+  <paragraph|vector-length><index|vector-length><scm|(vector-length v)>
 
   以整数返回向量中元素的数量。
 
@@ -1275,7 +1275,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|vector-ref><scm|(vector-ref v k )>
+  <paragraph|vector-ref><index|vector-ref><scm|(vector-ref v k )>
 
   返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
 
@@ -1343,637 +1343,637 @@
     \;
   </scm-chunk>
 
-  \;
+  <paragraph|vector-set!><index|vector-set!><scm|(vector-set! v k obj )>
 
-  <\description>
+  该函数将对象 obj 存储到向量中索引为 k 的元素里。注意，返回的不是向量，而是那个 obj。当 k 不是向量的有效索引，报错。
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (define my-vector #(0 1 2 3))
+
+    (check my-vector =\<gtr\> #(0 1 2 3))
+
+    \;
+
+    (check (vector-set! my-vector 2 10) =\<gtr\> 10)
+
+    (check my-vector =\<gtr\> #(0 1 10 3))
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-set! my-vector 4 10))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-\<gtr\>list><index|vector-\<gtr\>list><scm|(vector-\<gtr\>list v [start [end]])>
+
+  返回一个新分配的列表，包含向量中从 start 到 end 之间的元素中的对象。当 <scm|start>、<scm|end>不是向量的有效索引，报错。
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (check (vector-\<gtr\>list #()) =\<gtr\> '())
+
+    (check (vector-\<gtr\>list #() 0) =\<gtr\> '())
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-\<gtr\>list #() 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check (vector-\<gtr\>list #(0 1 2 3)) =\<gtr\> '(0 1 2 3))
+
+    (check (vector-\<gtr\>list #(0 1 2 3) 1) =\<gtr\> '(1 2 3))
+
+    (check (vector-\<gtr\>list #(0 1 2 3) 1 1) =\<gtr\> '())
+
+    (check (vector-\<gtr\>list #(0 1 2 3) 1 2) =\<gtr\> '(1))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|list-\<gtr\>vector><index|list-\<gtr\>vector><scm|(list-\<gtr\>vector l)>
+
+  返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
+
+    (check (list-\<gtr\>vector '()) =\<gtr\> #())
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-\<gtr\>string><index|vector-\<gtr\>string><scm|(vector-\<gtr\>string v [start [end]]) =\<gtr\> string>
+
+  将向量v转化为字符串，如果指定了起始索引和终止索引，则只将指定范围内的子向量转化为字符串。
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    ; 0-clause BSD
+
+    ; Bill Schottstaedt
+
+    ; from S7 source repo: r7rs.scm
+
+    (define* (vector-\<gtr\>string v (start 0) end)\ 
+
+    \ \ (let ((stop (or end (length v))))\ 
+
+    \ \ \ \ (copy v (make-string (- stop start)) start stop)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3)) =\<gtr\> "0123")
+
+    (check (vector-\<gtr\>string (vector #\\a #\\b #\\c)) =\<gtr\> "abc")
+
+    \;
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 0 4) =\<gtr\> "0123")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1) =\<gtr\> "123")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 4) =\<gtr\> "123")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 3) =\<gtr\> "12")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 2) =\<gtr\> "1")
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 2 10))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 2 3) =\<gtr\> "2")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 1 3))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-\<gtr\>vector><index|string-\<gtr\>vector><scm|(s [start [end]]) =\<gtr\> vector>
+
+  将字符串s转化为向量，如果指定了起始索引和终止索引，则只将指定范围内的子字符串转化为向量。
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    ; 0-clause BSD
+
+    ; Bill Schottstaedt
+
+    ; from S7 source repo: r7rs.scm
+
+    (define* (string-\<gtr\>vector s (start 0) end)
+
+    \ \ (let ((stop (or end (length s))))\ 
+
+    \ \ \ \ (copy s (make-vector (- stop start)) start stop)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/scheme/base-test.scm|false|false>
+    (check (string-\<gtr\>vector "0123") =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "abc") =\<gtr\> (vector #\\a #\\b #\\c))
+
+    \;
+
+    (check (string-\<gtr\>vector "0123" 0 4) =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "0123" 1) =\<gtr\> (vector #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "0123" 1 4) =\<gtr\> (vector #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "0123" 1 3) =\<gtr\> (vector #\\1 #\\2))
+
+    (check (string-\<gtr\>vector "0123" 1 2) =\<gtr\> (vector #\\1))
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (string-\<gtr\>vector "0123" 2 10))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-copy><index|vector-copy><scm|(vector-copy v [start [end]])>
+
+  返回一个新的分配副本，包含给定向量从开始到结束的元素。新向量的元素与旧向量的元素相同（在eqv?的意义上）。
+
+  <\scm-code>
+    (define (vector-copy v)
+
+    \ \ (let ((new-v (make-vector (vector-length v))))
+
+    \ \ \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ \ \ \ (if (= i (vector-length v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ new-v
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-v i (vector-ref v i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)))))))
+  </scm-code>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define* (vector-copy v (start 0) (end (vector-length v)))
+
+    \ \ (if (or (\<gtr\> start end) (\<gtr\> end (vector-length v)))
+
+    \ \ \ \ \ \ (error 'out-of-range "vector-copy")
+
+    \ \ \ \ \ \ (let ((new-v (make-vector (- end start))))
+
+    \ \ \ \ \ \ \ \ (let loop ((i start) (j 0))
+
+    \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= i end)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ new-v
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-v j (vector-ref v i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) (+ j 1))))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (check (vector-copy #(0 1 2 3)) =\<gtr\> #(0 1 2 3))
+
+    (check (vector-copy #(0 1 2 3) 1) =\<gtr\> #(1 2 3))
+
+    (check (vector-copy #(0 1 2 3) 3) =\<gtr\> #(3))
+
+    (check (vector-copy #(0 1 2 3) 4) =\<gtr\> #())
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy #(0 1 2 3) 5))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy #(0 1 2 3) 1 5))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (define my-vector #(0 1 2 3))
+
+    (check (eqv? my-vector (vector-copy #(0 1 2 3))) =\<gtr\> #f)
+
+    (check\ 
+
+    \ \ (eqv? (vector-ref my-vector 2)
+
+    \ \ \ \ \ \ \ \ (vector-ref (vector-copy #(0 1 2 3)) 2))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check (vector-copy #(0 1 2 3) 1 1) =\<gtr\> #())
+
+    (check (vector-copy #(0 1 2 3) 1 2) =\<gtr\> #(1))
+
+    (check (vector-copy #(0 1 2 3) 1 4) =\<gtr\> #(1 2 3))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-copy!><index|vector-copy!><scm|(vector-copy! to at from [start [end]])>
+
+  <scm|to>和<scm|from>都是向量，<scm|vector-copy!>就是从<scm|from>向量复制元素依次粘贴到<scm|to>向量，粘贴从<scm|to>向量的第<scm|at>个索引位置开始；<scm|start>和<scm|end>是可选参数，用于指定从<scm|from>向量选取元素的范围。
+
+  <\scm-code>
+    a (vector "a0" "a1" "a2" "a3" "a4")
+
+    b (vector "b0" "b1" "b2" "b3" "b4"
+
+    \;
+
+    (vector-copy! b 1 a 0 2) 就是：
+
+    第一步：从a中选取索引为[0,2)的元素，即"a0" "a1"
+
+    第二步：定位到b的索引为 1 的位置，即"b1"所在的那个位置
+
+    第二步：以刚刚定位到的那个"b1"位置为起点，把刚刚选出的元素"a0" "a1"依次替换，直到
+
     \;
 
     \;
 
-    <item*|vector-set!><scm|(vector-set! v k obj )>，该函数将对象 obj 存储到向量中索引为 k 的元素里。注意，返回的不是向量，而是那个 obj。当 k 不是向量的有效索引，报错。
+    代码实现时要注意
 
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (define my-vector #(0 1 2 3))
+    at、to、from的边界条件，按顺序写它们会导致报错的条件
 
-      (check my-vector =\<gtr\> #(0 1 2 3))
+    要注意每一个参数在后面会遇到怎样的使用
 
-      \;
+    \;
 
-      (check (vector-set! my-vector 2 10) =\<gtr\> 10)
+    第一步：只涉及单个参数的报错条件
 
-      (check my-vector =\<gtr\> #(0 1 10 3))
+    (\<less\> at 0) 可省去
 
-      \;
+    (\<gtr\> at (vector-length to)) 可省去
 
-      (check
+    (\<less\> start 0)
 
-      \ \ (catch 'out-of-range
+    (\<less\> start 0)
 
-      \ \ \ \ (lambda () (vector-set! my-vector 4 10))
+    (\<gtr\> start (vector-length from))
 
-      \ \ \ \ (lambda args #t))
+    (\<less\> end 0)
 
-      \ \ =\<gtr\>
+    (\<gtr\> end (vector-length from))
 
-      \ \ #t)
+    \;
 
-      \;
-    </scm-chunk>
+    第二步：两个依赖关系的参数的报错条件
 
-    <item*|vector-\<gtr\>list><scm|(vector-\<gtr\>list v [start [end]])>，返回一个新分配的列表，包含向量中从 start 到 end 之间的元素中的对象。当 <scm|start>、<scm|end>不是向量的有效索引，报错。
+    (\<gtr\> start end)
 
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (check (vector-\<gtr\>list #()) =\<gtr\> '())
+    \;
 
-      (check (vector-\<gtr\>list #() 0) =\<gtr\> '())
+    第三步：三个依赖关系参数的报错条件
 
-      \;
+    (\<gtr\> (+ at (- end start)) (vector-length to))
 
-      (check
+    \;
 
-      \ \ (catch 'out-of-range
+    综合上方的报错条件，去掉一些多余的条件：
 
-      \ \ \ \ (lambda () (vector-\<gtr\>list #() 1))
+    (\<less\> start 0)可省去
 
-      \ \ \ \ (lambda args #t))
+    因为有(\<gtr\> (+ at (- end start)) (vector-length to))，所以(\<gtr\> at (vector-length to))可省去
+  </scm-code>
 
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check (vector-\<gtr\>list #(0 1 2 3)) =\<gtr\> '(0 1 2 3))
-
-      (check (vector-\<gtr\>list #(0 1 2 3) 1) =\<gtr\> '(1 2 3))
-
-      (check (vector-\<gtr\>list #(0 1 2 3) 1 1) =\<gtr\> '())
-
-      (check (vector-\<gtr\>list #(0 1 2 3) 1 2) =\<gtr\> '(1))
-
-      \;
-    </scm-chunk>
-
-    <item*|list-\<gtr\>vector><scm|(list-\<gtr\>vector l)>，返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
-
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
-
-      (check (list-\<gtr\>vector '()) =\<gtr\> #())
-
-      \;
-    </scm-chunk>
-
-    <item*|vector-\<gtr\>string><scm|(vector-\<gtr\>string v [start [end]]) =\<gtr\> string>，将向量v转化为字符串，如果指定了起始索引和终止索引，则只将指定范围内的子向量转化为字符串。
-
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      ; 0-clause BSD
-
-      ; Bill Schottstaedt
-
-      ; from S7 source repo: r7rs.scm
-
-      (define* (vector-\<gtr\>string v (start 0) end)\ 
-
-      \ \ (let ((stop (or end (length v))))\ 
-
-      \ \ \ \ (copy v (make-string (- stop start)) start stop)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3)) =\<gtr\> "0123")
-
-      (check (vector-\<gtr\>string (vector #\\a #\\b #\\c)) =\<gtr\> "abc")
-
-      \;
-
-      (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 0 4) =\<gtr\> "0123")
-
-      (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1) =\<gtr\> "123")
-
-      (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 4) =\<gtr\> "123")
-
-      (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 3) =\<gtr\> "12")
-
-      (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 2) =\<gtr\> "1")
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 2 10))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 2 3) =\<gtr\> "2")
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda () (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 1 3))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    <item*|string-\<gtr\>vector><scm|(string-\<gtr\>vector s [start [end]]) =\<gtr\> vector>，将字符串s转化为向量，如果指定了起始索引和终止索引，则只将指定范围内的子字符串转化为向量。
-
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      ; 0-clause BSD
-
-      ; Bill Schottstaedt
-
-      ; from S7 source repo: r7rs.scm
-
-      (define* (string-\<gtr\>vector s (start 0) end)
-
-      \ \ (let ((stop (or end (length s))))\ 
-
-      \ \ \ \ (copy s (make-vector (- stop start)) start stop)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|goldfish/scheme/base-test.scm|false|false>
-      (check (string-\<gtr\>vector "0123") =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
-
-      (check (string-\<gtr\>vector "abc") =\<gtr\> (vector #\\a #\\b #\\c))
-
-      \;
-
-      (check (string-\<gtr\>vector "0123" 0 4) =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
-
-      (check (string-\<gtr\>vector "0123" 1) =\<gtr\> (vector #\\1 #\\2 #\\3))
-
-      (check (string-\<gtr\>vector "0123" 1 4) =\<gtr\> (vector #\\1 #\\2 #\\3))
-
-      (check (string-\<gtr\>vector "0123" 1 3) =\<gtr\> (vector #\\1 #\\2))
-
-      (check (string-\<gtr\>vector "0123" 1 2) =\<gtr\> (vector #\\1))
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (string-\<gtr\>vector "0123" 2 10))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    <item*|vector-copy><scm|(vector-copy v [start [end]])>，返回一个新的分配副本，包含给定向量从开始到结束的元素。新向量的元素与旧向量的元素相同（在eqv?的意义上）。
-
-    <\scm-code>
-      (define (vector-copy v)
-
-      \ \ (let ((new-v (make-vector (vector-length v))))
-
-      \ \ \ \ (let loop ((i 0))
-
-      \ \ \ \ \ \ \ \ \ (if (= i (vector-length v))
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ new-v
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-v i (vector-ref v i))
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)))))))
-    </scm-code>
-
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define* (vector-copy v (start 0) (end (vector-length v)))
-
-      \ \ (if (or (\<gtr\> start end) (\<gtr\> end (vector-length v)))
-
-      \ \ \ \ \ \ (error 'out-of-range "vector-copy")
-
-      \ \ \ \ \ \ (let ((new-v (make-vector (- end start))))
-
-      \ \ \ \ \ \ \ \ (let loop ((i start) (j 0))
-
-      \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= i end)
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ new-v
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-v j (vector-ref v i))
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) (+ j 1))))))))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (check (vector-copy #(0 1 2 3)) =\<gtr\> #(0 1 2 3))
-
-      (check (vector-copy #(0 1 2 3) 1) =\<gtr\> #(1 2 3))
-
-      (check (vector-copy #(0 1 2 3) 3) =\<gtr\> #(3))
-
-      (check (vector-copy #(0 1 2 3) 4) =\<gtr\> #())
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy #(0 1 2 3) 5))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy #(0 1 2 3) 1 5))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (define my-vector #(0 1 2 3))
-
-      (check (eqv? my-vector (vector-copy #(0 1 2 3))) =\<gtr\> #f)
-
-      (check\ 
-
-      \ \ (eqv? (vector-ref my-vector 2)
-
-      \ \ \ \ \ \ \ \ (vector-ref (vector-copy #(0 1 2 3)) 2))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check (vector-copy #(0 1 2 3) 1 1) =\<gtr\> #())
-
-      (check (vector-copy #(0 1 2 3) 1 2) =\<gtr\> #(1))
-
-      (check (vector-copy #(0 1 2 3) 1 4) =\<gtr\> #(1 2 3))
-
-      \;
-    </scm-chunk>
-
-    <item*|vector-copy!><scm|(vector-copy! to at from [start [end]])>，<scm|to>和<scm|from>都是向量，<scm|vector-copy!>就是从<scm|from>向量复制元素依次粘贴到<scm|to>向量，粘贴从<scm|to>向量的第<scm|at>个索引位置开始；<scm|start>和<scm|end>是可选参数，用于指定从<scm|from>向量选取元素的范围。
-
-    <\scm-code>
-      a (vector "a0" "a1" "a2" "a3" "a4")
-
-      b (vector "b0" "b1" "b2" "b3" "b4"
-
-      \;
-
-      (vector-copy! b 1 a 0 2) 就是：
-
-      第一步：从a中选取索引为[0,2)的元素，即"a0" "a1"
-
-      第二步：定位到b的索引为 1 的位置，即"b1"所在的那个位置
-
-      第二步：以刚刚定位到的那个"b1"位置为起点，把刚刚选出的元素"a0" "a1"依次替换，直到
-
-      \;
-
-      \;
-
-      代码实现时要注意
-
-      at、to、from的边界条件，按顺序写它们会导致报错的条件
-
-      要注意每一个参数在后面会遇到怎样的使用
-
-      \;
-
-      第一步：只涉及单个参数的报错条件
-
-      (\<less\> at 0) 可省去
-
-      (\<gtr\> at (vector-length to)) 可省去
-
-      (\<less\> start 0)
-
-      (\<less\> start 0)
-
-      (\<gtr\> start (vector-length from))
-
-      (\<less\> end 0)
-
-      (\<gtr\> end (vector-length from))
-
-      \;
-
-      第二步：两个依赖关系的参数的报错条件
-
-      (\<gtr\> start end)
-
-      \;
-
-      第三步：三个依赖关系参数的报错条件
-
-      (\<gtr\> (+ at (- end start)) (vector-length to))
-
-      \;
-
-      综合上方的报错条件，去掉一些多余的条件：
-
-      (\<less\> start 0)可省去
-
-      因为有(\<gtr\> (+ at (- end start)) (vector-length to))，所以(\<gtr\> at (vector-length to))可省去
-    </scm-code>
-
-    <\session|guile|default>
-      <\input>
-        \<gtr\>\ 
-      <|input>
-        (define a (vector "a0" "a1" "a2" "a3" "a4"))
-      </input>
-
-      <\input>
-        \<gtr\>\ 
-      <|input>
-        (define b (vector "b0" "b1" "b2" "b3" "b4"))
-      </input>
-
-      <\input>
-        \<gtr\>\ 
-      <|input>
-        (vector-copy! b 0 a 1)
-      </input>
-
-      <\unfolded-io>
-        \<gtr\>\ 
-      <|unfolded-io>
-        b
-      <|unfolded-io>
-        <guile-result|#("a1" "a2" "a3" "a4" "b4")>
-      </unfolded-io>
-
-      <\unfolded-io>
-        \<gtr\>\ 
-      <|unfolded-io>
-        a
-      <|unfolded-io>
-        <guile-result|#("a0" "a1" "a2" "a3" "a4")>
-      </unfolded-io>
-
-      <\input>
-        \<gtr\>\ 
-      <|input>
-        \;
-      </input>
-    </session>
-
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define* (vector-copy! to at from (start 0) (end (vector-length from)))
-
-      \ \ (if (or (\<less\> at 0)
-
-      \ \ \ \ \ \ \ \ \ \ (\<gtr\> start (vector-length from))
-
-      \ \ \ \ \ \ \ \ \ \ (\<less\> end 0)
-
-      \ \ \ \ \ \ \ \ \ \ (\<gtr\> end (vector-length from))
-
-      \ \ \ \ \ \ \ \ \ \ (\<gtr\> start end)
-
-      \ \ \ \ \ \ \ \ \ \ (\<gtr\> (+ at (- end start)) (vector-length to)))
-
-      \ \ \ \ \ \ (error 'out-of-range "vector-copy!")
-
-      \ \ \ \ \ \ (let loop ((to-i at) (from-i start))
-
-      \ \ \ \ \ \ \ \ (if (\<gtr\>= from-i end)
-
-      \ \ \ \ \ \ \ \ \ \ \ \ to
-
-      \ \ \ \ \ \ \ \ \ \ \ \ (begin
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! to to-i (vector-ref from from-i))
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ to-i 1) (+ from-i 1)))))))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\session|guile|default>
+    <\input>
+      \<gtr\>\ 
+    <|input>
       (define a (vector "a0" "a1" "a2" "a3" "a4"))
+    </input>
 
+    <\input>
+      \<gtr\>\ 
+    <|input>
       (define b (vector "b0" "b1" "b2" "b3" "b4"))
+    </input>
 
-      \;
-
-      ;(\<less\> at 0)
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy! b -1 a))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      ;(\<less\> start 0)
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy! b 0 a -1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      ;(\<gtr\> start (vector-length from))
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy! b 0 a 6))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      ;(\<gtr\> end (vector-length from))
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy! b 0 a 0 6))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      ;(\<gtr\> start end)
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy! b 0 a 2 1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      ;(\<gtr\> (+ at (- end start)) (vector-length to))
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy! b 6 a))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (vector-copy! b 1 a))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (define a (vector "a0" "a1" "a2" "a3" "a4"))
-
-      (define b (vector "b0" "b1" "b2" "b3" "b4"))
-
+    <\input>
+      \<gtr\>\ 
+    <|input>
       (vector-copy! b 0 a 1)
+    </input>
 
-      (check b =\<gtr\> #("a1" "a2" "a3" "a4" "b4"))
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      b
+    <|unfolded-io>
+      <guile-result|#("a1" "a2" "a3" "a4" "b4")>
+    </unfolded-io>
 
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      a
+    <|unfolded-io>
+      <guile-result|#("a0" "a1" "a2" "a3" "a4")>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
       \;
+    </input>
+  </session>
 
-      (define a (vector "a0" "a1" "a2" "a3" "a4"))
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define* (vector-copy! to at from (start 0) (end (vector-length from)))
 
-      (define b (vector "b0" "b1" "b2" "b3" "b4"))
+    \ \ (if (or (\<less\> at 0)
 
-      (vector-copy! b 0 a 0 5)
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> start (vector-length from))
 
-      (check b =\<gtr\> #("a0" "a1" "a2" "a3" "a4"))\ 
+    \ \ \ \ \ \ \ \ \ \ (\<less\> end 0)
 
-      \;
-    </scm-chunk>
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> end (vector-length from))
 
-    <\scm-code>
-      \;
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> start end)
 
-      \;
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> (+ at (- end start)) (vector-length to)))
 
-      \;
-    </scm-code>
+    \ \ \ \ \ \ (error 'out-of-range "vector-copy!")
 
-    <item*|vector-append><scm|(vector-append vector . . . )>，返回一个新分配的向量，其元素是给定向量的元素的拼接。这是一个S7内置的函数。
+    \ \ \ \ \ \ (let loop ((to-i at) (from-i start))
 
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (check (vector-append #(0 1 2) #(3 4 5)) =\<gtr\> #(0 1 2 3 4 5))
+    \ \ \ \ \ \ \ \ (if (\<gtr\>= from-i end)
 
-      \;
-    </scm-chunk>
+    \ \ \ \ \ \ \ \ \ \ \ \ to
 
-    <item*|vector-fill!>
+    \ \ \ \ \ \ \ \ \ \ \ \ (begin
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define vector-fill! fill!)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! to to-i (vector-ref from from-i))
 
-      \;
-    </scm-chunk>
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ to-i 1) (+ from-i 1)))))))
 
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (define my-vector (vector 0 1 2 3 4))
+    \;
+  </scm-chunk>
 
-      (fill! my-vector #f)
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (define a (vector "a0" "a1" "a2" "a3" "a4"))
 
-      (check my-vector =\<gtr\> #(#f #f #f #f #f))\ 
+    (define b (vector "b0" "b1" "b2" "b3" "b4"))
 
-      \;
+    \;
 
-      (define my-vector (vector 0 1 2 3 4))
+    ;(\<less\> at 0)
 
-      (fill! my-vector #f 1 2)
+    (check
 
-      (check my-vector =\<gtr\> #(0 #f 2 3 4))\ 
+    \ \ (catch 'out-of-range
 
-      \;
-    </scm-chunk>
-  </description>
+    \ \ \ \ (lambda () (vector-copy! b -1 a))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<less\> start 0)
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> start (vector-length from))
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a 6))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> end (vector-length from))
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a 0 6))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> start end)
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a 2 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> (+ at (- end start)) (vector-length to))
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 6 a))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 1 a))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (define a (vector "a0" "a1" "a2" "a3" "a4"))
+
+    (define b (vector "b0" "b1" "b2" "b3" "b4"))
+
+    (vector-copy! b 0 a 1)
+
+    (check b =\<gtr\> #("a1" "a2" "a3" "a4" "b4"))
+
+    \;
+
+    (define a (vector "a0" "a1" "a2" "a3" "a4"))
+
+    (define b (vector "b0" "b1" "b2" "b3" "b4"))
+
+    (vector-copy! b 0 a 0 5)
+
+    (check b =\<gtr\> #("a0" "a1" "a2" "a3" "a4"))\ 
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-append><index|vector-append><scm|(vector-append vector . . . )>
+
+  返回一个新分配的向量，其元素是给定向量的元素的拼接。这是一个S7内置的函数。
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (check (vector-append #(0 1 2) #(3 4 5)) =\<gtr\> #(0 1 2 3 4 5))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-fill!><index|vector-fill!>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define vector-fill! fill!)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (define my-vector (vector 0 1 2 3 4))
+
+    (fill! my-vector #f)
+
+    (check my-vector =\<gtr\> #(#f #f #f #f #f))\ 
+
+    \;
+
+    (define my-vector (vector 0 1 2 3 4))
+
+    (fill! my-vector #f 1 2)
+
+    (check my-vector =\<gtr\> #(0 #f 2 3 4))\ 
+
+    \;
+  </scm-chunk>
 
   <section|字节向量>
 
@@ -2167,11 +2167,15 @@
 
   <paragraph|vector-for-each><index|vector-for-each><scm|(vector-for-each proc vector1 [vector2 ...])>
 
+  <subparagraph|实现>
+
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define vector-for-each for-each)
 
     \;
   </scm-chunk>
+
+  <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
     (check
@@ -2235,171 +2239,187 @@
 
   <section|异常处理>
 
-  <\description>
-    <item*|guard>
+  <paragraph|guard><index|guard>
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define (raise . args)
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (raise . args)
 
-      \ \ (apply throw #t args))
+    \ \ (apply throw #t args))
 
-      \;
+    \;
 
-      (define-macro (guard results . body)
+    (define-macro (guard results . body)
 
-      \ \ ‘(let ((,(car results)\ 
+    \ \ ‘(let ((,(car results)\ 
 
-      \ \ \ \ \ \ \ \ \ \ (catch #t\ 
+    \ \ \ \ \ \ \ \ \ \ (catch #t\ 
 
-      \ \ \ \ \ \ \ \ \ \ \ \ (lambda ()\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ (lambda ()\ 
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@body)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@body)\ 
 
-      \ \ \ \ \ \ \ \ \ \ \ \ (lambda (type info)
+    \ \ \ \ \ \ \ \ \ \ \ \ (lambda (type info)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (pair? (*s7* 'catches))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (pair? (*s7* 'catches))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda () (apply throw type info))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda () (apply throw type info))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car info))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car info))))))
 
-      \ \ \ \ \ (cond ,@(cdr results)
+    \ \ \ \ \ (cond ,@(cdr results)
 
-      \ \ \ \ \ \ \ \ \ \ \ (else\ 
+    \ \ \ \ \ \ \ \ \ \ \ (else\ 
 
-      \ \ \ \ \ \ \ \ \ \ \ \ (if (procedure? ,(car results))\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ (if (procedure? ,(car results))\ 
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,(car results))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,(car results))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(car results))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(car results))))))
 
-      \;
-    </scm-chunk>
+    \;
+  </scm-chunk>
 
-    测试用例
+  测试用例
 
-    <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
-      (guard (condition
+  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+    (guard (condition
 
-      \ \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ \ (else
 
-      \ \ \ \ \ \ \ \ \ \ (display "condition: ")
+    \ \ \ \ \ \ \ \ \ \ (display "condition: ")
 
-      \ \ \ \ \ \ \ \ \ \ (write condition)
+    \ \ \ \ \ \ \ \ \ \ (write condition)
 
-      \ \ \ \ \ \ \ \ \ \ (newline)
+    \ \ \ \ \ \ \ \ \ \ (newline)
 
-      \ \ \ \ \ \ \ \ \ \ 'exception))
+    \ \ \ \ \ \ \ \ \ \ 'exception))
 
-      \ \ (+ 1 (raise 'an-error)))
+    \ \ (+ 1 (raise 'an-error)))
 
-      ; PRINTS: condition: an-error
+    ; PRINTS: condition: an-error
 
-      \;
+    \;
 
-      (guard (condition
+    (guard (condition
 
-      \ \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ \ (else
 
-      \ \ \ \ \ \ \ \ \ \ (display "something went wrong")
+    \ \ \ \ \ \ \ \ \ \ (display "something went wrong")
 
-      \ \ \ \ \ \ \ \ \ \ (newline)
+    \ \ \ \ \ \ \ \ \ \ (newline)
 
-      \ \ \ \ \ \ \ \ \ \ 'dont-care))
+    \ \ \ \ \ \ \ \ \ \ 'dont-care))
 
-      \ (+ 1 (raise 'an-error)))
+    \ (+ 1 (raise 'an-error)))
 
-      ; PRINTS: something went wrong
+    ; PRINTS: something went wrong
 
-      \;
-    </scm-chunk>
+    \;
+  </scm-chunk>
 
-    <item*|read-error?>
+  <paragraph|read-error?><index|read-error?>
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define (read-error? obj) (eq? (car obj) 'read-error))
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (read-error? obj) (eq? (car obj) 'read-error))
 
-      \;
-    </scm-chunk>
+    \;
+  </scm-chunk>
 
-    <item*|file-error?>
+  <paragraph|file-error?><index|file-error?>
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define (file-error? obj) (eq? (car obj) 'io-error))
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (file-error? obj) (eq? (car obj) 'io-error))
 
-      \;
-    </scm-chunk>
-  </description>
+    \;
+  </scm-chunk>
 
   <section|输入和输出>
 
   <subsection|端口>
 
-  <\description>
-    <item*|call-with-port>
+  <paragraph|call-with-port><index|call-with-port>
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define (call-with-port port proc)
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (call-with-port port proc)
 
-      \ \ (let ((res (proc port)))
+    \ \ (let ((res (proc port)))
 
-      \ \ \ \ (if res (close-port port))
+    \ \ \ \ (if res (close-port port))
 
-      \ \ \ \ res))
+    \ \ \ \ res))
 
-      \;
-    </scm-chunk>
+    \;
+  </scm-chunk>
 
-    <item*|input-port?>S7内置函数。
+  <paragraph|input-port?><index|input-port?>
 
-    <item*|output-port?>S7内置函数。
+  S7内置函数。
 
-    <item*|textual-port?>
+  <paragraph|output-port?><index|output-port?>
 
-    <item*|binary-port?>
+  S7内置函数。
 
-    <item*|port?>
+  <paragraph|textual-port?><index|textual-port?>
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define (port? p) (or (input-port? p) (output-port? p)))
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define textual-port? port?)
 
-      (define binary-port? port?)
+    \;
+  </scm-chunk>
 
-      (define textual-port? port?)
+  <paragraph|binary-port?><index|binary-port?>
 
-      \;
-    </scm-chunk>
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define binary-port? port?)
 
-    <item*|input-port-open?>
+    \;
+  </scm-chunk>
 
-    <item*|output-port-open?>
+  <paragraph|port?><index|port?>
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define (input-port-open? p) (not (port-closed? p)))
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (port? p) (or (input-port? p) (output-port? p)))
 
-      (define (output-port-open? p) (not (port-closed? p)))
+    \;
+  </scm-chunk>
 
-      \;
-    </scm-chunk>
+  <paragraph|input-port-open?><index|input-port-open?>
 
-    <item*|close-port>
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (input-port-open? p) (not (port-closed? p)))
 
-    <item*|close-input-port>S7内置函数。
+    \;
+  </scm-chunk>
 
-    <item*|close-output-port>S7内置函数。
+  <paragraph|output-port-open?><index|output-port-open?>
 
-    <\scm-chunk|goldfish/scheme/base.scm|true|true>
-      (define (close-port p)
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (output-port-open? p) (not (port-closed? p)))
 
-      \ \ (if (input-port? p)
+    \;
+  </scm-chunk>
 
-      \ \ \ \ \ \ (close-input-port p)
+  <paragraph|close-port><index|close-port>
 
-      \ \ \ \ \ \ (close-output-port p)))
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (close-port p)
 
-      \;
-    </scm-chunk>
-  </description>
+    \ \ (if (input-port? p)
+
+    \ \ \ \ \ \ (close-input-port p)
+
+    \ \ \ \ \ \ (close-output-port p)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|close-input-port><index|close-input-port>
+
+  S7内置函数。
+
+  <paragraph|close-output-port><index|close-output-port>
+
+  S7内置函数。
 
   <subsection|输入>
 
@@ -2431,25 +2451,19 @@
     \;
   </scm-chunk>
 
-  <\description>
-    \;
+  <paragraph|char-ready?>
 
-    \;
+  <paragraph|read-string>
 
-    <item*|char-ready?>
+  <paragraph|read-u8>
 
-    <item*|read-string>
+  <paragraph|peek-u8>
 
-    <item*|read-u8>
+  <paragraph|u8-ready?>
 
-    <item*|peek-u8>
+  <paragraph|read-bytevector>
 
-    <item*|u8-ready?>
-
-    <item*|read-bytevector>
-
-    <item*|read-bytevector!>
-  </description>
+  <paragraph|read-bytevector!>
 
   <subsection|输出>
 
