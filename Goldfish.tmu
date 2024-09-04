@@ -255,26 +255,6 @@
     \;
   </scm-chunk>
 
-  <\session|elvish|default>
-    <\output>
-      Elvish 0.19.2
-    </output>
-
-    <\unfolded-io|Elvish] >
-      cd ~/git/liii; bin/scheme tests/goldfish/liii/base-test.scm
-    <|unfolded-io>
-      \;
-
-      ; *** checks *** : 17 correct, 0 failed.
-
-      tests/goldfish/liii/base-test.scm =\<gtr\> #\<less\>unspecified\<gtr\>
-    </unfolded-io>
-
-    <\input|Elvish] >
-      \;
-    </input>
-  </session>
-
   <section|表达式>
 
   本节对应R7RS的第四节：表达式。
@@ -285,7 +265,7 @@
 
   <paragraph|case><index|case>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|false|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|false|true>
     (check (case '+
 
     \ \ \ \ \ \ \ \ \ ((+ -) 'p0)
@@ -409,7 +389,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (let-values (((ret) (+ 1 2))) (+ ret 4)) =\<gtr\> 7)
 
     \;
@@ -503,7 +483,7 @@
 
   通过<scm|define-record-type>，定义了一种名为<scm|pare>的记录类型，其中<scm|kons>是这种记录类型的构造器，<scm|pare?>是谓词，<scm|kar>和<scm|kdr>是选择器，<scm|set-kar!>是修改器。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (define-record-type :pare
 
     \ \ (kons x y)
@@ -543,7 +523,7 @@
 
   上面那个例子比较难懂，提供一个更易懂的例子：
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (define-record-type :person
 
     \ \ (make-person name age)
@@ -591,7 +571,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (square 2) =\<gtr\> 4)
 
     \;
@@ -603,7 +583,7 @@
 
   当且仅当obj是序对时，返回真。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (pair? '(a . b)) =\<gtr\> #t)
 
     (check (pair? '(a b c)) =\<gtr\> #t)
@@ -621,7 +601,7 @@
     一个序对由<scm|\<less\>car\<gtr\>>部分与<scm|\<less\>cdr\<gtr\>>部分组成，形如：<scm|(\<less\>car\<gtr\> . \<less\>cdr\<gtr\>)>
   </footnote>。<scm|car>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (car '(a b c . d)) =\<gtr\> 'a)
 
     \;
@@ -649,7 +629,7 @@
 
   <scm|cdr>是一个S7内置函数，用于返回序对的<scm|\<less\>cdr\<gtr\>>部分。<scm|cdr>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (cdr '(a b c . d)) =\<gtr\> '(b c . d))
 
     \;
@@ -679,7 +659,7 @@
 
   <scm|caar>是一个S7内置函数，用于返回序对<scm|\<less\>car\<gtr\>>部分的<scm|\<less\>car\<gtr\>>部分。参数必须是序对，且该序对的<scm|\<less\>car\<gtr\>>部分的内容也要是序对，否则报错。特别地，空列表不是序对，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (caar '((a . b) . c)) =\<gtr\> 'a)
 
     \;
@@ -717,7 +697,7 @@
 
   当且仅当obj是空列表的时候，返回值为真。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (null? '()) =\<gtr\> #t)
 
     (check (null? '(1)) =\<gtr\> #f)
@@ -729,7 +709,7 @@
 
   <paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (make-list 3 #\\a) =\<gtr\> (list #\\a #\\a #\\a))
 
     (check (make-list 3) =\<gtr\> (list #f #f #f))
@@ -745,7 +725,7 @@
 
   <scm|(length list) -\<gtr\> int>，<scm|length>是一个S7内置函数，它接收一个列表为参数，返回该列表中元素的数量。如果参数不是列表，返回0。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (length ()) =\<gtr\> 0)
 
     (check (length '(a b c)) =\<gtr\> 3)
@@ -765,7 +745,7 @@
 
   <scm|append>是一个S7内置函数，它接收多个列表为参数，按顺序拼接在一起，返回一个新的列表。<scm|append>没有参数时，返回空列表。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (append '(a) '(b c d)) =\<gtr\> '(a b c d))
 
     (check (append '(a b) 'c) =\<gtr\> '(a b . c))
@@ -801,13 +781,13 @@
     </input>
   </session>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (list-ref (cons '(1 2) '(3 4)) 1) =\<gtr\> 3)
 
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (list-ref '(a b c) 2) =\<gtr\> 'c)
 
     \;
@@ -861,7 +841,7 @@
 
   对比使用<scm|equal?>的<scm|member>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“严格”，适用于判断的元素类型最少，速度最快，适用于判断布尔值（<scm|#t>、<scm|#f>）、符号、整数（浮点数和复数不行）、函数（的值）这些类型的元素是否在列表中。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (memq #f '(1 #f 2 3)) =\<gtr\> '(#f 2 3))
 
     (check (memq 'a '(1 a 2 3)) =\<gtr\> '(a 2 3))
@@ -899,7 +879,7 @@
 
   比使用<scm|equal?>的<scm|member>“严格”，但比使用<scm|<scm|eq?>>的<scm|memq>“宽松”，适用于判断的元素类型次全（<scm|memv>能实现的功能<scm|member>都能实现），速度中等，适用于判断数值类元素（整数、浮点数、复数）是否在列表中。但是注意，即使数值相同也不视为同一元素。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (memv 2 '(1 2 3)) =\<gtr\> '(2 3))
 
     (check (memv 2.0 '(1 2.0 3)) =\<gtr\> '(2.0 3))
@@ -919,7 +899,7 @@
 
   <scm|member>是一个S7内置函数，接收一个元素和一个列表为参数，返回包含该元素的第一个子列表。当元素不在列表中，返回<scm|#f>。当列表为空列表，返回<scm|#f>。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (member 2 '(1 2 3)) =\<gtr\> '(2 3))
 
     (check (member 0 '(1 2 3)) =\<gtr\> #f)
@@ -933,7 +913,7 @@
 
   对比使用<scm|eq?>的<scm|memq>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“宽松”，适用判断的元素类型最全，但速度最慢（因为它会递归地比较复合数据结构的每个部分），建议用于判断字符串、序对、列表这些类型的元素是否在列表中，如果无需判断这些类型，建议选用<scm|memv>或<scm|memq>。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (member "1" '(0 "1" 2 3)) =\<gtr\> '("1" 2 3))
 
     (check (member '(1 . 2) '(0 (1 . 2) 3)) =\<gtr\> '((1 . 2) 3))
@@ -949,7 +929,7 @@
 
   判断一个对象x是否是字符类型。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (char? #\\A) =\<gtr\> #t)
 
     (check (char? 1) =\<gtr\> #f)
@@ -961,7 +941,7 @@
 
   判断两个及以上字符对象是否相等。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (char=? #\\A #\\A) =\<gtr\> #t)
 
     (check (char=? #\\A #\\A #\\A) =\<gtr\> #t)
@@ -977,7 +957,7 @@
 
   <scm|string?>是一个S7内置的谓词函数，当且仅当参数对象类型是字符串（例如<scm|"MathAgape">）时返回<scm|#t>，否则都返回<scm|#f>。当参数为符号（例如<scm|'MathAgape>）、字符（例如<scm|#/MathAgape>）、数字（例如<scm|123>）、列表（例如<scm|'(1 2 3)>）这些非字符串类型时，都返回<scm|#f>。<scm|string?>用于确定对象是否可以被当作字符串处理，在需要执行对字符串特定操作时特别有用，避免类型错误。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (string? "MathAgape") =\<gtr\> #t)
 
     (check (string? "") =\<gtr\> #t)
@@ -999,7 +979,7 @@
 
   <scm|string-length>是一个S7内置的函数，它接收一个字符串作为参数，返回一个表示该字符串长度的整数，即字符串中包含的字符数。当参数不是字符串，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (string-length "MathAgape") =\<gtr\> 9)
 
     (check (string-length "") =\<gtr\> 0)
@@ -1025,7 +1005,7 @@
 
   <scm|string-ref>是一个S7内置的函数，接收一个字符串和一个称为索引值的非负整数k为参数，通过索引值k返回字符串的第k个元素（从0开始计数）。当参数为空字符串时，报错。当k为负数，报错。当k大于等于字符串中字符数时，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (string-ref "MathAgape" 0) =\<gtr\> #\\M)
 
     (check (string-ref "MathAgape" 2) =\<gtr\> #\\t)
@@ -1079,7 +1059,7 @@
 
   <scm|string-append>是一个S7内置的函数，用于连接两个或多个字符串。它会将所有提供的字符串参数逐个拼接在一起，并返回一个新的字符串，原始字符串不会被修改。当没有参数时，返回空字符串。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (string-append "Math" "Agape") =\<gtr\> "MathAgape")
 
     \;
@@ -1093,7 +1073,7 @@
 
   <scm|string-\<gtr\>list>是一个S7内置的函数，用于将字符串转换为字符列表。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check
 
     \ \ (string-\<gtr\>list "MathAgape")
@@ -1113,7 +1093,7 @@
 
   <scm|list-\<gtr\>string>是一个S7内置的函数，用于将字符列表转换为字符串。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check
 
     \ \ (list-\<gtr\>string '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
@@ -1155,7 +1135,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (define original-string "MathAgape")
 
     (define copied-string (string-copy original-string))
@@ -1223,7 +1203,7 @@
 
   如果obj是一个向量返回<scm|#t>，否则返回<scm|#f>。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector? #(1 2 3)) =\<gtr\> #t)
 
     (check (vector? #()) =\<gtr\> #t)
@@ -1237,7 +1217,7 @@
 
   返回长度为k的向量，如果提供了fill，则采用fill作为每一个元素的初始值，否则每一个元素的初始值是未指定。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (make-vector 1 1) =\<gtr\> (vector 1))
 
     (check (make-vector 3 'a) =\<gtr\> (vector 'a 'a 'a))
@@ -1255,7 +1235,7 @@
 
   返回一个新分配的向量，其元素包含给定的参数。类似于<scm|list>。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector 'a 'b 'c) =\<gtr\> #(a b c))
 
     (check (vector) =\<gtr\> #())
@@ -1267,7 +1247,7 @@
 
   以整数返回向量中元素的数量。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector-length #(1 2 3)) =\<gtr\> 3)
 
     (check (vector-length #()) =\<gtr\> 0)
@@ -1279,7 +1259,7 @@
 
   返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector-ref #(1 2 3) 0) =\<gtr\> 1)
 
     (check (vector-ref #(1 2 3) 2) =\<gtr\> 3)
@@ -1347,7 +1327,7 @@
 
   该函数将对象 obj 存储到向量中索引为 k 的元素里。注意，返回的不是向量，而是那个 obj。当 k 不是向量的有效索引，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (define my-vector #(0 1 2 3))
 
     (check my-vector =\<gtr\> #(0 1 2 3))
@@ -1379,7 +1359,7 @@
 
   返回一个新分配的列表，包含向量中从 start 到 end 之间的元素中的对象。当 <scm|start>、<scm|end>不是向量的有效索引，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector-\<gtr\>list #()) =\<gtr\> '())
 
     (check (vector-\<gtr\>list #() 0) =\<gtr\> '())
@@ -1415,7 +1395,7 @@
 
   返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
 
     (check (list-\<gtr\>vector '()) =\<gtr\> #())
@@ -1443,7 +1423,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3)) =\<gtr\> "0123")
 
     (check (vector-\<gtr\>string (vector #\\a #\\b #\\c)) =\<gtr\> "abc")
@@ -1515,7 +1495,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/scheme/base-test.scm|false|false>
+  <\scm-chunk|goldfish/liii/base-test.scm|false|false>
     (check (string-\<gtr\>vector "0123") =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
 
     (check (string-\<gtr\>vector "abc") =\<gtr\> (vector #\\a #\\b #\\c))
@@ -1595,7 +1575,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector-copy #(0 1 2 3)) =\<gtr\> #(0 1 2 3))
 
     (check (vector-copy #(0 1 2 3) 1) =\<gtr\> #(1 2 3))
@@ -1801,7 +1781,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (define a (vector "a0" "a1" "a2" "a3" "a4"))
 
     (define b (vector "b0" "b1" "b2" "b3" "b4"))
@@ -1943,7 +1923,7 @@
 
   返回一个新分配的向量，其元素是给定向量的元素的拼接。这是一个S7内置的函数。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector-append #(0 1 2) #(3 4 5)) =\<gtr\> #(0 1 2 3 4 5))
 
     \;
@@ -1957,7 +1937,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (define my-vector (vector 0 1 2 3 4))
 
     (fill! my-vector #f)
@@ -1985,7 +1965,7 @@
 
   <scm|apply>是R7RS定义的函数。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (apply + (list 3 4)) =\<gtr\> 7)
 
     (check (apply + (list 2 3 4)) =\<gtr\> 9)
@@ -2003,7 +1983,7 @@
 
   <scm|map>是S7的内置高阶函数，它接收一个函数和一个列表为从参数，把该函数应用于该列表的每个元素上，并返回一个新列表。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (map square (list 1 2 3 4 5)) =\<gtr\> '(1 4 9 16 25))
 
     \;
@@ -2021,7 +2001,7 @@
 
   <subparagraph|测试>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check
 
     \ \ (string-map
@@ -2047,7 +2027,7 @@
 
   <scm|for-each>是S7内置的高阶函数。<scm|for-each>的参数与<scm|map>的参数类似，但<scm|for-each>调用<scm|proc>是为了它的副作用，而不是为了它的返回值。与<scm|map>不同，<scm|for-each>保证会按照从第一个元素到最后一个元素的顺序调用<scm|proc>，并且<scm|for-each>返回的值是未指定的。如果给出了多个列表，并且不是所有列表的长度都相同，<scm|for-each>会在最短的列表用尽时终止。当<scm|proc>不接受与<scm|lists>数量相同的参数，报错。
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check
 
     \ \ (let ((v (make-vector 5)))
@@ -2099,7 +2079,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check
 
     \ \ (let ((lst '()))
@@ -2177,7 +2157,7 @@
 
   <subparagraph|测试>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check
 
     \ \ (let ((lst (make-list 5)))
@@ -2281,7 +2261,7 @@
 
   测试用例
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (guard (condition
 
     \ \ \ \ \ \ \ \ \ (else
@@ -2445,7 +2425,7 @@
 
   <subparagraph|测试>
 
-  <\scm-chunk|tests/goldfish/scheme/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
     (check (eof-object) =\<gtr\> #\<less\>eof\<gtr\>)
 
     \;
