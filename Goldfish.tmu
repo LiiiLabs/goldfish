@@ -1,6 +1,6 @@
 <TMU|<tuple|1.0.3|1.2.9.1>>
 
-<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile>>
+<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
 <\body>
   <\hide-preamble>
@@ -581,147 +581,7 @@
 
   <section|序对和列表>
 
-  \;
-
-  <paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (make-list 3 #\\a) =\<gtr\> (list #\\a #\\a #\\a))
-
-    (check (make-list 3) =\<gtr\> (list #f #f #f))
-
-    \;
-
-    (check (make-list 0) =\<gtr\> (list ))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|length><index|length>
-
-  <scm|(length list) -\<gtr\> int>，<scm|length>是一个S7内置函数，它接收一个列表为参数，返回该列表中元素的数量。如果参数不是列表，返回0。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (length ()) =\<gtr\> 0)
-
-    (check (length '(a b c)) =\<gtr\> 3)
-
-    (check (length '(a (b) (c d e))) =\<gtr\> 3)
-
-    \;
-
-    (check (length 2) =\<gtr\> #f)
-
-    (check (length '(a . b)) =\<gtr\> -1)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|append><index|append>
-
-  <scm|append>是一个S7内置函数，它接收多个列表为参数，按顺序拼接在一起，返回一个新的列表。<scm|append>没有参数时，返回空列表。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (append '(a) '(b c d)) =\<gtr\> '(a b c d))
-
-    (check (append '(a b) 'c) =\<gtr\> '(a b . c))
-
-    \;
-
-    (check (append () 'c) =\<gtr\> 'c)
-
-    (check (append) =\<gtr\> '())
-
-    \;
-  </scm-chunk>
-
-  <paragraph|memq><index|memq>
-
-  <scm|memq>是一个S7内置函数，和<scm|member>类似，但判断元素等价的谓词是<scm|eq?>。也就是说，检查的是两个元素在是否是同一个实例，即它们是否具有相同的内存地址。
-
-  对比使用<scm|equal?>的<scm|member>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“严格”，适用于判断的元素类型最少，速度最快，适用于判断布尔值（<scm|#t>、<scm|#f>）、符号、整数（浮点数和复数不行）、函数（的值）这些类型的元素是否在列表中。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (memq #f '(1 #f 2 3)) =\<gtr\> '(#f 2 3))
-
-    (check (memq 'a '(1 a 2 3)) =\<gtr\> '(a 2 3))
-
-    (check (memq 2 '(1 2 3)) =\<gtr\> '(2 3))
-
-    \;
-
-    (check (memq 2.0 '(1 2.0 3)) =\<gtr\> #f)
-
-    (check (memq 2+0i '(1 2+0i 3)) =\<gtr\> #f)
-
-    \;
-
-    (define num1 3)
-
-    (define num2 3)
-
-    (check (memq num1 '(3 num2)) =\<gtr\> '(3 num2))
-
-    (check (memq 3 '(num1 num2)) =\<gtr\> #f)
-
-    (check (memq 'num1 '(num1 num2)) =\<gtr\> '(num1 num2))
-
-    \;
-
-    (check (memq (+ 1 1) '(1 2 3)) =\<gtr\> '(2 3))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|memv><index|memv>
-
-  <scm|memv>是一个S7内置函数，和<scm|member>类似，但判断元素元素的谓词是<scm|eqv?>。也就是说，检查的是两个元素是否相同或在数值上等价。
-
-  比使用<scm|equal?>的<scm|member>“严格”，但比使用<scm|<scm|eq?>>的<scm|memq>“宽松”，适用于判断的元素类型次全（<scm|memv>能实现的功能<scm|member>都能实现），速度中等，适用于判断数值类元素（整数、浮点数、复数）是否在列表中。但是注意，即使数值相同也不视为同一元素。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (memv 2 '(1 2 3)) =\<gtr\> '(2 3))
-
-    (check (memv 2.0 '(1 2.0 3)) =\<gtr\> '(2.0 3))
-
-    (check (memv 2+0i '(1 2+0i 3)) =\<gtr\> '(2+0i 3))
-
-    \;
-
-    (check (memv 2 '(1 2.0 3)) =\<gtr\> #f)
-
-    (check (memv 2 '(1 2+0i 3)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|member><index|member>
-
-  <scm|member>是一个S7内置函数，接收一个元素和一个列表为参数，返回包含该元素的第一个子列表。当元素不在列表中，返回<scm|#f>。当列表为空列表，返回<scm|#f>。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (member 2 '(1 2 3)) =\<gtr\> '(2 3))
-
-    (check (member 0 '(1 2 3)) =\<gtr\> #f)
-
-    (check (member 0 '()) =\<gtr\> #f)
-
-    \ 
-  </scm-chunk>
-
-  注意，判断两个元素等价的谓词是<scm|equal?>。也就是说，检查的是两个元素在结构和内容上是否等价。
-
-  对比使用<scm|eq?>的<scm|memq>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“宽松”，适用判断的元素类型最全，但速度最慢（因为它会递归地比较复合数据结构的每个部分），建议用于判断字符串、序对、列表这些类型的元素是否在列表中，如果无需判断这些类型，建议选用<scm|memv>或<scm|memq>。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (member "1" '(0 "1" 2 3)) =\<gtr\> '("1" 2 3))
-
-    (check (member '(1 . 2) '(0 (1 . 2) 3)) =\<gtr\> '((1 . 2) 3))
-
-    (check (member '(1 2) '(0 (1 2) 3)) =\<gtr\> '((1 2) 3))
-
-    \;
-  </scm-chunk>
+  见<chapter-ref|chapter:liii_list>
 
   <section|字符>
 
@@ -2803,7 +2663,7 @@
     \;
   </scm-chunk>
 
-  <chapter|(liii list)>
+  <chapter|(liii list)><label|chapter:liii_list>
 
   <section|许可证>
 
@@ -3011,17 +2871,33 @@
 
   <section|SRFI-1>
 
-  SRFI-1中有一部分函数已经在R7RS的<scm|(scheme base)>库里面了。本节不包含R7RS定义的那些函数。
+  SRFI-1中有一部分函数已经在R7RS的<scm|(scheme base)>库里面了。本节包含了R7RS定义的<scm|(scheme base)>里面和列表相关的函数，这些函数的实现和测试均在<shell|base.scm>和<shell|base-test.scm>中维护。用户可以通过<scm|(import (liii base))>导入这些函数，或者使用<scm|(import (liii list))>导入这些函数。
 
   <subsection|构造器>
 
   <paragraph|cons><index|cons>
 
-  R7RS中定义的S7 Scheme内置函数。
+  S7 Scheme内置的R7RS中定义的函数。
 
   <paragraph|list><index|list>
 
-  R7RS中定义的S7 Scheme内置函数。
+  S7 Scheme内置的R7RS中定义的函数。
+
+  <paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
+
+  S7 Scheme内置的R7RS中定义的函数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (make-list 3 #\\a) =\<gtr\> (list #\\a #\\a #\\a))
+
+    (check (make-list 3) =\<gtr\> (list #f #f #f))
+
+    \;
+
+    (check (make-list 0) =\<gtr\> (list ))
+
+    \;
+  </scm-chunk>
 
   <paragraph|circular-list><index|circular-list>
 
@@ -3811,6 +3687,44 @@
 
   <subsection|常用函数>
 
+  <paragraph|length><index|length><scm|(l) -\<gtr\> integer>
+
+  <scm|length>是一个S7内置的R7RS定义的函数，它接收一个列表为参数，返回该列表中元素的数量。如果参数不是列表，返回0。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (length ()) =\<gtr\> 0)
+
+    (check (length '(a b c)) =\<gtr\> 3)
+
+    (check (length '(a (b) (c d e))) =\<gtr\> 3)
+
+    \;
+
+    (check (length 2) =\<gtr\> #f)
+
+    (check (length '(a . b)) =\<gtr\> -1)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|append><index|append>
+
+  <scm|append>是一个S7内置的R7RS定义的函数，它接收多个列表为参数，按顺序拼接在一起，返回一个新的列表。<scm|append>没有参数时，返回空列表。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (append '(a) '(b c d)) =\<gtr\> '(a b c d))
+
+    (check (append '(a b) 'c) =\<gtr\> '(a b . c))
+
+    \;
+
+    (check (append () 'c) =\<gtr\> 'c)
+
+    (check (append) =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
   <paragraph|count><index|count>
 
   <scm|count>是一个高阶函数，它接收两个参数：一个谓词和一个列表；返回满足谓词条件的元素在列表中出现的次数。
@@ -4210,6 +4124,94 @@
   </scm-chunk>
 
   <subsection|搜索>
+
+  <paragraph|memq><index|memq>
+
+  <scm|memq>是一个S7内置函数，和<scm|member>类似，但判断元素等价的谓词是<scm|eq?>。也就是说，检查的是两个元素在是否是同一个实例，即它们是否具有相同的内存地址。
+
+  对比使用<scm|equal?>的<scm|member>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“严格”，适用于判断的元素类型最少，速度最快，适用于判断布尔值（<scm|#t>、<scm|#f>）、符号、整数（浮点数和复数不行）、函数（的值）这些类型的元素是否在列表中。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (memq #f '(1 #f 2 3)) =\<gtr\> '(#f 2 3))
+
+    (check (memq 'a '(1 a 2 3)) =\<gtr\> '(a 2 3))
+
+    (check (memq 2 '(1 2 3)) =\<gtr\> '(2 3))
+
+    \;
+
+    (check (memq 2.0 '(1 2.0 3)) =\<gtr\> #f)
+
+    (check (memq 2+0i '(1 2+0i 3)) =\<gtr\> #f)
+
+    \;
+
+    (define num1 3)
+
+    (define num2 3)
+
+    (check (memq num1 '(3 num2)) =\<gtr\> '(3 num2))
+
+    (check (memq 3 '(num1 num2)) =\<gtr\> #f)
+
+    (check (memq 'num1 '(num1 num2)) =\<gtr\> '(num1 num2))
+
+    \;
+
+    (check (memq (+ 1 1) '(1 2 3)) =\<gtr\> '(2 3))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|memv><index|memv>
+
+  <scm|memv>是一个S7内置函数，和<scm|member>类似，但判断元素元素的谓词是<scm|eqv?>。也就是说，检查的是两个元素是否相同或在数值上等价。
+
+  比使用<scm|equal?>的<scm|member>“严格”，但比使用<scm|<scm|eq?>>的<scm|memq>“宽松”，适用于判断的元素类型次全（<scm|memv>能实现的功能<scm|member>都能实现），速度中等，适用于判断数值类元素（整数、浮点数、复数）是否在列表中。但是注意，即使数值相同也不视为同一元素。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (memv 2 '(1 2 3)) =\<gtr\> '(2 3))
+
+    (check (memv 2.0 '(1 2.0 3)) =\<gtr\> '(2.0 3))
+
+    (check (memv 2+0i '(1 2+0i 3)) =\<gtr\> '(2+0i 3))
+
+    \;
+
+    (check (memv 2 '(1 2.0 3)) =\<gtr\> #f)
+
+    (check (memv 2 '(1 2+0i 3)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|member><index|member>
+
+  <scm|member>是一个S7内置函数，接收一个元素和一个列表为参数，返回包含该元素的第一个子列表。当元素不在列表中，返回<scm|#f>。当列表为空列表，返回<scm|#f>。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (member 2 '(1 2 3)) =\<gtr\> '(2 3))
+
+    (check (member 0 '(1 2 3)) =\<gtr\> #f)
+
+    (check (member 0 '()) =\<gtr\> #f)
+
+    \ 
+  </scm-chunk>
+
+  注意，判断两个元素等价的谓词是<scm|equal?>。也就是说，检查的是两个元素在结构和内容上是否等价。
+
+  对比使用<scm|eq?>的<scm|memq>或使用<scm|<scm|eqv?>>的<scm|memv>，这种检查最为“宽松”，适用判断的元素类型最全，但速度最慢（因为它会递归地比较复合数据结构的每个部分），建议用于判断字符串、序对、列表这些类型的元素是否在列表中，如果无需判断这些类型，建议选用<scm|memv>或<scm|memq>。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (member "1" '(0 "1" 2 3)) =\<gtr\> '("1" 2 3))
+
+    (check (member '(1 . 2) '(0 (1 . 2) 3)) =\<gtr\> '((1 . 2) 3))
+
+    (check (member '(1 2) '(0 (1 2) 3)) =\<gtr\> '((1 2) 3))
+
+    \;
+  </scm-chunk>
 
   <paragraph|find><index|find>
 
