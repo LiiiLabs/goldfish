@@ -1,8 +1,20 @@
 <TMU|<tuple|1.0.3|1.2.9.1>>
 
-<style|<tuple|generic|chinese|literate>>
+<style|<tuple|generic|chinese|literate|goldfish|reduced-margins>>
 
 <\body>
+  <\hide-preamble>
+    <assign|scm|<macro|body|<goldfish-lang|<arg|body>>>>
+
+    <assign|scm-chunk|<\macro|name|prev|next|body>
+      <\generic-chunk|<arg|name>|<arg|prev>|<arg|next>>
+        <with|mode|prog|prog-language|goldfish|font-family|rm|<arg|body>>
+      </generic-chunk>
+    </macro>>
+
+    <assign|subparagraph|<macro|title|<assign|subparagraph-numbered|<compound|subparagraph-display-numbers>><assign|subparagraph-prefix|<macro|<compound|the-subparagraph>.>><compound|next-subparagraph><compound|subparagraph-clean><compound|subparagraph-header|<arg|title>><compound|subparagraph-toc|<arg|title>><small|<if|<value|subparagraph-numbered>|<compound|subparagraph-numbered-title|<arg|title>>|<compound|subparagraph-unnumbered-title|<arg|title>>>>>>
+  </hide-preamble>
+
   文档许可证暂时没有确定！
 
   <chapter|(liii list)>
@@ -77,6 +89,34 @@
     \;
   </scm-chunk>
 
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|false|true>
+    ;;; SRFI-1 list-processing library \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ -*- Scheme -*-
+
+    ;;; Reference implementation
+
+    ;;;
+
+    ;;; SPDX-License-Identifier: MIT
+
+    ;;;
+
+    ;;; Copyright (c) 1998, 1999 by Olin Shivers. You may do as you please with
+
+    ;;; this code as long as you do not remove this copyright notice or
+
+    ;;; hold me liable for its use. Please send bug reports to shivers@ai.mit.edu.
+
+    ;;; \ \ \ \ -Olin
+
+    ;;;
+
+    ;;; Copyright (c) 2024 The Goldfish Scheme Authors
+
+    ;;; Follow the same License as the original one
+
+    \;
+  </scm-chunk>
+
   <section|接口>
 
   Liii List函数库是金鱼标准库中的List函数库，其中的大部分函数来自函数库<scm|(srfi srfi-1)>，小部分是三鲤自己设计的函数。来自SRFI 1的，我们只是在Liii List中导出相关函数名，相关实现和单元测试都在SRFI 1中维护。
@@ -137,12 +177,42 @@
     \;
   </scm-chunk>
 
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define-library (srfi srfi-1)
+
+    (export
+
+    \ \ circular-list iota circular-list? null-list?
+
+    \ \ first second third fourth fifth
+
+    \ \ sixth seventh eighth ninth tenth
+
+    \ \ take drop take-right drop-right count fold fold-right
+
+    \ \ reduce reduce-right filter partition remove find
+
+    \ \ delete delete-duplicates
+
+    \ \ take-while drop-while list-index any every
+
+    \ \ last-pair last)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
   <section|测试>
+
+  在金鱼Scheme中的SRFI 1实现需要遵循最小依赖原则，目前<scm|delete-duplicates>是一个复杂度比较高的实现，在SRFI 1中保留，但并不在<scm|(liii list)>导出，故而在本测试文件的开头需要从<scm|(srfi srfi-1)>单独导入。
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (import (liii list)
 
-    \ \ \ \ \ \ \ \ (liii check))
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (only (srfi srfi-1) delete-duplicates))
 
     \;
 
@@ -151,9 +221,1467 @@
     \;
   </scm-chunk>
 
-  <section|实现>
+  <section|SRFI-1>
 
-  <paragraph|length=?><scm|(x l) =\<gtr\> boolean>
+  SRFI-1中有一部分函数已经在R7RS的<scm|(scheme base)>库里面了。本节不包含R7RS定义的那些函数。
+
+  <subsection|构造器>
+
+  <paragraph|circular-list><index|circular-list>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    ; 0 clause BSD, from S7 repo stuff.scm
+
+    (define circular-list
+
+    \ \ (lambda objs
+
+    \ \ \ \ (let ((lst (copy objs)))
+
+    \ \ \ \ \ \ (set-cdr! (list-tail lst (- (length lst) 1)) lst))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|iota><index|iota>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    ; 0 clause BSD, from S7 repo stuff.scm
+
+    (define* (iota n (start 0) (incr 1))\ 
+
+    \ \ (if (or (not (integer? n)) (\<less\> n 0))
+
+    \ \ \ \ (error 'wrong-type-arg
+
+    \ \ \ \ \ \ \ \ \ \ \ "iota length ~A should be a non-negative integer" n))
+
+    \ \ (let ((lst (make-list n)))
+
+    \ \ \ \ (do ((p lst (cdr p))
+
+    \ \ \ \ \ \ \ \ \ (i start (+ i incr)))
+
+    \ \ \ \ \ \ ((null? p) lst)
+
+    \ \ \ \ \ \ (set! (car p) i))))
+
+    \;
+  </scm-chunk>
+
+  测试用例
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (iota 3) =\<gtr\> (list 0 1 2))
+
+    (check (iota 3 7) =\<gtr\> (list 7 8 9))
+
+    (check (iota 2 7 2) =\<gtr\> (list 7 9))
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (iota -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <subsection|谓词>
+
+  <paragraph|circular-list?><index|circular-list?>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    ; 0 clause BSD, from S7 repo stuff.scm
+
+    (define circular-list?
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (catch #t
+
+    \ \ \ \ \ \ (lambda () (infinite? (length obj)))
+
+    \ \ \ \ \ \ (lambda args #f))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (circular-list? (circular-list 1 2)) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|null-list?><index|null-list?>
+
+  <scm|null-list?>是一个函数，返回<scm|#t>当且仅当参数是空列表。当参数为空列表，返回<scm|#t>；否则报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (null-list? l)
+
+    \ \ (cond ((pair? l) #f)
+
+    \ \ \ \ \ \ \ \ ((null? l) #t)
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ (error 'wrong-type-arg "null-list?: argument out of domain" l))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (null-list? '()) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  当参数为序对，返回<scm|#f>。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (null-list? '(1 . 2)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  当参数为非空列表，返回<scm|#f>。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (null-list? '(1 2)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  当参数既不是序对也不是列表，报错。
+
+  辨析：<scm|null?>在参数为非序对时，不报错，只是返回<scm|#f>。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (null? 1) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  如果已经确定需要判别的对象是列表，使用<scm|null-list?>更加合适。<scm|null?>无法分辨非空的序对和非空的列表，命名上偏模糊，不推荐使用。
+
+  <subsection|选择器>
+
+  <paragraph|first><index|first>
+
+  <scm|first>是一个函数，<scm|car>的同义词，用于返回列表的第1个元素。当列表元素不足1个，报错。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (first '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 1)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (first '()))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define first car)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|second><index|second>
+
+  <scm|second>是一个函数，<scm|cadr>的同义词，用于返回列表的第2个元素。当列表元素不足2个，报错。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (second '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 2)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (second '(1)))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define second cadr)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|third><index|third>
+
+  <scm|third>是一个函数，<scm|caddr>的同义词，用于返回列表的第3个元素。当列表元素不足3个，报错。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (third '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 3)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (third '(1 2)))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define third caddr)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|fourth><index|fourth>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (fourth x) (list-ref x 3))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fourth '(1 2 3 4 5 6)) =\<gtr\> 4)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|fifth><index|fifth>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (fifth x) (list-ref x 4))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fifth '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 5)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|sixth><index|sixth>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (sixth x) (list-ref x 5))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (sixth '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 6)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|seventh><index|seventh>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (seventh x) (list-ref x 6))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (seventh '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 7)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|eighth><index|eighth>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (eighth x) (list-ref x 7))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (eighth '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 8)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|ninth><index|ninth>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (ninth x) (list-ref x 8))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (ninth '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 9)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|tenth><index|tenth>
+
+  <scm|tenth>是一个函数，用于返回列表的第10个元素。当列表元素不足10个，报错。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (tenth '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 10)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (tenth x)\ 
+
+    \ \ (cadr (cddddr (cddddr x))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|take><index|take>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (take '(1 2 3 4) 3) =\<gtr\> '(1 2 3))
+
+    \;
+
+    (check (take '(1 2 3 4) 4) =\<gtr\> '(1 2 3 4))
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (take '(1 2 3 4) 5))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+
+    (check (take '(1 2 3 . 4) 3) =\<gtr\> '(1 2 3))
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (take '(1 2 3 . 4) 4))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <scm|take>是一个函数，接收一个列表和一个非负整数k为参数，返回列表的前k个元素组成的新列表。当列表元素数量不足k个，报错。
+
+  <\session|goldfish|default>
+    <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+      (define (take l k)
+
+      \ \ (let recur ((l l) (k k))
+
+      \ \ \ \ (if (zero? k) '()
+
+      \ \ \ \ \ \ \ \ (cons (car l)
+
+      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (recur (cdr l) (- k 1))))))
+
+      \;
+    </scm-chunk>
+  </session>
+
+  <paragraph|drop><index|drop>
+
+  <scm|drop>是一个函数，接收一个列表和一个非负整数k为参数，返回去掉列表前k个元素组成的新列表。当列表元素数量不足k个，报错。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (drop '(1 2 3 4) 2) =\<gtr\> '(3 4))
+
+    \;
+
+    (check (drop '(1 2 3 4) 4) =\<gtr\> '())
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (drop '(1 2 3 4) 5))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+
+    (check (drop '(1 2 3 . 4) 3) =\<gtr\> 4)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (drop '(1 2 3 . 4) 4))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <\session|goldfish|default>
+    \;
+
+    <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+      (define (drop l k)
+
+      \ \ (let iter ((l l) (k k))
+
+      \ \ \ \ (if (zero? k) l (iter (cdr l) (- k 1)))))
+
+      \;
+    </scm-chunk>
+  </session>
+
+  <paragraph|take-right><index|take-right>
+
+  <scm|take-right>是一个函数，接收一个列表和一个非负整数k为参数，取出列表的后k个元素组成新列表，返回这个新列表。当列表元素数量不足k个，报错。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (take-right '(1 2 3 4) 3) =\<gtr\> '(2 3 4))
+
+    \;
+
+    (check (take-right '(1 2 3 4) 4) =\<gtr\> '(1 2 3 4))
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (take-right '(1 2 3 4) 5))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+
+    (check (take-right '(1 2 3 . 4) 3) =\<gtr\> '(1 2 3 . 4))
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (take-right '(1 2 3 . 4) 4))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (take-right l k)
+
+    \ \ (let lp ((lag l) \ (lead (drop l k)))
+
+    \ \ \ \ (if (pair? lead)
+
+    \ \ \ \ \ \ \ \ (lp (cdr lag) (cdr lead))
+
+    \ \ \ \ \ \ \ \ lag)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|drop-right><index|drop-right>
+
+  <scm|drop-right>是一个函数，接收一个列表和一个非负整数k为参数，去掉列表的后k个元素组成新列表，返回这个新列表。当列表元素数量不足k个，报错。当k为负数，报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (drop-right l k)
+
+    \ \ (let recur ((lag l) (lead (drop l k)))
+
+    \ \ \ \ (if (pair? lead)
+
+    \ \ \ \ \ \ \ \ (cons (car lag) (recur (cdr lag) (cdr lead)))
+
+    \ \ \ \ \ \ \ \ '())))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (drop-right '(1 2 3 4) 2) =\<gtr\> '(1 2))
+
+    \;
+
+    (check (drop-right '(1 2 3 4) 4) =\<gtr\> '())
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (drop-right '(1 2 3 4) 5))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (drop-right '(1 2 3 4) -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+
+    (check (drop-right '(1 2 3 . 4) 3) =\<gtr\> '())
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (drop-right '(1 2 3 . 4) 4))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|last-pair><index|last-pari>
+
+  <scm|last-pair>是一个函数，以序对形式返回列表的最后一个元素，参数必须是序对，空列表报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (last-pair l)
+
+    \ \ (if (pair? (cdr l))
+
+    \ \ \ \ \ \ (last-pair (cdr l)) l))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (last-pair '(a b c)) =\<gtr\> '(c))
+
+    (check (last-pair '(c)) =\<gtr\> '(c))
+
+    \;
+
+    (check (last-pair '(a b . c)) =\<gtr\> '(b . c))
+
+    (check (last-pair '(b . c)) =\<gtr\> '(b . c))
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (last-pair '()))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|last><index|last>
+
+  <scm|last>是一个函数，以符号形式返回列表的最后一个元素，参数必须是序对，空列表报错。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (last l)
+
+    \ \ (car (last-pair l)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (last '(a b c)) =\<gtr\> 'c)
+
+    (check (last '(c)) =\<gtr\> 'c)
+
+    \;
+
+    (check (last '(a b . c)) =\<gtr\> 'b)
+
+    (check (last '(b . c)) =\<gtr\> 'b)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (last '()))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <subsection|常用函数>
+
+  <paragraph|count><index|count>
+
+  <scm|count>是一个高阶函数，它接收两个参数：一个谓词和一个列表；返回满足谓词条件的元素在列表中出现的次数。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (count pred list1 . lists)
+
+    \ \ (let lp ((lis list1) (i 0))
+
+    \ \ \ \ (if (null-list? lis) i
+
+    \ \ \ \ \ \ \ \ (lp (cdr lis) (if (pred (car lis)) (+ i 1) i)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (count even? '(3 1 4 1 5 9 2 5 6)) =\<gtr\> 3)
+
+    \;
+  </scm-chunk>
+
+  <subsection|折叠和映射>
+
+  <paragraph|fold><index|fold>
+
+  <scm|fold>是一个高阶函数，它接受三个参数：一个函数、一个初始值和一个列表，将函数累积地应用到一个列表的所有元素上，从左到右，从而将列表折叠成一个单一的值。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (fold f initial l)
+
+    \ \ (when (not (procedure? f))
+
+    \ \ \ \ (error 'type-error "The first param must be a procedure"))
+
+    \ \ (if (null? l)
+
+    \ \ \ \ \ \ initial
+
+    \ \ \ \ \ \ (fold f
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (f (car l) initial)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (cdr l))))
+
+    \;
+  </scm-chunk>
+
+  这是SRFI-1官方提供的实现，我们暂时不用。
+
+  <\scm-code>
+    (define (fold kons knil lis1 . lists)
+
+    \ \ (if (pair? lists)
+
+    \ \ \ \ \ \ (let lp ((lists (cons lis1 lists)) (ans knil))
+
+    \ \ \ \ \ \ \ \ (receive (cars+ans cdrs) (%cars+cdrs+ lists ans)
+
+    \ \ \ \ \ \ \ \ \ \ (if (null? cars+ans) ans
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (lp cdrs (apply kons cars+ans)))))
+
+    \;
+
+    \ \ \ \ \ \ (let lp ((lis lis1) (ans knil))
+
+    \ \ \ \ \ \ \ \ (if (null-list? lis) ans
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (lp (cdr lis) (kons (car lis) ans))))))
+  </scm-code>
+
+  常见的用法：
+
+  从初始值开始，依次累加列表中的元素，返回一个数；当列表为空列表时，返回初始值。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fold + 0 '(1 2 3 4)) =\<gtr\> 10)
+
+    \;
+
+    (check (fold + 0 '()) =\<gtr\> 0)
+
+    \;
+
+    (check-catch 'type-error (fold 0 + '(1 2 3 4)))
+
+    \;
+  </scm-chunk>
+
+  反转列表中的元素，返回一个新列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fold cons () '(1 2 3 4)) =\<gtr\> '(4 3 2 1))
+
+    \;
+  </scm-chunk>
+
+  统计列表中满足谓词的元素数量，返回这个数量。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (fold (lambda (x count) (if (symbol? x) (+ count 1) count))
+
+    \ \ \ \ \ \ \ \ 0
+
+    \ \ \ \ \ \ \ \ '(a b 1 2 3 4))
+
+    \ \ =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|fold-right><index|fold-right>
+
+  <scm|fold-right>与<scm|fold>类似，不同的是，<scm|fold-right>是从右到左折叠。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (fold-right f initial l)
+
+    \ \ (if (null? l)
+
+    \ \ \ \ initial
+
+    \ \ \ \ (f (car l)
+
+    \ \ \ \ \ \ \ \ (fold-right f
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ initial
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr l)))))
+
+    \;
+  </scm-chunk>
+
+  这是SRFI-1官方提供的实现，我们暂时不用：
+
+  <\scm-code>
+    (define (fold-right kons knil lis1 . lists)
+
+    \ \ (if (pair? lists)
+
+    \ \ \ \ \ \ (let recur ((lists (cons lis1 lists)))
+
+    \ \ \ \ \ \ \ \ (let ((cdrs (%cdrs lists)))
+
+    \ \ \ \ \ \ \ \ \ \ (if (null? cdrs) knil
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply kons (%cars+ lists (recur cdrs))))))
+
+    \;
+
+    \ \ \ \ \ \ (let recur ((lis lis1))
+
+    \ \ \ \ \ \ \ \ (if (null-list? lis) knil
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let ((head (car lis)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (kons head (recur (cdr lis))))))))
+  </scm-code>
+
+  在用作累加、统计时，<scm|fold-right>与<scm|fold>的结果是相同的。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fold-right + 0 '(1 2 3 4)) =\<gtr\> 10)
+
+    \;
+
+    (check (fold-right + 0 '()) =\<gtr\> 0)
+
+    \;
+
+    (check
+
+    \ \ (fold-right (lambda (x count) (if (symbol? x) (+ count 1) count))
+
+    \ \ \ \ \ \ \ \ 0
+
+    \ \ \ \ \ \ \ \ '(a b 1 2 3 4))
+
+    \ \ =\<gtr\>
+
+    \ \ 2)
+
+    \;
+  </scm-chunk>
+
+  但<scm|fold-right>与<scm|fold>的折叠方向是相反的，这就使得列表原本的顺序得以保持，不会反转。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fold-right cons () '(1 2 3 4)) =\<gtr\> '(1 2 3 4))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|reduce><index|reduce>
+
+  <scm|reduce>与<scm|fold>类似，但有微妙且关键的不同。只有在列表为空列表时，才会使用这个初始值。在列表不是空列表时，则把列表的<scm|\<less\>car\<gtr\>>部分取出作为<scm|fold>的初始值，又把列表的<scm|\<less\>cdr\<gtr\>>部分取出作为<scm|fold>的列表。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (reduce f initial l)
+
+    \ \ (if (null-list? l) initial
+
+    \ \ \ \ \ \ (fold f (car l) (cdr l))))
+
+    \;
+  </scm-chunk>
+
+  在用作累加时，<scm|reduce>与<scm|fold>的结果是相同的。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (reduce + 0 '(1 2 3 4)) =\<gtr\> 10)
+
+    \;
+
+    (check (reduce + 0 '()) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  不适用于反转列表中的元素，但当列表非空，返回的不再是列表，而是序对。因为<scm|reduce>会把非空列表的第一个元素取出来作为<scm|fold>的初始值。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (reduce cons () '(1 2 3 4)) =\<gtr\> '(4 3 2 . 1))
+
+    \;
+  </scm-chunk>
+
+  不适用于统计列表中满足谓词的元素数量，因为<scm|reduce>会把非空列表的第一个元素取出来作为<scm|fold>的初始值，引发错误。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda
+
+    \ \ \ \ \ \ ()
+
+    \ \ \ \ \ \ (reduce (lambda (x count) (if (symbol? x) (+ count 1) count))
+
+    \ \ \ \ \ \ \ \ 0
+
+    \ \ \ \ \ \ \ \ '(a b 1 2 3 4)))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|reduce-right><index|reduce-right>
+
+  <scm|reduce-right>与<scm|reduce>类似，不同的是，<scm|reduce-right>是从右到左规约。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (reduce-right f initial l)
+
+    \ \ (if (null-list? l) initial
+
+    \ \ \ \ \ \ (let recur ((head (car l)) (l (cdr l)))
+
+    \ \ \ \ \ \ \ \ (if (pair? l)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (f head (recur (car l) (cdr l)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ head))))
+
+    \;
+  </scm-chunk>
+
+  在用作累加时，<scm|reduce-right>与<scm|fold>的结果是相同的。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (reduce-right + 0 '(1 2 3 4)) =\<gtr\> 10)
+
+    \;
+
+    (check (reduce-right + 0 '()) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  也不适用于重列列表中的元素，以及统计列表中满足谓词的元素数量。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (reduce-right cons () '(1 2 3 4))
+
+    \ \ \ \ \ \ \ =\<gtr\> '(1 2 3 . 4) )
+
+    \;
+
+    (check
+
+    \ \ (reduce-right (lambda (x count) (if (symbol? x) (+ count 1) count))
+
+    \ \ \ \ \ \ \ \ 0
+
+    \ \ \ \ \ \ \ \ '(a b 1 2 3 4))
+
+    \ \ =\<gtr\> 6)
+
+    \;
+  </scm-chunk>
+
+  <subsection|过滤和分组>
+
+  <paragraph|filter><index|filter>
+
+  <scm|filter>是一个高阶函数，接收一个谓词和一个列表为参数，从这个列表中筛出满足谓词的元素，组成一个新列表，返回这个新列表。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (filter pred l)
+
+    \ \ (let recur ((l l))
+
+    \ \ \ \ (if (null-list? l) l
+
+    \ \ \ \ \ \ \ \ (let ((head (car l))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (tail (cdr l)))
+
+    \ \ \ \ \ \ \ \ \ \ (if (pred head)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((new-tail (recur tail)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (eq? tail new-tail) l
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons head new-tail)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (recur tail))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (filter even? '(-2 -1 0 1 2)) =\<gtr\> '(-2 0 2))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|partition><index|partition>
+
+  <scm|partition>是一个高阶函数，接收一个谓词和一个列表为参数，从这个列表中分别筛出满足和不满足谓词的元素，各组成一个新列表，返回以这两个新列表组成的序对。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (partition pred l)
+
+    \ \ (let loop ((lst l) (satisfies '()) (dissatisfies '()))
+
+    \ \ \ \ (cond ((null? lst)
+
+    \ \ \ \ \ \ \ \ \ \ \ (cons satisfies dissatisfies))
+
+    \ \ \ \ \ \ \ \ \ \ ((pred (car lst))
+
+    \ \ \ \ \ \ \ \ \ \ \ (loop (cdr lst) (cons (car lst) satisfies) dissatisfies))
+
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ (loop (cdr lst) satisfies (cons (car lst) dissatisfies))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (partition symbol? '(one 2 3 four five 6))
+
+    \ \ =\<gtr\> (cons '(five four one) '(6 3 2)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|remove><index|remove>
+
+  <scm|remove>是一个高阶函数，接收一个谓词和一个列表为参数，从这个列表中去掉满足谓词的元素，组成一个新列表，返回这个新列表。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (remove pred l)
+
+    \ \ (filter (lambda (x) (not (pred x))) l))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (remove even? '(-2 -1 0 1 2)) =\<gtr\> '(-1 1))
+
+    \;
+  </scm-chunk>
+
+  <subsection|搜索>
+
+  <paragraph|find><index|find>
+
+  <scm|find>是一个高阶函数，接收一个谓词和一个列表为参数，返回该列表中第一个满足谓词的元素。当列表为空列表，或列表中没有满足谓词的元素，返回<scm|#f>。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (find pred l)
+
+    \ \ (cond ((null? l) #f)
+
+    \ \ \ \ \ \ \ \ ((pred (car l)) (car l))\ 
+
+    \ \ \ \ \ \ \ \ (else (find pred (cdr l)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (find even? '(3 1 4 1 5 9)) =\<gtr\> 4)
+
+    \;
+
+    (check (find even? '()) =\<gtr\> #f)
+
+    \;
+
+    (check (find even? '(1 3 5 7 9)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|take-while><index|take-while>
+
+  <scm|take-while>是一个高阶函数，接收一个谓词和一个列表为参数，按列表顺序筛出满足谓词的元素，直到不满足谓词的那个一个就停止筛选，返回筛出的元素组成的列表。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (take-while pred lst)
+
+    \ \ (if (null? lst)\ 
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (if (pred (car lst))
+
+    \ \ \ \ \ \ \ \ \ \ (cons (car lst) (take-while pred (cdr lst)))
+
+    \ \ \ \ \ \ \ \ \ \ '())))
+
+    \;
+  </scm-chunk>
+
+  当参数的列表为空列表，无论谓词是什么都返回空列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check <code*|(take-while even? '())> =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  当列表中所有元素都满足谓词，返回原列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (take-while (lambda (x) #t) '(1 2 3))
+
+    \ \ =\<gtr\> '(1 2 3))
+
+    \;
+  </scm-chunk>
+
+  当列表中没有元素满足谓词，返回空列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (take-while (lambda (x) #f) '(1 2 3))
+
+    \ \ =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  当列表的第一个元素就不满足谓词，返回空列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (take-while (lambda (x) (not (= x 1))) '(1 2 3))
+
+    \ \ =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  筛出元素的过程按照列表的顺序进行，当一个元素已经不满足谓词，那么这个元素之后的元素不会被筛出。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (take-while (lambda (x) (\<less\> x 3)) '(1 2 3 0))
+
+    \ \ =\<gtr\> '(1 2))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|drop-while><index|drop-while>
+
+  <scm|drop-while>是一个高阶函数，接收一个谓词和一个列表为参数，按列表顺序丢掉满足谓词的元素，直到不满足谓词的那个一个就停止丢掉，返回剩下的元素组成的列表。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (drop-while pred l)
+
+    \ \ (if (null? l)
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (if (pred (car l))
+
+    \ \ \ \ \ \ \ \ \ \ (drop-while pred (cdr l))
+
+    \ \ \ \ \ \ \ \ \ \ l)))
+
+    \;
+  </scm-chunk>
+
+  当列表为空列表，返回空列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (drop-while even? '()) =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  当列表中所有元素都满足谓词，返回空列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (drop-while (lambda (x) #t) '(1 2 3)) =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  当列表中没有元素满足谓词，返回原列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (drop-while (lambda (x) #f) '(1 2 3)) =\<gtr\> '(1 2 3))
+
+    \;
+  </scm-chunk>
+
+  当列表的第一个元素就不满足谓词，返回原列表。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (drop-while (lambda (x) (not (= x 1))) '(1 2 3))
+
+    \ \ =\<gtr\> '(1 2 3))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|list-index><index|list-index>
+
+  <scm|list-index>是一个高阶函数，接收一个谓词和一个列表为参数，返回第一个符合谓词要求的元素的位置索引。当列表为空列表，或列表中没有满足谓词的元素，返回<scm|#f>。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (list-index pred l)
+
+    \ \ \ \ (let loop ((index 0) (l l))
+
+    \ \ \ \ \ \ (if (null? l)
+
+    \ \ \ \ \ \ \ \ \ \ #f
+
+    \ \ \ \ \ \ \ \ \ \ (if (pred (car l))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ index
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ index 1) (cdr l))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (list-index even? '(3 1 4 1 5 9)) =\<gtr\> 2)
+
+    (check (list-index even? '()) =\<gtr\> #f)
+
+    (check (list-index even? '(1 3 5 7 9)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|any><index|any>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (any pred? l)
+
+    \ \ (cond ((null? l) #f)
+
+    \ \ \ \ \ \ \ \ ((pred? (car l)) #t)
+
+    \ \ \ \ \ \ \ \ (else (any pred? (cdr l)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (any integer? '()) =\<gtr\> #f)
+
+    (check (any integer? '(a 3.14 "3")) =\<gtr\> #f)
+
+    (check (any integer? '(a 3.14 3)) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|every><index|every>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (every pred? l)
+
+    \ \ (cond ((null? l) #t)
+
+    \ \ \ \ \ \ \ \ ((not (pred? (car l))) #f)
+
+    \ \ \ \ \ \ \ \ (else (every pred? (cdr l)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (every integer? '()) =\<gtr\> #t)
+
+    (check (every integer? '(a 3.14 3)) =\<gtr\> #f)
+
+    (check (every integer? '(1 2 3)) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <subsection|删除>
+
+  公共子函数，用于处理可选的<scm|maybe-equal>参数。
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (%extract-maybe-equal maybe-equal)
+
+    \ \ (let ((my-equal (if (null-list? maybe-equal)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car maybe-equal))))
+
+    \ \ \ \ (if (procedure? my-equal)
+
+    \ \ \ \ \ \ \ \ my-equal
+
+    \ \ \ \ \ \ \ \ (error 'wrong-type-arg "maybe-equal must be procedure"))))
+  </scm-chunk>
+
+  <paragraph|delete><index|delete>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (delete x l . maybe-equal)
+
+    \ \ (let ((my-equal (%extract-maybe-equal maybe-equal)))
+
+    \ \ \ \ (filter (lambda (y) (not (my-equal x y))) l)))
+
+    \;
+  </scm-chunk>
+
+  测试用例
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (delete 1 (list 1 2 3 4)) =\<gtr\> (list 2 3 4))
+
+    \;
+
+    (check (delete 0 (list 1 2 3 4)) =\<gtr\> (list 1 2 3 4))
+
+    \;
+
+    (check (delete #\\a (list #\\a #\\b #\\c) char=?)
+
+    \ \ \ \ \ \ \ =\<gtr\> (list #\\b #\\c))
+
+    \;
+
+    (check (delete #\\a (list #\\a #\\b #\\c) (lambda (x y) #f))
+
+    \ \ \ \ \ \ \ =\<gtr\> (list #\\a #\\b #\\c))
+
+    \;
+
+    (check (delete 1 (list )) =\<gtr\> (list ))
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda ()
+
+    \ \ \ \ \ \ (check (delete 1 (list 1 2 3 4) 'not-pred) =\<gtr\> 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|delete-duplicates><index|delete-duplicates>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    ;;; right-duplicate deletion
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;;; delete-duplicates delete-duplicates!
+
+    ;;;
+
+    ;;; Beware -- these are N^2 algorithms. To efficiently remove duplicates
+
+    ;;; in long lists, sort the list to bring duplicates together, then use a
+
+    ;;; linear-time algorithm to kill the dups. Or use an algorithm based on
+
+    ;;; element-marking. The former gives you O(n lg n), the latter is linear.
+
+    \;
+
+    (define (delete-duplicates lis . maybe-equal)
+
+    \ \ (let ((my-equal (%extract-maybe-equal maybe-equal)))
+
+    \ \ \ \ (let recur ((lis lis))
+
+    \ \ \ \ \ \ (if (null-list? lis)
+
+    \ \ \ \ \ \ \ \ \ \ lis
+
+    \ \ \ \ \ \ \ \ \ \ (let* ((x (car lis))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (tail (cdr lis))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (new-tail (recur (delete x tail my-equal))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (if (eq? tail new-tail)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ lis
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons x new-tail)))))))
+
+    \;
+  </scm-chunk>
+
+  测试用例
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (delete-duplicates (list 1 1 2 3)) =\<gtr\> (list 1 2 3))
+
+    (check (delete-duplicates (list 1 2 3)) =\<gtr\> (list 1 2 3))
+
+    (check (delete-duplicates (list 1 1 1)) =\<gtr\> (list 1))
+
+    \;
+
+    (check (delete-duplicates (list )) =\<gtr\> (list ))
+
+    \;
+
+    (check (delete-duplicates (list 1 1 2 3) (lambda (x y) #f))
+
+    \ \ \ \ \ \ \ =\<gtr\> (list 1 1 2 3))
+
+    \;
+  </scm-chunk>
+
+  如果判断相等的函数类型不正确，会报错：
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda
+
+    \ \ \ \ \ \ ()
+
+    \ \ \ \ \ \ (check (delete-duplicates (list 1 1 2 3) 'not-pred) =\<gtr\> 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <section|三鲤扩展库>
+
+  <paragraph|length=?><index|length=?><scm|(x l) =\<gtr\> boolean>
 
   <\description>
     <item*|x>期望的列表长度，如果长度为负数，该函数会抛出<scm|value-error>
@@ -463,19 +1991,113 @@
     \;
   </scm-chunk>
 
-  \;
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|false>
     (check-report)
 
     \;
   </scm-chunk>
+
+  <\the-index|idx>
+    <index+1|any|<pageref|auto-78>>
+
+    <index+1|circular-list|<pageref|auto-8>>
+
+    <index+1|circular-list?|<pageref|auto-13>>
+
+    <index+1|count|<pageref|auto-51>>
+
+    <index+1|delete|<pageref|auto-83>>
+
+    <index+1|delete-duplicates|<pageref|auto-85>>
+
+    <index+1|drop|<pageref|auto-40>>
+
+    <index+1|drop-right|<pageref|auto-44>>
+
+    <index+1|drop-while|<pageref|auto-74>>
+
+    <index+1|eighth|<pageref|auto-32>>
+
+    <index+1|every|<pageref|auto-80>>
+
+    <index+1|fifth|<pageref|auto-26>>
+
+    <index+1|filter|<pageref|auto-63>>
+
+    <index+1|find|<pageref|auto-70>>
+
+    <index+1|first|<pageref|auto-18>>
+
+    <index+1|flatmap|<pageref|auto-94>>
+
+    <index+1|fold|<pageref|auto-54>>
+
+    <index+1|fold-right|<pageref|auto-56>>
+
+    <index+1|fourth|<pageref|auto-24>>
+
+    <index+1|iota|<pageref|auto-10>>
+
+    <index+1|last|<pageref|auto-48>>
+
+    <index+1|last-pari|<pageref|auto-46>>
+
+    <index+1|length=?|<pageref|auto-88>>
+
+    <index+1|list-index|<pageref|auto-76>>
+
+    <index+1|list-not-null?|<pageref|auto-100>>
+
+    <index+1|list-view|<pageref|auto-90>>
+
+    <index+1|ninth|<pageref|auto-34>>
+
+    <index+1|not-null-list?|<pageref|auto-96>>
+
+    <index+1|null-list?|<pageref|auto-15>>
+
+    <index+1|partition|<pageref|auto-65>>
+
+    <index+1|reduce|<pageref|auto-58>>
+
+    <index+1|reduce-right|<pageref|auto-60>>
+
+    <index+1|remove|<pageref|auto-67>>
+
+    <index+1|second|<pageref|auto-20>>
+
+    <index+1|seventh|<pageref|auto-30>>
+
+    <index+1|sixth|<pageref|auto-28>>
+
+    <index+1|take|<pageref|auto-38>>
+
+    <index+1|take-right|<pageref|auto-42>>
+
+    <index+1|take-while|<pageref|auto-72>>
+
+    <index+1|tenth|<pageref|auto-36>>
+
+    <index+1|third|<pageref|auto-22>>
+  </the-index>
 </body>
 
 <\initial>
   <\collection>
-    <associate|page-medium|paper>
+    <associate|font-base-size|8>
+    <associate|page-height|auto>
+    <associate|page-medium|papyrus>
     <associate|page-screen-margin|false>
+    <associate|page-type|a5>
+    <associate|page-width|auto>
     <associate|save-aux|false>
   </collection>
 </initial>
