@@ -581,133 +581,7 @@
 
   <section|序对和列表>
 
-  <paragraph|pair?><index|pair?><scm|(obj) =\<gtr\> bool>
-
-  当且仅当obj是序对时，返回真。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (pair? '(a . b)) =\<gtr\> #t)
-
-    (check (pair? '(a b c)) =\<gtr\> #t)
-
-    (check (pair? '()) =\<gtr\> #f)
-
-    (check (pair? '#(a b)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|car><index|car>
-
-  <scm|car>是一个S7内置函数，用于返回序对的<scm|\<less\>car\<gtr\>>部分<\footnote>
-    一个序对由<scm|\<less\>car\<gtr\>>部分与<scm|\<less\>cdr\<gtr\>>部分组成，形如：<scm|(\<less\>car\<gtr\> . \<less\>cdr\<gtr\>)>
-  </footnote>。<scm|car>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (car '(a b c . d)) =\<gtr\> 'a)
-
-    \;
-
-    (check (car '(a b c)) =\<gtr\> 'a)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (car '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|cdr><index|cdr>
-
-  <scm|cdr>是一个S7内置函数，用于返回序对的<scm|\<less\>cdr\<gtr\>>部分。<scm|cdr>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (cdr '(a b c . d)) =\<gtr\> '(b c . d))
-
-    \;
-
-    (check (cdr '(a b c)) =\<gtr\> '(b c))
-
-    \ \ 
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (cdr '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|caar><index|caar>
-
-  <scm|(caar pair) =\<gtr\> obj>
-
-  <scm|caar>是一个S7内置函数，用于返回序对<scm|\<less\>car\<gtr\>>部分的<scm|\<less\>car\<gtr\>>部分。参数必须是序对，且该序对的<scm|\<less\>car\<gtr\>>部分的内容也要是序对，否则报错。特别地，空列表不是序对，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (caar '((a . b) . c)) =\<gtr\> 'a)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (caar '(a b . c)))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (caar '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|null?><index|null?><scm|(null? obj) =\<gtr\> bool>
-
-  当且仅当obj是空列表的时候，返回值为真。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (null? '()) =\<gtr\> #t)
-
-    (check (null? '(1)) =\<gtr\> #f)
-
-    (check (null? '(1 2)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
+  \;
 
   <paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
 
@@ -757,82 +631,6 @@
     (check (append () 'c) =\<gtr\> 'c)
 
     (check (append) =\<gtr\> '())
-
-    \;
-  </scm-chunk>
-
-  <paragraph|list-ref><index|list-ref>
-
-  <scm|list-ref>是一个S7内置函数，接收一个列表和一个称为索引值的非负整数k为参数，通过索引值k返回列表的第k个元素（从0开始计数）。当参数为空列表时，报错。当k为负数，报错。当k大于等于列表中元素数时，报错。
-
-  注意<scm|(cons '(1 2) '(3 4))>其实是一个列表，但这个列表的元素不都是整数。这个例子容易理解成结果是一个序对且不是列表。
-
-  <\session|goldfish|default>
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      (cons '(1 2) '(3 4))
-    <|unfolded-io>
-      ((1 2) 3 4)
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (list-ref (cons '(1 2) '(3 4)) 1) =\<gtr\> 3)
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (list-ref '(a b c) 2) =\<gtr\> 'c)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (list-ref '() 0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (list-ref '(a b c) -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (list-ref '(a b c) 3))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
 
     \;
   </scm-chunk>
@@ -2723,7 +2521,7 @@
 
   \;
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check-report)
 
     \;
@@ -3168,6 +2966,8 @@
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     (define-library (srfi srfi-1)
 
+    (import (liii error))
+
     (export
 
     \ \ circular-list iota circular-list? null-list?
@@ -3215,6 +3015,14 @@
 
   <subsection|构造器>
 
+  <paragraph|cons><index|cons>
+
+  R7RS中定义的S7 Scheme内置函数。
+
+  <paragraph|list><index|list>
+
+  R7RS中定义的S7 Scheme内置函数。
+
   <paragraph|circular-list><index|circular-list>
 
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
@@ -3236,13 +3044,15 @@
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     ; 0 clause BSD, from S7 repo stuff.scm
 
-    (define* (iota n (start 0) (incr 1))\ 
+    (define* (iota n (start 0) (incr 1))
 
-    \ \ (if (or (not (integer? n)) (\<less\> n 0))
+    \ \ (when (not (integer? n))
 
-    \ \ \ \ (error 'wrong-type-arg
+    \ \ \ \ (type-error "iota: n must be a integer"))
 
-    \ \ \ \ \ \ \ \ \ \ \ "iota length ~A should be a non-negative integer" n))
+    \ \ (when (\<less\> n 0)
+
+    \ \ \ \ (value-error "iota: n must be postive but received ~d" n))
 
     \ \ (let ((lst (make-list n)))
 
@@ -3268,20 +3078,44 @@
 
     \;
 
-    (check
+    (check-catch 'value-error (iota -1))
 
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (iota -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'type-error (iota 'a))
 
     \;
   </scm-chunk>
 
   <subsection|谓词>
+
+  <paragraph|pair?><index|pair?><scm|(obj) =\<gtr\> bool>
+
+  <scm|pair?>是S7 Scheme内置的R7RS定义的函数：当且仅当obj是序对时，返回真。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (pair? '(a . b)) =\<gtr\> #t)
+
+    (check (pair? '(a b c)) =\<gtr\> #t)
+
+    (check (pair? '()) =\<gtr\> #f)
+
+    (check (pair? '#(a b)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|null?><index|null?><scm|(obj) =\<gtr\> bool>
+
+  <scm|null?>是S7 Scheme内置的R7RS定义的函数：当且仅当obj是空列表的时候，返回值为真。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (null? '()) =\<gtr\> #t)
+
+    (check (null? '(1)) =\<gtr\> #f)
+
+    (check (null? '(1 2)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
 
   <paragraph|circular-list?><index|circular-list?>
 
@@ -3362,6 +3196,116 @@
   如果已经确定需要判别的对象是列表，使用<scm|null-list?>更加合适。<scm|null?>无法分辨非空的序对和非空的列表，命名上偏模糊，不推荐使用。
 
   <subsection|选择器>
+
+  <paragraph|car><index|car>
+
+  <scm|car>是S7 Scheme内置的R7RS定义的函数，用于返回序对的<scm|\<less\>car\<gtr\>>部分<\footnote>
+    一个序对由<scm|\<less\>car\<gtr\>>部分与<scm|\<less\>cdr\<gtr\>>部分组成，形如：<scm|(\<less\>car\<gtr\> . \<less\>cdr\<gtr\>)>
+  </footnote>。<scm|car>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (car '(a b c . d)) =\<gtr\> 'a)
+
+    \;
+
+    (check (car '(a b c)) =\<gtr\> 'a)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (car '()))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|cdr><index|cdr>
+
+  <scm|cdr>是S7 Scheme内置的R7RS定义的函数，用于返回序对的<scm|\<less\>cdr\<gtr\>>部分。<scm|cdr>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (cdr '(a b c . d)) =\<gtr\> '(b c . d))
+
+    \;
+
+    (check (cdr '(a b c)) =\<gtr\> '(b c))
+
+    \ \ 
+
+    (check-catch 'wrong-type-arg (cdr '()))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|caar><index|caar><scm|(caar pair) =\<gtr\> obj>
+
+  <scm|caar>是S7 Scheme内置的R7RS定义的函数，用于返回序对<scm|\<less\>car\<gtr\>>部分的<scm|\<less\>car\<gtr\>>部分。参数必须是序对，且该序对的<scm|\<less\>car\<gtr\>>部分的内容也要是序对，否则报错。特别地，空列表不是序对，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (caar '((a . b) . c)) =\<gtr\> 'a)
+
+    \;
+
+    (check-catch 'wrong-type-arg (caar '(a b . c)))
+
+    \;
+
+    (check-catch 'wrong-type-arg (caar '()))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|list-ref><index|list-ref>
+
+  <scm|list-ref>是S7 Scheme内置的R7RS定义的函数，接收一个列表和一个称为索引值的非负整数k为参数，通过索引值k返回列表的第k个元素（从0开始计数）。当参数为空列表时，报错。当k为负数，报错。当k大于等于列表中元素数时，报错。
+
+  注意<scm|(cons '(1 2) '(3 4))>其实是一个列表，但这个列表的元素不都是整数。这个例子容易理解成结果是一个序对且不是列表。
+
+  <\session|goldfish|default>
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (cons '(1 2) '(3 4))
+    <|unfolded-io>
+      ((1 2) 3 4)
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (list-ref (cons '(1 2) '(3 4)) 1) =\<gtr\> 3)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (check (list-ref '(a b c) 2) =\<gtr\> 'c)
+
+    \;
+
+    (check 'wrong-type-arg (list-ref '() 0))
+
+    \;
+
+    (check 'out-of-range (list-ref '(a b c) -1))
+
+    (check 'out-of-range (list-ref '(a b c) 3))
+
+    \;
+  </scm-chunk>
 
   <paragraph|first><index|first>
 
