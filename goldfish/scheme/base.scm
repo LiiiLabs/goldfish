@@ -193,10 +193,13 @@
     res))
 
 (define (port? p) (or (input-port? p) (output-port? p)))
-(define binary-port? port?)
+
 (define textual-port? port?)
 
+(define binary-port? port?)
+
 (define (input-port-open? p) (not (port-closed? p)))
+
 (define (output-port-open? p) (not (port-closed? p)))
 
 (define (close-port p)
@@ -208,3 +211,4 @@
 
 ) ; end of begin
 ) ; end of define-library
+
