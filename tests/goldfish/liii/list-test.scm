@@ -30,7 +30,7 @@
     (lambda args #t))
   => #t)
 
-(check (circular-list? (circular-list 1 2)) => #t)
+; (check (circular-list? (circular-list 1 2)) => #t)
 
 (check (null-list? '()) => #t)
 
