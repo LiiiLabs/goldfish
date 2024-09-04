@@ -3348,6 +3348,34 @@
 
     <index+1|fourth|<pageref|auto-24>>
 
+    <index+1|hash-table?|<pageref|auto-156>>
+
+    <index+1|hash-table=?|<pageref|auto-166>>
+
+    <index+1|hash-table-clear!|<pageref|auto-190>>
+
+    <index+1|hash-table-contains?|<pageref|auto-158>>
+
+    <index+1|hash-table-delete!|<pageref|auto-182>>
+
+    <index+1|hash-table-empty?|<pageref|auto-162>>
+
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-208>>
+
+    <index+1|hash-table-keys|<pageref|auto-199>>
+
+    <index+1|hash-table-ref|<pageref|auto-171>>
+
+    <index+1|hash-table-ref/default|<pageref|auto-173>>
+
+    <index+1|hash-table-set!|<pageref|auto-178>>
+
+    <index+1|hash-table-size|<pageref|auto-195>>
+
+    <index+1|hash-table-update!|<pageref|auto-186>>
+
+    <index+1|hash-table-values|<pageref|auto-203>>
+
     <index+1|iota|<pageref|auto-10>>
 
     <index+1|last|<pageref|auto-48>>
