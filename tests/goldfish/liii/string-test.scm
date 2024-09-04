@@ -18,8 +18,7 @@
 ; All right reserved.
 
 (import (liii check)
-        (liii string)
-        (srfi srfi-8))
+        (liii string))
 
 (check-set-mode! 'report-failed)
 
@@ -74,7 +73,6 @@
 (check-false (string-null? 'not-a-string))
 
 (check-true (string-every #\x "xxxxxx"))
-
 (check-false (string-every #\x "xxx0xx"))
 
 (check
@@ -230,7 +228,6 @@
   #t)
 
 (check-true (string-any #\0 "xxx0xx"))
-
 (check-false (string-any #\0 "xxxxxx"))
 
 (check
@@ -277,21 +274,9 @@
   =>
   #t)
 
-(check
-  (string-any 
-    char-alphabetic?
-    "01c345"
-    2)
-  =>
-  #t)
+(check-true (string-any char-alphabetic? "01c345" 2))
 
-(check
-  (string-any 
-    char-alphabetic?
-    "01c345"
-    3)
-  =>
-  #f)
+(check-false (string-any char-alphabetic? "01c345" 3))
 
 (check
   (string-any 
@@ -375,41 +360,17 @@
   =>
   #t)
 
-(check
-  (string-take-right "MathAgape" 1)
-  =>
-  "e")
+(check (string-take-right "MathAgape" 1) => "e")
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (string-take-right "MathAgape" 20))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (string-take-right "MathAgape" 20))
 
-(check
-  (string-drop "MathAgape" 8)
-  =>
-  "e")
+(check (string-drop "MathAgape" 8) => "e")
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (string-drop "MathAgape" 20))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
 
-(check
-  (string-drop-right "MathAgape" 5)
-  =>
-  "Math")
+(check (string-drop-right "MathAgape" 5) => "Math")
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (string-drop "MathAgape" 20))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
 
 (check
   (string-pad "MathAgape" 15)
@@ -484,16 +445,8 @@
   =>
   #t)
 
-
-(check
-  (string-trim "  2 4  ")
-  =>
-  "2 4  ")
-
-(check
-  (string-trim "  2 4  " 2)
-  =>
-  "2 4  ")
+(check (string-trim "  2 4  ") => "2 4  ")
+(check (string-trim "  2 4  " 2) => "2 4  ")
 
 (check
   (string-trim "  2 4  " 3)
@@ -554,10 +507,7 @@
   =>
   " 3")
 
-(check
-  (string-trim-right "  2 4  ")
-  =>
-  "  2 4")
+(check (string-trim-right "  2 4  ") => "  2 4")
 
 (check
   (string-trim-right "  2 4  " 1)
@@ -638,107 +588,37 @@
   =>
   "012")
 
-(check
-  (string-trim-both "  2 4  ")
-  =>
-  "2 4")
+(check (string-trim-both "  2 4  ") => "2 4")
+(check (string-trim-both "--2 4--" #\-) => "2 4")
 
-(check
-  (string-trim-both "--2 4--" #\-)
-  =>
-  "2 4")
+(check-true (string-prefix? "Ma" "MathAgape"))
+(check-true (string-prefix? "" "MathAgape"))
+(check-true (string-prefix? "MathAgape" "MathAgape"))
+(check-false (string-prefix? "a" "MathAgape"))
 
-(check
-  (string-prefix? "Ma" "MathAgape")
-  =>
-  #t)
-
-(check
-  (string-prefix? "" "MathAgape")
-  =>
-  #t)
-
-(check
-  (string-prefix? "MathAgape" "MathAgape")
-  =>
-  #t)
-
-(check
- (string-prefix? "a" "MathAgape")
-  =>
-  #f)
-
-(check
-  (string-suffix? "e" "MathAgape")
-  =>
-  #t)
-
-(check
-  (string-suffix? "" "MathAgape")
-  =>
-  #t)
-
-(check
-  (string-suffix? "MathAgape" "MathAgape")
-  =>
-  #t)
-
-(check
- (string-suffix? "p" "MathAgape")
-  =>
-  #f)
+(check-true (string-suffix? "e" "MathAgape"))
+(check-true (string-suffix? "" "MathAgape"))
+(check-true (string-suffix? "MathAgape" "MathAgape"))
+(check-false (string-suffix? "p" "MathAgape"))
 
 (check (string-index "0123456789" #\2) => 2)
-
 (check (string-index "0123456789" #\2 2) => 2)
-
 (check (string-index "0123456789" #\2 3) => #f)
-
 (check (string-index "01x3456789" char-alphabetic?) => 2)
 
-(check
-  (string-index-right "0123456789" #\8)
-  =>
-  8)
+(check (string-index-right "0123456789" #\8) => 8)
+(check (string-index-right "0123456789" #\8 2) => 8)
+(check (string-index-right "0123456789" #\8 9) => #f)
+(check (string-index-right "01234567x9" char-alphabetic?) => 8)
 
-(check
-  (string-index-right "0123456789" #\8 2)
-  =>
-  8)
-
-(check
-  (string-index-right "0123456789" #\8 9)
-  =>
-  #f)
-
-(check
-  (string-index-right "01234567x9" char-alphabetic?)
-  =>
-  8)
-
-(check
-  (string-contains "0123456789" "3")
-  =>
-  #t)
-
-(check
-  (string-contains "0123456789" "34")
-  =>
-  #t)
-
-(check
-  (string-contains "0123456789" "24")
-  =>
-  #f)
+(check-true (string-contains "0123456789" "3"))
+(check-true (string-contains "0123456789" "34"))
+(check-false (string-contains "0123456789" "24"))
 
 (check (string-count "xyz" #\x) => 1)
-
 (check (string-count "xyz" #\x 0 1) => 1)
-
 (check (string-count "xyz" #\y 0 1) => 0)
-
 (check (string-count "xyz" #\x 0 3) => 1)
-
 (check (string-count "xyz" (lambda (x) (char=? x #\x))) => 1)
 
 (check (string-reverse "01234") => "43210")
