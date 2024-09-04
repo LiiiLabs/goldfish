@@ -17,6 +17,284 @@
 
   文档许可证暂时没有确定！
 
+  \;
+
+  <chapter|(liii error)>
+
+  异常的命名参考Python标准库的<hlink|内置异常|https://docs.python.org/3/library/exceptions.html>。
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/liii/error.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    ; see https://docs.python.org/3/library/exceptions.html#exception-hierarchy
+
+    (define-library (liii error)
+
+    (export ???
+
+    \ \ os-error file-not-found-error not-a-directory-error file-exists-error
+
+    \ \ timeout-error
+
+    \ \ type-error value-error)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii error))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <paragraph|os-error><index|os-error>
+
+  系统级别的错误。
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (os-error . args)
+
+    \ \ (apply error (cons 'os-error args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'os-error (os-error))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|file-not-found-error><index|file-not-found-error>
+
+  文件未找到。
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (file-not-found-error . args)
+
+    \ \ (apply error (cons 'file-not-found-error args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'file-not-found-error (file-not-found-error))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|not-a-directory-error><index|not-a-directory-error>
+
+  不是一个目录。
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (not-a-directory-error . args)
+
+    \ \ (apply error (cons 'not-a-directory-error args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'not-a-directory-error (not-a-directory-error))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|file-exists-error><index|file-exists-error>
+
+  文件已存在。
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (file-exists-error . args)
+
+    \ \ (apply error (cons 'file-exists-error args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'file-exists-error (file-exists-error))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|timeout-error><index|timeout-error>
+
+  超时错误。
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (timeout-error . args)
+
+    \ \ (apply error (cons 'timeout-error args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'timeout-error (timeout-error))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|type-error><index|type-error>
+
+  如果类型不匹配，直接报错。
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (type-error . args)
+
+    \ \ (apply error (cons 'type-error args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'type-error (type-error))
+
+    (check-catch 'type-error (type-error "msg"))
+
+    (check-catch 'type-error (type-error "msg" "msg2"))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|value-error><index|value-error>
+
+  值不正确
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (value-error . args)
+
+    \ \ (apply error (cons 'value-error args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'value-error (value-error))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|???><index|???>
+
+  Scala风格未实现错误，一般用于标记为实现的接口。
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (???)
+
+    \ \ (error 'not-implemented-error "???"))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-catch 'not-implemented-error (???))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/liii/error.scm|true|false>
+    ) ; begin
+
+    ) ; define-library
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
   <chapter|(liii list)>
 
   <section|许可证>
@@ -3312,145 +3590,161 @@
   </scm-chunk>
 
   <\the-index|idx>
-    <index+1|any|<pageref|auto-78>>
+    <index+1|???|<pageref|auto-21>>
 
-    <index+1|circular-list|<pageref|auto-8>>
+    <index+1|any|<pageref|auto-100>>
 
-    <index+1|circular-list?|<pageref|auto-13>>
+    <index+1|circular-list|<pageref|auto-30>>
 
-    <index+1|count|<pageref|auto-51>>
+    <index+1|circular-list?|<pageref|auto-35>>
 
-    <index+1|delete|<pageref|auto-83>>
+    <index+1|count|<pageref|auto-73>>
 
-    <index+1|delete-duplicates|<pageref|auto-85>>
+    <index+1|delete|<pageref|auto-105>>
 
-    <index+1|drop|<pageref|auto-40>>
+    <index+1|delete-duplicates|<pageref|auto-107>>
 
-    <index+1|drop-right|<pageref|auto-44>>
+    <index+1|drop|<pageref|auto-62>>
 
-    <index+1|drop-while|<pageref|auto-74>>
+    <index+1|drop-right|<pageref|auto-66>>
 
-    <index+1|eighth|<pageref|auto-32>>
+    <index+1|drop-while|<pageref|auto-96>>
 
-    <index+1|every|<pageref|auto-80>>
+    <index+1|eighth|<pageref|auto-54>>
 
-    <index+1|fifth|<pageref|auto-26>>
+    <index+1|every|<pageref|auto-102>>
 
-    <index+1|filter|<pageref|auto-63>>
+    <index+1|fifth|<pageref|auto-48>>
 
-    <index+1|find|<pageref|auto-70>>
+    <index+1|file-exists-error|<pageref|auto-13>>
 
-    <index+1|first|<pageref|auto-18>>
+    <index+1|file-not-found-error|<pageref|auto-9>>
 
-    <index+1|flatmap|<pageref|auto-94>>
+    <index+1|filter|<pageref|auto-85>>
 
-    <index+1|fold|<pageref|auto-54>>
+    <index+1|find|<pageref|auto-92>>
 
-    <index+1|fold-right|<pageref|auto-56>>
+    <index+1|first|<pageref|auto-40>>
 
-    <index+1|fourth|<pageref|auto-24>>
+    <index+1|flatmap|<pageref|auto-116>>
 
-    <index+1|hash-table?|<pageref|auto-156>>
+    <index+1|fold|<pageref|auto-76>>
 
-    <index+1|hash-table=?|<pageref|auto-166>>
+    <index+1|fold-right|<pageref|auto-78>>
 
-    <index+1|hash-table-clear!|<pageref|auto-190>>
+    <index+1|fourth|<pageref|auto-46>>
 
-    <index+1|hash-table-contains?|<pageref|auto-158>>
+    <index+1|hash-table?|<pageref|auto-178>>
 
-    <index+1|hash-table-delete!|<pageref|auto-182>>
+    <index+1|hash-table=?|<pageref|auto-188>>
 
-    <index+1|hash-table-empty?|<pageref|auto-162>>
+    <index+1|hash-table-clear!|<pageref|auto-212>>
 
-    <index+1|hash-table-\<gtr\>alist|<pageref|auto-208>>
+    <index+1|hash-table-contains?|<pageref|auto-180>>
 
-    <index+1|hash-table-keys|<pageref|auto-199>>
+    <index+1|hash-table-delete!|<pageref|auto-204>>
 
-    <index+1|hash-table-ref|<pageref|auto-171>>
+    <index+1|hash-table-empty?|<pageref|auto-184>>
 
-    <index+1|hash-table-ref/default|<pageref|auto-173>>
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-230>>
 
-    <index+1|hash-table-set!|<pageref|auto-178>>
+    <index+1|hash-table-keys|<pageref|auto-221>>
 
-    <index+1|hash-table-size|<pageref|auto-195>>
+    <index+1|hash-table-ref|<pageref|auto-193>>
 
-    <index+1|hash-table-update!|<pageref|auto-186>>
+    <index+1|hash-table-ref/default|<pageref|auto-195>>
 
-    <index+1|hash-table-values|<pageref|auto-203>>
+    <index+1|hash-table-set!|<pageref|auto-200>>
 
-    <index+1|iota|<pageref|auto-10>>
+    <index+1|hash-table-size|<pageref|auto-217>>
 
-    <index+1|last|<pageref|auto-48>>
+    <index+1|hash-table-update!|<pageref|auto-208>>
 
-    <index+1|last-pair|<pageref|auto-46>>
+    <index+1|hash-table-values|<pageref|auto-225>>
 
-    <index+1|length=?|<pageref|auto-88>>
+    <index+1|iota|<pageref|auto-32>>
 
-    <index+1|list-index|<pageref|auto-76>>
+    <index+1|last|<pageref|auto-70>>
 
-    <index+1|list-not-null?|<pageref|auto-100>>
+    <index+1|last-pair|<pageref|auto-68>>
 
-    <index+1|list-view|<pageref|auto-90>>
+    <index+1|length=?|<pageref|auto-110>>
 
-    <index+1|ninth|<pageref|auto-34>>
+    <index+1|list-index|<pageref|auto-98>>
 
-    <index+1|not-null-list?|<pageref|auto-96>>
+    <index+1|list-not-null?|<pageref|auto-122>>
 
-    <index+1|null-list?|<pageref|auto-15>>
+    <index+1|list-view|<pageref|auto-112>>
 
-    <index+1|partition|<pageref|auto-65>>
+    <index+1|ninth|<pageref|auto-56>>
 
-    <index+1|queue|<pageref|auto-128>>
+    <index+1|not-a-directory-error|<pageref|auto-11>>
 
-    <index+1|queue-back|<pageref|auto-136>>
+    <index+1|not-null-list?|<pageref|auto-118>>
 
-    <index+1|queue-empty?|<pageref|auto-130>>
+    <index+1|null-list?|<pageref|auto-37>>
 
-    <index+1|queue-front|<pageref|auto-134>>
+    <index+1|os-error|<pageref|auto-7>>
 
-    <index+1|queue-\<gtr\>list|<pageref|auto-142>>
+    <index+1|partition|<pageref|auto-87>>
 
-    <index+1|queue-pop!|<pageref|auto-140>>
+    <index+1|queue|<pageref|auto-150>>
 
-    <index+1|queue-push!|<pageref|auto-138>>
+    <index+1|queue-back|<pageref|auto-158>>
 
-    <index+1|queue-size|<pageref|auto-132>>
+    <index+1|queue-empty?|<pageref|auto-152>>
 
-    <index+1|reduce|<pageref|auto-58>>
+    <index+1|queue-front|<pageref|auto-156>>
 
-    <index+1|reduce-right|<pageref|auto-60>>
+    <index+1|queue-\<gtr\>list|<pageref|auto-164>>
 
-    <index+1|remove|<pageref|auto-67>>
+    <index+1|queue-pop!|<pageref|auto-162>>
 
-    <index+1|second|<pageref|auto-20>>
+    <index+1|queue-push!|<pageref|auto-160>>
 
-    <index+1|seventh|<pageref|auto-30>>
+    <index+1|queue-size|<pageref|auto-154>>
 
-    <index+1|sixth|<pageref|auto-28>>
+    <index+1|reduce|<pageref|auto-80>>
 
-    <index+1|stack|<pageref|auto-108>>
+    <index+1|reduce-right|<pageref|auto-82>>
 
-    <index+1|stack-empty?|<pageref|auto-110>>
+    <index+1|remove|<pageref|auto-89>>
 
-    <index+1|stack-\<gtr\>list|<pageref|auto-120>>
+    <index+1|second|<pageref|auto-42>>
 
-    <index+1|stack-pop!|<pageref|auto-118>>
+    <index+1|seventh|<pageref|auto-52>>
 
-    <index+1|stack-push!|<pageref|auto-116>>
+    <index+1|sixth|<pageref|auto-50>>
 
-    <index+1|stack-size|<pageref|auto-112>>
+    <index+1|stack|<pageref|auto-130>>
 
-    <index+1|stack-top|<pageref|auto-114>>
+    <index+1|stack-empty?|<pageref|auto-132>>
 
-    <index+1|take|<pageref|auto-38>>
+    <index+1|stack-\<gtr\>list|<pageref|auto-142>>
 
-    <index+1|take-right|<pageref|auto-42>>
+    <index+1|stack-pop!|<pageref|auto-140>>
 
-    <index+1|take-while|<pageref|auto-72>>
+    <index+1|stack-push!|<pageref|auto-138>>
 
-    <index+1|tenth|<pageref|auto-36>>
+    <index+1|stack-size|<pageref|auto-134>>
 
-    <index+1|third|<pageref|auto-22>>
+    <index+1|stack-top|<pageref|auto-136>>
+
+    <index+1|take|<pageref|auto-60>>
+
+    <index+1|take-right|<pageref|auto-64>>
+
+    <index+1|take-while|<pageref|auto-94>>
+
+    <index+1|tenth|<pageref|auto-58>>
+
+    <index+1|third|<pageref|auto-44>>
+
+    <index+1|timeout-error|<pageref|auto-15>>
+
+    <index+1|type-error|<pageref|auto-17>>
+
+    <index+1|value-error|<pageref|auto-19>>
   </the-index>
 </body>
 
