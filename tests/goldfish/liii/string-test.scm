@@ -67,20 +67,11 @@
   =>
   #t)
 
-(check
-  (string-null? "")
-  =>
-  #t)
+(check-true (string-null? ""))
 
-(check
-  (string-null? "MathAgape")
-  =>
-  #f)
+(check-false (string-null? "MathAgape"))
 
-(check
-  (string-null? 'not-a-string)
-  =>
-  #f)
+(check-false (string-null? 'not-a-string))
 
 (check
   (string-every 
@@ -154,21 +145,9 @@
   =>
   #f)
 
-(check
-  (string-every 
-    char-numeric?
-    "ab2345"
-    2)
-  =>
-  #t)
+(check-true (string-every char-numeric? "ab2345" 2))
 
-(check
-  (string-every 
-    char-numeric?
-    "ab2345"
-    1)
-  =>
-  #f)
+(check-false (string-every char-numeric? "ab2345" 1))
 
 (check
   (string-every 
@@ -805,57 +784,34 @@
 
 (check (string-reverse "01234") => "43210")
 
-(check
-  (catch 'out-of-range
-    (lambda () (string-reverse "01234" -1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-reverse "01234" -1))
 
 (check (string-reverse "01234" 0) => "43210")
 (check (string-reverse "01234" 1) => "04321")
 (check (string-reverse "01234" 5) => "01234")
 
-(check
-  (catch 'out-of-range
-    (lambda () (string-reverse "01234" 6))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-reverse "01234" 6))
 
 (check (string-reverse "01234" 0 2) => "10234")
 (check (string-reverse "01234" 1 3) => "02134")
 (check (string-reverse "01234" 1 5) => "04321")
 (check (string-reverse "01234" 0 5) => "43210")
 
-(check
-  (catch 'out-of-range
-    (lambda () (string-reverse "01234" 1 6))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-reverse "01234" 1 6))
 
-(check
-  (catch 'out-of-range
-    (lambda () (string-reverse "01234" -1 3))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-reverse "01234" -1 3))
 
 (check
   (string-tokenize "1 22 333")
-  =>
-  '("1" "22" "333"))
+  => '("1" "22" "333"))
 
 (check
   (string-tokenize "1 22 333" #\2)
-  =>
-  '("1 " " 333"))
+  => '("1 " " 333"))
 
 (check
   (string-tokenize "1 22 333" #\  2)
-  =>
-  `("22" "333"))
+  => `("22" "333"))
 
 (check-report)
 (if (check-failed?) (exit -1))

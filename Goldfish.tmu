@@ -2797,668 +2797,628 @@
 
   <section|内部公共子函数>
 
-  <\description>
-    <item*|%string-from-range>
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (%string-from-range str start_end)
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (%string-from-range str start_end)
+    \ \ (cond ((null-list? start_end) str)
 
-      \ \ (cond ((null-list? start_end) str)
+    \ \ \ \ \ \ \ \ ((= (length start_end) 1)
 
-      \ \ \ \ \ \ \ \ ((= (length start_end) 1)
+    \ \ \ \ \ \ \ \ \ \ (substring str (car start_end)))
 
-      \ \ \ \ \ \ \ \ \ \ (substring str (car start_end)))
+    \ \ \ \ \ \ \ \ ((= (length start_end) 2)
 
-      \ \ \ \ \ \ \ \ ((= (length start_end) 2)
+    \ \ \ \ \ \ \ \ \ (substring str (first start_end) (second start_end)))
 
-      \ \ \ \ \ \ \ \ \ (substring str (first start_end) (second start_end)))
+    \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args "%string-from-range"))))
 
-      \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args "%string-from-range"))))
+    \;
+  </scm-chunk>
 
-      \;
-    </scm-chunk>
+  <todo|测试一下边界条件，这样后面漏测也没关系了。>
 
-    <todo|测试一下边界条件，这样后面漏测也没关系了。>
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (%make-criterion char/pred?)
 
-    <item*|%make-criterion>
+    \ \ (cond ((char? char/pred?) (lambda (x) (char=? x char/pred?)))
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (%make-criterion char/pred?)
+    \ \ \ \ \ \ \ \ ((procedure? char/pred?) char/pred?)
 
-      \ \ (cond ((char? char/pred?) (lambda (x) (char=? x char/pred?)))
+    \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "%make-criterion"))))
 
-      \ \ \ \ \ \ \ \ ((procedure? char/pred?) char/pred?)
-
-      \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "%make-criterion"))))
-
-      \;
-    </scm-chunk>
-  </description>
+    \;
+  </scm-chunk>
 
   <section|列表-字符串转换>
 
-  <\description>
-    <item*|string-join>
+  <paragraph|string-join><index|string-join>
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-join l . delim+grammer)
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-join l . delim+grammer)
 
-      \ \ (define (extract-params params-l)
+    \ \ (define (extract-params params-l)
 
-      \ \ \ \ (cond ((null-list? params-l)
+    \ \ \ \ (cond ((null-list? params-l)
 
-      \ \ \ \ \ \ \ \ \ \ \ (list "" 'infix))
+    \ \ \ \ \ \ \ \ \ \ \ (list "" 'infix))
 
-      \ \ \ \ \ \ \ \ \ \ ((and (= (length params-l) 1)
+    \ \ \ \ \ \ \ \ \ \ ((and (= (length params-l) 1)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string? (car params-l)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string? (car params-l)))
 
-      \ \ \ \ \ \ \ \ \ \ \ (list (car params-l) 'infix))
+    \ \ \ \ \ \ \ \ \ \ \ (list (car params-l) 'infix))
 
-      \ \ \ \ \ \ \ \ \ \ ((and (= (length params-l) 2)
+    \ \ \ \ \ \ \ \ \ \ ((and (= (length params-l) 2)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string? (first params-l))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string? (first params-l))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol? (second params-l)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol? (second params-l)))
 
-      \ \ \ \ \ \ \ \ \ \ \ params-l)
+    \ \ \ \ \ \ \ \ \ \ \ params-l)
 
-      \ \ \ \ \ \ \ \ \ \ ((\<gtr\> (length params-l) 2)
+    \ \ \ \ \ \ \ \ \ \ ((\<gtr\> (length params-l) 2)
 
-      \ \ \ \ \ \ \ \ \ \ \ (error 'wrong-number-of-args "optional params in string-join"))
+    \ \ \ \ \ \ \ \ \ \ \ (error 'wrong-number-of-args "optional params in string-join"))
 
-      \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "optional params in string-join"))))
+    \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "optional params in string-join"))))
 
-      \ \ 
+    \ \ 
 
-      \ \ (define (string-join-sub l delim)
+    \ \ (define (string-join-sub l delim)
 
-      \ \ \ \ (cond ((null-list? l) "")
+    \ \ \ \ (cond ((null-list? l) "")
 
-      \ \ \ \ \ \ \ \ \ \ ((= (length l) 1) (car l))
+    \ \ \ \ \ \ \ \ \ \ ((= (length l) 1) (car l))
 
-      \ \ \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ \ \ (else
 
-      \ \ \ \ \ \ \ \ \ \ \ \ (string-append
+    \ \ \ \ \ \ \ \ \ \ \ \ (string-append
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car l)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car l)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ delim
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ delim
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-join-sub (cdr l) delim)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-join-sub (cdr l) delim)))))
 
-      \ \ 
+    \ \ 
 
-      \ \ (let* ((params \ (extract-params delim+grammer))
+    \ \ (let* ((params \ (extract-params delim+grammer))
 
-      \ \ \ \ \ \ \ \ \ (delim \ \ (first params))
+    \ \ \ \ \ \ \ \ \ (delim \ \ (first params))
 
-      \ \ \ \ \ \ \ \ \ (grammer (second params))
+    \ \ \ \ \ \ \ \ \ (grammer (second params))
 
-      \ \ \ \ \ \ \ \ \ (ret \ \ \ \ (string-join-sub l delim)))
+    \ \ \ \ \ \ \ \ \ (ret \ \ \ \ (string-join-sub l delim)))
 
-      \ \ \ \ (case grammer
+    \ \ \ \ (case grammer
 
-      \ \ \ \ \ \ ('infix ret)
+    \ \ \ \ \ \ ('infix ret)
 
-      \ \ \ \ \ \ ('strict-infix
+    \ \ \ \ \ \ ('strict-infix
 
-      \ \ \ \ \ \ \ (if (null-list? l)
+    \ \ \ \ \ \ \ (if (null-list? l)
 
-      \ \ \ \ \ \ \ \ \ \ \ (error 'wrong-type-arg "empty list not allowed")
+    \ \ \ \ \ \ \ \ \ \ \ (error 'wrong-type-arg "empty list not allowed")
 
-      \ \ \ \ \ \ \ \ \ \ \ ret))
+    \ \ \ \ \ \ \ \ \ \ \ ret))
 
-      \ \ \ \ \ \ ('suffix
+    \ \ \ \ \ \ ('suffix
 
-      \ \ \ \ \ \ \ \ (if (null-list? l) "" (string-append ret delim)))
+    \ \ \ \ \ \ \ \ (if (null-list? l) "" (string-append ret delim)))
 
-      \ \ \ \ \ \ ('prefix
+    \ \ \ \ \ \ ('prefix
 
-      \ \ \ \ \ \ \ \ (if (null-list? l) "" (string-append delim ret)))
+    \ \ \ \ \ \ \ \ (if (null-list? l) "" (string-append delim ret)))
 
-      \ \ \ \ \ \ (else (error 'wrong-type-arg "invalid grammer")))))
+    \ \ \ \ \ \ (else (error 'wrong-type-arg "invalid grammer")))))
 
-      \;
-    </scm-chunk>
+    \;
+  </scm-chunk>
 
-    测试用例
+  测试用例
 
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check (string-join '("a" "b" "c")) =\<gtr\> "abc")
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-join '("a" "b" "c")) =\<gtr\> "abc")
 
-      \;
+    \;
 
-      (check (string-join '("a" "b" "c") ":") =\<gtr\> "a:b:c")
+    (check (string-join '("a" "b" "c") ":") =\<gtr\> "a:b:c")
 
-      (check (string-join '("a" "b" "c") ":" 'infix) =\<gtr\> "a:b:c")
+    (check (string-join '("a" "b" "c") ":" 'infix) =\<gtr\> "a:b:c")
 
-      (check (string-join '("a" "b" "c") ":" 'suffix) =\<gtr\> "a:b:c:")
+    (check (string-join '("a" "b" "c") ":" 'suffix) =\<gtr\> "a:b:c:")
 
-      (check (string-join '("a" "b" "c") ":" 'prefix) =\<gtr\> ":a:b:c")
+    (check (string-join '("a" "b" "c") ":" 'prefix) =\<gtr\> ":a:b:c")
 
-      \;
+    \;
 
-      (check (string-join '() ":") =\<gtr\> "")
+    (check (string-join '() ":") =\<gtr\> "")
 
-      (check (string-join '() ":" 'infix) =\<gtr\> "")
+    (check (string-join '() ":" 'infix) =\<gtr\> "")
 
-      (check (string-join '() ":" 'prefix) =\<gtr\> "")
+    (check (string-join '() ":" 'prefix) =\<gtr\> "")
 
-      (check (string-join '() ":" 'suffix) =\<gtr\> "")
+    (check (string-join '() ":" 'suffix) =\<gtr\> "")
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (catch 'wrong-type-arg
+    \ \ (catch 'wrong-type-arg
 
-      \ \ \ \ (lambda ()\ 
+    \ \ \ \ (lambda ()\ 
 
-      \ \ \ \ \ \ (string-join '() ":" 'strict-infix))
+    \ \ \ \ \ \ (string-join '() ":" 'strict-infix))
 
-      \ \ \ \ (lambda args #t))
+    \ \ \ \ (lambda args #t))
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\>
 
-      \ \ #t)
+    \ \ #t)
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (catch 'wrong-type-arg
+    \ \ (catch 'wrong-type-arg
 
-      \ \ \ \ (lambda ()\ 
+    \ \ \ \ (lambda ()\ 
 
-      \ \ \ \ \ \ (string-join '() ":" 2))
+    \ \ \ \ \ \ (string-join '() ":" 2))
 
-      \ \ \ \ (lambda args #t))
+    \ \ \ \ (lambda args #t))
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\>
 
-      \ \ #t)
+    \ \ #t)
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (catch 'wrong-type-arg
+    \ \ (catch 'wrong-type-arg
 
-      \ \ \ \ (lambda ()\ 
+    \ \ \ \ (lambda ()\ 
 
-      \ \ \ \ \ \ (string-join '() ":" 'no-such-grammer))
+    \ \ \ \ \ \ (string-join '() ":" 'no-such-grammer))
 
-      \ \ \ \ (lambda args #t))
+    \ \ \ \ (lambda args #t))
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\>
 
-      \ \ #t)
+    \ \ #t)
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (catch 'wrong-number-of-args
+    \ \ (catch 'wrong-number-of-args
 
-      \ \ \ \ (lambda ()\ 
+    \ \ \ \ (lambda ()\ 
 
-      \ \ \ \ \ \ (string-join '() ":" 1 2 3))
+    \ \ \ \ \ \ (string-join '() ":" 1 2 3))
 
-      \ \ \ \ (lambda args #t))
+    \ \ \ \ (lambda args #t))
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\>
 
-      \ \ #t)
+    \ \ #t)
 
-      \;
-    </scm-chunk>
-  </description>
+    \;
+  </scm-chunk>
 
   <section|谓词>
 
+  <paragraph|string-null?>
+
+  <scm|<code|<code*|string-null?>>>是一个谓词函数，当且仅当参数字符串为空（即长度为0）时返回<scm|#t>，否则都返回<scm|#f>，也就是说，当参数是非字符串或长度不为0的字符串时，返回<scm|#f>。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-null? str)
+
+    \ \ (and (string? str)\ 
+
+    \ \ \ \ \ \ \ ((lambda (x) (= x 0)) (string-length str))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-true (string-null? ""))
+
+    \;
+
+    (check-false (string-null? "MathAgape"))
+
+    \;
+
+    (check-false (string-null? 'not-a-string))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-every>
+
+  <scm|string-every>是一个谓词函数，它接收一个字符串<scm|str>和一个评估规则<scm|criterion>为参数，以及最多2个非负整数为可选参数<scm|. start_end>用于指定搜索的起始位置和结束位置，检查指定范围内字符串中的每个字符是否都满足评估规则<scm|criterion>。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-every char/pred? str . start+end)
+
+    \ \ (define (string-every-sub pred? str)
+
+    \ \ \ \ (let
+
+    \ \ \ \ \ \ loop ((i 0) (len (string-length str)))
+
+    \ \ \ \ \ \ (or (= i len)
+
+    \ \ \ \ \ \ \ \ \ \ (and (pred? (string-ref str i))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) len)))))
+
+    \ \ 
+
+    \ \ (let ((str-sub (%string-from-range str start+end))
+
+    \ \ \ \ \ \ \ \ (criterion (%make-criterion char/pred?)))
+
+    \ \ \ \ (string-every-sub criterion str-sub)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ #\\x
+
+    \ \ \ \ "xxxxxx")
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ #\\x
+
+    \ \ \ \ "xxx0xx")
+
+    \ \ =\<gtr\>
+
+    \ \ #f)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ char-numeric?
+
+    \ \ \ \ "012345")
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ char-numeric?
+
+    \ \ \ \ "012d45")
+
+    \ \ =\<gtr\>
+
+    \ \ #f)
+
+    \;
+  </scm-chunk>
+
+  注意，评估规则<scm|criterion>必须是谓词或字符，否则报错。
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda ()\ 
+
+    \ \ \ \ \ \ (string-every
+
+    \ \ \ \ \ \ \ \ \ 1
+
+    \ \ \ \ \ \ \ \ \ "012345"))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda ()\ 
+
+    \ \ \ \ \ \ (string-every
+
+    \ \ \ \ \ \ \ \ \ #\\012345
+
+    \ \ \ \ \ \ \ \ \ "012345"))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda ()\ 
+
+    \ \ \ \ \ \ (string-every
+
+    \ \ \ \ \ \ \ \ \ "012345"
+
+    \ \ \ \ \ \ \ \ \ "012345"))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  注意，谓词要使用字符属性测试函数（例如<scm|char-numeric?>），不要用类型检查函数（例如<scm|<code*|number?>>），否则失去了检查的意义。
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ char-numeric?
+
+    \ \ \ \ "012345")
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ <code*|number?>
+
+    \ \ \ \ "012345")
+
+    \ \ =\<gtr\>
+
+    \ \ #f)
+
+    \;
+  </scm-chunk>
+
+  对于可选参数<scm|. start_end>：没有可选参数时，默认搜索整个字符串；只有1个可选参数时，该数指定的是起始位置，结束位置默认为字符串的最后一个字符。注意，有2个可选参数时，第二个数不能小于第一个数，否则报错；指定的起始位置和结束位置不能超过字符串<scm|str>的起始范围，否则报错；可选参数超过2个时，报错。（注意，可选参数的规则适用于后面所有调用到<scm|%string-from-range>的函数）
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-true (string-every char-numeric? "ab2345" 2))
+
+    \;
+
+    (check-false (string-every char-numeric? "ab2345" 1))
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ char-numeric?
+
+    \ \ \ \ "ab234f"
+
+    \ \ \ \ 2)
+
+    \ \ =\<gtr\>
+
+    \ \ #f)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ char-numeric?
+
+    \ \ \ \ "ab234f"
+
+    \ \ \ \ 2
+
+    \ \ \ \ 4)
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ <code*|char-numeric?>
+
+    \ \ \ \ "ab234f"
+
+    \ \ \ \ 2
+
+    \ \ \ \ 2)
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ <code*|char-numeric?>
+
+    \ \ \ \ "ab234f"
+
+    \ \ \ \ 1
+
+    \ \ \ \ 4)
+
+    \ \ =\<gtr\>
+
+    \ \ #f)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ char-numeric?
+
+    \ \ \ \ "ab234f"
+
+    \ \ \ \ 2
+
+    \ \ \ \ 5)
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (string-every\ 
+
+    \ \ \ \ <code*|char-numeric?>
+
+    \ \ \ \ "ab234f"
+
+    \ \ \ \ 2
+
+    \ \ \ \ 6)
+
+    \ \ =\<gtr\>
+
+    \ \ #f)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda ()\ 
+
+    \ \ \ \ \ \ (string-every\ 
+
+    \ \ \ \ \ \ \ \ char-numeric?
+
+    \ \ \ \ \ \ \ "ab234f"
+
+    \ \ \ \ \ \ \ 2
+
+    \ \ \ \ \ \ \ 7))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda ()\ 
+
+    \ \ \ \ \ \ (string-every\ 
+
+    \ \ \ \ \ \ \ \ char-numeric?
+
+    \ \ \ \ \ \ \ "ab234f"
+
+    \ \ \ \ \ \ \ 2
+
+    \ \ \ \ \ \ \ 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-number-of-args
+
+    \ \ \ \ (lambda ()\ 
+
+    \ \ \ \ \ \ (string-every\ 
+
+    \ \ \ \ \ \ \ \ char-numeric?
+
+    \ \ \ \ \ \ \ "ab234f"
+
+    \ \ \ \ \ \ \ 2
+
+    \ \ \ \ \ \ \ 7
+
+    \ \ \ \ \ \ \ 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
   <\description>
-    <item*|string-null?><scm|<code|<code*|string-null?>>>是一个谓词函数，当且仅当参数字符串为空（即长度为0）时返回<scm|#t>，否则都返回<scm|#f>，也就是说，当参数是非字符串或长度不为0的字符串时，返回<scm|#f>。
+    <item*|string-null?>
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-null? str)
+    \;
 
-      \ \ (and (string? str)\ 
-
-      \ \ \ \ \ \ \ ((lambda (x) (= x 0)) (string-length str))))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-null? "")
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-null? "MathAgape")
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-
-      (check
-
-      \ \ (string-null? 'not-a-string)
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-    </scm-chunk>
-
-    <item*|string-every><scm|string-every>是一个谓词函数，它接收一个字符串<scm|str>和一个评估规则<scm|criterion>为参数，以及最多2个非负整数为可选参数<scm|. start_end>用于指定搜索的起始位置和结束位置，检查指定范围内字符串中的每个字符是否都满足评估规则<scm|criterion>。
-
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-every char/pred? str . start+end)
-
-      \ \ (define (string-every-sub pred? str)
-
-      \ \ \ \ (let
-
-      \ \ \ \ \ \ loop ((i 0) (len (string-length str)))
-
-      \ \ \ \ \ \ (or (= i len)
-
-      \ \ \ \ \ \ \ \ \ \ (and (pred? (string-ref str i))\ 
-
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) len)))))
-
-      \ \ 
-
-      \ \ (let ((str-sub (%string-from-range str start+end))
-
-      \ \ \ \ \ \ \ \ (criterion (%make-criterion char/pred?)))
-
-      \ \ \ \ (string-every-sub criterion str-sub)))
-
-      \;
-    </scm-chunk>
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ #\\x
-
-      \ \ \ \ "xxxxxx")
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ #\\x
-
-      \ \ \ \ "xxx0xx")
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "012345")
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "012d45")
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-    </scm-chunk>
-
-    注意，评估规则<scm|criterion>必须是谓词或字符，否则报错。
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-every
-
-      \ \ \ \ \ \ \ \ \ 1
-
-      \ \ \ \ \ \ \ \ \ "012345"))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-every
-
-      \ \ \ \ \ \ \ \ \ #\\012345
-
-      \ \ \ \ \ \ \ \ \ "012345"))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-type-arg
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-every
-
-      \ \ \ \ \ \ \ \ \ "012345"
-
-      \ \ \ \ \ \ \ \ \ "012345"))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-
-    注意，谓词要使用字符属性测试函数（例如<scm|char-numeric?>），不要用类型检查函数（例如<scm|<code*|number?>>），否则失去了检查的意义。
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "012345")
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ <code*|number?>
-
-      \ \ \ \ "012345")
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-    </scm-chunk>
-
-    对于可选参数<scm|. start_end>：没有可选参数时，默认搜索整个字符串；只有1个可选参数时，该数指定的是起始位置，结束位置默认为字符串的最后一个字符。注意，有2个可选参数时，第二个数不能小于第一个数，否则报错；指定的起始位置和结束位置不能超过字符串<scm|str>的起始范围，否则报错；可选参数超过2个时，报错。（注意，可选参数的规则适用于后面所有调用到<scm|%string-from-range>的函数）
-
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "ab2345"
-
-      \ \ \ \ 2)
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "ab2345"
-
-      \ \ \ \ 1)
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "ab234f"
-
-      \ \ \ \ 2)
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "ab234f"
-
-      \ \ \ \ 2
-
-      \ \ \ \ 4)
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ <code*|char-numeric?>
-
-      \ \ \ \ "ab234f"
-
-      \ \ \ \ 2
-
-      \ \ \ \ 2)
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ <code*|char-numeric?>
-
-      \ \ \ \ "ab234f"
-
-      \ \ \ \ 1
-
-      \ \ \ \ 4)
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ char-numeric?
-
-      \ \ \ \ "ab234f"
-
-      \ \ \ \ 2
-
-      \ \ \ \ 5)
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (string-every\ 
-
-      \ \ \ \ <code*|char-numeric?>
-
-      \ \ \ \ "ab234f"
-
-      \ \ \ \ 2
-
-      \ \ \ \ 6)
-
-      \ \ =\<gtr\>
-
-      \ \ #f)
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-every\ 
-
-      \ \ \ \ \ \ \ \ char-numeric?
-
-      \ \ \ \ \ \ \ "ab234f"
-
-      \ \ \ \ \ \ \ 2
-
-      \ \ \ \ \ \ \ 7))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-every\ 
-
-      \ \ \ \ \ \ \ \ char-numeric?
-
-      \ \ \ \ \ \ \ "ab234f"
-
-      \ \ \ \ \ \ \ 2
-
-      \ \ \ \ \ \ \ 1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'wrong-number-of-args
-
-      \ \ \ \ (lambda ()\ 
-
-      \ \ \ \ \ \ (string-every\ 
-
-      \ \ \ \ \ \ \ \ char-numeric?
-
-      \ \ \ \ \ \ \ "ab234f"
-
-      \ \ \ \ \ \ \ 2
-
-      \ \ \ \ \ \ \ 7
-
-      \ \ \ \ \ \ \ 1))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
+    <item*|string-every>
 
     <item*|string-any><scm|string-any>是一个谓词函数，它接收一个谓词和一个字符串为参数，用于检查字符串中是否存在字符都满足谓词。注意，这里的谓词必须是字符属性测试函数，否则报错。
 
@@ -5001,211 +4961,165 @@
 
   <section|翻转和追加>
 
-  <\description>
-    <item*|string-reverse>
+  <paragraph|string-reverse><index|string-reverse>
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-reverse str . start+end)
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-reverse str . start+end)
 
-      \ \ (cond ((null-list? start+end)
+    \ \ (cond ((null-list? start+end)
 
-      \ \ \ \ \ \ \ \ \ (reverse str))
+    \ \ \ \ \ \ \ \ \ (reverse str))
 
-      \ \ \ \ \ \ \ \ ((= (length start+end) 1)
+    \ \ \ \ \ \ \ \ ((= (length start+end) 1)
 
-      \ \ \ \ \ \ \ \ \ (let ((start (first start+end)))
+    \ \ \ \ \ \ \ \ \ (let ((start (first start+end)))
 
-      \ \ \ \ \ \ \ \ \ \ \ (string-append (substring str 0 start)
+    \ \ \ \ \ \ \ \ \ \ \ (string-append (substring str 0 start)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (reverse (substring str start)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (reverse (substring str start)))))
 
-      \ \ \ \ \ \ \ \ ((= (length start+end) 2)
+    \ \ \ \ \ \ \ \ ((= (length start+end) 2)
 
-      \ \ \ \ \ \ \ \ \ (let ((start (first start+end))
+    \ \ \ \ \ \ \ \ \ (let ((start (first start+end))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (end (second start+end)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (end (second start+end)))
 
-      \ \ \ \ \ \ \ \ \ \ \ (string-append (substring str 0 start)
+    \ \ \ \ \ \ \ \ \ \ \ (string-append (substring str 0 start)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (reverse (substring str start end))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (reverse (substring str start end))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring str end))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring str end))))
 
-      \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args "string-reverse"))))
+    \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args "string-reverse"))))
 
-      \;
-    </scm-chunk>
+    \;
+  </scm-chunk>
 
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check (string-reverse "01234") =\<gtr\> "43210")
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-reverse "01234") =\<gtr\> "43210")
 
-      \;
+    \;
 
-      (check
+    (check-catch 'out-of-range (string-reverse "01234" -1))
 
-      \ \ (catch 'out-of-range
+    \;
 
-      \ \ \ \ (lambda () (string-reverse "01234" -1))
+    (check (string-reverse "01234" 0) =\<gtr\> "43210")
 
-      \ \ \ \ (lambda args #t))
+    (check (string-reverse "01234" 1) =\<gtr\> "04321")
 
-      \ \ =\<gtr\>
+    (check (string-reverse "01234" 5) =\<gtr\> "01234")
 
-      \ \ #t)
+    \;
 
-      \;
+    (check-catch 'out-of-range (string-reverse "01234" 6))
 
-      (check (string-reverse "01234" 0) =\<gtr\> "43210")
+    \;
 
-      (check (string-reverse "01234" 1) =\<gtr\> "04321")
+    (check (string-reverse "01234" 0 2) =\<gtr\> "10234")
 
-      (check (string-reverse "01234" 5) =\<gtr\> "01234")
+    (check (string-reverse "01234" 1 3) =\<gtr\> "02134")
 
-      \;
+    (check (string-reverse "01234" 1 5) =\<gtr\> "04321")
 
-      (check
+    (check (string-reverse "01234" 0 5) =\<gtr\> "43210")
 
-      \ \ (catch 'out-of-range
+    \;
 
-      \ \ \ \ (lambda () (string-reverse "01234" 6))
+    (check-catch 'out-of-range (string-reverse "01234" 1 6))
 
-      \ \ \ \ (lambda args #t))
+    \;
 
-      \ \ =\<gtr\>
+    (check-catch 'out-of-range (string-reverse "01234" -1 3))
 
-      \ \ #t)
-
-      \;
-
-      (check (string-reverse "01234" 0 2) =\<gtr\> "10234")
-
-      (check (string-reverse "01234" 1 3) =\<gtr\> "02134")
-
-      (check (string-reverse "01234" 1 5) =\<gtr\> "04321")
-
-      (check (string-reverse "01234" 0 5) =\<gtr\> "43210")
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (string-reverse "01234" 1 6))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-
-      (check
-
-      \ \ (catch 'out-of-range
-
-      \ \ \ \ (lambda () (string-reverse "01234" -1 3))
-
-      \ \ \ \ (lambda args #t))
-
-      \ \ =\<gtr\>
-
-      \ \ #t)
-
-      \;
-    </scm-chunk>
-  </description>
+    \;
+  </scm-chunk>
 
   <section|插入和解析>
 
-  <\description>
-    <item*|string-tokenize>
+  <paragraph|string-tokenize><index|string-tokenize>
 
-    <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-      (define (string-tokenize str . char+start+end)
+  <subparagraph|实现>
 
-      \ \ 
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-tokenize str . char+start+end)
 
-      \ \ (define (string-tokenize-sub str char)
+    \ \ 
 
-      \ \ \ \ 
+    \ \ (define (string-tokenize-sub str char)
 
-      \ \ \ \ (define (tokenize-helper tokens cursor)
+    \ \ \ \ 
 
-      \ \ \ \ \ \ (let ((sep-pos/false (string-index str char cursor)))
+    \ \ \ \ (define (tokenize-helper tokens cursor)
 
-      \ \ \ \ \ \ \ \ (if (not sep-pos/false)
+    \ \ \ \ \ \ (let ((sep-pos/false (string-index str char cursor)))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ (reverse (cons (substring str cursor) tokens))
+    \ \ \ \ \ \ \ \ (if (not sep-pos/false)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ (let ((new-tokens
+    \ \ \ \ \ \ \ \ \ \ \ \ (reverse (cons (substring str cursor) tokens))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (= cursor sep-pos/false)
+    \ \ \ \ \ \ \ \ \ \ \ \ (let ((new-tokens
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tokens
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (= cursor sep-pos/false)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (substring str cursor sep-pos/false) tokens)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tokens
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-cursor (+ sep-pos/false 1)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (substring str cursor sep-pos/false) tokens)))
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ (tokenize-helper new-tokens next-cursor)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-cursor (+ sep-pos/false 1)))
 
-      \ \ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (tokenize-helper new-tokens next-cursor)))))
 
-      \ \ \ \ \ \ (tokenize-helper '() 0))
+    \ \ 
 
-      \ \ 
+    \ \ \ \ \ \ (tokenize-helper '() 0))
 
-      \ \ (cond ((null-list? char+start+end)
+    \ \ 
 
-      \ \ \ \ \ \ \ \ \ (string-tokenize-sub str #\\ ))
+    \ \ (cond ((null-list? char+start+end)
 
-      \ \ \ \ \ \ \ \ ((list? char+start+end)
+    \ \ \ \ \ \ \ \ \ (string-tokenize-sub str #\\ ))
 
-      \ \ \ \ \ \ \ \ \ (string-tokenize-sub
+    \ \ \ \ \ \ \ \ ((list? char+start+end)
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str (cdr char+start+end))
+    \ \ \ \ \ \ \ \ \ (string-tokenize-sub
 
-      \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car char+start+end)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str (cdr char+start+end))
 
-      \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "string-tokenize"))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car char+start+end)))
 
-      \;
-    </scm-chunk>
+    \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "string-tokenize"))))
 
-    <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-      (check
+    \;
+  </scm-chunk>
 
-      \ \ (string-tokenize "1 22 333")
+  <subparagraph|测试>
 
-      \ \ =\<gtr\>
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
 
-      \ \ '("1" "22" "333"))
+    \ \ (string-tokenize "1 22 333")
 
-      \;
+    \ \ =\<gtr\> '("1" "22" "333"))
 
-      (check
+    \;
 
-      \ \ (string-tokenize "1 22 333" #\\2)
+    (check
 
-      \ \ =\<gtr\>
+    \ \ (string-tokenize "1 22 333" #\\2)
 
-      \ \ '("1 " " 333"))
+    \ \ =\<gtr\> '("1 " " 333"))
 
-      \;
+    \;
 
-      (check
+    (check
 
-      \ \ (string-tokenize "1 22 333" #\\ \ 2)
+    \ \ (string-tokenize "1 22 333" #\\ \ 2)
 
-      \ \ =\<gtr\>
+    \ \ =\<gtr\> ‘("22" "333"))
 
-      \ \ ‘("22" "333"))
-
-      \;
-    </scm-chunk>
-  </description>
+    \;
+  </scm-chunk>
 
   <section|结尾>
 
