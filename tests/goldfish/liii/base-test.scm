@@ -83,53 +83,6 @@
 
 (check (square 2) => 4)
 
-(check (pair? '(a . b)) => #t)
-(check (pair? '(a b c)) => #t)
-(check (pair? '()) => #f)
-(check (pair? '#(a b)) => #f)
-
-(check (car '(a b c . d)) => 'a)
-
-(check (car '(a b c)) => 'a)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (car '()))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (cdr '(a b c . d)) => '(b c . d))
-
-(check (cdr '(a b c)) => '(b c))
-  
-(check
-  (catch 'wrong-type-arg
-    (lambda () (cdr '()))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (caar '((a . b) . c)) => 'a)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (caar '(a b . c)))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (caar '()))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (null? '()) => #t)
-(check (null? '(1)) => #f)
-(check (null? '(1 2)) => #f)
-
 (check (make-list 3 #\a) => (list #\a #\a #\a))
 (check (make-list 3) => (list #f #f #f))
 
@@ -147,31 +100,6 @@
 
 (check (append () 'c) => 'c)
 (check (append) => '())
-
-(check (list-ref (cons '(1 2) '(3 4)) 1) => 3)
-
-(check (list-ref '(a b c) 2) => 'c)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (list-ref '() 0))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (list-ref '(a b c) -1))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (list-ref '(a b c) 3))
-    (lambda args #t))
-  =>
-  #t)
 
 (check (memq #f '(1 #f 2 3)) => '(#f 2 3))
 (check (memq 'a '(1 a 2 3)) => '(a 2 3))
@@ -653,4 +581,45 @@
 (check-catch 'type-error (add3 1.2 2 3))
 
 (check-report)
+
+(check (pair? '(a . b)) => #t)
+(check (pair? '(a b c)) => #t)
+(check (pair? '()) => #f)
+(check (pair? '#(a b)) => #f)
+
+(check (null? '()) => #t)
+(check (null? '(1)) => #f)
+(check (null? '(1 2)) => #f)
+
+(check (car '(a b c . d)) => 'a)
+
+(check (car '(a b c)) => 'a)
+
+(check
+  (catch 'wrong-type-arg
+    (lambda () (car '()))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (cdr '(a b c . d)) => '(b c . d))
+
+(check (cdr '(a b c)) => '(b c))
+  
+(check-catch 'wrong-type-arg (cdr '()))
+
+(check (caar '((a . b) . c)) => 'a)
+
+(check-catch 'wrong-type-arg (caar '(a b . c)))
+
+(check-catch 'wrong-type-arg (caar '()))
+
+(check (list-ref (cons '(1 2) '(3 4)) 1) => 3)
+
+(check (list-ref '(a b c) 2) => 'c)
+
+(check-catch 'wrong-type-arg (list-ref '() 0))
+
+(check-catch 'out-of-range (list-ref '(a b c) -1))
+(check-catch 'out-of-range (list-ref '(a b c) 3))
 

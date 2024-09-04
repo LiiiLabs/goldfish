@@ -24,11 +24,8 @@
 (check (iota 3 7) => (list 7 8 9))
 (check (iota 2 7 2) => (list 7 9))
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (iota -1))
-    (lambda args #t))
-  => #t)
+(check-catch 'value-error (iota -1))
+(check-catch 'type-error (iota 'a))
 
 ; (check (circular-list? (circular-list 1 2)) => #t)
 

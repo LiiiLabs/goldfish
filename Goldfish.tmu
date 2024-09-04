@@ -3296,13 +3296,13 @@
 
     \;
 
-    (check 'wrong-type-arg (list-ref '() 0))
+    (check-catch 'wrong-type-arg (list-ref '() 0))
 
     \;
 
-    (check 'out-of-range (list-ref '(a b c) -1))
+    (check-catch 'out-of-range (list-ref '(a b c) -1))
 
-    (check 'out-of-range (list-ref '(a b c) 3))
+    (check-catch 'out-of-range (list-ref '(a b c) 3))
 
     \;
   </scm-chunk>
