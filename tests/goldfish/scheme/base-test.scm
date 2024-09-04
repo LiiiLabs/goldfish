@@ -1,12 +1,63 @@
-(import (scheme base)
-        (liii list)
-        (liii check))
+(check (case '+
+         ((+ -) 'p0)
+         ((* /) 'p1))
+  => 'p0)
 
-(check-set-mode! 'report-failed)
+(check (case '-
+         ((+ -) 'p0)
+         ((* /) 'p1))
+  => 'p0)
+
+(check (case '*
+         ((+ -) 'p0)
+         ((* /) 'p1))
+  => 'p1)
+
+(check (case '@
+         ((+ -) 'p0)
+         ((* /) 'p1))
+  => #<unspecified>)
+
+(check (case '&
+         ((+ -) 'p0)
+         ((* /) 'p1))
+  => #<unspecified>)
 
 (check (let-values (((ret) (+ 1 2))) (+ ret 4)) => 7)
 
 (check (let-values (((a b) (values 3 4))) (+ a b)) => 7)
+
+(define-record-type :pare
+  (kons x y)
+  pare?
+  (x kar set-kar!)
+  (y kdr))
+
+(check (pare? (kons 1 2)) => #t)
+(check (pare? (cons 1 2)) => #f)
+(check (kar (kons 1 2)) => 1)
+(check (kdr (kons 1 2)) => 2)
+
+(check
+ (let ((k (kons 1 2)))
+   (set-kar! k 3)
+   (kar k))
+  => 3)
+
+(define-record-type :person
+  (make-person name age)
+  person?
+  (name get-name set-name!)
+  (age get-age))
+
+(check (person? (make-person "Da" 3)) => #t)
+(check (get-age (make-person "Da" 3)) => 3)
+(check (get-name (make-person "Da" 3)) => "Da")
+(check
+  (let ((da (make-person "Da" 3)))
+    (set-name! da "Darcy")
+    (get-name da))
+  => "Darcy")
 
 (check (square 2) => 4)
 
@@ -546,5 +597,3 @@
 
 (check (eof-object) => #<eof>)
 
-(check-report)
-(if (check-failed?) (exit -1))
