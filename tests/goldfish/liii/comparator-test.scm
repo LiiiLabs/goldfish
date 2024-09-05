@@ -16,11 +16,8 @@
 (check-false (<? boolean-comparator #t #f))
 
 (check-false (complex<? 1 1))
-(check-true (complex<? 1i 2i))
+(check-true (complex<? 0+1i 0+2i))
 (check-true (complex<? 1+2i 2+2i))
-
-(check (> (boolean-hash #t) 0) => #t)
-(check (boolean-hash #f) => 0)
 
 (check-report)
 

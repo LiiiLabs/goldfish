@@ -166,9 +166,6 @@
 
 (define %salt% (lambda () 16064047))
 
-(define (boolean-hash obj)
-  (if obj (%salt%) 0))
-
 (define (=? comparator a b . objs)
   (let loop ((a a) (b b) (objs objs))
     (and (binary=? comparator a b)

@@ -10081,20 +10081,6 @@
     (define %salt% (lambda () 16064047))
 
     \;
-
-    (define (boolean-hash obj)
-
-    \ \ (if obj (%salt%) 0))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
-    (check (\<gtr\> (boolean-hash #t) 0) =\<gtr\> #t)
-
-    (check (boolean-hash #f) =\<gtr\> 0)
-
-    \;
   </scm-chunk>
 
   <section|比较谓词>
@@ -10129,7 +10115,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|\<gtr\>?>
+  \;
+
+  <paragraph|\<gtr\>?><index|\<gtr\>?>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (\<gtr\>? comparator a b . objs)
@@ -10143,7 +10131,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|\<less\>=?>
+  \;
+
+  <paragraph|\<less\>=?><index|\<less\>=?>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (\<less\>=? comparator a b . objs)
@@ -10157,7 +10147,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|\<gtr\>=?>
+  \;
+
+  <paragraph|\<gtr\>=?><index|\<gtr\>=?>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (\<gtr\>=? comparator a b . objs)
