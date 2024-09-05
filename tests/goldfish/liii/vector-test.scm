@@ -17,7 +17,7 @@
 (import (liii list)
         (liii check)
         (liii vector)
-        (scheme base))
+        (only (scheme base) let-values))
 
 (check-set-mode! 'report-failed)
 
@@ -28,6 +28,24 @@
    vector-any vector-every vector-copy vector-copy!
    vector-index vector-index-right vector-partition
    vector-swap!))
+
+(check (vector-copy #(0 1 2 3)) => #(0 1 2 3))
+(check (vector-copy #(0 1 2 3) 1) => #(1 2 3))
+(check (vector-copy #(0 1 2 3) 3) => #(3))
+(check (vector-copy #(0 1 2 3) 4) => #())
+
+(check-catch 'out-of-range (vector-copy #(0 1 2 3) 5))
+(check-catch 'out-of-range (vector-copy #(0 1 2 3) 1 5))
+
+(define my-vector #(0 1 2 3))
+(check (eqv? my-vector (vector-copy #(0 1 2 3))) => #f)
+(check-true
+  (eqv? (vector-ref my-vector 2)
+        (vector-ref (vector-copy #(0 1 2 3)) 2)))
+
+(check (vector-copy #(0 1 2 3) 1 1) => #())
+(check (vector-copy #(0 1 2 3) 1 2) => #(1))
+(check (vector-copy #(0 1 2 3) 1 4) => #(1 2 3))
 
 (check-true (vector-empty? (vector)))
 (check-false (vector-empty? (vector 1)))
@@ -75,6 +93,118 @@
 (check-catch
  'out-of-range
  (vector-swap! my-vector 1 (vector-length my-vector)))
+
+(define my-vector (vector 0 1 2 3 4))
+(fill! my-vector #f)
+(check my-vector => #(#f #f #f #f #f)) 
+
+(define my-vector (vector 0 1 2 3 4))
+(fill! my-vector #f 1 2)
+(check my-vector => #(0 #f 2 3 4)) 
+
+(define a (vector "a0" "a1" "a2" "a3" "a4"))
+(define b (vector "b0" "b1" "b2" "b3" "b4"))
+
+;(< at 0)
+(check
+  (catch 'out-of-range
+    (lambda () (vector-copy! b -1 a))
+    (lambda args #t))
+  =>
+  #t)
+
+;(< start 0)
+(check
+  (catch 'out-of-range
+    (lambda () (vector-copy! b 0 a -1))
+    (lambda args #t))
+  =>
+  #t)
+
+;(> start (vector-length from))
+(check
+  (catch 'out-of-range
+    (lambda () (vector-copy! b 0 a 6))
+    (lambda args #t))
+  =>
+  #t)
+
+;(> end (vector-length from))
+(check
+  (catch 'out-of-range
+    (lambda () (vector-copy! b 0 a 0 6))
+    (lambda args #t))
+  =>
+  #t)
+
+;(> start end)
+(check
+  (catch 'out-of-range
+    (lambda () (vector-copy! b 0 a 2 1))
+    (lambda args #t))
+  =>
+  #t)
+
+;(> (+ at (- end start)) (vector-length to))
+(check
+  (catch 'out-of-range
+    (lambda () (vector-copy! b 6 a))
+    (lambda args #t))
+  =>
+  #t)
+
+(check
+  (catch 'out-of-range
+    (lambda () (vector-copy! b 1 a))
+    (lambda args #t))
+  =>
+  #t)
+
+(define a (vector "a0" "a1" "a2" "a3" "a4"))
+(define b (vector "b0" "b1" "b2" "b3" "b4"))
+(vector-copy! b 0 a 1)
+(check b => #("a1" "a2" "a3" "a4" "b4"))
+
+(define a (vector "a0" "a1" "a2" "a3" "a4"))
+(define b (vector "b0" "b1" "b2" "b3" "b4"))
+(vector-copy! b 0 a 0 5)
+(check b => #("a0" "a1" "a2" "a3" "a4")) 
+
+(check (vector->string (vector #\0 #\1 #\2 #\3)) => "0123")
+(check (vector->string (vector #\a #\b #\c)) => "abc")
+
+(check (vector->string (vector #\0 #\1 #\2 #\3) 0 4) => "0123")
+(check (vector->string (vector #\0 #\1 #\2 #\3) 1) => "123")
+(check (vector->string (vector #\0 #\1 #\2 #\3) 1 4) => "123")
+(check (vector->string (vector #\0 #\1 #\2 #\3) 1 3) => "12")
+(check (vector->string (vector #\0 #\1 #\2 #\3) 1 2) => "1")
+
+(check
+  (catch 'out-of-range
+    (lambda () (vector->string (vector #\0 #\1 #\2 #\3) 2 10))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (vector->string (vector 0 1 #\2 3 4) 2 3) => "2")
+
+(check
+  (catch 'wrong-type-arg
+    (lambda () (vector->string (vector 0 1 #\2 3 4) 1 3))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (string->vector "0123") => (vector #\0 #\1 #\2 #\3))
+(check (string->vector "abc") => (vector #\a #\b #\c))
+
+(check (string->vector "0123" 0 4) => (vector #\0 #\1 #\2 #\3))
+(check (string->vector "0123" 1) => (vector #\1 #\2 #\3))
+(check (string->vector "0123" 1 4) => (vector #\1 #\2 #\3))
+(check (string->vector "0123" 1 3) => (vector #\1 #\2))
+(check (string->vector "0123" 1 2) => (vector #\1))
+
+(check-catch 'out-of-range (string->vector "0123" 2 10))
 
 (check-report)
 
