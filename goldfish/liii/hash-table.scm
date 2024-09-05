@@ -15,9 +15,10 @@
 ;
 
 (define-library (liii hash-table)
-(import (srfi srfi-125))
+(import (srfi srfi-125)
+        (srfi srfi-128))
 (export
-  make-hash-table, hash-table, hash-table-unfold, alist->hash-table
+  make-hash-table hash-table hash-table-unfold alist->hash-table
   hash-table? hash-table-contains? hash-table-empty? hash-table=?
   hash-table-mutable?
   hash-table-ref hash-table-ref/default

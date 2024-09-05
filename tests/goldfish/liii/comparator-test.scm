@@ -17,6 +17,8 @@
   (check-false (<? default-comp 1 1))
   (check-true (<? default-comp 0+1i 0+2i))
   (check-true (<? default-comp 1+2i 2+2i))
+  
+  (check (comparator-hash default-comp (list 1 2)) => 42)
 )
 
 (check-report)
