@@ -9704,13 +9704,25 @@
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define-library (srfi srfi-128)
 
-    (import (scheme base))
+    (import (scheme base)
+
+    \ \ \ \ \ \ \ \ (liii error))
 
     (export
 
-    \ \ make-comparator make-default-comparator
+    \ \ comparator? comparator-ordered? comparator-hashable?
 
-    \ \ boolean\<less\>? complex\<less\>? default-hash
+    \ \ make-comparator make-pair-comparator make-list-comparator
+
+    \ \ make-vector-comparator make-eq-comparator make-eqv-comparator make-equal-comparator
+
+    \ \ boolean-hash char-hash char-ci-hash string-hash string-ci-hash
+
+    \ \ symbol-hash number-hash
+
+    \ \ make-default-comparator default-hash
+
+    \ \ comparator-test-type comparator-check-type comparator-hash
 
     \ \ =? \<less\>? \<gtr\>? \<less\>=? \<gtr\>=?
 
@@ -9721,11 +9733,11 @@
     \;
   </scm-chunk>
 
-  <paragraph|comparator?>
+  <paragraph|comparator?><index|comparator?>
 
-  <paragraph|comparator-ordered?>
+  <paragraph|comparator-ordered?><index|comparator-ordered?>
 
-  <paragraph|comparator-hashable?>
+  <paragraph|comparator-hashable?><index|comparator-hashable?>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define-record-type comparator
@@ -9749,7 +9761,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|comparator-test-type>
+  \;
+
+  <paragraph|comparator-test-type><index|comparator-test-type>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     ;; Invoke the test type
@@ -9761,7 +9775,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|comparator-check-type>
+  \;
+
+  <paragraph|comparator-check-type><index|comparator-check-type>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (comparator-check-type comparator obj)
@@ -9770,12 +9786,14 @@
 
     \ \ \ \ #t
 
-    \ \ \ \ (error "comparator type check failed" comparator obj)))
+    \ \ \ \ (type-error "comparator type check failed" comparator obj)))
 
     \;
   </scm-chunk>
 
-  <paragraph|comparator-hash>
+  \;
+
+  <paragraph|comparator-hash><index|comparator-hash>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (comparator-hash comparator obj)
@@ -10295,32 +10313,6 @@
 
   <paragraph|boolean\<less\>?><index|boolean\<less\>?>
 
-  <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
-    (define boolean-comparator
-
-    \ \ (make-comparator boolean? eq? boolean\<less\>? default-hash))
-
-    \;
-
-    (check-false (boolean\<less\>? #t #t))
-
-    (check-false (\<less\>? boolean-comparator #t #t))
-
-    (check-false (boolean\<less\>? #f #f))
-
-    (check-false (\<less\>? boolean-comparator #f #f))
-
-    (check-true (boolean\<less\>? #f #t))
-
-    (check-true (\<less\>? boolean-comparator #f #t))
-
-    (check-false (boolean\<less\>? #t #f))
-
-    (check-false (\<less\>? boolean-comparator #t #f))
-
-    \;
-  </scm-chunk>
-
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (boolean\<less\>? a b)
 
@@ -10332,20 +10324,6 @@
   </scm-chunk>
 
   <paragraph|complex\<less\>?>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
-    (check-false (complex\<less\>? 1 1))
-
-    (check-true (complex\<less\>? 0+1i 0+2i))
-
-    (check-true (complex\<less\>? 1+2i 2+2i))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|实现>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (complex\<less\>? a b)
@@ -10371,12 +10349,38 @@
 
   \;
 
+  <paragraph|boolean-hash><index|boolean-hash>
+
+  <paragraph|char-hash><index|char-hash>
+
+  <paragraph|char-ci-hash><index|char-ci-hash>
+
+  <paragraph|string-hash><index|string-hash>
+
+  <paragraph|string-ci-hash><index|string-ci-hash>
+
+  <paragraph|symbol-hash><index|symbol-hash>
+
+  <paragraph|number-hash><index|number-hash>
+
   <paragraph|default-hash><index|default-hash>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
-    (define (default-hash obj)
+    (define boolean-hash hash-code)
 
-    \ \ (hash-code obj))
+    (define char-hash hash-code)
+
+    (define char-ci-hash hash-code)
+
+    (define string-hash hash-code)
+
+    (define string-ci-hash hash-code)
+
+    (define symbol-hash hash-code)
+
+    (define number-hash hash-code)
+
+    (define default-hash hash-code)
 
     \;
   </scm-chunk>
@@ -10485,7 +10489,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|make-default-comparator>
+  \;
+
+  <paragraph|make-default-comparator><index|make-default-comparator>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (make-default-comparator)
@@ -10506,7 +10512,13 @@
   <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
     (let1 default-comp (make-default-comparator)
 
-    \ \ (check-true (\<less\>? default-comp #f #t))
+    \ \ (check-false (\<less\>? default-comp #t #t))
+
+    \ \ (check-false (\<less\>? default-comp #f #f))
+
+    \ \ (check-true (\<less\>? \ default-comp #f #t))
+
+    \ \ (check-false (\<less\>? default-comp #t #f))
 
     \ \ (check-true (\<less\>? default-comp (cons #f #f) (cons #t #t)))
 
@@ -10515,6 +10527,14 @@
     \ \ (check-true (\<less\>? default-comp (list 1 2) (list 1 3)))
 
     \ \ (check-true (\<less\>? default-comp (vector "a" "b") (vector "b" "c")))
+
+    \ \ 
+
+    \ \ (check-false (\<less\>? default-comp 1 1))
+
+    \ \ (check-true (\<less\>? default-comp 0+1i 0+2i))
+
+    \ \ (check-true (\<less\>? default-comp 1+2i 2+2i))
 
     )
 

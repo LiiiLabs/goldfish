@@ -31,10 +31,16 @@
 ;;; deficiencies." --Tony Hoare
 
 (define-library (srfi srfi-128)
-(import (scheme base))
+(import (scheme base)
+        (liii error))
 (export
-  make-comparator make-default-comparator
-  boolean<? complex<? default-hash
+  comparator? comparator-ordered? comparator-hashable?
+  make-comparator make-pair-comparator make-list-comparator
+  make-vector-comparator make-eq-comparator make-eqv-comparator make-equal-comparator
+  boolean-hash char-hash char-ci-hash string-hash string-ci-hash
+  symbol-hash number-hash
+  make-default-comparator default-hash
+  comparator-test-type comparator-check-type comparator-hash
   =? <? >? <=? >=?
 )
 (begin
@@ -56,7 +62,7 @@
 (define (comparator-check-type comparator obj)
   (if (comparator-test-type comparator obj)
     #t
-    (error "comparator type check failed" comparator obj)))
+    (type-error "comparator type check failed" comparator obj)))
 
 (define (comparator-hash comparator obj)
   ((comparator-hash-function comparator) obj))
@@ -274,8 +280,14 @@
 (define (symbol<? a b)
   (string<? (symbol->string a) (symbol->string b)))
 
-(define (default-hash obj)
-  (hash-code obj))
+(define boolean-hash hash-code)
+(define char-hash hash-code)
+(define char-ci-hash hash-code)
+(define string-hash hash-code)
+(define string-ci-hash hash-code)
+(define symbol-hash hash-code)
+(define number-hash hash-code)
+(define default-hash hash-code)
 
 (define (dispatch-ordering type a b)
   (case type
