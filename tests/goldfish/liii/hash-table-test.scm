@@ -32,6 +32,16 @@
   (hash-table-set! ht 1 2)
   (check (ht 1) => 2))
 
+(let* ((mod10 (lambda (x) (modulo x 10)))
+       (digit=? (lambda (x y) (= (modulo x 10) (modulo y 10))))
+       (comp (make-comparator number? digit=? #f mod10))
+       (ht (make-hash-table comp)))
+  (hash-table-set! ht 1 2)
+  (hash-table-set! ht 11 3)
+  (check (ht 1) => 3)
+  (check (ht 11) => 3)
+  (check (ht 21) => 3))
+
 (let1 ht (make-hash-table)
   (hash-table-set! ht 'brand 'liii)
   (check (hash-table-contains? ht 'brand) => #t)

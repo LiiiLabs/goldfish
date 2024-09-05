@@ -10275,6 +10275,26 @@
     \ \ (check (ht 1) =\<gtr\> 2))
 
     \;
+
+    (let* ((mod10 (lambda (x) (modulo x 10)))
+
+    \ \ \ \ \ \ \ (digit=? (lambda (x y) (= (modulo x 10) (modulo y 10))))
+
+    \ \ \ \ \ \ \ (comp (make-comparator number? digit=? #f mod10))
+
+    \ \ \ \ \ \ \ (ht (make-hash-table comp)))
+
+    \ \ (hash-table-set! ht 1 2)
+
+    \ \ (hash-table-set! ht 11 3)
+
+    \ \ (check (ht 1) =\<gtr\> 3)
+
+    \ \ (check (ht 11) =\<gtr\> 3)
+
+    \ \ (check (ht 21) =\<gtr\> 3))
+
+    \;
   </scm-chunk>
 
   <paragraph|hash-table>
