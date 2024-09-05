@@ -9662,7 +9662,7 @@
 
     \ \ make-comparator
 
-    \ \ boolean\<less\>? default-hash
+    \ \ boolean\<less\>? complex\<less\>? default-hash
 
     \ \ =? \<less\>? \<gtr\>? \<less\>=? \<gtr\>=?
 
