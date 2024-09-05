@@ -655,72 +655,6 @@
     apply的原理可视化
   </big-figure>
 
-  <paragraph|map><index|map>
-
-  <scm|map>是S7的内置高阶函数，它接收一个函数和一个列表为从参数，把该函数应用于该列表的每个元素上，并返回一个新列表。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (map square (list 1 2 3 4 5)) =\<gtr\> '(1 4 9 16 25))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|vector-map><index|vector-map>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define (vector-map p . args) (apply vector (apply map p args)))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|for-each><index|for-each><scm|(for-each proc list1 [list2 ...])>
-
-  <scm|for-each>是S7内置的高阶函数。<scm|for-each>的参数与<scm|map>的参数类似，但<scm|for-each>调用<scm|proc>是为了它的副作用，而不是为了它的返回值。与<scm|map>不同，<scm|for-each>保证会按照从第一个元素到最后一个元素的顺序调用<scm|proc>，并且<scm|for-each>返回的值是未指定的。如果给出了多个列表，并且不是所有列表的长度都相同，<scm|for-each>会在最短的列表用尽时终止。当<scm|proc>不接受与<scm|lists>数量相同的参数，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (let ((v (make-vector 5)))
-
-    \ \ \ \ (for-each (lambda (i) (vector-set! v i (* i i)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (iota 5))
-
-    \ \ \ \ v)
-
-    \ \ =\<gtr\> #(0 1 4 9 16))
-
-    \;
-
-    (check
-
-    \ \ (let ((v (make-vector 5 #f)))
-
-    \ \ \ \ (for-each (lambda (i) (vector-set! v i (* i i)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (iota 4))
-
-    \ \ \ \ v)
-
-    \ \ =\<gtr\> #(0 1 4 9 #f))
-
-    \;
-
-    (check
-
-    \ \ (let ((v (make-vector 5 #f)))
-
-    \ \ \ \ (for-each (lambda (i) (vector-set! v i (* i i)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (iota 0))
-
-    \ \ \ \ v)
-
-    \ \ =\<gtr\> #(#f #f #f #f #f))
-
-    \;
-  </scm-chunk>
-
   <paragraph|call-with-current-continuation>
 
   <paragraph|call/cc>
@@ -4800,6 +4734,10 @@
 
     (export
 
+    \ \ ; S7 built-in
+
+    \ \ cons car cdr map for-each
+
     \ \ ; SRFI 1: Constructors
 
     \ \ circular-list iota
@@ -5776,6 +5714,68 @@
   </scm-chunk>
 
   <subsection|折叠和映射>
+
+  <label|r7rs><paragraph|map><index|map>
+
+  <scm|map>是S7的内置高阶函数，它接收一个函数和一个列表为从参数，把该函数应用于该列表的每个元素上，并返回一个新列表。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (map square (list 1 2 3 4 5)) =\<gtr\> '(1 4 9 16 25))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|r7rs><paragraph|for-each><index|for-each><scm|(for-each proc list1 [list2 ...])>
+
+  <scm|for-each>是S7内置的高阶函数。<scm|for-each>的参数与<scm|map>的参数类似，但<scm|for-each>调用<scm|proc>是为了它的副作用，而不是为了它的返回值。与<scm|map>不同，<scm|for-each>保证会按照从第一个元素到最后一个元素的顺序调用<scm|proc>，并且<scm|for-each>返回的值是未指定的。如果给出了多个列表，并且不是所有列表的长度都相同，<scm|for-each>会在最短的列表用尽时终止。当<scm|proc>不接受与<scm|lists>数量相同的参数，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (let ((v (make-vector 5)))
+
+    \ \ \ \ (for-each (lambda (i) (vector-set! v i (* i i)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (iota 5))
+
+    \ \ \ \ v)
+
+    \ \ =\<gtr\> #(0 1 4 9 16))
+
+    \;
+
+    (check
+
+    \ \ (let ((v (make-vector 5 #f)))
+
+    \ \ \ \ (for-each (lambda (i) (vector-set! v i (* i i)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (iota 4))
+
+    \ \ \ \ v)
+
+    \ \ =\<gtr\> #(0 1 4 9 #f))
+
+    \;
+
+    (check
+
+    \ \ (let ((v (make-vector 5 #f)))
+
+    \ \ \ \ (for-each (lambda (i) (vector-set! v i (* i i)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (iota 0))
+
+    \ \ \ \ v)
+
+    \ \ =\<gtr\> #(#f #f #f #f #f))
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <paragraph|fold><index|fold>
 
@@ -7114,7 +7114,9 @@
 
     \ \ ; from (scheme base)
 
-    \ \ vector-copy vector-fill! vector-copy! vector-\<gtr\>string string-\<gtr\>vector vector-for-each
+    \ \ vector-copy vector-fill! vector-copy! vector-\<gtr\>string string-\<gtr\>vector
+
+    \ \ vector-map vector-for-each
 
     \ \ ; from (srfi srfi-133)
 
@@ -7408,6 +7410,14 @@
   </scm-chunk>
 
   <subsection|迭代>
+
+  <label|r7rs><paragraph|vector-map><index|vector-map>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (vector-map p . args) (apply vector (apply map p args)))
+
+    \;
+  </scm-chunk>
 
   <label|r7rs><paragraph|vector-for-each><scm|(proc vector1 [vector2 ...])><index|vector-for-each>
 

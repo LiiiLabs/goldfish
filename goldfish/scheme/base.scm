@@ -104,8 +104,6 @@
 
 (define (square x) (* x x))
 
-(define (vector-map p . args) (apply vector (apply map p args)))
-
 (define (raise . args)
   (apply throw #t args))
 
@@ -173,6 +171,8 @@
               (begin
                 (vector-set! new-v j (vector-ref v i))
                 (loop (+ i 1) (+ j 1))))))))
+
+(define (vector-map p . args) (apply vector (apply map p args)))
 
 (define vector-for-each for-each)
 

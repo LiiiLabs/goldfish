@@ -20,7 +20,8 @@
   ; S7 Scheme built-in
   make-vector vector vector-length vector-ref vector-set! vector->list list->vector
   ; from (scheme base)
-  vector-copy vector-fill! vector-copy! vector->string string->vector vector-for-each
+  vector-copy vector-fill! vector-copy! vector->string string->vector
+  vector-map vector-for-each
   ; from (srfi srfi-133)
   vector-empty?
   vector-count

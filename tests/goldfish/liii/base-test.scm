@@ -93,29 +93,6 @@
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
-(check (map square (list 1 2 3 4 5)) => '(1 4 9 16 25))
-
-(check
-  (let ((v (make-vector 5)))
-    (for-each (lambda (i) (vector-set! v i (* i i)))
-              (iota 5))
-    v)
-  => #(0 1 4 9 16))
-
-(check
-  (let ((v (make-vector 5 #f)))
-    (for-each (lambda (i) (vector-set! v i (* i i)))
-              (iota 4))
-    v)
-  => #(0 1 4 9 #f))
-
-(check
-  (let ((v (make-vector 5 #f)))
-    (for-each (lambda (i) (vector-set! v i (* i i)))
-              (iota 0))
-    v)
-  => #(#f #f #f #f #f))
-
 (guard (condition
          (else
           (display "condition: ")
@@ -288,6 +265,29 @@
 
 (check (append () 'c) => 'c)
 (check (append) => '())
+
+(check (map square (list 1 2 3 4 5)) => '(1 4 9 16 25))
+
+(check
+  (let ((v (make-vector 5)))
+    (for-each (lambda (i) (vector-set! v i (* i i)))
+              (iota 5))
+    v)
+  => #(0 1 4 9 16))
+
+(check
+  (let ((v (make-vector 5 #f)))
+    (for-each (lambda (i) (vector-set! v i (* i i)))
+              (iota 4))
+    v)
+  => #(0 1 4 9 #f))
+
+(check
+  (let ((v (make-vector 5 #f)))
+    (for-each (lambda (i) (vector-set! v i (* i i)))
+              (iota 0))
+    v)
+  => #(#f #f #f #f #f))
 
 (check (memq #f '(1 #f 2 3)) => '(#f 2 3))
 (check (memq 'a '(1 a 2 3)) => '(a 2 3))

@@ -16,6 +16,8 @@
 
 (define-library (liii list)
 (export
+  ; S7 built-in
+  cons car cdr map for-each
   ; SRFI 1: Constructors
   circular-list iota
   ; SRFI 1: Predicates
