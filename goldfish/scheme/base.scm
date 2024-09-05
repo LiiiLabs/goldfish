@@ -19,6 +19,7 @@
   let-values
   define-record-type
   square
+  boolean=?
   ; String
   string-copy
   ; Vector
@@ -103,6 +104,17 @@
        ',type)))
 
 (define (square x) (* x x))
+
+(define (boolean=? obj1 obj2 . rest)
+  (define (same-boolean obj rest)
+    (if (null? rest)
+        #t
+        (and (equal? obj (car rest))
+             (same-boolean obj (cdr rest)))))
+  (cond ((not (boolean? obj1)) #f)
+        ((not (boolean? obj2)) #f)
+        ((not (equal? obj1 obj2)) #f)
+        (else (same-boolean obj1 rest))))
 
 (define (raise . args)
   (apply throw #t args))

@@ -140,6 +140,8 @@
 
     \ \ square
 
+    \ \ boolean=?
+
     \ \ ; String
 
     \ \ string-copy
@@ -189,6 +191,8 @@
     \ \ define-record-type
 
     \ \ square
+
+    \ \ boolean=?
 
     \ \ ; String
 
@@ -587,6 +591,50 @@
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (square 2) =\<gtr\> 4)
+
+    \;
+  </scm-chunk>
+
+  <section|布尔值>
+
+  <label|r7rs><paragraph|boolean=?><scm|(obj1 obj2 ...) =\<gtr\> boolean><index|boolean=?>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (boolean=? obj1 obj2 . rest)
+
+    \ \ (define (same-boolean obj rest)
+
+    \ \ \ \ (if (null? rest)
+
+    \ \ \ \ \ \ \ \ #t
+
+    \ \ \ \ \ \ \ \ (and (equal? obj (car rest))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (same-boolean obj (cdr rest)))))
+
+    \ \ (cond ((not (boolean? obj1)) #f)
+
+    \ \ \ \ \ \ \ \ ((not (boolean? obj2)) #f)
+
+    \ \ \ \ \ \ \ \ ((not (equal? obj1 obj2)) #f)
+
+    \ \ \ \ \ \ \ \ (else (same-boolean obj1 rest))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (boolean=? #t #t))
+
+    (check-true (boolean=? #f #f))
+
+    (check-true (boolean=? #t #t #t))
+
+    (check-false (boolean=? #t #f))
+
+    (check-false (boolean=? #f #t))
 
     \;
   </scm-chunk>
@@ -9585,6 +9633,40 @@
 
   SRFI 128的参考实现依赖于SRFI 39。我们可以移除SRFI 128的参考实现对于SRFI 39的依赖。
 
+  <\scm-chunk|goldfish/liii/comparator.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
   <\scm-chunk|goldfish/srfi/srfi-128.scm|false|true>
     ;;; SPDX-License-Identifier: MIT
 
@@ -9653,16 +9735,26 @@
 
   <section|接口>
 
-  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
-    (define-library (srfi srfi-128)
+  <\scm-chunk|goldfish/liii/comparator.scm|true|true>
+    (define-library (liii comparator)
 
-    (import (scheme base))
+    (import (srfi srfi-128))
 
     (export
 
-    \ \ make-comparator
+    \ \ comparator? comparator-ordered? comparator-hashable?
 
-    \ \ boolean\<less\>? complex\<less\>? default-hash
+    \ \ make-comparator make-pair-comparator make-list-comparator
+
+    \ \ make-vector-comparator make-eq-comparator make-eqv-comparator make-equal-comparator
+
+    \ \ boolean-hash char-hash char-ci-hash string-hash string-ci-hash
+
+    \ \ symbol-hash number-hash
+
+    \ \ make-default-comparator default-hash
+
+    \ \ comparator-test-type comparator-check-type comparator-hash
 
     \ \ =? \<less\>? \<gtr\>? \<less\>=? \<gtr\>=?
 
@@ -9673,11 +9765,43 @@
     \;
   </scm-chunk>
 
-  <paragraph|comparator?>
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define-library (srfi srfi-128)
 
-  <paragraph|comparator-ordered?>
+    (import (scheme base)
 
-  <paragraph|comparator-hashable?>
+    \ \ \ \ \ \ \ \ (liii error))
+
+    (export
+
+    \ \ comparator? comparator-ordered? comparator-hashable?
+
+    \ \ make-comparator make-pair-comparator make-list-comparator
+
+    \ \ make-vector-comparator make-eq-comparator make-eqv-comparator make-equal-comparator
+
+    \ \ boolean-hash char-hash char-ci-hash string-hash string-ci-hash
+
+    \ \ symbol-hash number-hash
+
+    \ \ make-default-comparator default-hash
+
+    \ \ comparator-test-type comparator-check-type comparator-hash
+
+    \ \ =? \<less\>? \<gtr\>? \<less\>=? \<gtr\>=?
+
+    )
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <paragraph|comparator?><index|comparator?>
+
+  <paragraph|comparator-ordered?><index|comparator-ordered?>
+
+  <paragraph|comparator-hashable?><index|comparator-hashable?>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define-record-type comparator
@@ -9701,12 +9825,56 @@
     \;
   </scm-chunk>
 
+  \;
+
+  <paragraph|comparator-test-type><index|comparator-test-type>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    ;; Invoke the test type
+
+    (define (comparator-test-type comparator obj)
+
+    \ \ ((comparator-type-test-predicate comparator) obj))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|comparator-check-type><index|comparator-check-type>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (comparator-check-type comparator obj)
+
+    \ \ (if (comparator-test-type comparator obj)
+
+    \ \ \ \ #t
+
+    \ \ \ \ (type-error "comparator type check failed" comparator obj)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|comparator-hash><index|comparator-hash>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (comparator-hash comparator obj)
+
+    \ \ ((comparator-hash-function comparator) obj))
+
+    \;
+  </scm-chunk>
+
   <section|测试>
 
   <\scm-chunk|tests/goldfish/liii/comparator-test.scm|false|true>
-    (import (srfi srfi-128)
+    (import (liii comparator)
 
-    \ \ \ \ \ \ \ \ (liii check))
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (liii base))
 
     \;
 
@@ -9718,16 +9886,6 @@
   \;
 
   <section|内部函数>
-
-  <paragraph|default-hash>
-
-  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
-    (define (default-hash obj)
-
-    \ \ (hash-code obj))
-
-    \;
-  </scm-chunk>
 
   <paragraph|binary=?>
 
@@ -9785,6 +9943,48 @@
     \;
   </scm-chunk>
 
+  <paragraph|%salt%>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define %salt%
+
+    \ \ 16064047)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-bound>
+
+  <\equation*>
+    2<rsup|25>-1
+  </equation*>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (hash-bound)
+
+    \ \ 33554432)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|make-hasher>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-hasher)
+
+    \ \ (let ((result (%salt%)))
+
+    \ \ \ \ (case-lambda
+
+    \ \ \ \ \ (() result)
+
+    \ \ \ \ \ ((n) (set! result (+ (modulo (* result 33) (hash-bound)) n))
+
+    \ \ \ \ \ \ \ \ \ \ result))))
+
+    \;
+  </scm-chunk>
+
   <section|构造器>
 
   <paragraph|make-comparator><index|make-comparator>
@@ -9808,8 +10008,6 @@
 
     \;
   </scm-chunk>
-
-  \;
 
   <paragraph|make-eq-comparator><index|make-eq-comparator>
 
@@ -9913,7 +10111,237 @@
     \;
   </scm-chunk>
 
-  <section|谓词>
+  <paragraph|make-list-comparator><index|make-list-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    ;; Cheap test for listness
+
+    (define (norp? obj) (or (null? obj) (pair? obj)))
+
+    \;
+
+    (define (make-list-comparator element-comparator type-test empty? head tail)
+
+    \ \ \ (make-comparator
+
+    \ \ \ \ \ (make-list-type-test element-comparator type-test empty? head tail)
+
+    \ \ \ \ \ (make-list=? element-comparator type-test empty? head tail)
+
+    \ \ \ \ \ (make-list\<less\>? element-comparator type-test empty? head tail)
+
+    \ \ \ \ \ (make-list-hash element-comparator type-test empty? head tail)))
+
+    \;
+
+    (define (make-list-type-test element-comparator type-test empty? head tail)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (and
+
+    \ \ \ \ \ \ (type-test obj)
+
+    \ \ \ \ \ \ (let ((elem-type-test (comparator-type-test-predicate element-comparator)))
+
+    \ \ \ \ \ \ \ \ (let loop ((obj obj))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((empty? obj) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((not (elem-type-test (head obj))) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (tail obj)))))))))
+
+    \;
+
+    (define (make-list=? element-comparator type-test empty? head tail)
+
+    \ \ (lambda (a b)
+
+    \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator)))
+
+    \ \ \ \ \ \ (let loop ((a a) (b b))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((and (empty? a) (empty? b) #t))
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? a) #f)
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? b) #f)
+
+    \ \ \ \ \ \ \ \ \ \ ((elem=? (head a) (head b)) (loop (tail a) (tail b)))
+
+    \ \ \ \ \ \ \ \ \ \ (else #f))))))
+
+    \;
+
+    (define (make-list\<less\>? element-comparator type-test empty? head tail)
+
+    \ \ (lambda (a b)
+
+    \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ (elem\<less\>? (comparator-ordering-predicate element-comparator)))
+
+    \ \ \ \ \ \ (let loop ((a a) (b b))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((and (empty? a) (empty? b) #f))
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? a) #t)
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? b) #f)
+
+    \ \ \ \ \ \ \ \ \ \ ((elem=? (head a) (head b)) (loop (tail a) (tail b)))
+
+    \ \ \ \ \ \ \ \ \ \ ((elem\<less\>? (head a) (head b)) #t)
+
+    \ \ \ \ \ \ \ \ \ \ (else #f))))))
+
+    \;
+
+    (define (make-list-hash element-comparator type-test empty? head tail)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (let ((elem-hash (comparator-hash-function element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ (acc (make-hasher)))
+
+    \ \ \ \ \ \ (let loop ((obj obj))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? obj) (acc))
+
+    \ \ \ \ \ \ \ \ \ \ (else (acc (elem-hash (head obj))) (loop (tail obj))))))))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|make-vector-comparator><index|make-vector-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-vector-comparator element-comparator type-test length ref)
+
+    \ \ (make-comparator
+
+    \ \ \ \ (make-vector-type-test element-comparator type-test length ref)
+
+    \ \ \ \ (make-vector=? element-comparator type-test length ref)
+
+    \ \ \ \ (make-vector\<less\>? element-comparator type-test length ref)
+
+    \ \ \ \ (make-vector-hash element-comparator type-test length ref)))
+
+    \;
+
+    (define (make-vector-type-test element-comparator type-test length ref)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (and
+
+    \ \ \ \ \ \ (type-test obj)
+
+    \ \ \ \ \ \ (let ((elem-type-test (comparator-type-test-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (len (length obj)))
+
+    \ \ \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((= n len) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((not (elem-type-test (ref obj n))) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ n 1)))))))))
+
+    \;
+
+    (define (make-vector=? element-comparator type-test length ref)
+
+    \ \ \ (lambda (a b)
+
+    \ \ \ \ \ (and
+
+    \ \ \ \ \ \ \ (= (length a) (length b))
+
+    \ \ \ \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (len (length b)))
+
+    \ \ \ \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((= n len) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((elem=? (ref a n) (ref b n)) (loop (+ n 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else #f)))))))
+
+    \;
+
+    (define (make-vector\<less\>? element-comparator type-test length ref)
+
+    \ \ \ (lambda (a b)
+
+    \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ ((\<less\> (length a) (length b)) #t)
+
+    \ \ \ \ \ \ \ ((\<gtr\> (length a) (length b)) #f)
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (elem\<less\>? (comparator-ordering-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (len (length a)))
+
+    \ \ \ \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((= n len) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((elem=? (ref a n) (ref b n)) (loop (+ n 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((elem\<less\>? (ref a n) (ref b n)) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else #f))))))))
+
+    \;
+
+    (define (make-vector-hash element-comparator type-test length ref)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (let ((elem-hash (comparator-hash-function element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ (acc (make-hasher))
+
+    \ \ \ \ \ \ \ \ \ \ (len (length obj)))
+
+    \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((= n len) (acc))
+
+    \ \ \ \ \ \ \ \ \ \ (else (acc (elem-hash (ref obj n))) (loop (+ n 1))))))))
+
+    \;
+  </scm-chunk>
 
   <section|标准函数>
 
@@ -9949,32 +10377,6 @@
 
   <paragraph|boolean\<less\>?><index|boolean\<less\>?>
 
-  <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
-    (define boolean-comparator
-
-    \ \ (make-comparator boolean? eq? boolean\<less\>? default-hash))
-
-    \;
-
-    (check-false (boolean\<less\>? #t #t))
-
-    (check-false (\<less\>? boolean-comparator #t #t))
-
-    (check-false (boolean\<less\>? #f #f))
-
-    (check-false (\<less\>? boolean-comparator #f #f))
-
-    (check-true (boolean\<less\>? #f #t))
-
-    (check-true (\<less\>? boolean-comparator #f #t))
-
-    (check-false (boolean\<less\>? #t #f))
-
-    (check-false (\<less\>? boolean-comparator #t #f))
-
-    \;
-  </scm-chunk>
-
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (boolean\<less\>? a b)
 
@@ -9986,20 +10388,6 @@
   </scm-chunk>
 
   <paragraph|complex\<less\>?>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
-    (check-false (complex\<less\>? 1 1))
-
-    (check-true (complex\<less\>? 0+1i 0+2i))
-
-    (check-true (complex\<less\>? 1+2i 2+2i))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|实现>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (complex\<less\>? a b)
@@ -10019,6 +10407,44 @@
     (define (symbol\<less\>? a b)
 
     \ \ (string\<less\>? (symbol-\<gtr\>string a) (symbol-\<gtr\>string b)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|boolean-hash><index|boolean-hash>
+
+  <paragraph|char-hash><index|char-hash>
+
+  <paragraph|char-ci-hash><index|char-ci-hash>
+
+  <paragraph|string-hash><index|string-hash>
+
+  <paragraph|string-ci-hash><index|string-ci-hash>
+
+  <paragraph|symbol-hash><index|symbol-hash>
+
+  <paragraph|number-hash><index|number-hash>
+
+  <paragraph|default-hash><index|default-hash>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define boolean-hash hash-code)
+
+    (define char-hash hash-code)
+
+    (define char-ci-hash hash-code)
+
+    (define string-hash hash-code)
+
+    (define string-ci-hash hash-code)
+
+    (define symbol-hash hash-code)
+
+    (define number-hash hash-code)
+
+    (define default-hash hash-code)
 
     \;
   </scm-chunk>
@@ -10044,11 +10470,15 @@
 
     \ \ \ \ ((6) (complex\<less\>? a b))
 
-    \ \ \ \ ((7) ((make-vector\<less\>? (make-default-comparator) vector? vector-length vector-ref) a b))
+    \ \ \ \ ((7) ((make-vector\<less\>? (make-default-comparator) vector? vector-length vector-ref)
+
+    \ \ \ \ \ \ \ \ \ \ a b))
 
     \ \ \ \ ((8) ((make-vector\<less\>? (make-comparator exact-integer? = \<less\> default-hash)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytevector? bytevector-length bytevector-u8-ref) a b))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytevector? bytevector-length bytevector-u8-ref)
+
+    \ \ \ \ \ \ \ \ \ \ a b))
 
     \ \ \ \ ; Add more here
 
@@ -10073,12 +10503,104 @@
     \;
   </scm-chunk>
 
-  \;
-
-  <paragraph|boolean-hash><index|boolean-hash>
+  <paragraph|default-equality>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
-    (define %salt% (lambda () 16064047))
+    (define (dispatch-equality type a b)
+
+    \ \ (case type
+
+    \ \ \ \ ((0) #t) ; All empty lists are equal
+
+    \ \ \ \ ((1) ((make-pair=? (make-default-comparator) (make-default-comparator)) a b))
+
+    \ \ \ \ ((2) (boolean=? a b))
+
+    \ \ \ \ ((3) (char=? a b))
+
+    \ \ \ \ ((4) (string=? a b))
+
+    \ \ \ \ ((5) (symbol=? a b))
+
+    \ \ \ \ ((6) (= a b))
+
+    \ \ \ \ ((7) ((make-vector=? (make-default-comparator)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vector? vector-length vector-ref) a b))
+
+    \ \ \ \ ((8) ((make-vector=? (make-comparator exact-integer? = \<less\> default-hash)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytevector? bytevector-length bytevector-u8-ref) a b))
+
+    \ \ \ \ ; Add more here
+
+    \ \ \ \ (else (binary=? (registered-comparator type) a b))))
+
+    \;
+
+    (define (default-equality a b)
+
+    \ \ (let ((a-type (object-type a))
+
+    \ \ \ \ \ \ \ \ (b-type (object-type b)))
+
+    \ \ \ \ (if (= a-type b-type)
+
+    \ \ \ \ \ \ \ \ (dispatch-equality a-type a b)
+
+    \ \ \ \ \ \ \ \ #f)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|make-default-comparator><index|make-default-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-default-comparator)
+
+    \ \ (make-comparator
+
+    \ \ \ \ (lambda (obj) #t)
+
+    \ \ \ \ default-equality
+
+    \ \ \ \ default-ordering
+
+    \ \ \ \ default-hash))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
+    (let1 default-comp (make-default-comparator)
+
+    \ \ (check-false (\<less\>? default-comp #t #t))
+
+    \ \ (check-false (\<less\>? default-comp #f #f))
+
+    \ \ (check-true (\<less\>? \ default-comp #f #t))
+
+    \ \ (check-false (\<less\>? default-comp #t #f))
+
+    \ \ (check-true (\<less\>? default-comp (cons #f #f) (cons #t #t)))
+
+    \ \ (check-true (\<less\>? default-comp (list 1 2) (list 2 3)))
+
+    \ \ (check-true (\<less\>? default-comp (list 1 2) (list 1 3)))
+
+    \ \ (check-true (\<less\>? default-comp (vector "a" "b") (vector "b" "c")))
+
+    \ \ 
+
+    \ \ (check-false (\<less\>? default-comp 1 1))
+
+    \ \ (check-true (\<less\>? default-comp 0+1i 0+2i))
+
+    \ \ (check-true (\<less\>? default-comp 1+2i 2+2i))
+
+    )
 
     \;
   </scm-chunk>
@@ -10164,6 +10686,14 @@
   </scm-chunk>
 
   <section|结尾>
+
+  <\scm-chunk|goldfish/liii/comparator.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|false>
     ) ; end of begin

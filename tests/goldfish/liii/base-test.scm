@@ -83,6 +83,12 @@
 
 (check (square 2) => 4)
 
+(check-true (boolean=? #t #t))
+(check-true (boolean=? #f #f))
+(check-true (boolean=? #t #t #t))
+(check-false (boolean=? #t #f))
+(check-false (boolean=? #f #t))
+
 (check (char? #\A) => #t)
 (check (char? 1) => #f)
 
