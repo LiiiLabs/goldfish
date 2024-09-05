@@ -6981,6 +6981,510 @@
     \;
   </scm-chunk>
 
+  <chapter|(liii vector)>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/vector.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    (define-library (srfi srfi-133)
+
+    \;
+
+    (export
+
+    \ \ vector-empty?
+
+    \ \ vector-count
+
+    \ \ vector-any vector-every vector-copy vector-copy!
+
+    \ \ vector-index vector-index-right vector-partition
+
+    \ \ vector-swap!)
+
+    (import (scheme base))
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/vector.scm|true|true>
+    (define-library (liii vector)
+
+    \;
+
+    (export
+
+    \ \ vector-empty?
+
+    \ \ vector-count
+
+    \ \ vector-any vector-every vector-copy vector-copy!
+
+    \ \ vector-index vector-index-right vector-partition
+
+    \ \ vector-swap!)
+
+    (import (srfi srfi-133))
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (liii vector)
+
+    \ \ \ \ \ \ \ \ (scheme base))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (for-each (lambda (p) (check (procedure? p) =\<gtr\> #t))
+
+    \ \ (list
+
+    \ \ \ vector-empty?
+
+    \ \ \ vector-count
+
+    \ \ \ vector-any vector-every vector-copy vector-copy!
+
+    \ \ \ vector-index vector-index-right vector-partition
+
+    \ \ \ vector-swap!))
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <subsection|谓词>
+
+  <paragraph|vector-empty?><index|vector-empty?>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    (define (vector-empty? v)
+
+    \ \ (when (not (vector? v))
+
+    \ \ \ \ (error 'type-error "v is not a vector"))
+
+    \ \ (zero? (vector-length v)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check-true (vector-empty? (vector)))
+
+    (check-false (vector-empty? (vector 1)))
+
+    (check-catch 'type-error (vector-empty? 1))
+
+    \;
+  </scm-chunk>
+
+  <subsection|迭代>
+
+  <paragraph|vector-count><index|vector-count>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    ; TODO optional parameters
+
+    (define (vector-count pred v)
+
+    \ \ (let loop ((i 0) (count 0))
+
+    \ \ \ \ \ \ \ (cond ((= i (vector-length v)) count)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((pred (vector-ref v i))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) (+ count 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1) count)))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-count even? #()) =\<gtr\> 0)
+
+    (check (vector-count even? #(1 3 5 7 9)) =\<gtr\> 0)
+
+    (check (vector-count even? #(1 3 4 7 8)) =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <subsection|搜索>
+
+  <paragraph|vector-any><index|vector-any>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    ; TODO optional parameters
+
+    (define (vector-any pred v)
+
+    \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ \ (cond ((= i (vector-length v)) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((pred (vector-ref v i)) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-any even? #()) =\<gtr\> #f)
+
+    (check (vector-any even? #(1 3 5 7 9)) =\<gtr\> #f)
+
+    (check (vector-any even? #(1 3 4 7 8)) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-every><index|vector-every>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    ; TODO optional parameters
+
+    (define (vector-every pred v)
+
+    \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ \ (cond ((= i (vector-length v)) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((not (pred (vector-ref v i))) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-every odd? #()) =\<gtr\> #t)
+
+    (check (vector-every odd? #(1 3 5 7 9)) =\<gtr\> #t)
+
+    (check (vector-every odd? #(1 3 4 7 8)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-index><index|vector-index>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    ; TODO optional parameters
+
+    (define (vector-index pred v)
+
+    \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ \ (cond ((= i (vector-length v)) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((pred (vector-ref v i)) i)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-index even? #()) =\<gtr\> #f)
+
+    (check (vector-index even? #(1 3 5 7 9)) =\<gtr\> #f)
+
+    (check (vector-index even? #(1 3 4 7 8)) =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-index-right><index|vector-index-right>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    ; TODO optional parameters
+
+    (define (vector-index-right pred v)
+
+    \ \ (let ((len (vector-length v)))
+
+    \ \ \ \ (let loop ((i (- len 1)))
+
+    \ \ \ \ \ \ \ \ \ (cond ((\<less\> i 0) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((pred (vector-ref v i)) i)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (- i 1)))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-index-right even? #()) =\<gtr\> #f)
+
+    (check (vector-index-right even? #(1 3 5 7 9)) =\<gtr\> #f)
+
+    (check (vector-index-right even? #(1 3 4 7 8)) =\<gtr\> 4)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector-partition><index|vector-partition>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    (define (vector-partition pred v)
+
+    \ \ (let* ((len (vector-length v))
+
+    \ \ \ \ \ \ \ \ \ (cnt (vector-count pred v))
+
+    \ \ \ \ \ \ \ \ \ (ret (make-vector len)))
+
+    \ \ \ \ (let loop ((i 0) (yes 0) (no cnt))
+
+    \ \ \ \ \ \ (if (= i len)
+
+    \ \ \ \ \ \ \ \ (values ret cnt)
+
+    \ \ \ \ \ \ \ \ (let ((elem (vector-ref v i)))
+
+    \ \ \ \ \ \ \ \ \ \ (if (pred elem)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! ret yes elem)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) (+ yes 1) no))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! ret no elem)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) yes (+ no 1)))))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (define (vector-partition-\<gtr\>list pred v)
+
+    \ \ (let-values (((ret cnt) (vector-partition pred v))) (list ret cnt)))
+
+    \;
+
+    (check (vector-partition-\<gtr\>list even? #()) =\<gtr\> '(#() 0))
+
+    (check (vector-partition-\<gtr\>list even? #(1 3 5 7 9)) =\<gtr\> '(#(1 3 5 7 9) 0))
+
+    (check (vector-partition-\<gtr\>list even? #(1 3 4 7 8)) =\<gtr\> '(#(4 8 1 3 7) 2))
+
+    \;
+  </scm-chunk>
+
+  <subsection|修改器>
+
+  <paragraph|vector-swap!><index|vector-swap!>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    (define (vector-swap! vec i j)
+
+    \ \ (let ((elem-i (vector-ref vec i))
+
+    \ \ \ \ \ \ \ \ (elem-j (vector-ref vec j)))
+
+    \ \ \ \ (vector-set! vec i elem-j)
+
+    \ \ \ \ (vector-set! vec j elem-i)
+
+    \ \ \ \ ))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (define my-vector (vector 0 1 2 3))
+
+    (vector-swap! my-vector 1 2)
+
+    (check my-vector =\<gtr\> #(0 2 1 3))
+
+    \;
+
+    (define my-vector (vector 0 1 2 3))
+
+    (vector-swap! my-vector 1 1)
+
+    (check my-vector =\<gtr\> #(0 1 2 3))
+
+    \;
+
+    (define my-vector (vector 0 1 2 3))
+
+    (vector-swap! my-vector 0 (- (vector-length my-vector) 1))
+
+    (check my-vector =\<gtr\> #(3 1 2 0))
+
+    \;
+
+    (check-catch
+
+    \ 'out-of-range
+
+    \ (vector-swap! my-vector 1 (vector-length my-vector)))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/vector.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
   <chapter|(liii stack)>
 
   栈是一个先进后出（FILO）的数据结构。
