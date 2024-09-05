@@ -747,68 +747,6 @@
     \;
   </scm-chunk>
 
-  <paragraph|vector-for-each><index|vector-for-each><scm|(vector-for-each proc vector1 [vector2 ...])>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define vector-for-each for-each)
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (let ((lst (make-list 5)))
-
-    \ \ \ \ (vector-for-each
-
-    \ \ \ \ \ \ (lambda (i) (list-set! lst i (* i i)))
-
-    \ \ \ \ \ \ #(0 1 2 3 4))
-
-    \ \ \ \ lst)
-
-    \ \ =\<gtr\> '(0 1 4 9 16))
-
-    \;
-
-    (check
-
-    \ \ (let ((lst (make-list 5)))
-
-    \ \ \ \ (vector-for-each
-
-    \ \ \ \ \ \ (lambda (i) (list-set! lst i (* i i)))
-
-    \ \ \ \ \ \ #(0 1 2))
-
-    \ \ \ \ lst)
-
-    \ \ =\<gtr\> '(0 1 4 #f #f))
-
-    \;
-
-    (check
-
-    \ \ (let ((lst (make-list 5)))
-
-    \ \ \ \ (vector-for-each
-
-    \ \ \ \ \ \ (lambda (i) (list-set! lst i (* i i)))
-
-    \ \ \ \ \ \ #())
-
-    \ \ \ \ lst)
-
-    \ \ =\<gtr\> '(#f #f #f #f #f))
-
-    \;
-  </scm-chunk>
-
   <paragraph|call-with-current-continuation>
 
   <paragraph|call/cc>
@@ -7174,7 +7112,7 @@
 
     \ \ ; from (scheme base)
 
-    \ \ vector-copy vector-fill! vector-copy! vector-\<gtr\>string string-\<gtr\>vector
+    \ \ vector-copy vector-fill! vector-copy! vector-\<gtr\>string string-\<gtr\>vector vector-for-each
 
     \ \ ; from (srfi srfi-133)
 
@@ -7468,6 +7406,68 @@
   </scm-chunk>
 
   <subsection|迭代>
+
+  <label|r7rs><paragraph|vector-for-each><scm|(proc vector1 [vector2 ...])><index|vector-for-each>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define vector-for-each for-each)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check
+
+    \ \ (let ((lst (make-list 5)))
+
+    \ \ \ \ (vector-for-each
+
+    \ \ \ \ \ \ (lambda (i) (list-set! lst i (* i i)))
+
+    \ \ \ \ \ \ #(0 1 2 3 4))
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '(0 1 4 9 16))
+
+    \;
+
+    (check
+
+    \ \ (let ((lst (make-list 5)))
+
+    \ \ \ \ (vector-for-each
+
+    \ \ \ \ \ \ (lambda (i) (list-set! lst i (* i i)))
+
+    \ \ \ \ \ \ #(0 1 2))
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '(0 1 4 #f #f))
+
+    \;
+
+    (check
+
+    \ \ (let ((lst (make-list 5)))
+
+    \ \ \ \ (vector-for-each
+
+    \ \ \ \ \ \ (lambda (i) (list-set! lst i (* i i)))
+
+    \ \ \ \ \ \ #())
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '(#f #f #f #f #f))
+
+    \;
+  </scm-chunk>
 
   <paragraph|vector-count><index|vector-count>
 

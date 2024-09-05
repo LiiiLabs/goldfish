@@ -122,30 +122,6 @@
     v)
   => #(#f #f #f #f #f))
 
-(check
-  (let ((lst (make-list 5)))
-    (vector-for-each
-      (lambda (i) (list-set! lst i (* i i)))
-      #(0 1 2 3 4))
-    lst)
-  => '(0 1 4 9 16))
-
-(check
-  (let ((lst (make-list 5)))
-    (vector-for-each
-      (lambda (i) (list-set! lst i (* i i)))
-      #(0 1 2))
-    lst)
-  => '(0 1 4 #f #f))
-
-(check
-  (let ((lst (make-list 5)))
-    (vector-for-each
-      (lambda (i) (list-set! lst i (* i i)))
-      #())
-    lst)
-  => '(#f #f #f #f #f))
-
 (guard (condition
          (else
           (display "condition: ")
