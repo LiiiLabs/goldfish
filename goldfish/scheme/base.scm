@@ -104,8 +104,6 @@
 
 (define (square x) (* x x))
 
-(define (string-map p . args) (apply string (apply map p args)))
-
 (define (vector-map p . args) (apply vector (apply map p args)))
 
 (define (raise . args)
@@ -160,6 +158,8 @@
         ((= (length start_end) 2)
          (substring str (car start_end) (cadr start_end)))
         (else (error 'wrong-number-of-args))))
+
+(define (string-map p . args) (apply string (apply map p args)))
 
 (define string-for-each for-each)
 

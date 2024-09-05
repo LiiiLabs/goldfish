@@ -665,32 +665,6 @@
     \;
   </scm-chunk>
 
-  <paragraph|string-map><index|string-map>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define (string-map p . args) (apply string (apply map p args)))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (string-map
-
-    \ \ \ \ (lambda (ch) (integer-\<gtr\>char (+ 1 (char-\<gtr\>integer ch))))
-
-    \ \ \ \ "HAL")
-
-    \ \ =\<gtr\> "IBM")
-
-    \;
-  </scm-chunk>
-
   <paragraph|vector-map><index|vector-map>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
@@ -2370,7 +2344,7 @@
 
     \ \ ; from (scheme base)
 
-    \ \ string-copy string-for-each
+    \ \ string-copy string-for-each string-map
 
     \ \ ; from (srfi srfi-13)
 
@@ -4512,6 +4486,34 @@
   </scm-chunk>
 
   <section|Fold, unfold & map>
+
+  <label|r7rs><paragraph|string-map><index|string-map>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (string-map p . args) (apply string (apply map p args)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-map
+
+    \ \ \ \ (lambda (ch) (integer-\<gtr\>char (+ 1 (char-\<gtr\>integer ch))))
+
+    \ \ \ \ "HAL")
+
+    \ \ =\<gtr\> "IBM")
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <label|r7rs><paragraph|string-for-each><scm|(proc str1 [str2 ...])><index|string-for-each>
 

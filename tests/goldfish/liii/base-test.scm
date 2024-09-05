@@ -96,12 +96,6 @@
 (check (map square (list 1 2 3 4 5)) => '(1 4 9 16 25))
 
 (check
-  (string-map
-    (lambda (ch) (integer->char (+ 1 (char->integer ch))))
-    "HAL")
-  => "IBM")
-
-(check
   (let ((v (make-vector 5)))
     (for-each (lambda (i) (vector-set! v i (* i i)))
               (iota 5))

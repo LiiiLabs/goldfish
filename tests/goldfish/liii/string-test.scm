@@ -601,6 +601,12 @@
 (check-catch 'out-of-range (string-reverse "01234" -1 3))
 
 (check
+  (string-map
+    (lambda (ch) (integer->char (+ 1 (char->integer ch))))
+    "HAL")
+  => "IBM")
+
+(check
   (let ((lst '()))
     (string-for-each
       (lambda (x) (set! lst (cons (char->integer x) lst)))
