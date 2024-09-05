@@ -14,8 +14,8 @@
 ; under the License.
 ;
 
-(import (srfi srfi-1)
-        (srfi srfi-78)
+(import (liii list)
+        (liii check)
         (scheme case-lambda))
 
 (check-set-mode! 'report-failed)
@@ -33,5 +33,4 @@
 (check ((my-func) 1 2 3 4) => 10)
 
 (check-report)
-(if (check-failed?) (exit -1))
 

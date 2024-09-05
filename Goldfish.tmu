@@ -557,6 +557,24 @@
     \;
   </scm-chunk>
 
+  <subparagraph|SRFI>
+
+  <\scm-chunk|goldfish/srfi/srfi-9.scm|false|false>
+    (define-library (srfi srfi-9)
+
+    (import (scheme base))
+
+    (export define-record-type)
+
+    (begin
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
   \;
 
   <section|相等性判断>
@@ -2659,6 +2677,722 @@
 
   <\scm-chunk|tests/goldfish/liii/error-test.scm|true|false>
     (check-report)
+
+    \;
+  </scm-chunk>
+
+  <chapter|(liii check)>
+
+  <section|协议>
+
+  <\scm-chunk|goldfish/liii/check.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|false|true>
+    ; \<less\>PLAINTEXT\<gtr\>
+
+    ; Copyright (c) 2005-2006 Sebastian Egner.
+
+    ;\ 
+
+    ; Permission is hereby granted, free of charge, to any person obtaining
+
+    ; a copy of this software and associated documentation files (the
+
+    ; ''Software''), to deal in the Software without restriction, including
+
+    ; without limitation the rights to use, copy, modify, merge, publish,
+
+    ; distribute, sublicense, and/or sell copies of the Software, and to
+
+    ; permit persons to whom the Software is furnished to do so, subject to
+
+    ; the following conditions:
+
+    ;\ 
+
+    ; The above copyright notice and this permission notice shall be
+
+    ; included in all copies or substantial portions of the Software.
+
+    ;\ 
+
+    ; THE SOFTWARE IS PROVIDED ‘‘AS IS'', WITHOUT WARRANTY OF ANY KIND,
+
+    ; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+
+    ; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+
+    ; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+
+    ; LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+
+    ; OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+
+    ; WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+    ;\ 
+
+    ; -----------------------------------------------------------------------
+
+    ;\ 
+
+    ; Lightweight testing (reference implementation)
+
+    ; ==============================================
+
+    ;
+
+    ; Sebastian.Egner@philips.com
+
+    ; in R5RS + SRFI 23 (error) + SRFI 42 (comprehensions)
+
+    ;
+
+    ; history of this file:
+
+    ; \ \ SE, 25-Oct-2004: first version based on code used in SRFIs 42 and 67
+
+    ; \ \ SE, 19-Jan-2006: (arg ...) made optional in check-ec
+
+    ;
+
+    ; Naming convention "check:\<less\>identifier\<gtr\>" is used only internally.
+
+    ;
+
+    ; Copyright (c) 2024 The Goldfish Scheme Authors
+
+    ; Follow the same License as the original one
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <section|接口>
+
+  将<scm|check:proc>导出的原因是<scm|check>是使用宏实现的，而宏里面用到了<scm|check:proc>，不导出无法生效。
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-library (liii check)
+
+    (export test check check-set-mode! check:proc
+
+    \ \ check-catch check-report check-failed?
+
+    \ \ check-true check-false)
+
+    (import (srfi srfi-78)
+
+    \ \ \ \ \ \ \ \ (rename (srfi srfi-78)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check-report srfi-78-check-report)))
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define-library (srfi srfi-78)
+
+    (export check check-set-mode! check-report check-reset!
+
+    \ \ \ \ \ \ \ \ check-passed? check-failed?
+
+    \ \ \ \ \ \ \ \ check:proc)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  \;
+
+  \;
+
+  <section|实现>
+
+  使用display作为测试结果的展示函数，比write好，因为display可以正常显示文本中的汉字。
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define check:write display)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-set-mode!><index|check-set-mode!>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define check:mode #f)
+
+    \;
+
+    (define (check-set-mode! mode)
+
+    \ \ (set! check:mode
+
+    \ \ \ \ \ \ \ \ (case mode
+
+    \ \ \ \ \ \ \ \ \ \ ((off) \ \ \ \ \ \ \ \ \ \ 0)
+
+    \ \ \ \ \ \ \ \ \ \ ((summary) \ \ \ \ \ \ 1)
+
+    \ \ \ \ \ \ \ \ \ \ ((report-failed) 10)
+
+    \ \ \ \ \ \ \ \ \ \ ((report) \ \ \ \ \ \ \ 100)
+
+    \ \ \ \ \ \ \ \ \ \ (else (error "unrecognized mode" mode)))))
+
+    \;
+
+    \;
+  </scm-chunk>
+
+  将检查模式初始化为<scm|'report>：
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (check-set-mode! 'report)
+
+    \;
+  </scm-chunk>
+
+  以<scm|check>函数为例，不同的检查模式下，得到的结果不同。可以使用单元测试来查看这四种测试用例具体使用方法：
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+    (import (srfi srfi-78))
+
+    \;
+  </scm-chunk>
+
+  <\description>
+    <item*|report>默认检查模式，无论正确还是错误，都会展示详细的信息。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      ;
+
+      ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+      ;
+
+      ; Licensed under the Apache License, Version 2.0 (the "License");
+
+      ; you may not use this file except in compliance with the License.
+
+      ; You may obtain a copy of the License at
+
+      ;
+
+      ; http://www.apache.org/licenses/LICENSE-2.0
+
+      ;
+
+      ; Unless required by applicable law or agreed to in writing, software
+
+      ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+      ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+      ; License for the specific language governing permissions and limitations
+
+      ; under the License.
+
+      ;
+
+      \;
+
+      (display "----------\\n")
+
+      (display "check mode: report\\n")
+
+      \;
+
+      (check-set-mode! 'report)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-reset!)
+
+      \;
+    </scm-chunk>
+
+    <item*|off>设置为off的时候，禁用后续的测试用例。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      (display "\\n----------\\n")
+
+      (display "check mode: off\\n")
+
+      \;
+
+      (check-set-mode! 'off)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-reset!)
+
+      \;
+    </scm-chunk>
+
+    <item*|report-failed>设置为report-failed的时候，在check正确时只返回正确的测试数量，在check错误时，显示错误。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      (display "\\n----------\\n")
+
+      (display "check mode: report-failed\\n")
+
+      \;
+
+      (check-set-mode! 'report-failed)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-reset!)
+
+      \;
+    </scm-chunk>
+
+    <item*|summary>设置为summary的时候，不汇报错误，需要显示调用<scm|check-report>才能显示的测试汇总结果，显式调用<scm|check:failed>显式查看错误的例子。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      (display "\\n----------\\n")
+
+      (display "check mode: summary\\n")
+
+      \;
+
+      (check-set-mode! 'summary)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-report)
+
+      \;
+    </scm-chunk>
+
+    这个时候如果需要查看错误，那么可以重新设置检查模式，重新检查报告：
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|false>
+      (check-set-mode! 'report)
+
+      \;
+
+      (check-report)
+
+      \;
+    </scm-chunk>
+  </description>
+
+  <paragraph|check-failed?><index|check-failed?>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define check:correct 0)
+
+    (define check:failed '())
+
+    \;
+
+    (define (check-reset!)
+
+    \ \ (set! check:correct 0)
+
+    \ \ (set! check:failed '()))
+
+    \;
+
+    (define (check:add-correct!)
+
+    \ \ (set! check:correct (+ check:correct 1)))
+
+    \;
+
+    (define (check:add-failed! expression actual-result expected-result)
+
+    \ \ (set! check:failed
+
+    \ \ \ \ \ \ \ \ (cons (list expression actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ check:failed)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define (check:report-expression expression)
+
+    \ \ (newline)
+
+    \ \ (check:write expression)
+
+    \ \ (display " =\<gtr\> "))
+
+    \;
+
+    (define (check:report-actual-result actual-result)
+
+    \ \ (check:write actual-result)
+
+    \ \ (display " ; "))
+
+    \;
+
+    (define (check:report-correct cases)
+
+    \ \ (display "correct")
+
+    \ \ (if (not (= cases 1))
+
+    \ \ \ \ \ \ (begin (display " (")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (display cases)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (display " cases checked)")))
+
+    \ \ (newline))
+
+    \;
+
+    (define (check:report-failed expected-result)
+
+    \ \ (display "*** failed ***")
+
+    \ \ (newline)
+
+    \ \ (display "; expected result: ")
+
+    \ \ (check:write expected-result)
+
+    \ \ (newline))
+
+    \;
+
+    (define (check-passed? expected-total-count)
+
+    \ \ (and (= (length check:failed) 0)
+
+    \ \ \ \ \ \ \ (= check:correct expected-total-count)))
+
+    \;
+
+    (define (check-failed?)
+
+    \ \ (\<gtr\>= (length check:failed) 1))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check><index|check>
+
+  check的具体过程，依据不同的检查模式，做不同的处理：
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define (check:proc expression thunk equal expected-result)
+
+    \ \ (case check:mode
+
+    \ \ \ \ ((0) #f)
+
+    \ \ \ \ ((1)
+
+    \ \ \ \ \ (let ((actual-result (thunk)))
+
+    \ \ \ \ \ \ \ (if (equal actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ (check:add-correct!)
+
+    \ \ \ \ \ \ \ \ \ \ \ (check:add-failed! expression actual-result expected-result))))
+
+    \ \ \ \ ((10)
+
+    \ \ \ \ \ (let ((actual-result (thunk)))
+
+    \ \ \ \ \ \ \ (if (equal actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ (check:add-correct!)
+
+    \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-expression expression)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-actual-result actual-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-failed expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:add-failed! expression actual-result expected-result)))))
+
+    \ \ \ \ ((100)
+
+    \ \ \ \ \ (check:report-expression expression)
+
+    \ \ \ \ \ (let ((actual-result (thunk)))
+
+    \ \ \ \ \ \ \ (check:report-actual-result actual-result)
+
+    \ \ \ \ \ \ \ (if (equal actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ (begin (check:report-correct 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:add-correct!))
+
+    \ \ \ \ \ \ \ \ \ \ \ (begin (check:report-failed expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:add-failed! expression\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ actual-result\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected-result)))))
+
+    \ \ \ \ (else (error "unrecognized check:mode" check:mode))))
+
+    \;
+  </scm-chunk>
+
+  check的接口实现，使用S7 Scheme的<scm|define-macro>实现：
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define-macro (check expr =\<gtr\> expected)
+
+    \ \ ‘(check:proc ',expr (lambda () ,expr) equal? ,expected))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-true><index|check-true>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (check-true body)
+
+    \ \ ‘(check ,body =\<gtr\> #t))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-false><index|check-false>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (check-false body)
+
+    \ \ ‘(check ,body =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-catch><index|check-catch>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (check-catch error-id body)
+
+    \ \ ‘(check
+
+    \ \ \ \ (catch ,error-id
+
+    \ \ \ \ \ \ (lambda () ,body)
+
+    \ \ \ \ \ \ (lambda args ,error-id))
+
+    \ \ \ \ \ \ =\<gtr\> ,error-id))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|test><index|test><scm|(obj1 obj2) =\<gtr\> boolean>
+
+  <scm|test>函数是为了兼容S7 Scheme仓库里面的测试用例。
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (test left right)
+
+    \ \ ‘(check ,left =\<gtr\> ,right))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-report><index|check-report>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define (check-report . msg)
+
+    \ \ (if (not (null? msg))
+
+    \ \ \ \ (begin
+
+    \ \ \ \ \ \ (display (car msg))))
+
+    \ \ (srfi-78-check-report)
+
+    \ \ (if (check-failed?) (exit -1)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define (check-report)
+
+    \ \ (if (\<gtr\>= check:mode 1)
+
+    \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ (display "; *** checks *** : ")
+
+    \ \ \ \ \ \ \ \ (display check:correct)
+
+    \ \ \ \ \ \ \ \ (display " correct, ")
+
+    \ \ \ \ \ \ \ \ (display (length check:failed))
+
+    \ \ \ \ \ \ \ \ (display " failed.")
+
+    \ \ \ \ \ \ \ \ (if (or (null? check:failed) (\<less\>= check:mode 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let* ((w (car (reverse check:failed)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (expression (car w))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (actual-result (cadr w))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (expected-result (caddr w)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (display " First failed example:")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-expression expression)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-actual-result actual-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-failed expected-result))))))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
 
     \;
   </scm-chunk>
@@ -8789,6 +9523,144 @@
     \;
   </scm-chunk>
 
+  <chapter|(scheme case-lambda)>
+
+  <section|协议>
+
+  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  在Scheme语言中，<scm|case-lambda>是一种特殊的lambda表达式，它可以根据不同数量的参数执行不同的代码块。<scm|case-lambda>允许你定义一个函数，这个函数根据传入参数的数量来选择执行不同的lambda表达式。
+
+  \;
+
+  下面是一个使用<scm|case-lambda>的示例：
+
+  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|true|false>
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (scheme case-lambda))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (define (my-func . args)
+
+    \ \ (case-lambda
+
+    \ \ \ \ (() "zero args")
+
+    \ \ \ \ ((x) (+ x x))
+
+    \ \ \ \ ((x y) (+ x y))
+
+    \ \ \ \ ((x y . rest) (reduce + 0 (cons x (cons y rest))))))
+
+    \;
+
+    (check ((my-func)) =\<gtr\> "zero args")
+
+    (check ((my-func) 2) =\<gtr\> 4)
+
+    (check ((my-func) 3 4) =\<gtr\> 7)
+
+    (check ((my-func) 1 2 3 4) =\<gtr\> 10)
+
+    \;
+
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <\scm-chunk|goldfish/scheme/case-lambda.scm|false|false>
+    ; 0-clause BSD
+
+    ; Bill Schottstaedt
+
+    ; from S7 source repo: r7rs.scm
+
+    \;
+
+    (define-library (scheme case-lambda)
+
+    (export case-lambda)
+
+    (begin
+
+    \;
+
+    ;; case-lambda \ \ \ \ \ \ 
+
+    (define-macro (case-lambda . choices)
+
+    \ \ ‘(lambda args
+
+    \ \ \ \ \ (case (length args)
+
+    \ \ \ \ \ \ \ ,@(map (lambda (choice)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (symbol? (car choice))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (negative? (length (car choice))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(else (apply (lambda ,(car choice) ,@(cdr choice)) args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((,(length (car choice)))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply (lambda ,(car choice) ,@(cdr choice)) args))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ choices))))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
   <chapter|(srfi sicp)>
 
   <section|许可证>
@@ -8996,347 +9868,379 @@
   </scm-chunk>
 
   <\the-index|idx>
-    <index+1|!=|<pageref|auto-153>>
+    <index+1|!=|<pageref|auto-154>>
 
-    <index+1|==|<pageref|auto-151>>
+    <index+1|==|<pageref|auto-152>>
 
-    <index+1|???|<pageref|auto-189>>
+    <index+1|???|<pageref|auto-190>>
 
-    <index+1|any|<pageref|auto-356>>
+    <index+1|any|<pageref|auto-378>>
 
-    <index+1|append|<pageref|auto-321>>
+    <index+1|append|<pageref|auto-343>>
 
-    <index+1|apply|<pageref|auto-76>>
+    <index+1|apply|<pageref|auto-77>>
 
-    <index+1|binary-port?|<pageref|auto-119>>
+    <index+1|binary-port?|<pageref|auto-120>>
 
-    <index+1|caar|<pageref|auto-282>>
+    <index+1|caar|<pageref|auto-304>>
 
-    <index+1|call-with-port|<pageref|auto-109>>
+    <index+1|call-with-port|<pageref|auto-110>>
 
-    <index+1|car|<pageref|auto-278>>
+    <index+1|car|<pageref|auto-300>>
 
     <index+1|case|<pageref|auto-9>>
 
-    <index+1|cdr|<pageref|auto-280>>
+    <index+1|cdr|<pageref|auto-302>>
 
-    <index+1|char?|<pageref|auto-24>>
+    <index+1|char?|<pageref|auto-25>>
 
-    <index+1|char=?|<pageref|auto-26>>
+    <index+1|char=?|<pageref|auto-27>>
 
-    <index+1|circular-list|<pageref|auto-264>>
+    <index+1|check|<pageref|auto-201>>
 
-    <index+1|circular-list?|<pageref|auto-273>>
+    <index+1|check-catch|<pageref|auto-207>>
 
-    <index+1|close-input-port|<pageref|auto-127>>
+    <index+1|check-failed?|<pageref|auto-199>>
 
-    <index+1|close-output-port|<pageref|auto-129>>
+    <index+1|check-false|<pageref|auto-205>>
 
-    <index+1|close-port|<pageref|auto-125>>
+    <index+1|check-report|<pageref|auto-211>>
 
-    <index+1|compose|<pageref|auto-163>>
+    <index+1|check-set-mode!|<pageref|auto-197>>
 
-    <index+1|cons|<pageref|auto-258>>
+    <index+1|check-true|<pageref|auto-203>>
 
-    <index+1|count|<pageref|auto-323>>
+    <index+1|circular-list|<pageref|auto-286>>
+
+    <index+1|circular-list?|<pageref|auto-295>>
+
+    <index+1|close-input-port|<pageref|auto-128>>
+
+    <index+1|close-output-port|<pageref|auto-130>>
+
+    <index+1|close-port|<pageref|auto-126>>
+
+    <index+1|compose|<pageref|auto-164>>
+
+    <index+1|cons|<pageref|auto-280>>
+
+    <index+1|count|<pageref|auto-345>>
 
     <index+1|define-record-type|<pageref|auto-14>>
 
-    <index+1|delete|<pageref|auto-361>>
+    <index+1|delete|<pageref|auto-383>>
 
-    <index+1|delete-duplicates|<pageref|auto-363>>
+    <index+1|delete-duplicates|<pageref|auto-385>>
 
-    <index+1|display*|<pageref|auto-155>>
+    <index+1|display*|<pageref|auto-156>>
 
-    <index+1|drop|<pageref|auto-308>>
+    <index+1|drop|<pageref|auto-330>>
 
-    <index+1|drop-right|<pageref|auto-312>>
+    <index+1|drop-right|<pageref|auto-334>>
 
-    <index+1|drop-while|<pageref|auto-352>>
+    <index+1|drop-while|<pageref|auto-374>>
 
-    <index+1|eighth|<pageref|auto-300>>
+    <index+1|eighth|<pageref|auto-322>>
 
-    <index+1|eof-object|<pageref|auto-137>>
+    <index+1|eof-object|<pageref|auto-138>>
 
-    <index+1|every|<pageref|auto-358>>
+    <index+1|every|<pageref|auto-380>>
 
-    <index+1|fifth|<pageref|auto-294>>
+    <index+1|fifth|<pageref|auto-316>>
 
-    <index+1|file-error?|<pageref|auto-105>>
+    <index+1|file-error?|<pageref|auto-106>>
 
-    <index+1|file-exists-error|<pageref|auto-181>>
+    <index+1|file-exists-error|<pageref|auto-182>>
 
-    <index+1|file-not-found-error|<pageref|auto-177>>
+    <index+1|file-not-found-error|<pageref|auto-178>>
 
-    <index+1|filter|<pageref|auto-335>>
+    <index+1|filter|<pageref|auto-357>>
 
-    <index+1|find|<pageref|auto-348>>
+    <index+1|find|<pageref|auto-370>>
 
-    <index+1|first|<pageref|auto-286>>
+    <index+1|first|<pageref|auto-308>>
 
-    <index+1|flatmap|<pageref|auto-372>>
+    <index+1|flatmap|<pageref|auto-394>>
 
-    <index+1|fold|<pageref|auto-326>>
+    <index+1|fold|<pageref|auto-348>>
 
-    <index+1|fold-right|<pageref|auto-328>>
+    <index+1|fold-right|<pageref|auto-350>>
 
-    <index+1|for-each|<pageref|auto-87>>
+    <index+1|for-each|<pageref|auto-88>>
 
-    <index+1|fourth|<pageref|auto-292>>
+    <index+1|fourth|<pageref|auto-314>>
 
-    <index+1|guard|<pageref|auto-101>>
+    <index+1|guard|<pageref|auto-102>>
 
-    <index+1|hash-table?|<pageref|auto-434>>
+    <index+1|hash-table?|<pageref|auto-486>>
 
-    <index+1|hash-table=?|<pageref|auto-444>>
+    <index+1|hash-table=?|<pageref|auto-496>>
 
-    <index+1|hash-table-clear!|<pageref|auto-468>>
+    <index+1|hash-table-clear!|<pageref|auto-520>>
 
-    <index+1|hash-table-contains?|<pageref|auto-436>>
+    <index+1|hash-table-contains?|<pageref|auto-488>>
 
-    <index+1|hash-table-delete!|<pageref|auto-460>>
+    <index+1|hash-table-delete!|<pageref|auto-512>>
 
-    <index+1|hash-table-empty?|<pageref|auto-440>>
+    <index+1|hash-table-empty?|<pageref|auto-492>>
 
-    <index+1|hash-table-\<gtr\>alist|<pageref|auto-486>>
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-538>>
 
-    <index+1|hash-table-keys|<pageref|auto-477>>
+    <index+1|hash-table-keys|<pageref|auto-529>>
 
-    <index+1|hash-table-ref|<pageref|auto-449>>
+    <index+1|hash-table-ref|<pageref|auto-501>>
 
-    <index+1|hash-table-ref/default|<pageref|auto-451>>
+    <index+1|hash-table-ref/default|<pageref|auto-503>>
 
-    <index+1|hash-table-set!|<pageref|auto-456>>
+    <index+1|hash-table-set!|<pageref|auto-508>>
 
-    <index+1|hash-table-size|<pageref|auto-473>>
+    <index+1|hash-table-size|<pageref|auto-525>>
 
-    <index+1|hash-table-update!|<pageref|auto-464>>
+    <index+1|hash-table-update!|<pageref|auto-516>>
 
-    <index+1|hash-table-values|<pageref|auto-481>>
+    <index+1|hash-table-values|<pageref|auto-533>>
 
-    <index+1|identity|<pageref|auto-161>>
+    <index+1|identity|<pageref|auto-162>>
 
-    <index+1|in?|<pageref|auto-157>>
+    <index+1|in?|<pageref|auto-158>>
 
-    <index+1|input-port?|<pageref|auto-111>>
+    <index+1|input-port?|<pageref|auto-112>>
 
-    <index+1|input-port-open?|<pageref|auto-121>>
+    <index+1|input-port-open?|<pageref|auto-122>>
 
-    <index+1|iota|<pageref|auto-266>>
+    <index+1|iota|<pageref|auto-288>>
 
-    <index+1|last|<pageref|auto-316>>
+    <index+1|last|<pageref|auto-338>>
 
-    <index+1|last-pair|<pageref|auto-314>>
+    <index+1|last-pair|<pageref|auto-336>>
 
-    <index+1|length|<pageref|auto-319>>
+    <index+1|length|<pageref|auto-341>>
 
-    <index+1|length=?|<pageref|auto-366>>
+    <index+1|length=?|<pageref|auto-388>>
 
-    <index+1|let1|<pageref|auto-159>>
+    <index+1|let1|<pageref|auto-160>>
 
     <index+1|let-values|<pageref|auto-11>>
 
-    <index+1|list|<pageref|auto-260>>
+    <index+1|list|<pageref|auto-282>>
 
-    <index+1|list-\<gtr\>string|<pageref|auto-39>>
+    <index+1|list-\<gtr\>string|<pageref|auto-40>>
 
-    <index+1|list-\<gtr\>vector|<pageref|auto-58>>
+    <index+1|list-\<gtr\>vector|<pageref|auto-59>>
 
-    <index+1|list-index|<pageref|auto-354>>
+    <index+1|list-index|<pageref|auto-376>>
 
-    <index+1|list-not-null?|<pageref|auto-378>>
+    <index+1|list-not-null?|<pageref|auto-400>>
 
-    <index+1|list-ref|<pageref|auto-284>>
+    <index+1|list-ref|<pageref|auto-306>>
 
-    <index+1|list-view|<pageref|auto-368>>
+    <index+1|list-view|<pageref|auto-390>>
 
-    <index+1|make-list|<pageref|auto-262>>
+    <index+1|make-list|<pageref|auto-284>>
 
-    <index+1|make-vector|<pageref|auto-46>>
+    <index+1|make-vector|<pageref|auto-47>>
 
-    <index+1|map|<pageref|auto-79>>
+    <index+1|map|<pageref|auto-80>>
 
-    <index+1|member|<pageref|auto-346>>
+    <index+1|member|<pageref|auto-368>>
 
-    <index+1|memq|<pageref|auto-342>>
+    <index+1|memq|<pageref|auto-364>>
 
-    <index+1|memv|<pageref|auto-344>>
+    <index+1|memv|<pageref|auto-366>>
 
-    <index+1|ninth|<pageref|auto-302>>
+    <index+1|ninth|<pageref|auto-324>>
 
-    <index+1|not-a-directory-error|<pageref|auto-179>>
+    <index+1|not-a-directory-error|<pageref|auto-180>>
 
-    <index+1|not-null-list?|<pageref|auto-374>>
+    <index+1|not-null-list?|<pageref|auto-396>>
 
-    <index+1|null?|<pageref|auto-271>>
+    <index+1|null?|<pageref|auto-293>>
 
-    <index+1|null-list?|<pageref|auto-275>>
+    <index+1|null-list?|<pageref|auto-297>>
 
-    <index+1|os-error|<pageref|auto-175>>
+    <index+1|os-error|<pageref|auto-176>>
 
-    <index+1|output-port?|<pageref|auto-113>>
+    <index+1|output-port?|<pageref|auto-114>>
 
-    <index+1|output-port-open?|<pageref|auto-123>>
+    <index+1|output-port-open?|<pageref|auto-124>>
 
-    <index+1|pair?|<pageref|auto-269>>
+    <index+1|pair?|<pageref|auto-291>>
 
-    <index+1|partition|<pageref|auto-337>>
+    <index+1|partition|<pageref|auto-359>>
 
-    <index+1|port?|<pageref|auto-115>>
+    <index+1|port?|<pageref|auto-116>>
 
-    <index+1|procedure?|<pageref|auto-74>>
+    <index+1|procedure?|<pageref|auto-75>>
 
-    <index+1|queue|<pageref|auto-406>>
+    <index+1|queue|<pageref|auto-458>>
 
-    <index+1|queue-back|<pageref|auto-414>>
+    <index+1|queue-back|<pageref|auto-466>>
 
-    <index+1|queue-empty?|<pageref|auto-408>>
+    <index+1|queue-empty?|<pageref|auto-460>>
 
-    <index+1|queue-front|<pageref|auto-412>>
+    <index+1|queue-front|<pageref|auto-464>>
 
-    <index+1|queue-\<gtr\>list|<pageref|auto-420>>
+    <index+1|queue-\<gtr\>list|<pageref|auto-472>>
 
-    <index+1|queue-pop!|<pageref|auto-418>>
+    <index+1|queue-pop!|<pageref|auto-470>>
 
-    <index+1|queue-push!|<pageref|auto-416>>
+    <index+1|queue-push!|<pageref|auto-468>>
 
-    <index+1|queue-size|<pageref|auto-410>>
+    <index+1|queue-size|<pageref|auto-462>>
 
-    <index+1|read-error?|<pageref|auto-103>>
+    <index+1|read-error?|<pageref|auto-104>>
 
-    <index+1|reduce|<pageref|auto-330>>
+    <index+1|reduce|<pageref|auto-352>>
 
-    <index+1|reduce-right|<pageref|auto-332>>
+    <index+1|reduce-right|<pageref|auto-354>>
 
-    <index+1|remove|<pageref|auto-339>>
+    <index+1|remove|<pageref|auto-361>>
 
-    <index+1|second|<pageref|auto-288>>
+    <index+1|second|<pageref|auto-310>>
 
-    <index+1|seventh|<pageref|auto-298>>
+    <index+1|seventh|<pageref|auto-320>>
 
-    <index+1|sixth|<pageref|auto-296>>
+    <index+1|sixth|<pageref|auto-318>>
 
-    <index+1|square|<pageref|auto-20>>
+    <index+1|square|<pageref|auto-21>>
 
-    <index+1|stack|<pageref|auto-386>>
+    <index+1|stack|<pageref|auto-438>>
 
-    <index+1|stack-empty?|<pageref|auto-388>>
+    <index+1|stack-empty?|<pageref|auto-440>>
 
-    <index+1|stack-\<gtr\>list|<pageref|auto-398>>
+    <index+1|stack-\<gtr\>list|<pageref|auto-450>>
 
-    <index+1|stack-pop!|<pageref|auto-396>>
+    <index+1|stack-pop!|<pageref|auto-448>>
 
-    <index+1|stack-push!|<pageref|auto-394>>
+    <index+1|stack-push!|<pageref|auto-446>>
 
-    <index+1|stack-size|<pageref|auto-390>>
+    <index+1|stack-size|<pageref|auto-442>>
 
-    <index+1|stack-top|<pageref|auto-392>>
+    <index+1|stack-top|<pageref|auto-444>>
 
-    <index+1|string?|<pageref|auto-29>>
+    <index+1|string?|<pageref|auto-30>>
 
-    <index+1|string-any|<pageref|auto-207>>
+    <index+1|string-any|<pageref|auto-229>>
 
-    <index+1|string-append|<pageref|auto-35>>
+    <index+1|string-append|<pageref|auto-36>>
 
-    <index+1|string-contains|<pageref|auto-239>>
+    <index+1|string-contains|<pageref|auto-261>>
 
-    <index+1|string-copy|<pageref|auto-41>>
+    <index+1|string-copy|<pageref|auto-42>>
 
-    <index+1|string-count|<pageref|auto-241>>
+    <index+1|string-count|<pageref|auto-263>>
 
-    <index+1|string-drop|<pageref|auto-214>>
+    <index+1|string-drop|<pageref|auto-236>>
 
-    <index+1|string-drop-right|<pageref|auto-216>>
+    <index+1|string-drop-right|<pageref|auto-238>>
 
-    <index+1|string-every|<pageref|auto-205>>
+    <index+1|string-every|<pageref|auto-227>>
 
-    <index+1|string-for-each|<pageref|auto-89>>
+    <index+1|string-for-each|<pageref|auto-90>>
 
-    <index+1|string-\<gtr\>list|<pageref|auto-37>>
+    <index+1|string-\<gtr\>list|<pageref|auto-38>>
 
-    <index+1|string-\<gtr\>vector|<pageref|auto-62>>
+    <index+1|string-\<gtr\>vector|<pageref|auto-63>>
 
-    <index+1|string-index|<pageref|auto-235>>
+    <index+1|string-index|<pageref|auto-257>>
 
-    <index+1|string-index-right|<pageref|auto-237>>
+    <index+1|string-index-right|<pageref|auto-259>>
 
-    <index+1|string-join|<pageref|auto-198>>
+    <index+1|string-join|<pageref|auto-220>>
 
-    <index+1|string-length|<pageref|auto-31>>
+    <index+1|string-length|<pageref|auto-32>>
 
-    <index+1|string-map|<pageref|auto-81>>
+    <index+1|string-map|<pageref|auto-82>>
 
-    <index+1|string-null?|<pageref|auto-203>>
+    <index+1|string-null?|<pageref|auto-225>>
 
-    <index+1|string-pad|<pageref|auto-218>>
+    <index+1|string-pad|<pageref|auto-240>>
 
-    <index+1|string-pad-right|<pageref|auto-220>>
+    <index+1|string-pad-right|<pageref|auto-242>>
 
-    <index+1|string-prefix?|<pageref|auto-230>>
+    <index+1|string-prefix?|<pageref|auto-252>>
 
-    <index+1|string-ref|<pageref|auto-33>>
+    <index+1|string-ref|<pageref|auto-34>>
 
-    <index+1|string-reverse|<pageref|auto-244>>
+    <index+1|string-reverse|<pageref|auto-266>>
 
-    <index+1|string-suffix?|<pageref|auto-232>>
+    <index+1|string-suffix?|<pageref|auto-254>>
 
-    <index+1|string-take|<pageref|auto-210>>
+    <index+1|string-take|<pageref|auto-232>>
 
-    <index+1|string-take-right|<pageref|auto-212>>
+    <index+1|string-take-right|<pageref|auto-234>>
 
-    <index+1|string-tokenize|<pageref|auto-247>>
+    <index+1|string-tokenize|<pageref|auto-269>>
 
-    <index+1|string-trim|<pageref|auto-223>>
+    <index+1|string-trim|<pageref|auto-245>>
 
-    <index+1|string-trim-both|<pageref|auto-227>>
+    <index+1|string-trim-both|<pageref|auto-249>>
 
-    <index+1|string-trim-right|<pageref|auto-225>>
+    <index+1|string-trim-right|<pageref|auto-247>>
 
-    <index+1|take|<pageref|auto-306>>
+    <index+1|take|<pageref|auto-328>>
 
-    <index+1|take-right|<pageref|auto-310>>
+    <index+1|take-right|<pageref|auto-332>>
 
-    <index+1|take-while|<pageref|auto-350>>
+    <index+1|take-while|<pageref|auto-372>>
 
-    <index+1|tenth|<pageref|auto-304>>
+    <index+1|tenth|<pageref|auto-326>>
 
-    <index+1|textual-port?|<pageref|auto-117>>
+    <index+1|test|<pageref|auto-209>>
 
-    <index+1|third|<pageref|auto-290>>
+    <index+1|textual-port?|<pageref|auto-118>>
 
-    <index+1|timeout-error|<pageref|auto-183>>
+    <index+1|third|<pageref|auto-312>>
 
-    <index+1|typed-lambda|<pageref|auto-165>>
+    <index+1|timeout-error|<pageref|auto-184>>
 
-    <index+1|type-error|<pageref|auto-185>>
+    <index+1|typed-lambda|<pageref|auto-166>>
 
-    <index+1|value-error|<pageref|auto-187>>
+    <index+1|type-error|<pageref|auto-186>>
 
-    <index+1|vector?|<pageref|auto-44>>
+    <index+1|value-error|<pageref|auto-188>>
 
-    <index+1|vector|<pageref|auto-48>>
+    <index+1|vector?|<pageref|auto-45>>
 
-    <index+1|vector-append|<pageref|auto-68>>
+    <index+1|vector|<pageref|auto-49>>
 
-    <index+1|vector-copy|<pageref|auto-64>>
+    <index+1|vector-any|<pageref|auto-417>>
 
-    <index+1|vector-copy!|<pageref|auto-66>>
+    <index+1|vector-append|<pageref|auto-69>>
 
-    <index+1|vector-fill!|<pageref|auto-70>>
+    <index+1|vector-copy|<pageref|auto-65>>
 
-    <index+1|vector-for-each|<pageref|auto-91>>
+    <index+1|vector-copy!|<pageref|auto-67>>
 
-    <index+1|vector-\<gtr\>list|<pageref|auto-56>>
+    <index+1|vector-count|<pageref|auto-412>>
 
-    <index+1|vector-\<gtr\>string|<pageref|auto-60>>
+    <index+1|vector-empty?|<pageref|auto-409>>
 
-    <index+1|vector-length|<pageref|auto-50>>
+    <index+1|vector-every|<pageref|auto-421>>
 
-    <index+1|vector-map|<pageref|auto-85>>
+    <index+1|vector-fill!|<pageref|auto-71>>
 
-    <index+1|vector-ref|<pageref|auto-52>>
+    <index+1|vector-for-each|<pageref|auto-92>>
 
-    <index+1|vector-set!|<pageref|auto-54>>
+    <index+1|vector-\<gtr\>list|<pageref|auto-57>>
+
+    <index+1|vector-\<gtr\>string|<pageref|auto-61>>
+
+    <index+1|vector-index|<pageref|auto-423>>
+
+    <index+1|vector-index-right|<pageref|auto-425>>
+
+    <index+1|vector-length|<pageref|auto-51>>
+
+    <index+1|vector-map|<pageref|auto-86>>
+
+    <index+1|vector-partition|<pageref|auto-427>>
+
+    <index+1|vector-ref|<pageref|auto-53>>
+
+    <index+1|vector-set!|<pageref|auto-55>>
+
+    <index+1|vector-swap!|<pageref|auto-430>>
   </the-index>
 </body>
 
