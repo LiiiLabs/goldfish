@@ -9729,7 +9729,193 @@
     \;
   </scm-chunk>
 
-  <chapter|SRFI-8: Receive>
+  <chapter|(scheme char)>
+
+  <section|许可证>
+
+  <\scm-chunk|tests/goldfish/scheme/char-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|tests/goldfish/scheme/char-test.scm|true|true>
+    (import (liii check))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <label|r7rs><paragraph|char-upcase><index|char-upcase>
+
+  S7内置函数。
+
+  <\scm-chunk|tests/goldfish/scheme/char-test.scm|true|true>
+    (check (char-upcase #\\A) =\<gtr\> #\\A)
+
+    (check (char-upcase #\\a) =\<gtr\> #\\A)
+
+    (check (char-upcase #\\?) =\<gtr\> #\\?)
+
+    (check (char-upcase #\\$) =\<gtr\> #\\$)
+
+    (check (char-upcase #\\.) =\<gtr\> #\\.)
+
+    (check (char-upcase #\\\\) =\<gtr\> #\\\\)
+
+    (check (char-upcase #\\5) =\<gtr\> #\\5)
+
+    (check (char-upcase #\\)) =\<gtr\> #\\))
+
+    (check (char-upcase #\\%) =\<gtr\> #\\%)
+
+    (check (char-upcase #\\0) =\<gtr\> #\\0)
+
+    (check (char-upcase #\\_) =\<gtr\> #\\_)
+
+    (check (char-upcase #\\?) =\<gtr\> #\\?)
+
+    (check (char-upcase #\\space) =\<gtr\> #\\space)
+
+    (check (char-upcase #\\newline) =\<gtr\> #\\newline)
+
+    (check (char-upcase #\\null) =\<gtr\> #\\null)
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|tests/goldfish/scheme/char-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <chapter|(scheme file)>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/scheme/file.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/scheme/file.scm|true|true>
+    (define-library (scheme file)
+
+    (export open-binary-input-file open-binary-output-file)
+
+    (begin
+
+    \ \ 
+  </scm-chunk>
+
+  <section|实现>
+
+  <label|r7rs><paragraph|open-input-file><index|open-input-file>
+
+  S7内置函数。
+
+  <label|r7rs><paragraph|open-binary-input-file><index|open-binary-input-file>
+
+  <\scm-chunk|goldfish/scheme/file.scm|true|true>
+    (define open-binary-input-file open-input-file)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|r7rs><paragraph|open-output-file><index|open-output-file>
+
+  S7内置函数。
+
+  <label|r7rs><paragraph|open-binary-output-file><index|open-binary-output-file>
+
+  <\scm-chunk|goldfish/scheme/file.scm|true|true>
+    (define open-binary-output-file open-output-file)
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/scheme/file.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <chapter|(srfi srfi-8)>
 
   \;
 
