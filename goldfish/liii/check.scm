@@ -26,7 +26,6 @@
 (define-macro (check-true body)
   `(check ,body => #t))
 
-
 (define-macro (check-false body)
   `(check ,body => #f))
 

@@ -3275,8 +3275,6 @@
     \ \ ‘(check ,body =\<gtr\> #t))
 
     \;
-
-    \;
   </scm-chunk>
 
   <paragraph|check-false><index|check-false>
@@ -9870,347 +9868,379 @@
   </scm-chunk>
 
   <\the-index|idx>
-    <index+1|!=|<pageref|auto-153>>
+    <index+1|!=|<pageref|auto-154>>
 
-    <index+1|==|<pageref|auto-151>>
+    <index+1|==|<pageref|auto-152>>
 
-    <index+1|???|<pageref|auto-189>>
+    <index+1|???|<pageref|auto-190>>
 
-    <index+1|any|<pageref|auto-356>>
+    <index+1|any|<pageref|auto-378>>
 
-    <index+1|append|<pageref|auto-321>>
+    <index+1|append|<pageref|auto-343>>
 
-    <index+1|apply|<pageref|auto-76>>
+    <index+1|apply|<pageref|auto-77>>
 
-    <index+1|binary-port?|<pageref|auto-119>>
+    <index+1|binary-port?|<pageref|auto-120>>
 
-    <index+1|caar|<pageref|auto-282>>
+    <index+1|caar|<pageref|auto-304>>
 
-    <index+1|call-with-port|<pageref|auto-109>>
+    <index+1|call-with-port|<pageref|auto-110>>
 
-    <index+1|car|<pageref|auto-278>>
+    <index+1|car|<pageref|auto-300>>
 
     <index+1|case|<pageref|auto-9>>
 
-    <index+1|cdr|<pageref|auto-280>>
+    <index+1|cdr|<pageref|auto-302>>
 
-    <index+1|char?|<pageref|auto-24>>
+    <index+1|char?|<pageref|auto-25>>
 
-    <index+1|char=?|<pageref|auto-26>>
+    <index+1|char=?|<pageref|auto-27>>
 
-    <index+1|circular-list|<pageref|auto-264>>
+    <index+1|check|<pageref|auto-201>>
 
-    <index+1|circular-list?|<pageref|auto-273>>
+    <index+1|check-catch|<pageref|auto-207>>
 
-    <index+1|close-input-port|<pageref|auto-127>>
+    <index+1|check-failed?|<pageref|auto-199>>
 
-    <index+1|close-output-port|<pageref|auto-129>>
+    <index+1|check-false|<pageref|auto-205>>
 
-    <index+1|close-port|<pageref|auto-125>>
+    <index+1|check-report|<pageref|auto-211>>
 
-    <index+1|compose|<pageref|auto-163>>
+    <index+1|check-set-mode!|<pageref|auto-197>>
 
-    <index+1|cons|<pageref|auto-258>>
+    <index+1|check-true|<pageref|auto-203>>
 
-    <index+1|count|<pageref|auto-323>>
+    <index+1|circular-list|<pageref|auto-286>>
+
+    <index+1|circular-list?|<pageref|auto-295>>
+
+    <index+1|close-input-port|<pageref|auto-128>>
+
+    <index+1|close-output-port|<pageref|auto-130>>
+
+    <index+1|close-port|<pageref|auto-126>>
+
+    <index+1|compose|<pageref|auto-164>>
+
+    <index+1|cons|<pageref|auto-280>>
+
+    <index+1|count|<pageref|auto-345>>
 
     <index+1|define-record-type|<pageref|auto-14>>
 
-    <index+1|delete|<pageref|auto-361>>
+    <index+1|delete|<pageref|auto-383>>
 
-    <index+1|delete-duplicates|<pageref|auto-363>>
+    <index+1|delete-duplicates|<pageref|auto-385>>
 
-    <index+1|display*|<pageref|auto-155>>
+    <index+1|display*|<pageref|auto-156>>
 
-    <index+1|drop|<pageref|auto-308>>
+    <index+1|drop|<pageref|auto-330>>
 
-    <index+1|drop-right|<pageref|auto-312>>
+    <index+1|drop-right|<pageref|auto-334>>
 
-    <index+1|drop-while|<pageref|auto-352>>
+    <index+1|drop-while|<pageref|auto-374>>
 
-    <index+1|eighth|<pageref|auto-300>>
+    <index+1|eighth|<pageref|auto-322>>
 
-    <index+1|eof-object|<pageref|auto-137>>
+    <index+1|eof-object|<pageref|auto-138>>
 
-    <index+1|every|<pageref|auto-358>>
+    <index+1|every|<pageref|auto-380>>
 
-    <index+1|fifth|<pageref|auto-294>>
+    <index+1|fifth|<pageref|auto-316>>
 
-    <index+1|file-error?|<pageref|auto-105>>
+    <index+1|file-error?|<pageref|auto-106>>
 
-    <index+1|file-exists-error|<pageref|auto-181>>
+    <index+1|file-exists-error|<pageref|auto-182>>
 
-    <index+1|file-not-found-error|<pageref|auto-177>>
+    <index+1|file-not-found-error|<pageref|auto-178>>
 
-    <index+1|filter|<pageref|auto-335>>
+    <index+1|filter|<pageref|auto-357>>
 
-    <index+1|find|<pageref|auto-348>>
+    <index+1|find|<pageref|auto-370>>
 
-    <index+1|first|<pageref|auto-286>>
+    <index+1|first|<pageref|auto-308>>
 
-    <index+1|flatmap|<pageref|auto-372>>
+    <index+1|flatmap|<pageref|auto-394>>
 
-    <index+1|fold|<pageref|auto-326>>
+    <index+1|fold|<pageref|auto-348>>
 
-    <index+1|fold-right|<pageref|auto-328>>
+    <index+1|fold-right|<pageref|auto-350>>
 
-    <index+1|for-each|<pageref|auto-87>>
+    <index+1|for-each|<pageref|auto-88>>
 
-    <index+1|fourth|<pageref|auto-292>>
+    <index+1|fourth|<pageref|auto-314>>
 
-    <index+1|guard|<pageref|auto-101>>
+    <index+1|guard|<pageref|auto-102>>
 
-    <index+1|hash-table?|<pageref|auto-434>>
+    <index+1|hash-table?|<pageref|auto-486>>
 
-    <index+1|hash-table=?|<pageref|auto-444>>
+    <index+1|hash-table=?|<pageref|auto-496>>
 
-    <index+1|hash-table-clear!|<pageref|auto-468>>
+    <index+1|hash-table-clear!|<pageref|auto-520>>
 
-    <index+1|hash-table-contains?|<pageref|auto-436>>
+    <index+1|hash-table-contains?|<pageref|auto-488>>
 
-    <index+1|hash-table-delete!|<pageref|auto-460>>
+    <index+1|hash-table-delete!|<pageref|auto-512>>
 
-    <index+1|hash-table-empty?|<pageref|auto-440>>
+    <index+1|hash-table-empty?|<pageref|auto-492>>
 
-    <index+1|hash-table-\<gtr\>alist|<pageref|auto-486>>
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-538>>
 
-    <index+1|hash-table-keys|<pageref|auto-477>>
+    <index+1|hash-table-keys|<pageref|auto-529>>
 
-    <index+1|hash-table-ref|<pageref|auto-449>>
+    <index+1|hash-table-ref|<pageref|auto-501>>
 
-    <index+1|hash-table-ref/default|<pageref|auto-451>>
+    <index+1|hash-table-ref/default|<pageref|auto-503>>
 
-    <index+1|hash-table-set!|<pageref|auto-456>>
+    <index+1|hash-table-set!|<pageref|auto-508>>
 
-    <index+1|hash-table-size|<pageref|auto-473>>
+    <index+1|hash-table-size|<pageref|auto-525>>
 
-    <index+1|hash-table-update!|<pageref|auto-464>>
+    <index+1|hash-table-update!|<pageref|auto-516>>
 
-    <index+1|hash-table-values|<pageref|auto-481>>
+    <index+1|hash-table-values|<pageref|auto-533>>
 
-    <index+1|identity|<pageref|auto-161>>
+    <index+1|identity|<pageref|auto-162>>
 
-    <index+1|in?|<pageref|auto-157>>
+    <index+1|in?|<pageref|auto-158>>
 
-    <index+1|input-port?|<pageref|auto-111>>
+    <index+1|input-port?|<pageref|auto-112>>
 
-    <index+1|input-port-open?|<pageref|auto-121>>
+    <index+1|input-port-open?|<pageref|auto-122>>
 
-    <index+1|iota|<pageref|auto-266>>
+    <index+1|iota|<pageref|auto-288>>
 
-    <index+1|last|<pageref|auto-316>>
+    <index+1|last|<pageref|auto-338>>
 
-    <index+1|last-pair|<pageref|auto-314>>
+    <index+1|last-pair|<pageref|auto-336>>
 
-    <index+1|length|<pageref|auto-319>>
+    <index+1|length|<pageref|auto-341>>
 
-    <index+1|length=?|<pageref|auto-366>>
+    <index+1|length=?|<pageref|auto-388>>
 
-    <index+1|let1|<pageref|auto-159>>
+    <index+1|let1|<pageref|auto-160>>
 
     <index+1|let-values|<pageref|auto-11>>
 
-    <index+1|list|<pageref|auto-260>>
+    <index+1|list|<pageref|auto-282>>
 
-    <index+1|list-\<gtr\>string|<pageref|auto-39>>
+    <index+1|list-\<gtr\>string|<pageref|auto-40>>
 
-    <index+1|list-\<gtr\>vector|<pageref|auto-58>>
+    <index+1|list-\<gtr\>vector|<pageref|auto-59>>
 
-    <index+1|list-index|<pageref|auto-354>>
+    <index+1|list-index|<pageref|auto-376>>
 
-    <index+1|list-not-null?|<pageref|auto-378>>
+    <index+1|list-not-null?|<pageref|auto-400>>
 
-    <index+1|list-ref|<pageref|auto-284>>
+    <index+1|list-ref|<pageref|auto-306>>
 
-    <index+1|list-view|<pageref|auto-368>>
+    <index+1|list-view|<pageref|auto-390>>
 
-    <index+1|make-list|<pageref|auto-262>>
+    <index+1|make-list|<pageref|auto-284>>
 
-    <index+1|make-vector|<pageref|auto-46>>
+    <index+1|make-vector|<pageref|auto-47>>
 
-    <index+1|map|<pageref|auto-79>>
+    <index+1|map|<pageref|auto-80>>
 
-    <index+1|member|<pageref|auto-346>>
+    <index+1|member|<pageref|auto-368>>
 
-    <index+1|memq|<pageref|auto-342>>
+    <index+1|memq|<pageref|auto-364>>
 
-    <index+1|memv|<pageref|auto-344>>
+    <index+1|memv|<pageref|auto-366>>
 
-    <index+1|ninth|<pageref|auto-302>>
+    <index+1|ninth|<pageref|auto-324>>
 
-    <index+1|not-a-directory-error|<pageref|auto-179>>
+    <index+1|not-a-directory-error|<pageref|auto-180>>
 
-    <index+1|not-null-list?|<pageref|auto-374>>
+    <index+1|not-null-list?|<pageref|auto-396>>
 
-    <index+1|null?|<pageref|auto-271>>
+    <index+1|null?|<pageref|auto-293>>
 
-    <index+1|null-list?|<pageref|auto-275>>
+    <index+1|null-list?|<pageref|auto-297>>
 
-    <index+1|os-error|<pageref|auto-175>>
+    <index+1|os-error|<pageref|auto-176>>
 
-    <index+1|output-port?|<pageref|auto-113>>
+    <index+1|output-port?|<pageref|auto-114>>
 
-    <index+1|output-port-open?|<pageref|auto-123>>
+    <index+1|output-port-open?|<pageref|auto-124>>
 
-    <index+1|pair?|<pageref|auto-269>>
+    <index+1|pair?|<pageref|auto-291>>
 
-    <index+1|partition|<pageref|auto-337>>
+    <index+1|partition|<pageref|auto-359>>
 
-    <index+1|port?|<pageref|auto-115>>
+    <index+1|port?|<pageref|auto-116>>
 
-    <index+1|procedure?|<pageref|auto-74>>
+    <index+1|procedure?|<pageref|auto-75>>
 
-    <index+1|queue|<pageref|auto-406>>
+    <index+1|queue|<pageref|auto-458>>
 
-    <index+1|queue-back|<pageref|auto-414>>
+    <index+1|queue-back|<pageref|auto-466>>
 
-    <index+1|queue-empty?|<pageref|auto-408>>
+    <index+1|queue-empty?|<pageref|auto-460>>
 
-    <index+1|queue-front|<pageref|auto-412>>
+    <index+1|queue-front|<pageref|auto-464>>
 
-    <index+1|queue-\<gtr\>list|<pageref|auto-420>>
+    <index+1|queue-\<gtr\>list|<pageref|auto-472>>
 
-    <index+1|queue-pop!|<pageref|auto-418>>
+    <index+1|queue-pop!|<pageref|auto-470>>
 
-    <index+1|queue-push!|<pageref|auto-416>>
+    <index+1|queue-push!|<pageref|auto-468>>
 
-    <index+1|queue-size|<pageref|auto-410>>
+    <index+1|queue-size|<pageref|auto-462>>
 
-    <index+1|read-error?|<pageref|auto-103>>
+    <index+1|read-error?|<pageref|auto-104>>
 
-    <index+1|reduce|<pageref|auto-330>>
+    <index+1|reduce|<pageref|auto-352>>
 
-    <index+1|reduce-right|<pageref|auto-332>>
+    <index+1|reduce-right|<pageref|auto-354>>
 
-    <index+1|remove|<pageref|auto-339>>
+    <index+1|remove|<pageref|auto-361>>
 
-    <index+1|second|<pageref|auto-288>>
+    <index+1|second|<pageref|auto-310>>
 
-    <index+1|seventh|<pageref|auto-298>>
+    <index+1|seventh|<pageref|auto-320>>
 
-    <index+1|sixth|<pageref|auto-296>>
+    <index+1|sixth|<pageref|auto-318>>
 
-    <index+1|square|<pageref|auto-20>>
+    <index+1|square|<pageref|auto-21>>
 
-    <index+1|stack|<pageref|auto-386>>
+    <index+1|stack|<pageref|auto-438>>
 
-    <index+1|stack-empty?|<pageref|auto-388>>
+    <index+1|stack-empty?|<pageref|auto-440>>
 
-    <index+1|stack-\<gtr\>list|<pageref|auto-398>>
+    <index+1|stack-\<gtr\>list|<pageref|auto-450>>
 
-    <index+1|stack-pop!|<pageref|auto-396>>
+    <index+1|stack-pop!|<pageref|auto-448>>
 
-    <index+1|stack-push!|<pageref|auto-394>>
+    <index+1|stack-push!|<pageref|auto-446>>
 
-    <index+1|stack-size|<pageref|auto-390>>
+    <index+1|stack-size|<pageref|auto-442>>
 
-    <index+1|stack-top|<pageref|auto-392>>
+    <index+1|stack-top|<pageref|auto-444>>
 
-    <index+1|string?|<pageref|auto-29>>
+    <index+1|string?|<pageref|auto-30>>
 
-    <index+1|string-any|<pageref|auto-207>>
+    <index+1|string-any|<pageref|auto-229>>
 
-    <index+1|string-append|<pageref|auto-35>>
+    <index+1|string-append|<pageref|auto-36>>
 
-    <index+1|string-contains|<pageref|auto-239>>
+    <index+1|string-contains|<pageref|auto-261>>
 
-    <index+1|string-copy|<pageref|auto-41>>
+    <index+1|string-copy|<pageref|auto-42>>
 
-    <index+1|string-count|<pageref|auto-241>>
+    <index+1|string-count|<pageref|auto-263>>
 
-    <index+1|string-drop|<pageref|auto-214>>
+    <index+1|string-drop|<pageref|auto-236>>
 
-    <index+1|string-drop-right|<pageref|auto-216>>
+    <index+1|string-drop-right|<pageref|auto-238>>
 
-    <index+1|string-every|<pageref|auto-205>>
+    <index+1|string-every|<pageref|auto-227>>
 
-    <index+1|string-for-each|<pageref|auto-89>>
+    <index+1|string-for-each|<pageref|auto-90>>
 
-    <index+1|string-\<gtr\>list|<pageref|auto-37>>
+    <index+1|string-\<gtr\>list|<pageref|auto-38>>
 
-    <index+1|string-\<gtr\>vector|<pageref|auto-62>>
+    <index+1|string-\<gtr\>vector|<pageref|auto-63>>
 
-    <index+1|string-index|<pageref|auto-235>>
+    <index+1|string-index|<pageref|auto-257>>
 
-    <index+1|string-index-right|<pageref|auto-237>>
+    <index+1|string-index-right|<pageref|auto-259>>
 
-    <index+1|string-join|<pageref|auto-198>>
+    <index+1|string-join|<pageref|auto-220>>
 
-    <index+1|string-length|<pageref|auto-31>>
+    <index+1|string-length|<pageref|auto-32>>
 
-    <index+1|string-map|<pageref|auto-81>>
+    <index+1|string-map|<pageref|auto-82>>
 
-    <index+1|string-null?|<pageref|auto-203>>
+    <index+1|string-null?|<pageref|auto-225>>
 
-    <index+1|string-pad|<pageref|auto-218>>
+    <index+1|string-pad|<pageref|auto-240>>
 
-    <index+1|string-pad-right|<pageref|auto-220>>
+    <index+1|string-pad-right|<pageref|auto-242>>
 
-    <index+1|string-prefix?|<pageref|auto-230>>
+    <index+1|string-prefix?|<pageref|auto-252>>
 
-    <index+1|string-ref|<pageref|auto-33>>
+    <index+1|string-ref|<pageref|auto-34>>
 
-    <index+1|string-reverse|<pageref|auto-244>>
+    <index+1|string-reverse|<pageref|auto-266>>
 
-    <index+1|string-suffix?|<pageref|auto-232>>
+    <index+1|string-suffix?|<pageref|auto-254>>
 
-    <index+1|string-take|<pageref|auto-210>>
+    <index+1|string-take|<pageref|auto-232>>
 
-    <index+1|string-take-right|<pageref|auto-212>>
+    <index+1|string-take-right|<pageref|auto-234>>
 
-    <index+1|string-tokenize|<pageref|auto-247>>
+    <index+1|string-tokenize|<pageref|auto-269>>
 
-    <index+1|string-trim|<pageref|auto-223>>
+    <index+1|string-trim|<pageref|auto-245>>
 
-    <index+1|string-trim-both|<pageref|auto-227>>
+    <index+1|string-trim-both|<pageref|auto-249>>
 
-    <index+1|string-trim-right|<pageref|auto-225>>
+    <index+1|string-trim-right|<pageref|auto-247>>
 
-    <index+1|take|<pageref|auto-306>>
+    <index+1|take|<pageref|auto-328>>
 
-    <index+1|take-right|<pageref|auto-310>>
+    <index+1|take-right|<pageref|auto-332>>
 
-    <index+1|take-while|<pageref|auto-350>>
+    <index+1|take-while|<pageref|auto-372>>
 
-    <index+1|tenth|<pageref|auto-304>>
+    <index+1|tenth|<pageref|auto-326>>
 
-    <index+1|textual-port?|<pageref|auto-117>>
+    <index+1|test|<pageref|auto-209>>
 
-    <index+1|third|<pageref|auto-290>>
+    <index+1|textual-port?|<pageref|auto-118>>
 
-    <index+1|timeout-error|<pageref|auto-183>>
+    <index+1|third|<pageref|auto-312>>
 
-    <index+1|typed-lambda|<pageref|auto-165>>
+    <index+1|timeout-error|<pageref|auto-184>>
 
-    <index+1|type-error|<pageref|auto-185>>
+    <index+1|typed-lambda|<pageref|auto-166>>
 
-    <index+1|value-error|<pageref|auto-187>>
+    <index+1|type-error|<pageref|auto-186>>
 
-    <index+1|vector?|<pageref|auto-44>>
+    <index+1|value-error|<pageref|auto-188>>
 
-    <index+1|vector|<pageref|auto-48>>
+    <index+1|vector?|<pageref|auto-45>>
 
-    <index+1|vector-append|<pageref|auto-68>>
+    <index+1|vector|<pageref|auto-49>>
 
-    <index+1|vector-copy|<pageref|auto-64>>
+    <index+1|vector-any|<pageref|auto-417>>
 
-    <index+1|vector-copy!|<pageref|auto-66>>
+    <index+1|vector-append|<pageref|auto-69>>
 
-    <index+1|vector-fill!|<pageref|auto-70>>
+    <index+1|vector-copy|<pageref|auto-65>>
 
-    <index+1|vector-for-each|<pageref|auto-91>>
+    <index+1|vector-copy!|<pageref|auto-67>>
 
-    <index+1|vector-\<gtr\>list|<pageref|auto-56>>
+    <index+1|vector-count|<pageref|auto-412>>
 
-    <index+1|vector-\<gtr\>string|<pageref|auto-60>>
+    <index+1|vector-empty?|<pageref|auto-409>>
 
-    <index+1|vector-length|<pageref|auto-50>>
+    <index+1|vector-every|<pageref|auto-421>>
 
-    <index+1|vector-map|<pageref|auto-85>>
+    <index+1|vector-fill!|<pageref|auto-71>>
 
-    <index+1|vector-ref|<pageref|auto-52>>
+    <index+1|vector-for-each|<pageref|auto-92>>
 
-    <index+1|vector-set!|<pageref|auto-54>>
+    <index+1|vector-\<gtr\>list|<pageref|auto-57>>
+
+    <index+1|vector-\<gtr\>string|<pageref|auto-61>>
+
+    <index+1|vector-index|<pageref|auto-423>>
+
+    <index+1|vector-index-right|<pageref|auto-425>>
+
+    <index+1|vector-length|<pageref|auto-51>>
+
+    <index+1|vector-map|<pageref|auto-86>>
+
+    <index+1|vector-partition|<pageref|auto-427>>
+
+    <index+1|vector-ref|<pageref|auto-53>>
+
+    <index+1|vector-set!|<pageref|auto-55>>
+
+    <index+1|vector-swap!|<pageref|auto-430>>
   </the-index>
 </body>
 
