@@ -10514,6 +10514,8 @@
 
     \ \ (check-true (\<less\>? default-comp (list 1 2) (list 1 3)))
 
+    \ \ (check-true (\<less\>? default-comp (vector "a" "b") (vector "b" "c")))
+
     )
 
     \;

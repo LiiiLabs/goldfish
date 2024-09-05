@@ -25,6 +25,7 @@
   (check-true (<? default-comp (cons #f #f) (cons #t #t)))
   (check-true (<? default-comp (list 1 2) (list 2 3)))
   (check-true (<? default-comp (list 1 2) (list 1 3)))
+  (check-true (<? default-comp (vector "a" "b") (vector "b" "c")))
 )
 
 (check-report)
