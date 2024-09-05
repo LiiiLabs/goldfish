@@ -9968,7 +9968,7 @@
 
     (check-true (\<less\>? boolean-comparator #f #t))
 
-    (check-false #t #f)
+    (check-false (boolean\<less\>? #t #f))
 
     (check-false (\<less\>? boolean-comparator #t #f))
 
