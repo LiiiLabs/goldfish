@@ -9649,12 +9649,44 @@
     ;;; deficiencies." --Tony Hoare
 
     \;
+  </scm-chunk>
 
+  <section|接口>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define-library (srfi srfi-128)
 
     (export boolean\<less\>? boolean-hash)
 
     (begin
+
+    \;
+  </scm-chunk>
+
+  <paragraph|comparator?>
+
+  <paragraph|comparator-ordered?>
+
+  <paragraph|comparator-hashable?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define-record-type comparator
+
+    \ \ (make-raw-comparator type-test equality ordering hash ordering? hash?)
+
+    \ \ comparator?
+
+    \ \ (type-test comparator-type-test-predicate)
+
+    \ \ (equality comparator-equality-predicate)
+
+    \ \ (ordering comparator-ordering-predicate)
+
+    \ \ (hash comparator-hash-function)
+
+    \ \ (ordering? comparator-ordered?)
+
+    \ \ (hash? comparator-hashable?))
 
     \;
   </scm-chunk>
@@ -9678,6 +9710,28 @@
   \;
 
   <section|构造器>
+
+  <paragraph|make-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-comparator type-test equality ordering hash)
+
+    \ \ (make-raw-comparator
+
+    \ \ \ \ (if (eq? type-test #t) (lambda (x) #t) type-test)
+
+    \ \ \ \ (if (eq? equality #t) (lambda (x y) (eqv? (ordering x y) 0)) equality)
+
+    \ \ \ \ (if ordering ordering (lambda (x y) (error "ordering not supported")))
+
+    \ \ \ \ (if hash hash (lambda (x y) (error "hashing not supported")))
+
+    \ \ \ \ (if ordering #t #f)
+
+    \ \ \ \ (if hash #t #f)))
+
+    \;
+  </scm-chunk>
 
   <section|谓词>
 

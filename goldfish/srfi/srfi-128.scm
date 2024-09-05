@@ -34,6 +34,25 @@
 (export boolean<? boolean-hash)
 (begin
 
+(define-record-type comparator
+  (make-raw-comparator type-test equality ordering hash ordering? hash?)
+  comparator?
+  (type-test comparator-type-test-predicate)
+  (equality comparator-equality-predicate)
+  (ordering comparator-ordering-predicate)
+  (hash comparator-hash-function)
+  (ordering? comparator-ordered?)
+  (hash? comparator-hashable?))
+
+(define (make-comparator type-test equality ordering hash)
+  (make-raw-comparator
+    (if (eq? type-test #t) (lambda (x) #t) type-test)
+    (if (eq? equality #t) (lambda (x y) (eqv? (ordering x y) 0)) equality)
+    (if ordering ordering (lambda (x y) (error "ordering not supported")))
+    (if hash hash (lambda (x y) (error "hashing not supported")))
+    (if ordering #t #f)
+    (if hash #t #f)))
+
 (define (boolean<? a b)
   ;; #f < #t but not otherwise
   (and (not a) b))
