@@ -9992,7 +9992,7 @@
   <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
     (check-false (complex\<less\>? 1 1))
 
-    (check-true (complex\<less\>? 1i 2i))
+    (check-true (complex\<less\>? 0+1i 0+2i))
 
     (check-true (complex\<less\>? 1+2i 2+2i))
 
