@@ -1,4 +1,4 @@
-(import (srfi srfi-128)
+(import (liii comparator)
         (liii check)
         (liii base))
 
