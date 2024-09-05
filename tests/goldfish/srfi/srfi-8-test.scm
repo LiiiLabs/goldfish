@@ -15,7 +15,7 @@
 ;
 
 (import (srfi srfi-8)
-        (srfi srfi-78))
+        (liii check))
 
 (check-set-mode! 'report-failed)
 
@@ -25,4 +25,4 @@
   3)
 
 (check-report)
-(if (check-failed?) (exit -1))
+
