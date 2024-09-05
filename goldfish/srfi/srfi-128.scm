@@ -33,7 +33,7 @@
 (define-library (srfi srfi-128)
 (import (scheme base))
 (export
-  make-comparator
+  make-comparator make-default-comparator
   boolean<? complex<? default-hash
   =? <? >? <=? >=?
 )
@@ -48,9 +48,6 @@
   (hash comparator-hash-function)
   (ordering? comparator-ordered?)
   (hash? comparator-hashable?))
-
-(define (default-hash obj)
-  (hash-code obj))
 
 (define (binary=? comparator a b)
   ((comparator-equality-predicate comparator) a b))
@@ -141,6 +138,9 @@
 (define (symbol<? a b)
   (string<? (symbol->string a) (symbol->string b)))
 
+(define (default-hash obj)
+  (hash-code obj))
+
 (define (dispatch-ordering type a b)
   (case type
     ((0) 0) ; All empty lists are equal
@@ -150,9 +150,11 @@
     ((4) (string<? a b))
     ((5) (symbol<? a b))
     ((6) (complex<? a b))
-    ((7) ((make-vector<? (make-default-comparator) vector? vector-length vector-ref) a b))
+    ((7) ((make-vector<? (make-default-comparator) vector? vector-length vector-ref)
+          a b))
     ((8) ((make-vector<? (make-comparator exact-integer? = < default-hash)
-                         bytevector? bytevector-length bytevector-u8-ref) a b))
+                         bytevector? bytevector-length bytevector-u8-ref)
+          a b))
     ; Add more here
     (else (binary<? (registered-comparator type) a b))))
 
@@ -164,7 +166,35 @@
       ((> a-type b-type) #f)
       (else (dispatch-ordering a-type a b)))))
 
-(define %salt% (lambda () 16064047))
+(define (dispatch-equality type a b)
+  (case type
+    ((0) #t) ; All empty lists are equal
+    ((1) ((make-pair=? (make-default-comparator) (make-default-comparator)) a b))
+    ((2) (boolean=? a b))
+    ((3) (char=? a b))
+    ((4) (string=? a b))
+    ((5) (symbol=? a b))
+    ((6) (= a b))
+    ((7) ((make-vector=? (make-default-comparator)
+                         vector? vector-length vector-ref) a b))
+    ((8) ((make-vector=? (make-comparator exact-integer? = < default-hash)
+                         bytevector? bytevector-length bytevector-u8-ref) a b))
+    ; Add more here
+    (else (binary=? (registered-comparator type) a b))))
+
+(define (default-equality a b)
+  (let ((a-type (object-type a))
+        (b-type (object-type b)))
+    (if (= a-type b-type)
+        (dispatch-equality a-type a b)
+        #f)))
+
+(define (make-default-comparator)
+  (make-comparator
+    (lambda (obj) #t)
+    default-equality
+    default-ordering
+    default-hash))
 
 (define (=? comparator a b . objs)
   (let loop ((a a) (b b) (objs objs))

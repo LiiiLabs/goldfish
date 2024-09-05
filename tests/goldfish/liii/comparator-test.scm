@@ -19,5 +19,7 @@
 (check-true (complex<? 0+1i 0+2i))
 (check-true (complex<? 1+2i 2+2i))
 
+(check-true (<? (make-default-comparator) #f #t))
+
 (check-report)
 
