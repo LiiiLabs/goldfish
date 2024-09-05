@@ -3366,7 +3366,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (actual-result (cadr w))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (expected-result (caddr w))) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (expected-result (caddr w)))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ (display " First failed example:")
 
