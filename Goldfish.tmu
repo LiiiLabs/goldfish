@@ -9754,6 +9754,10 @@
 
     \ \ make-default-comparator default-hash
 
+    \ \ comparator-type-test-predicate comparator-equality-predicate
+
+    \ \ comparator-ordering-predicate comparator-hash-function
+
     \ \ comparator-test-type comparator-check-type comparator-hash
 
     \ \ =? \<less\>? \<gtr\>? \<less\>=? \<gtr\>=?
@@ -9786,6 +9790,10 @@
 
     \ \ make-default-comparator default-hash
 
+    \ \ comparator-type-test-predicate comparator-equality-predicate
+
+    \ \ comparator-ordering-predicate comparator-hash-function
+
     \ \ comparator-test-type comparator-check-type comparator-hash
 
     \ \ =? \<less\>? \<gtr\>? \<less\>=? \<gtr\>=?
@@ -9802,6 +9810,14 @@
   <paragraph|comparator-ordered?><index|comparator-ordered?>
 
   <paragraph|comparator-hashable?><index|comparator-hashable?>
+
+  <paragraph|comparator-type-test-predicate><index|comparator-type-test-predicate>
+
+  <paragraph|comparator-equality-predicate><index|comparator-equality-predicate>
+
+  <paragraph|comparator-ordering-predicate><index|comparator-ordering-predicate>
+
+  <paragraph|comparator-hash-function><index|comparator-hash-function>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define-record-type comparator
@@ -9946,7 +9962,7 @@
   <paragraph|%salt%>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
-    (define %salt%
+    (define (%salt%)
 
     \ \ 16064047)
 
@@ -10599,6 +10615,10 @@
     \ \ (check-true (\<less\>? default-comp 0+1i 0+2i))
 
     \ \ (check-true (\<less\>? default-comp 1+2i 2+2i))
+
+    \ \ 
+
+    \ \ (check (comparator-hash default-comp (list 1 2)) =\<gtr\> 42)
 
     )
 
