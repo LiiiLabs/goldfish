@@ -557,6 +557,24 @@
     \;
   </scm-chunk>
 
+  <subparagraph|SRFI>
+
+  <\scm-chunk|goldfish/srfi/srfi-9.scm|false|false>
+    (define-library (srfi srfi-9)
+
+    (import (scheme base))
+
+    (export define-record-type)
+
+    (begin
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
   \;
 
   <section|相等性判断>
