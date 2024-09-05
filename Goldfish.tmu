@@ -8789,6 +8789,144 @@
     \;
   </scm-chunk>
 
+  <chapter|(scheme case-lambda)>
+
+  <section|协议>
+
+  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  在Scheme语言中，<scm|case-lambda>是一种特殊的lambda表达式，它可以根据不同数量的参数执行不同的代码块。<scm|case-lambda>允许你定义一个函数，这个函数根据传入参数的数量来选择执行不同的lambda表达式。
+
+  \;
+
+  下面是一个使用<scm|case-lambda>的示例：
+
+  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|true|false>
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (scheme case-lambda))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (define (my-func . args)
+
+    \ \ (case-lambda
+
+    \ \ \ \ (() "zero args")
+
+    \ \ \ \ ((x) (+ x x))
+
+    \ \ \ \ ((x y) (+ x y))
+
+    \ \ \ \ ((x y . rest) (reduce + 0 (cons x (cons y rest))))))
+
+    \;
+
+    (check ((my-func)) =\<gtr\> "zero args")
+
+    (check ((my-func) 2) =\<gtr\> 4)
+
+    (check ((my-func) 3 4) =\<gtr\> 7)
+
+    (check ((my-func) 1 2 3 4) =\<gtr\> 10)
+
+    \;
+
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <\scm-chunk|goldfish/scheme/case-lambda.scm|false|false>
+    ; 0-clause BSD
+
+    ; Bill Schottstaedt
+
+    ; from S7 source repo: r7rs.scm
+
+    \;
+
+    (define-library (scheme case-lambda)
+
+    (export case-lambda)
+
+    (begin
+
+    \;
+
+    ;; case-lambda \ \ \ \ \ \ 
+
+    (define-macro (case-lambda . choices)
+
+    \ \ ‘(lambda args
+
+    \ \ \ \ \ (case (length args)
+
+    \ \ \ \ \ \ \ ,@(map (lambda (choice)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (symbol? (car choice))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (negative? (length (car choice))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(else (apply (lambda ,(car choice) ,@(cdr choice)) args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((,(length (car choice)))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply (lambda ,(car choice) ,@(cdr choice)) args))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ choices))))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
   <chapter|(srfi sicp)>
 
   <section|许可证>
