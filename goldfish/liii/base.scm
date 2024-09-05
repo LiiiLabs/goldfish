@@ -21,6 +21,7 @@
   let-values
   define-record-type
   square
+  boolean=?
   ; String
   string-copy
   ; Vector

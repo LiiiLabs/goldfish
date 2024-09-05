@@ -140,6 +140,8 @@
 
     \ \ square
 
+    \ \ boolean=?
+
     \ \ ; String
 
     \ \ string-copy
@@ -189,6 +191,8 @@
     \ \ define-record-type
 
     \ \ square
+
+    \ \ boolean=?
 
     \ \ ; String
 
@@ -587,6 +591,50 @@
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (square 2) =\<gtr\> 4)
+
+    \;
+  </scm-chunk>
+
+  <section|布尔值>
+
+  <label|r7rs><paragraph|boolean=?><scm|(obj1 obj2 ...) =\<gtr\> boolean><index|boolean=?>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (boolean=? obj1 obj2 . rest)
+
+    \ \ (define (same-boolean obj rest)
+
+    \ \ \ \ (if (null? rest)
+
+    \ \ \ \ \ \ \ \ #t
+
+    \ \ \ \ \ \ \ \ (and (equal? obj (car rest))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (same-boolean obj (cdr rest)))))
+
+    \ \ (cond ((not (boolean? obj1)) #f)
+
+    \ \ \ \ \ \ \ \ ((not (boolean? obj2)) #f)
+
+    \ \ \ \ \ \ \ \ ((not (equal? obj1 obj2)) #f)
+
+    \ \ \ \ \ \ \ \ (else (same-boolean obj1 rest))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (boolean=? #t #t))
+
+    (check-true (boolean=? #f #f))
+
+    (check-true (boolean=? #t #t #t))
+
+    (check-false (boolean=? #t #f))
+
+    (check-false (boolean=? #f #t))
 
     \;
   </scm-chunk>
@@ -9701,12 +9749,50 @@
     \;
   </scm-chunk>
 
+  <paragraph|comparator-test-type>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    ;; Invoke the test type
+
+    (define (comparator-test-type comparator obj)
+
+    \ \ ((comparator-type-test-predicate comparator) obj))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|comparator-check-type>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (comparator-check-type comparator obj)
+
+    \ \ (if (comparator-test-type comparator obj)
+
+    \ \ \ \ #t
+
+    \ \ \ \ (error "comparator type check failed" comparator obj)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|comparator-hash>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (comparator-hash comparator obj)
+
+    \ \ ((comparator-hash-function comparator) obj))
+
+    \;
+  </scm-chunk>
+
   <section|测试>
 
   <\scm-chunk|tests/goldfish/liii/comparator-test.scm|false|true>
     (import (srfi srfi-128)
 
-    \ \ \ \ \ \ \ \ (liii check))
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (liii base))
 
     \;
 
@@ -9775,6 +9861,48 @@
     \;
   </scm-chunk>
 
+  <paragraph|%salt%>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define %salt%
+
+    \ \ 16064047)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-bound>
+
+  <\equation*>
+    2<rsup|25>-1
+  </equation*>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (hash-bound)
+
+    \ \ 33554432)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|make-hasher>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-hasher)
+
+    \ \ (let ((result (%salt%)))
+
+    \ \ \ \ (case-lambda
+
+    \ \ \ \ \ (() result)
+
+    \ \ \ \ \ ((n) (set! result (+ (modulo (* result 33) (hash-bound)) n))
+
+    \ \ \ \ \ \ \ \ \ \ result))))
+
+    \;
+  </scm-chunk>
+
   <section|构造器>
 
   <paragraph|make-comparator><index|make-comparator>
@@ -9798,8 +9926,6 @@
 
     \;
   </scm-chunk>
-
-  \;
 
   <paragraph|make-eq-comparator><index|make-eq-comparator>
 
@@ -9903,7 +10029,237 @@
     \;
   </scm-chunk>
 
-  <section|谓词>
+  <paragraph|make-list-comparator><index|make-list-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    ;; Cheap test for listness
+
+    (define (norp? obj) (or (null? obj) (pair? obj)))
+
+    \;
+
+    (define (make-list-comparator element-comparator type-test empty? head tail)
+
+    \ \ \ (make-comparator
+
+    \ \ \ \ \ (make-list-type-test element-comparator type-test empty? head tail)
+
+    \ \ \ \ \ (make-list=? element-comparator type-test empty? head tail)
+
+    \ \ \ \ \ (make-list\<less\>? element-comparator type-test empty? head tail)
+
+    \ \ \ \ \ (make-list-hash element-comparator type-test empty? head tail)))
+
+    \;
+
+    (define (make-list-type-test element-comparator type-test empty? head tail)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (and
+
+    \ \ \ \ \ \ (type-test obj)
+
+    \ \ \ \ \ \ (let ((elem-type-test (comparator-type-test-predicate element-comparator)))
+
+    \ \ \ \ \ \ \ \ (let loop ((obj obj))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((empty? obj) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((not (elem-type-test (head obj))) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (tail obj)))))))))
+
+    \;
+
+    (define (make-list=? element-comparator type-test empty? head tail)
+
+    \ \ (lambda (a b)
+
+    \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator)))
+
+    \ \ \ \ \ \ (let loop ((a a) (b b))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((and (empty? a) (empty? b) #t))
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? a) #f)
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? b) #f)
+
+    \ \ \ \ \ \ \ \ \ \ ((elem=? (head a) (head b)) (loop (tail a) (tail b)))
+
+    \ \ \ \ \ \ \ \ \ \ (else #f))))))
+
+    \;
+
+    (define (make-list\<less\>? element-comparator type-test empty? head tail)
+
+    \ \ (lambda (a b)
+
+    \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ (elem\<less\>? (comparator-ordering-predicate element-comparator)))
+
+    \ \ \ \ \ \ (let loop ((a a) (b b))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((and (empty? a) (empty? b) #f))
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? a) #t)
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? b) #f)
+
+    \ \ \ \ \ \ \ \ \ \ ((elem=? (head a) (head b)) (loop (tail a) (tail b)))
+
+    \ \ \ \ \ \ \ \ \ \ ((elem\<less\>? (head a) (head b)) #t)
+
+    \ \ \ \ \ \ \ \ \ \ (else #f))))))
+
+    \;
+
+    (define (make-list-hash element-comparator type-test empty? head tail)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (let ((elem-hash (comparator-hash-function element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ (acc (make-hasher)))
+
+    \ \ \ \ \ \ (let loop ((obj obj))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((empty? obj) (acc))
+
+    \ \ \ \ \ \ \ \ \ \ (else (acc (elem-hash (head obj))) (loop (tail obj))))))))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|make-vector-comparator><index|make-vector-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-vector-comparator element-comparator type-test length ref)
+
+    \ \ (make-comparator
+
+    \ \ \ \ (make-vector-type-test element-comparator type-test length ref)
+
+    \ \ \ \ (make-vector=? element-comparator type-test length ref)
+
+    \ \ \ \ (make-vector\<less\>? element-comparator type-test length ref)
+
+    \ \ \ \ (make-vector-hash element-comparator type-test length ref)))
+
+    \;
+
+    (define (make-vector-type-test element-comparator type-test length ref)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (and
+
+    \ \ \ \ \ \ (type-test obj)
+
+    \ \ \ \ \ \ (let ((elem-type-test (comparator-type-test-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (len (length obj)))
+
+    \ \ \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((= n len) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((not (elem-type-test (ref obj n))) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ n 1)))))))))
+
+    \;
+
+    (define (make-vector=? element-comparator type-test length ref)
+
+    \ \ \ (lambda (a b)
+
+    \ \ \ \ \ (and
+
+    \ \ \ \ \ \ \ (= (length a) (length b))
+
+    \ \ \ \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (len (length b)))
+
+    \ \ \ \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((= n len) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((elem=? (ref a n) (ref b n)) (loop (+ n 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else #f)))))))
+
+    \;
+
+    (define (make-vector\<less\>? element-comparator type-test length ref)
+
+    \ \ \ (lambda (a b)
+
+    \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ ((\<less\> (length a) (length b)) #t)
+
+    \ \ \ \ \ \ \ ((\<gtr\> (length a) (length b)) #f)
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ (let ((elem=? (comparator-equality-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (elem\<less\>? (comparator-ordering-predicate element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (len (length a)))
+
+    \ \ \ \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((= n len) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((elem=? (ref a n) (ref b n)) (loop (+ n 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((elem\<less\>? (ref a n) (ref b n)) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else #f))))))))
+
+    \;
+
+    (define (make-vector-hash element-comparator type-test length ref)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (let ((elem-hash (comparator-hash-function element-comparator))
+
+    \ \ \ \ \ \ \ \ \ \ (acc (make-hasher))
+
+    \ \ \ \ \ \ \ \ \ \ (len (length obj)))
+
+    \ \ \ \ \ \ (let loop ((n 0))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((= n len) (acc))
+
+    \ \ \ \ \ \ \ \ \ \ (else (acc (elem-hash (ref obj n))) (loop (+ n 1))))))))
+
+    \;
+  </scm-chunk>
 
   <section|标准函数>
 
@@ -10148,7 +10504,17 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
-    (check-true (\<less\>? (make-default-comparator) #f #t))
+    (let1 default-comp (make-default-comparator)
+
+    \ \ (check-true (\<less\>? default-comp #f #t))
+
+    \ \ (check-true (\<less\>? default-comp (cons #f #f) (cons #t #t)))
+
+    \ \ (check-true (\<less\>? default-comp (list 1 2) (list 2 3)))
+
+    \ \ (check-true (\<less\>? default-comp (list 1 2) (list 1 3)))
+
+    )
 
     \;
   </scm-chunk>

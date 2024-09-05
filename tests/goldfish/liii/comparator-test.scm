@@ -1,5 +1,6 @@
 (import (srfi srfi-128)
-        (liii check))
+        (liii check)
+        (liii base))
 
 (check-set-mode! 'report-failed)
 
@@ -19,7 +20,12 @@
 (check-true (complex<? 0+1i 0+2i))
 (check-true (complex<? 1+2i 2+2i))
 
-(check-true (<? (make-default-comparator) #f #t))
+(let1 default-comp (make-default-comparator)
+  (check-true (<? default-comp #f #t))
+  (check-true (<? default-comp (cons #f #f) (cons #t #t)))
+  (check-true (<? default-comp (list 1 2) (list 2 3)))
+  (check-true (<? default-comp (list 1 2) (list 1 3)))
+)
 
 (check-report)
 
