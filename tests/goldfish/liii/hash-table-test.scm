@@ -15,6 +15,7 @@
 ;
 
 (import (liii check)
+        (liii comparator)
         (liii hash-table)
         (liii base))
 
@@ -26,6 +27,10 @@
   (check (ht 'a) => #f)
   (hash-table-set! ht 'a 1)
   (check (ht 'a) => 1))
+
+(let1 ht (make-hash-table (make-default-comparator))
+  (hash-table-set! ht 1 2)
+  (check (ht 1) => 2))
 
 (let1 ht (make-hash-table)
   (hash-table-set! ht 'brand 'liii)

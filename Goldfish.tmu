@@ -8917,716 +8917,6 @@
     \;
   </scm-chunk>
 
-  <chapter|(liii hash-table)>
-
-  <section|许可证>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|false|true>
-    ;
-
-    ; Copyright (C) 2024 The Goldfish Scheme Authors
-
-    ;
-
-    ; Licensed under the Apache License, Version 2.0 (the "License");
-
-    ; you may not use this file except in compliance with the License.
-
-    ; You may obtain a copy of the License at
-
-    ;
-
-    ; http://www.apache.org/licenses/LICENSE-2.0
-
-    ;
-
-    ; Unless required by applicable law or agreed to in writing, software
-
-    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    ; License for the specific language governing permissions and limitations
-
-    ; under the License.
-
-    ;
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|goldfish/liii/hash-table.scm|false|true>
-    ;
-
-    ; Copyright (C) 2024 The Goldfish Scheme Authors
-
-    ;
-
-    ; Licensed under the Apache License, Version 2.0 (the "License");
-
-    ; you may not use this file except in compliance with the License.
-
-    ; You may obtain a copy of the License at
-
-    ;
-
-    ; http://www.apache.org/licenses/LICENSE-2.0
-
-    ;
-
-    ; Unless required by applicable law or agreed to in writing, software
-
-    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    ; License for the specific language governing permissions and limitations
-
-    ; under the License.
-
-    ;
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|false|true>
-    ;
-
-    ; Copyright (C) 2024 The Goldfish Scheme Authors
-
-    ;
-
-    ; Licensed under the Apache License, Version 2.0 (the "License");
-
-    ; you may not use this file except in compliance with the License.
-
-    ; You may obtain a copy of the License at
-
-    ;
-
-    ; http://www.apache.org/licenses/LICENSE-2.0
-
-    ;
-
-    ; Unless required by applicable law or agreed to in writing, software
-
-    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    ; License for the specific language governing permissions and limitations
-
-    ; under the License.
-
-    ;
-
-    \;
-  </scm-chunk>
-
-  <section|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (import (liii check)
-
-    \ \ \ \ \ \ \ \ (liii hash-table)
-
-    \ \ \ \ \ \ \ \ (liii base))
-
-    \;
-
-    (check-set-mode! 'report-failed)
-
-    \;
-
-    (define empty-ht (make-hash-table))
-
-    \;
-  </scm-chunk>
-
-  <section|接口>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define-library (srfi srfi-125)
-
-    (import (srfi srfi-1))
-
-    (export
-
-    \ \ make-hash-table, hash-table, hash-table-unfold, alist-\<gtr\>hash-table
-
-    \ \ hash-table? hash-table-contains? hash-table-empty? hash-table=?
-
-    \ \ hash-table-mutable?
-
-    \ \ hash-table-ref hash-table-ref/default
-
-    \ \ hash-table-set! hash-table-delete! hash-table-intern! hash-table-update!
-
-    \ \ hash-table-update!/default hash-table-pop! hash-table-clear!
-
-    \ \ hash-table-size hash-table-keys hash-table-values hash-table-entries
-
-    \ \ hash-table-find hash-table-count
-
-    )
-
-    (begin
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|goldfish/liii/hash-table.scm|true|true>
-    (define-library (liii hash-table)
-
-    (import (srfi srfi-125))
-
-    (export
-
-    \ \ make-hash-table, hash-table, hash-table-unfold, alist-\<gtr\>hash-table
-
-    \ \ hash-table? hash-table-contains? hash-table-empty? hash-table=?
-
-    \ \ hash-table-mutable?
-
-    \ \ hash-table-ref hash-table-ref/default
-
-    \ \ hash-table-set! hash-table-delete! hash-table-intern! hash-table-update!
-
-    \ \ hash-table-update!/default hash-table-pop! hash-table-clear!
-
-    \ \ hash-table-size hash-table-keys hash-table-values hash-table-entries
-
-    \ \ hash-table-find hash-table-count
-
-    )
-
-    (begin
-  </scm-chunk>
-
-  <subsection|访问哈希表中的元素>
-
-  除了SRFI 125定义的<scm|hash-table-ref>和<scm|hash-table-ref/default>之外，我们可以用S7 Scheme内置的访问方式：
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let1 ht (make-hash-table)
-
-    \ \ (check (ht 'a) =\<gtr\> #f)
-
-    \ \ (hash-table-set! ht 'a 1)
-
-    \ \ (check (ht 'a) =\<gtr\> 1))
-
-    \;
-  </scm-chunk>
-
-  <section|实现>
-
-  <subsection|子函数>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (assert-hash-table-type ht f)
-
-    \ \ (when (not (hash-table? ht))
-
-    \ \ \ \ (error 'type-error f "this parameter must be typed as hash-table")))
-
-    \;
-
-    (define hash-table-set-s7 hash-table-set!)
-
-    \;
-  </scm-chunk>
-
-  <subsection|构造器>
-
-  <paragraph|make-hash-table>
-
-  <paragraph|hash-table>
-
-  <subsection|谓词>
-
-  <paragraph|hash-table?><index|hash-table?>
-
-  S7内置函数。判断一个对象是不是哈希表。
-
-  <paragraph|hash-table-contains?><index|hash-table-contains?><scm|(hash-table key) =\<gtr\> bool>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-contains? ht key)
-
-    \ \ (not (not (hash-table-ref ht key))))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-set! ht 'brand 'liii)
-
-    \ \ (check (hash-table-contains? ht 'brand) =\<gtr\> #t)
-
-    \ \ (hash-table-set! ht 'brand #f)
-
-    \ \ (check (hash-table-contains? ht 'brand) =\<gtr\> #f))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table-empty?><index|hash-table-empty?>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-empty? ht)
-
-    \ \ (zero? (hash-table-size ht)))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (check (hash-table-empty? empty-ht) =\<gtr\> #t)
-
-    \;
-
-    (let1 test-ht (make-hash-table)
-
-    \ \ (hash-table-set! test-ht 'key 'value)
-
-    \ \ (check (hash-table-empty? test-ht) =\<gtr\> #f))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table=?><index|hash-table=?><scm|(ht1 ht2) =\<gtr\> boolean>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table=? ht1 ht2)
-
-    \ \ (equal? ht1 ht2))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let ((empty-h1 (make-hash-table))
-
-    \ \ \ \ \ \ (empty-h2 (make-hash-table)))
-
-    \ \ (check (hash-table=? empty-h1 empty-h2) =\<gtr\> #t))
-
-    \;
-
-    (let ((t1 (make-hash-table))
-
-    \ \ \ \ \ \ (t2 (make-hash-table)))
-
-    \ \ (hash-table-set! t1 'a 1)
-
-    \ \ (hash-table-set! t2 'a 1)
-
-    \ \ (check (hash-table=? t1 t2) =\<gtr\> #t)
-
-    \ \ (hash-table-set! t1 'b 2)
-
-    \ \ (check (hash-table=? t1 t2) =\<gtr\> #f))
-
-    \;
-  </scm-chunk>
-
-  <subsection|选择器>
-
-  <paragraph|hash-table-ref><index|hash-table-ref><scm|(hash-table-ref ht key) =\<gtr\> value>
-
-  <\description>
-    <item*|ht>哈希表
-
-    <item*|key>键
-
-    <item*|value>返回hash表中key这个键对应的值
-  </description>
-
-  SRFI 125定义的<scm|hash-table-ref>的函数签名是这样的：<scm|(hash-table-ref hash-table key [failure [success]])>。两参数形式的<scm|hash-table-ref>是S7 Scheme的内置函数。
-
-  在S7 Scheme中，可以直接将hash-table视作一个单参数的函数，比如<scm|(ht 'key)>等价于<scm|(hash-table-ref ht 'key)>。
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (check (hash-table-ref empty-ht 'key) =\<gtr\> #f)
-
-    \;
-
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-set! ht 'key 'value)
-
-    \ \ (check (hash-table-ref ht 'key) =\<gtr\> 'value)
-
-    \ \ (check (ht 'key) =\<gtr\> 'value))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table-ref/default><index|hash-table-ref/default><scm|(hash-table-ref/default ht key default) =\<gtr\> value>
-
-  <\description>
-    <item*|ht>哈希表
-
-    <item*|key>键
-
-    <item*|default>默认值，如果key这个键在哈希表中对应的值不存在，则返回默认值。注意，该默认值只有在key这个键不存在的时候，才会被求值。
-
-    <item*|value>键对应的值，如果不存在，则为默认值。
-  </description>
-
-  <subparagraph|测试>
-
-  当键对应的值存在时，default不会被求值，故而测试中的<scm|(display "hello")>实际不会被执行。
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let1 ht (make-hash-table)
-
-    \ \ (check (hash-table-ref/default ht 'key 'value1) =\<gtr\> 'value1)
-
-    \ \ (check (hash-table-ref/default ht 'key (+ 1 2)) =\<gtr\> 3)
-
-    \;
-
-    \ \ (hash-table-set! ht 'key 'value)
-
-    \ \ (check (hash-table-ref/default ht 'key
-
-    \ \ \ \ \ \ \ \ \ \ \ (begin (display "hello")
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ 1 2)))
-
-    \ \ \ \ =\<gtr\> 'value)
-
-    ) ; end of let1
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define-macro (hash-table-ref/default ht key default)
-
-    \ \ ‘(or (hash-table-ref ,ht ,key)
-
-    \ \ \ \ \ \ \ \ ,default))
-
-    \;
-  </scm-chunk>
-
-  <subsection|修改器>
-
-  <paragraph|hash-table-set!><index|hash-table-set!>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-set! ht 'k1 'v1 'k2 'v2)
-
-    \ \ (check (ht 'k1) =\<gtr\> 'v1)
-
-    \ \ (check (ht 'k2) =\<gtr\> 'v2)
-
-    )
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-set! ht . rest)
-
-    \ \ (assert-hash-table-type ht hash-table-set!)
-
-    \ \ (let1 len (length rest)
-
-    \ \ \ \ (when (or (odd? len) (zero? len))
-
-    \ \ \ \ \ \ (error 'wrong-number-of-args len "but must be even and non-zero"))
-
-    \ \ \ \ 
-
-    \ \ \ \ (hash-table-set-s7 ht (car rest) (cadr rest))
-
-    \ \ \ \ (when (\<gtr\> len 2)
-
-    \ \ \ \ \ \ \ \ \ \ (apply hash-table-set! (cons ht (cddr rest))))))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table-delete!><index|hash-table-delete!>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-update! ht 'key 'value)
-
-    \ \ (check (hash-table-delete! ht 'key) =\<gtr\> 1)
-
-    \ \ (check-false (hash-table-contains? ht 'key))
-
-    \ \ 
-
-    \ \ (hash-table-update! ht 'key1 'value1)
-
-    \ \ (hash-table-update! ht 'key2 'value2)
-
-    \ \ (hash-table-update! ht 'key3 'value3)
-
-    \ \ (hash-table-update! ht 'key4 'value4)
-
-    \ \ (check (hash-table-delete! ht 'key1 'key2 'key3) =\<gtr\> 3)
-
-    )
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-delete! ht key . keys)
-
-    \ \ (assert-hash-table-type ht hash-table-delete!)
-
-    \ \ (let1 all-keys (cons key keys)
-
-    \ \ \ \ (length
-
-    \ \ \ \ \ \ (filter
-
-    \ \ \ \ \ \ \ \ (lambda (x)
-
-    \ \ \ \ \ \ \ \ \ \ (if (hash-table-contains? ht x)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table-set-s7 ht x #f)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #t)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ #f))
-
-    \ \ \ \ \ \ \ \ all-keys))))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table-update!><index|hash-table-update!>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-update! ht key value)
-
-    \ \ (hash-table-set! ht key value))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-update! ht 'key 'value)
-
-    \ \ (check (ht 'key) =\<gtr\> 'value)
-
-    \ \ (hash-table-update! ht 'key 'value1)
-
-    \ \ (check (ht 'key) =\<gtr\> 'value1)
-
-    \ \ (hash-table-update! ht 'key #f)
-
-    \ \ (check (ht 'key) =\<gtr\> #f))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table-clear!><index|hash-table-clear!>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-clear! ht)
-
-    \ \ (for-each
-
-    \ \ \ \ (lambda (key)
-
-    \ \ \ \ \ \ (hash-table-set! ht key #f))
-
-    \ \ \ \ (hash-table-keys ht)))
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-update! ht 'key 'value)
-
-    \ \ (hash-table-update! ht 'key1 'value1)
-
-    \ \ (hash-table-update! ht 'key2 'value2)
-
-    \ \ (hash-table-clear! ht)
-
-    \ \ (check-true (hash-table-empty? ht)))
-
-    \;
-  </scm-chunk>
-
-  <subsection|哈希表整体>
-
-  <paragraph|hash-table-size><index|hash-table-size>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define hash-table-size hash-table-entries)
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (check (hash-table-size empty-ht) =\<gtr\> 0)
-
-    \;
-
-    (let1 populated-ht (make-hash-table)
-
-    \ \ (hash-table-set! populated-ht 'key1 'value1)
-
-    \ \ (hash-table-set! populated-ht 'key2 'value2)
-
-    \ \ (hash-table-set! populated-ht 'key3 'value3)
-
-    \ \ (check (hash-table-size populated-ht) =\<gtr\> 3))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table-keys><index|hash-table-keys>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-keys ht)
-
-    \ \ (map car (map values ht)))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (check (hash-table-keys empty-ht) =\<gtr\> '())
-
-    \;
-
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-set! ht 'k1 'v1)
-
-    \ \ (check (hash-table-keys ht) =\<gtr\> '(k1)))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|hash-table-values><index|hash-table-values>
-
-  <subparagraph|实现>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-values ht)
-
-    \ \ (map cdr (map values ht)))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    (check (hash-table-values empty-ht) =\<gtr\> '())
-
-    \;
-
-    (let1 ht (make-hash-table)
-
-    \ \ (hash-table-set! ht 'k1 'v1)
-
-    \ \ (check (hash-table-values ht) =\<gtr\> '(v1)))
-
-    \;
-  </scm-chunk>
-
-  <subsection|复制和转换>
-
-  <paragraph|hash-table-\<gtr\>alist><index|hash-table-\<gtr\>alist>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-\<gtr\>alist table)
-
-    \ \ (map values table))
-
-    \;
-  </scm-chunk>
-
-  <section|结尾>
-
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|false>
-    (check-report)
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|false>
-    ) ; end of begin
-
-    ) ; end of define-library
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|goldfish/liii/hash-table.scm|true|false>
-    ) ; end of begin
-
-    ) ; end of library
-
-    \;
-  </scm-chunk>
-
   <chapter|(liii comparator)>
 
   <section|许可证>
@@ -10729,6 +10019,750 @@
     \;
   </scm-chunk>
 
+  <chapter|(liii hash-table)>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/hash-table.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii comparator)
+
+    \ \ \ \ \ \ \ \ (liii hash-table)
+
+    \ \ \ \ \ \ \ \ (liii base))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (define empty-ht (make-hash-table))
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define-library (srfi srfi-125)
+
+    (import (srfi srfi-1))
+
+    (export
+
+    \ \ make-hash-table hash-table hash-table-unfold alist-\<gtr\>hash-table
+
+    \ \ hash-table? hash-table-contains? hash-table-empty? hash-table=?
+
+    \ \ hash-table-mutable?
+
+    \ \ hash-table-ref hash-table-ref/default
+
+    \ \ hash-table-set! hash-table-delete! hash-table-intern! hash-table-update!
+
+    \ \ hash-table-update!/default hash-table-pop! hash-table-clear!
+
+    \ \ hash-table-size hash-table-keys hash-table-values hash-table-entries
+
+    \ \ hash-table-find hash-table-count
+
+    )
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/hash-table.scm|true|true>
+    (define-library (liii hash-table)
+
+    (import (srfi srfi-125)
+
+    \ \ \ \ \ \ \ \ (srfi srfi-128))
+
+    (export
+
+    \ \ make-hash-table hash-table hash-table-unfold alist-\<gtr\>hash-table
+
+    \ \ hash-table? hash-table-contains? hash-table-empty? hash-table=?
+
+    \ \ hash-table-mutable?
+
+    \ \ hash-table-ref hash-table-ref/default
+
+    \ \ hash-table-set! hash-table-delete! hash-table-intern! hash-table-update!
+
+    \ \ hash-table-update!/default hash-table-pop! hash-table-clear!
+
+    \ \ hash-table-size hash-table-keys hash-table-values hash-table-entries
+
+    \ \ hash-table-find hash-table-count
+
+    )
+
+    (begin
+  </scm-chunk>
+
+  <subsection|访问哈希表中的元素>
+
+  除了SRFI 125定义的<scm|hash-table-ref>和<scm|hash-table-ref/default>之外，我们可以用S7 Scheme内置的访问方式：
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (check (ht 'a) =\<gtr\> #f)
+
+    \ \ (hash-table-set! ht 'a 1)
+
+    \ \ (check (ht 'a) =\<gtr\> 1))
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <subsection|子函数>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (assert-hash-table-type ht f)
+
+    \ \ (when (not (hash-table? ht))
+
+    \ \ \ \ (error 'type-error f "this parameter must be typed as hash-table")))
+
+    \;
+
+    (define s7-hash-table-set! hash-table-set!)
+
+    (define s7-make-hash-table make-hash-table)
+
+    \;
+  </scm-chunk>
+
+  <subsection|构造器>
+
+  <paragraph|make-hash-table><index|make-hash-table>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (make-hash-table . args)
+
+    \ \ (cond ((null? args) (s7-make-hash-table))
+
+    \ \ \ \ \ \ \ \ ((comparator? (car args))
+
+    \ \ \ \ \ \ \ \ \ (let* ((equiv (comparator-equality-predicate (car args)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-func (comparator-hash-function (car args))))
+
+    \ \ \ \ \ \ \ \ \ \ \ (s7-make-hash-table 8 (cons equiv hash-func) (cons #t #t))))
+
+    \ \ \ \ \ \ \ \ (else (type-error "make-hash-table"))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table (<code*|make-default-comparator>))
+
+    \ \ (hash-table-set! ht 1 2)
+
+    \ \ (check (ht 1) =\<gtr\> 2))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table>
+
+  <subsection|谓词>
+
+  <paragraph|hash-table?><index|hash-table?>
+
+  S7内置函数。判断一个对象是不是哈希表。
+
+  <paragraph|hash-table-contains?><index|hash-table-contains?><scm|(hash-table key) =\<gtr\> bool>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-contains? ht key)
+
+    \ \ (not (not (hash-table-ref ht key))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-set! ht 'brand 'liii)
+
+    \ \ (check (hash-table-contains? ht 'brand) =\<gtr\> #t)
+
+    \ \ (hash-table-set! ht 'brand #f)
+
+    \ \ (check (hash-table-contains? ht 'brand) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-empty?><index|hash-table-empty?>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-empty? ht)
+
+    \ \ (zero? (hash-table-size ht)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (check (hash-table-empty? empty-ht) =\<gtr\> #t)
+
+    \;
+
+    (let1 test-ht (make-hash-table)
+
+    \ \ (hash-table-set! test-ht 'key 'value)
+
+    \ \ (check (hash-table-empty? test-ht) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table=?><index|hash-table=?><scm|(ht1 ht2) =\<gtr\> boolean>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table=? ht1 ht2)
+
+    \ \ (equal? ht1 ht2))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let ((empty-h1 (make-hash-table))
+
+    \ \ \ \ \ \ (empty-h2 (make-hash-table)))
+
+    \ \ (check (hash-table=? empty-h1 empty-h2) =\<gtr\> #t))
+
+    \;
+
+    (let ((t1 (make-hash-table))
+
+    \ \ \ \ \ \ (t2 (make-hash-table)))
+
+    \ \ (hash-table-set! t1 'a 1)
+
+    \ \ (hash-table-set! t2 'a 1)
+
+    \ \ (check (hash-table=? t1 t2) =\<gtr\> #t)
+
+    \ \ (hash-table-set! t1 'b 2)
+
+    \ \ (check (hash-table=? t1 t2) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <subsection|选择器>
+
+  <paragraph|hash-table-ref><index|hash-table-ref><scm|(hash-table-ref ht key) =\<gtr\> value>
+
+  <\description>
+    <item*|ht>哈希表
+
+    <item*|key>键
+
+    <item*|value>返回hash表中key这个键对应的值
+  </description>
+
+  SRFI 125定义的<scm|hash-table-ref>的函数签名是这样的：<scm|(hash-table-ref hash-table key [failure [success]])>。两参数形式的<scm|hash-table-ref>是S7 Scheme的内置函数。
+
+  在S7 Scheme中，可以直接将hash-table视作一个单参数的函数，比如<scm|(ht 'key)>等价于<scm|(hash-table-ref ht 'key)>。
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (check (hash-table-ref empty-ht 'key) =\<gtr\> #f)
+
+    \;
+
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-set! ht 'key 'value)
+
+    \ \ (check (hash-table-ref ht 'key) =\<gtr\> 'value)
+
+    \ \ (check (ht 'key) =\<gtr\> 'value))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-ref/default><index|hash-table-ref/default><scm|(hash-table-ref/default ht key default) =\<gtr\> value>
+
+  <\description>
+    <item*|ht>哈希表
+
+    <item*|key>键
+
+    <item*|default>默认值，如果key这个键在哈希表中对应的值不存在，则返回默认值。注意，该默认值只有在key这个键不存在的时候，才会被求值。
+
+    <item*|value>键对应的值，如果不存在，则为默认值。
+  </description>
+
+  <subparagraph|测试>
+
+  当键对应的值存在时，default不会被求值，故而测试中的<scm|(display "hello")>实际不会被执行。
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (check (hash-table-ref/default ht 'key 'value1) =\<gtr\> 'value1)
+
+    \ \ (check (hash-table-ref/default ht 'key (+ 1 2)) =\<gtr\> 3)
+
+    \;
+
+    \ \ (hash-table-set! ht 'key 'value)
+
+    \ \ (check (hash-table-ref/default ht 'key
+
+    \ \ \ \ \ \ \ \ \ \ \ (begin (display "hello")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ 1 2)))
+
+    \ \ \ \ =\<gtr\> 'value)
+
+    ) ; end of let1
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define-macro (hash-table-ref/default ht key default)
+
+    \ \ ‘(or (hash-table-ref ,ht ,key)
+
+    \ \ \ \ \ \ \ \ ,default))
+
+    \;
+  </scm-chunk>
+
+  <subsection|修改器>
+
+  <paragraph|hash-table-set!><index|hash-table-set!>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-set! ht 'k1 'v1 'k2 'v2)
+
+    \ \ (check (ht 'k1) =\<gtr\> 'v1)
+
+    \ \ (check (ht 'k2) =\<gtr\> 'v2)
+
+    )
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-set! ht . rest)
+
+    \ \ (assert-hash-table-type ht hash-table-set!)
+
+    \ \ (let1 len (length rest)
+
+    \ \ \ \ (when (or (odd? len) (zero? len))
+
+    \ \ \ \ \ \ (error 'wrong-number-of-args len "but must be even and non-zero"))
+
+    \ \ \ \ 
+
+    \ \ \ \ (s7-hash-table-set! ht (car rest) (cadr rest))
+
+    \ \ \ \ (when (\<gtr\> len 2)
+
+    \ \ \ \ \ \ \ \ \ \ (apply hash-table-set! (cons ht (cddr rest))))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-delete!><index|hash-table-delete!>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-update! ht 'key 'value)
+
+    \ \ (check (hash-table-delete! ht 'key) =\<gtr\> 1)
+
+    \ \ (check-false (hash-table-contains? ht 'key))
+
+    \ \ 
+
+    \ \ (hash-table-update! ht 'key1 'value1)
+
+    \ \ (hash-table-update! ht 'key2 'value2)
+
+    \ \ (hash-table-update! ht 'key3 'value3)
+
+    \ \ (hash-table-update! ht 'key4 'value4)
+
+    \ \ (check (hash-table-delete! ht 'key1 'key2 'key3) =\<gtr\> 3)
+
+    )
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-delete! ht key . keys)
+
+    \ \ (assert-hash-table-type ht hash-table-delete!)
+
+    \ \ (let1 all-keys (cons key keys)
+
+    \ \ \ \ (length
+
+    \ \ \ \ \ \ (filter
+
+    \ \ \ \ \ \ \ \ (lambda (x)
+
+    \ \ \ \ \ \ \ \ \ \ (if (hash-table-contains? ht x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (s7-hash-table-set! ht x #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ #f))
+
+    \ \ \ \ \ \ \ \ all-keys))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-update!><index|hash-table-update!>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-update! ht key value)
+
+    \ \ (hash-table-set! ht key value))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-update! ht 'key 'value)
+
+    \ \ (check (ht 'key) =\<gtr\> 'value)
+
+    \ \ (hash-table-update! ht 'key 'value1)
+
+    \ \ (check (ht 'key) =\<gtr\> 'value1)
+
+    \ \ (hash-table-update! ht 'key #f)
+
+    \ \ (check (ht 'key) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-clear!><index|hash-table-clear!>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-clear! ht)
+
+    \ \ (for-each
+
+    \ \ \ \ (lambda (key)
+
+    \ \ \ \ \ \ (hash-table-set! ht key #f))
+
+    \ \ \ \ (hash-table-keys ht)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-update! ht 'key 'value)
+
+    \ \ (hash-table-update! ht 'key1 'value1)
+
+    \ \ (hash-table-update! ht 'key2 'value2)
+
+    \ \ (hash-table-clear! ht)
+
+    \ \ (check-true (hash-table-empty? ht)))
+
+    \;
+  </scm-chunk>
+
+  <subsection|哈希表整体>
+
+  <paragraph|hash-table-size><index|hash-table-size>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define hash-table-size hash-table-entries)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (check (hash-table-size empty-ht) =\<gtr\> 0)
+
+    \;
+
+    (let1 populated-ht (make-hash-table)
+
+    \ \ (hash-table-set! populated-ht 'key1 'value1)
+
+    \ \ (hash-table-set! populated-ht 'key2 'value2)
+
+    \ \ (hash-table-set! populated-ht 'key3 'value3)
+
+    \ \ (check (hash-table-size populated-ht) =\<gtr\> 3))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-keys><index|hash-table-keys>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-keys ht)
+
+    \ \ (map car (map values ht)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (check (hash-table-keys empty-ht) =\<gtr\> '())
+
+    \;
+
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-set! ht 'k1 'v1)
+
+    \ \ (check (hash-table-keys ht) =\<gtr\> '(k1)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-values><index|hash-table-values>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-values ht)
+
+    \ \ (map cdr (map values ht)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (check (hash-table-values empty-ht) =\<gtr\> '())
+
+    \;
+
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-set! ht 'k1 'v1)
+
+    \ \ (check (hash-table-values ht) =\<gtr\> '(v1)))
+
+    \;
+  </scm-chunk>
+
+  <subsection|复制和转换>
+
+  <paragraph|hash-table-\<gtr\>alist><index|hash-table-\<gtr\>alist>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-\<gtr\>alist table)
+
+    \ \ (map values table))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/hash-table.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </scm-chunk>
+
   <chapter|(liii set)>
 
   <section|许可证>
@@ -11236,13 +11270,13 @@
       3
     </unfolded-io>
 
-    <\unfolded-io>
+    <\folded-io>
       \<gtr\>\ 
-    <|unfolded-io>
+    <|folded-io>
       ((lambda (a b) (+ a b)) 1 2)
-    <|unfolded-io>
+    <|folded-io>
       3
-    </unfolded-io>
+    </folded-io>
 
     <\input>
       \<gtr\>\ 
