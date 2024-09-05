@@ -1625,14 +1625,6 @@
 
   <section|结尾>
 
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    ) ; end of begin
-
-    ) ; end of define-library
-
-    \;
-  </scm-chunk>
-
   <\scm-chunk|goldfish/liii/base.scm|true|false>
     ) ; end of begin
 
@@ -9497,6 +9489,18 @@
     \;
   </scm-chunk>
 
+  <chapter|三鲤扩展库>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
   <chapter|(scheme case-lambda)>
 
   <section|协议>
@@ -9946,33 +9950,33 @@
 
     <index+1|guard|<pageref|auto-74>>
 
-    <index+1|hash-table?|<pageref|auto-490>>
+    <index+1|hash-table?|<pageref|auto-493>>
 
-    <index+1|hash-table=?|<pageref|auto-500>>
+    <index+1|hash-table=?|<pageref|auto-503>>
 
-    <index+1|hash-table-clear!|<pageref|auto-524>>
+    <index+1|hash-table-clear!|<pageref|auto-527>>
 
-    <index+1|hash-table-contains?|<pageref|auto-492>>
+    <index+1|hash-table-contains?|<pageref|auto-495>>
 
-    <index+1|hash-table-delete!|<pageref|auto-516>>
+    <index+1|hash-table-delete!|<pageref|auto-519>>
 
-    <index+1|hash-table-empty?|<pageref|auto-496>>
+    <index+1|hash-table-empty?|<pageref|auto-499>>
 
-    <index+1|hash-table-\<gtr\>alist|<pageref|auto-542>>
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-545>>
 
-    <index+1|hash-table-keys|<pageref|auto-533>>
+    <index+1|hash-table-keys|<pageref|auto-536>>
 
-    <index+1|hash-table-ref|<pageref|auto-505>>
+    <index+1|hash-table-ref|<pageref|auto-508>>
 
-    <index+1|hash-table-ref/default|<pageref|auto-507>>
+    <index+1|hash-table-ref/default|<pageref|auto-510>>
 
-    <index+1|hash-table-set!|<pageref|auto-512>>
+    <index+1|hash-table-set!|<pageref|auto-515>>
 
-    <index+1|hash-table-size|<pageref|auto-529>>
+    <index+1|hash-table-size|<pageref|auto-532>>
 
-    <index+1|hash-table-update!|<pageref|auto-520>>
+    <index+1|hash-table-update!|<pageref|auto-523>>
 
-    <index+1|hash-table-values|<pageref|auto-537>>
+    <index+1|hash-table-values|<pageref|auto-540>>
 
     <index+1|identity|<pageref|auto-134>>
 
@@ -10000,7 +10004,7 @@
 
     <index+1|list-\<gtr\>string|<pageref|auto-40>>
 
-    <index+1|list-\<gtr\>vector|<pageref|auto-386>>
+    <index+1|list-\<gtr\>vector|<pageref|auto-433>>
 
     <index+1|list-index|<pageref|auto-348>>
 
@@ -10012,7 +10016,7 @@
 
     <index+1|make-list|<pageref|auto-256>>
 
-    <index+1|make-vector|<pageref|auto-401>>
+    <index+1|make-vector|<pageref|auto-381>>
 
     <index+1|map|<pageref|auto-52>>
 
@@ -10046,21 +10050,21 @@
 
     <index+1|procedure?|<pageref|auto-47>>
 
-    <index+1|queue|<pageref|auto-462>>
+    <index+1|queue|<pageref|auto-465>>
 
-    <index+1|queue-back|<pageref|auto-470>>
+    <index+1|queue-back|<pageref|auto-473>>
 
-    <index+1|queue-empty?|<pageref|auto-464>>
+    <index+1|queue-empty?|<pageref|auto-467>>
 
-    <index+1|queue-front|<pageref|auto-468>>
+    <index+1|queue-front|<pageref|auto-471>>
 
-    <index+1|queue-\<gtr\>list|<pageref|auto-476>>
+    <index+1|queue-\<gtr\>list|<pageref|auto-479>>
 
-    <index+1|queue-pop!|<pageref|auto-474>>
+    <index+1|queue-pop!|<pageref|auto-477>>
 
-    <index+1|queue-push!|<pageref|auto-472>>
+    <index+1|queue-push!|<pageref|auto-475>>
 
-    <index+1|queue-size|<pageref|auto-466>>
+    <index+1|queue-size|<pageref|auto-469>>
 
     <index+1|read-error?|<pageref|auto-76>>
 
@@ -10078,19 +10082,19 @@
 
     <index+1|square|<pageref|auto-21>>
 
-    <index+1|stack|<pageref|auto-442>>
+    <index+1|stack|<pageref|auto-445>>
 
-    <index+1|stack-empty?|<pageref|auto-444>>
+    <index+1|stack-empty?|<pageref|auto-447>>
 
-    <index+1|stack-\<gtr\>list|<pageref|auto-454>>
+    <index+1|stack-\<gtr\>list|<pageref|auto-457>>
 
-    <index+1|stack-pop!|<pageref|auto-452>>
+    <index+1|stack-pop!|<pageref|auto-455>>
 
-    <index+1|stack-push!|<pageref|auto-450>>
+    <index+1|stack-push!|<pageref|auto-453>>
 
-    <index+1|stack-size|<pageref|auto-446>>
+    <index+1|stack-size|<pageref|auto-449>>
 
-    <index+1|stack-top|<pageref|auto-448>>
+    <index+1|stack-top|<pageref|auto-451>>
 
     <index+1|string?|<pageref|auto-30>>
 
@@ -10114,7 +10118,7 @@
 
     <index+1|string-\<gtr\>list|<pageref|auto-38>>
 
-    <index+1|string-\<gtr\>vector|<pageref|auto-390>>
+    <index+1|string-\<gtr\>vector|<pageref|auto-437>>
 
     <index+1|string-index|<pageref|auto-229>>
 
@@ -10174,47 +10178,47 @@
 
     <index+1|value-error|<pageref|auto-160>>
 
-    <index+1|vector?|<pageref|auto-376>>
+    <index+1|vector|<pageref|auto-383>>
 
-    <index+1|vector|<pageref|auto-403>>
+    <index+1|vector?|<pageref|auto-393>>
 
-    <index+1|vector-any|<pageref|auto-421>>
+    <index+1|vector-any|<pageref|auto-409>>
 
-    <index+1|vector-append|<pageref|auto-410>>
+    <index+1|vector-append|<pageref|auto-390>>
 
-    <index+1|vector-copy!|<pageref|auto-392>>
+    <index+1|vector-copy|<pageref|auto-387>>
 
-    <index+1|vector-copy|<pageref|auto-407>>
+    <index+1|vector-copy!|<pageref|auto-428>>
 
-    <index+1|vector-count|<pageref|auto-416>>
+    <index+1|vector-count|<pageref|auto-404>>
 
-    <index+1|vector-empty?|<pageref|auto-413>>
+    <index+1|vector-empty?|<pageref|auto-395>>
 
-    <index+1|vector-every|<pageref|auto-425>>
+    <index+1|vector-every|<pageref|auto-413>>
 
-    <index+1|vector-fill!|<pageref|auto-394>>
+    <index+1|vector-fill!|<pageref|auto-426>>
 
     <index+1|vector-for-each|<pageref|auto-64>>
 
-    <index+1|vector-\<gtr\>list|<pageref|auto-384>>
+    <index+1|vector-\<gtr\>list|<pageref|auto-431>>
 
-    <index+1|vector-\<gtr\>string|<pageref|auto-388>>
+    <index+1|vector-\<gtr\>string|<pageref|auto-435>>
 
-    <index+1|vector-index|<pageref|auto-427>>
+    <index+1|vector-index|<pageref|auto-415>>
 
-    <index+1|vector-index-right|<pageref|auto-429>>
+    <index+1|vector-index-right|<pageref|auto-417>>
 
-    <index+1|vector-length|<pageref|auto-378>>
+    <index+1|vector-length|<pageref|auto-399>>
 
     <index+1|vector-map|<pageref|auto-58>>
 
-    <index+1|vector-partition|<pageref|auto-431>>
+    <index+1|vector-partition|<pageref|auto-419>>
 
-    <index+1|vector-ref|<pageref|auto-380>>
+    <index+1|vector-ref|<pageref|auto-401>>
 
-    <index+1|vector-set!|<pageref|auto-382>>
+    <index+1|vector-set!|<pageref|auto-422>>
 
-    <index+1|vector-swap!|<pageref|auto-434>>
+    <index+1|vector-swap!|<pageref|auto-424>>
   </the-index>
 </body>
 

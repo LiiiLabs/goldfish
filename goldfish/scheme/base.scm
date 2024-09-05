@@ -167,9 +167,6 @@
 
 (define (eof-object) #<eof>)
 
-) ; end of begin
-) ; end of define-library
-
 (define* (vector-copy v (start 0) (end (vector-length v)))
   (if (or (> start end) (> end (vector-length v)))
       (error 'out-of-range "vector-copy")
@@ -211,4 +208,7 @@
 (define* (string->vector s (start 0) end)
   (let ((stop (or end (length s)))) 
     (copy s (make-vector (- stop start)) start stop)))
+
+) ; end of begin
+) ; end of define-library
 
