@@ -146,13 +146,9 @@
 
     \ \ ; Vector
 
-    \ \ vector-\<gtr\>string
+    \ \ vector-\<gtr\>string string-\<gtr\>vector
 
-    \ \ string-\<gtr\>vector
-
-    \ \ vector-copy
-
-    \ \ vector-copy!
+    \ \ vector-copy vector-copy! vector-fill!
 
     \ \ ; Input and Output
 
@@ -200,13 +196,9 @@
 
     \ \ ; Vector
 
-    \ \ vector-\<gtr\>string
+    \ \ vector-\<gtr\>string string-\<gtr\>vector
 
-    \ \ string-\<gtr\>vector
-
-    \ \ vector-copy
-
-    \ \ vector-copy!
+    \ \ vector-copy vector-copy! vector-fill!
 
     \ \ ; Input and Output
 
@@ -318,6 +310,8 @@
 
     \;
   </scm-chunk>
+
+  \;
 
   <paragraph|let-values><index|let-values>
 
@@ -630,250 +624,6 @@
   </scm-chunk>
 
   <section|字符串>
-
-  <paragraph|string?><index|string?>
-
-  <scm|string?>是一个S7内置的谓词函数，当且仅当参数对象类型是字符串（例如<scm|"MathAgape">）时返回<scm|#t>，否则都返回<scm|#f>。当参数为符号（例如<scm|'MathAgape>）、字符（例如<scm|#/MathAgape>）、数字（例如<scm|123>）、列表（例如<scm|'(1 2 3)>）这些非字符串类型时，都返回<scm|#f>。<scm|string?>用于确定对象是否可以被当作字符串处理，在需要执行对字符串特定操作时特别有用，避免类型错误。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string? "MathAgape") =\<gtr\> #t)
-
-    (check (string? "") =\<gtr\> #t)
-
-    \;
-
-    (check (string? 'MathAgape) =\<gtr\> #f)
-
-    (check (string? #/MathAgape) =\<gtr\> #f)
-
-    (check (string? 123) =\<gtr\> #f)
-
-    (check (string? '(1 2 3)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|string-length><index|string-length>
-
-  <scm|string-length>是一个S7内置的函数，它接收一个字符串作为参数，返回一个表示该字符串长度的整数，即字符串中包含的字符数。当参数不是字符串，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string-length "MathAgape") =\<gtr\> 9)
-
-    (check (string-length "") =\<gtr\> 0)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (string-length 'not-a-string))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|string-ref><index|string-ref>
-
-  <scm|string-ref>是一个S7内置的函数，接收一个字符串和一个称为索引值的非负整数k为参数，通过索引值k返回字符串的第k个元素（从0开始计数）。当参数为空字符串时，报错。当k为负数，报错。当k大于等于字符串中字符数时，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string-ref "MathAgape" 0) =\<gtr\> #\\M)
-
-    (check (string-ref "MathAgape" 2) =\<gtr\> #\\t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "MathAgape" -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "MathAgape" 9))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "" 0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|string-append><index|string-append>
-
-  <scm|string-append>是一个S7内置的函数，用于连接两个或多个字符串。它会将所有提供的字符串参数逐个拼接在一起，并返回一个新的字符串，原始字符串不会被修改。当没有参数时，返回空字符串。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string-append "Math" "Agape") =\<gtr\> "MathAgape")
-
-    \;
-
-    (check (string-append) =\<gtr\> "")
-
-    \;
-  </scm-chunk>
-
-  <paragraph|string-\<gtr\>list><index|string-\<gtr\>list>
-
-  <scm|string-\<gtr\>list>是一个S7内置的函数，用于将字符串转换为字符列表。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (string-\<gtr\>list "MathAgape")
-
-    \ \ =\<gtr\>
-
-    \ \ '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
-
-    \;
-
-    (check (string-\<gtr\>list "") =\<gtr\> '())
-
-    \;
-  </scm-chunk>
-
-  <paragraph|list-\<gtr\>string><index|list-\<gtr\>string>
-
-  <scm|list-\<gtr\>string>是一个S7内置的函数，用于将字符列表转换为字符串。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (list-\<gtr\>string '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
-
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
-
-    \;
-
-    (check (list-\<gtr\>string '()) =\<gtr\> "")
-
-    \;
-  </scm-chunk>
-
-  <paragraph|string-copy><index|string-copy>
-
-  <scm|string-copy>是一个S7内置的函数，用于创建一个现有字符串的副本。这个函数返回一个与原始字符串内容完全相同的新字符串，但它们在内存中是两个独立的实体。也就是说，原始字符串和副本字符串内容相同，但它们是不同的对象，这可以用<code|<code*|equal?>>和<code|<code*|eq?>>对比出来。
-
-  <scm|string-copy>和<scm|%string-from-range>的实现比较接近，区别在于：在没有指定字符串的范围的时候，我们需要使用<scm|substring>来模拟整个字符串的拷贝。S7内置的函数只提供了整个字符串的拷贝，R7RS和SRFI-13是需要额外的字符串的范围的，所以需要重新实现。
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define (string-copy str . start_end)
-
-    \ \ (cond ((null? start_end)
-
-    \ \ \ \ \ \ \ \ \ (substring str 0))
-
-    \ \ \ \ \ \ \ \ ((= (length start_end) 1)
-
-    \ \ \ \ \ \ \ \ \ \ (substring str (car start_end)))
-
-    \ \ \ \ \ \ \ \ ((= (length start_end) 2)
-
-    \ \ \ \ \ \ \ \ \ (substring str (car start_end) (cadr start_end)))
-
-    \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args))))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (define original-string "MathAgape")
-
-    (define copied-string (string-copy original-string))
-
-    \;
-
-    (check (equal? original-string copied-string) =\<gtr\> #t)
-
-    (check (eq? original-string copied-string) =\<gtr\> #f)
-
-    \;
-
-    (check
-
-    \ \ (equal? (string-copy "MathAgape" 4)
-
-    \ \ \ \ \ \ \ \ \ \ (string-copy "MathAgape" 4))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (eq? (string-copy "MathAgape" 4)
-
-    \ \ \ \ \ \ \ (string-copy "MathAgape" 4))
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
-
-    \;
-
-    (check
-
-    \ \ (equal? (string-copy "MathAgape" 4 9)
-
-    \ \ \ \ \ \ \ \ \ \ (string-copy "MathAgape" 4 9))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (eq? (string-copy "MathAgape" 4 9)
-
-    \ \ \ \ \ \ \ (string-copy "MathAgape" 4 9))
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
-
-    \;
-  </scm-chunk>
 
   <section|向量>
 
@@ -2635,7 +2385,199 @@
 
   <chapter|(liii string)>
 
+  <label|r7rs><paragraph|string?><index|string?>
+
+  <scm|string?>是一个S7内置的谓词函数，当且仅当参数对象类型是字符串（例如<scm|"MathAgape">）时返回<scm|#t>，否则都返回<scm|#f>。当参数为符号（例如<scm|'MathAgape>）、字符（例如<scm|#/MathAgape>）、数字（例如<scm|123>）、列表（例如<scm|'(1 2 3)>）这些非字符串类型时，都返回<scm|#f>。<scm|string?>用于确定对象是否可以被当作字符串处理，在需要执行对字符串特定操作时特别有用，避免类型错误。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string? "MathAgape") =\<gtr\> #t)
+
+    (check (string? "") =\<gtr\> #t)
+
+    \;
+
+    (check (string? 'MathAgape) =\<gtr\> #f)
+
+    (check (string? #/MathAgape) =\<gtr\> #f)
+
+    (check (string? 123) =\<gtr\> #f)
+
+    (check (string? '(1 2 3)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|string-length><index|string-length>
+
+  <scm|string-length>是一个S7内置的函数，它接收一个字符串作为参数，返回一个表示该字符串长度的整数，即字符串中包含的字符数。当参数不是字符串，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-length "MathAgape") =\<gtr\> 9)
+
+    (check (string-length "") =\<gtr\> 0)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-length 'not-a-string))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|string-ref><index|string-ref>
+
+  <scm|string-ref>是一个S7内置的函数，接收一个字符串和一个称为索引值的非负整数k为参数，通过索引值k返回字符串的第k个元素（从0开始计数）。当参数为空字符串时，报错。当k为负数，报错。当k大于等于字符串中字符数时，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-ref "MathAgape" 0) =\<gtr\> #\\M)
+
+    (check (string-ref "MathAgape" 2) =\<gtr\> #\\t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (string-ref "MathAgape" -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (string-ref "MathAgape" 9))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (string-ref "" 0))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|string-append><index|string-append>
+
+  <scm|string-append>是一个S7内置的函数，用于连接两个或多个字符串。它会将所有提供的字符串参数逐个拼接在一起，并返回一个新的字符串，原始字符串不会被修改。当没有参数时，返回空字符串。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-append "Math" "Agape") =\<gtr\> "MathAgape")
+
+    \;
+
+    (check (string-append) =\<gtr\> "")
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|string-\<gtr\>list><index|string-\<gtr\>list>
+
+  <scm|string-\<gtr\>list>是一个S7内置的函数，用于将字符串转换为字符列表。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (string-\<gtr\>list "MathAgape")
+
+    \ \ =\<gtr\>
+
+    \ \ '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
+
+    \;
+
+    (check (string-\<gtr\>list "") =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|list-\<gtr\>string><index|list-\<gtr\>string>
+
+  <scm|list-\<gtr\>string>是一个S7内置的函数，用于将字符列表转换为字符串。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (list-\<gtr\>string '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
+
+    \ \ =\<gtr\>
+
+    \ \ "MathAgape")
+
+    \;
+
+    (check (list-\<gtr\>string '()) =\<gtr\> "")
+
+    \;
+  </scm-chunk>
+
+  \;
+
   <section|许可证>
+
+  <\scm-chunk|goldfish/liii/string.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|false|true>
     ;
@@ -2706,6 +2648,54 @@
   </scm-chunk>
 
   <section|接口>
+
+  <\scm-chunk|goldfish/liii/string.scm|true|false>
+    (define-library (liii string)
+
+    (export
+
+    \ \ ; from (scheme base)
+
+    \ \ string-copy
+
+    \ \ ; from (srfi srfi-13)
+
+    \ \ string-null? string-join
+
+    \ \ string-every string-any
+
+    \ \ string-take string-take-right string-drop string-drop-right
+
+    \ \ string-pad string-pad-right
+
+    \ \ string-trim string-trim-right string-trim-both
+
+    \ \ string-prefix? string-suffix?
+
+    \ \ string-index string-index-right
+
+    \ \ string-contains string-count
+
+    \ \ string-reverse
+
+    \ \ string-tokenize
+
+    )
+
+    (import (srfi srfi-13)
+
+    \ \ \ \ \ \ \ \ (scheme base)
+
+    \ \ \ \ \ \ \ \ (liii error))
+
+    (begin
+
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </scm-chunk>
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define-library (srfi srfi-13)
@@ -2793,7 +2783,7 @@
 
   <section|列表-字符串转换>
 
-  <paragraph|string-join><index|string-join><scm|(l [delim [grammer]]) =\<gtr\> string>
+  <paragraph|string-join><scm|(l [delim [grammer]]) =\<gtr\> string><index|string-join>
 
   <subparagraph|实现>
 
@@ -3606,6 +3596,82 @@
   </scm-chunk>
 
   <section|选择器>
+
+  <label|r7rs><paragraph|string-copy><index|string-copy>
+
+  <scm|string-copy>是一个S7内置的函数，用于创建一个现有字符串的副本。这个函数返回一个与原始字符串内容完全相同的新字符串，但它们在内存中是两个独立的实体。也就是说，原始字符串和副本字符串内容相同，但它们是不同的对象，这可以用<code|<code*|equal?>>和<code|<code*|eq?>>对比出来。
+
+  <scm|string-copy>和<scm|%string-from-range>的实现比较接近，区别在于：在没有指定字符串的范围的时候，我们需要使用<scm|substring>来模拟整个字符串的拷贝。S7内置的函数只提供了整个字符串的拷贝，R7RS和SRFI-13是需要额外的字符串的范围的，所以需要重新实现。
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (string-copy str . start_end)
+
+    \ \ (cond ((null? start_end)
+
+    \ \ \ \ \ \ \ \ \ (substring str 0))
+
+    \ \ \ \ \ \ \ \ ((= (length start_end) 1)
+
+    \ \ \ \ \ \ \ \ \ \ (substring str (car start_end)))
+
+    \ \ \ \ \ \ \ \ ((= (length start_end) 2)
+
+    \ \ \ \ \ \ \ \ \ (substring str (car start_end) (cadr start_end)))
+
+    \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (define original-string "MathAgape")
+
+    (define copied-string (string-copy original-string))
+
+    \;
+
+    (check-true (equal? original-string copied-string))
+
+    (check-false (eq? original-string copied-string))
+
+    \;
+
+    (check-true
+
+    \ \ (equal? (string-copy "MathAgape" 4)
+
+    \ \ \ \ \ \ \ \ \ \ (string-copy "MathAgape" 4)))
+
+    \;
+
+    (check-false
+
+    \ \ (eq? (string-copy "MathAgape" 4)
+
+    \ \ \ \ \ \ \ (string-copy "MathAgape" 4)))
+
+    \;
+
+    (check-true
+
+    \ \ (equal? (string-copy "MathAgape" 4 9)
+
+    \ \ \ \ \ \ \ \ \ \ (string-copy "MathAgape" 4 9)))
+
+    \;
+
+    (check-false
+
+    \ \ (eq? (string-copy "MathAgape" 4 9)
+
+    \ \ \ \ \ \ \ (string-copy "MathAgape" 4 9)))
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <paragraph|string-take><index|string-take>
 
@@ -8121,7 +8187,7 @@
 
   将字符串s转化为向量，如果指定了起始索引和终止索引，则只将指定范围内的子字符串转化为向量。
 
-  <\scm-chunk|goldfish/scheme/base.scm|true|false>
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
     ; 0-clause BSD
 
     ; Bill Schottstaedt
@@ -9493,7 +9559,7 @@
 
   <section|结尾>
 
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+  <\scm-chunk|goldfish/scheme/base.scm|true|false>
     ) ; end of begin
 
     ) ; end of define-library

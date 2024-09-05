@@ -328,6 +328,28 @@
   =>
   #t)
 
+(define original-string "MathAgape")
+(define copied-string (string-copy original-string))
+
+(check-true (equal? original-string copied-string))
+(check-false (eq? original-string copied-string))
+
+(check-true
+  (equal? (string-copy "MathAgape" 4)
+          (string-copy "MathAgape" 4)))
+
+(check-false
+  (eq? (string-copy "MathAgape" 4)
+       (string-copy "MathAgape" 4)))
+
+(check-true
+  (equal? (string-copy "MathAgape" 4 9)
+          (string-copy "MathAgape" 4 9)))
+
+(check-false
+  (eq? (string-copy "MathAgape" 4 9)
+       (string-copy "MathAgape" 4 9)))
+
 (check (string-take "MathAgape" 4) => "Math")
 
 (check

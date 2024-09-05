@@ -22,10 +22,8 @@
   ; String
   string-copy
   ; Vector
-  vector->string
-  string->vector
-  vector-copy
-  vector-copy!
+  vector->string string->vector
+  vector-copy vector-copy! vector-fill!
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?
@@ -106,15 +104,6 @@
 
 (define (square x) (* x x))
 
-(define (string-copy str . start_end)
-  (cond ((null? start_end)
-         (substring str 0))
-        ((= (length start_end) 1)
-          (substring str (car start_end)))
-        ((= (length start_end) 2)
-         (substring str (car start_end) (cadr start_end)))
-        (else (error 'wrong-number-of-args))))
-
 (define (string-map p . args) (apply string (apply map p args)))
 
 (define (vector-map p . args) (apply vector (apply map p args)))
@@ -166,6 +155,15 @@
       (close-output-port p)))
 
 (define (eof-object) #<eof>)
+
+(define (string-copy str . start_end)
+  (cond ((null? start_end)
+         (substring str 0))
+        ((= (length start_end) 1)
+          (substring str (car start_end)))
+        ((= (length start_end) 2)
+         (substring str (car start_end) (cadr start_end)))
+        (else (error 'wrong-number-of-args))))
 
 (define* (vector-copy v (start 0) (end (vector-length v)))
   (if (or (> start end) (> end (vector-length v)))
