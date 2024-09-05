@@ -9656,7 +9656,15 @@
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define-library (srfi srfi-128)
 
-    (export boolean\<less\>? boolean-hash)
+    (import (scheme base))
+
+    (export
+
+    \ \ boolean\<less\>? default-hash
+
+    \ \ =? \<less\>? \<gtr\>? \<less\>=? \<gtr\>=?
+
+    )
 
     (begin
 
@@ -9707,11 +9715,77 @@
 
   \;
 
+  <section|内部函数>
+
+  <paragraph|default-hash>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (default-hash obj)
+
+    \ \ (hash-code obj))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|binary=?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (binary=? comparator a b)
+
+    \ \ ((comparator-equality-predicate comparator) a b))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|binary\<less\>?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (binary\<less\>? comparator a b)
+
+    \ \ ((comparator-ordering-predicate comparator) a b))
+
+    \;
+  </scm-chunk>
+
   \;
+
+  <paragraph|binary\<gtr\>?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (binary\<gtr\>? comparator a b)
+
+    \ \ (binary\<less\>? comparator b a))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|binary\<less\>=?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (binary\<less\>=? comparator a b)
+
+    \ \ (not (binary\<gtr\>? comparator a b)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|binary\<gtr\>=?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (binary\<gtr\>=? comparator a b)
+
+    \ \ (not (binary\<less\>? comparator a b)))
+
+    \;
+  </scm-chunk>
 
   <section|构造器>
 
-  <paragraph|make-comparator>
+  <paragraph|make-comparator><index|make-comparator>
 
   <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
     (define (make-comparator type-test equality ordering hash)
@@ -9733,20 +9807,168 @@
     \;
   </scm-chunk>
 
+  \;
+
+  <paragraph|make-eq-comparator><index|make-eq-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-eq-comparator)
+
+    \ \ (make-comparator #t eq? #f default-hash))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|make-eqv-comparator><index|make-eqv-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-eqv-comparator)
+
+    \ \ (make-comparator #t eqv? #f default-hash))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|make-equal-comparator><index|make-equal-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-equal-comparator)
+
+    \ \ (make-comparator #t equal? #f default-hash))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|make-pair-comparator><index|make-pair-comparator>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (make-pair-type-test car-comparator cdr-comparator)
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (and (pair? obj)
+
+    \ \ \ \ \ \ \ \ \ (comparator-test-type car-comparator (car obj))
+
+    \ \ \ \ \ \ \ \ \ (comparator-test-type cdr-comparator (cdr obj)))))
+
+    \;
+
+    (define (make-pair=? car-comparator cdr-comparator)
+
+    \ \ \ (lambda (a b)
+
+    \ \ \ \ \ (and ((comparator-equality-predicate car-comparator) (car a) (car b))
+
+    \ \ \ \ \ \ \ \ \ \ ((comparator-equality-predicate cdr-comparator) (cdr a) (cdr b)))))
+
+    \;
+
+    (define (make-pair\<less\>? car-comparator cdr-comparator)
+
+    \ \ \ (lambda (a b)
+
+    \ \ \ \ \ \ (if (=? car-comparator (car a) (car b))
+
+    \ \ \ \ \ \ \ \ (\<less\>? cdr-comparator (cdr a) (cdr b))
+
+    \ \ \ \ \ \ \ \ (\<less\>? car-comparator (car a) (car b)))))
+
+    \;
+
+    (define (make-pair-hash car-comparator cdr-comparator)
+
+    \ \ \ (lambda (obj)
+
+    \ \ \ \ \ (let ((acc (make-hasher)))
+
+    \ \ \ \ \ \ \ (acc (comparator-hash car-comparator (car obj)))
+
+    \ \ \ \ \ \ \ (acc (comparator-hash cdr-comparator (cdr obj)))
+
+    \ \ \ \ \ \ \ (acc))))
+
+    \;
+
+    (define (make-pair-comparator car-comparator cdr-comparator)
+
+    \ \ \ (make-comparator
+
+    \ \ \ \ \ (make-pair-type-test car-comparator cdr-comparator)
+
+    \ \ \ \ \ (make-pair=? car-comparator cdr-comparator)
+
+    \ \ \ \ \ (make-pair\<less\>? car-comparator cdr-comparator)
+
+    \ \ \ \ \ (make-pair-hash car-comparator cdr-comparator)))
+
+    \;
+  </scm-chunk>
+
   <section|谓词>
 
-  <section|标准哈希函数>
+  <section|标准函数>
+
+  <paragraph|object-type>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (object-type obj)
+
+    \ \ (cond
+
+    \ \ \ \ ((null? obj) 0)
+
+    \ \ \ \ ((pair? obj) 1)
+
+    \ \ \ \ ((boolean? obj) 2)
+
+    \ \ \ \ ((char? obj) 3)
+
+    \ \ \ \ ((string? obj) 4)
+
+    \ \ \ \ ((symbol? obj) 5)
+
+    \ \ \ \ ((number? obj) 6)
+
+    \ \ \ \ ((vector? obj) 7)
+
+    \ \ \ \ ((bytevector? obj) 8)
+
+    \ \ \ \ (else 65535)))
+
+    \;
+  </scm-chunk>
 
   <paragraph|boolean\<less\>?><index|boolean\<less\>?>
 
   <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
-    (check (boolean\<less\>? #t #t) =\<gtr\> #f)
+    (define boolean-comparator
 
-    (check (boolean\<less\>? #f #f) =\<gtr\> #f)
+    \ \ (make-comparator boolean? eq? boolean\<less\>? default-hash))
 
-    (check (boolean\<less\>? #f #t) =\<gtr\> #t)
+    \;
 
-    (check (boolean\<less\>? #t #f) =\<gtr\> #f)
+    (check-false (boolean\<less\>? #t #t))
+
+    (check-false (\<less\>? boolean-comparator #t #t))
+
+    (check-false (boolean\<less\>? #f #f))
+
+    (check-false (\<less\>? boolean-comparator #f #f))
+
+    (check-true (boolean\<less\>? #f #t))
+
+    (check-true (\<less\>? boolean-comparator #f #t))
+
+    (check-false #t #f)
+
+    (check-false (\<less\>? boolean-comparator #t #f))
 
     \;
   </scm-chunk>
@@ -9757,6 +9979,94 @@
     \ \ ;; #f \<less\> #t but not otherwise
 
     \ \ (and (not a) b))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|complex\<less\>?>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/comparator-test.scm|true|true>
+    (check-false (complex\<less\>? 1 1))
+
+    (check-true (complex\<less\>? 1i 2i))
+
+    (check-true (complex\<less\>? 1+2i 2+2i))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (complex\<less\>? a b)
+
+    \ \ (if (= (real-part a) (real-part b))
+
+    \ \ \ \ (\<less\> (imag-part a) (imag-part b))
+
+    \ \ \ \ (\<less\> (real-part a) (real-part b))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|symbol\<less\>?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (symbol\<less\>? a b)
+
+    \ \ (string\<less\>? (symbol-\<gtr\>string a) (symbol-\<gtr\>string b)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|default-ordering>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (dispatch-ordering type a b)
+
+    \ \ (case type
+
+    \ \ \ \ ((0) 0) ; All empty lists are equal
+
+    \ \ \ \ ((1) ((make-pair\<less\>? (make-default-comparator) (make-default-comparator)) a b))
+
+    \ \ \ \ ((2) (boolean\<less\>? a b))
+
+    \ \ \ \ ((3) (char\<less\>? a b))
+
+    \ \ \ \ ((4) (string\<less\>? a b))
+
+    \ \ \ \ ((5) (symbol\<less\>? a b))
+
+    \ \ \ \ ((6) (complex\<less\>? a b))
+
+    \ \ \ \ ((7) ((make-vector\<less\>? (make-default-comparator) vector? vector-length vector-ref) a b))
+
+    \ \ \ \ ((8) ((make-vector\<less\>? (make-comparator exact-integer? = \<less\> default-hash)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bytevector? bytevector-length bytevector-u8-ref) a b))
+
+    \ \ \ \ ; Add more here
+
+    \ \ \ \ (else (binary\<less\>? (registered-comparator type) a b))))
+
+    \;
+
+    (define (default-ordering a b)
+
+    \ \ (let ((a-type (object-type a))
+
+    \ \ \ \ \ \ \ \ (b-type (object-type b)))
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((\<less\> a-type b-type) #t)
+
+    \ \ \ \ \ \ ((\<gtr\> a-type b-type) #f)
+
+    \ \ \ \ \ \ (else (dispatch-ordering a-type a b)))))
 
     \;
   </scm-chunk>
@@ -9781,6 +10091,80 @@
     (check (\<gtr\> (boolean-hash #t) 0) =\<gtr\> #t)
 
     (check (boolean-hash #f) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  <section|比较谓词>
+
+  <paragraph|=?><index|=?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (=? comparator a b . objs)
+
+    \ \ (let loop ((a a) (b b) (objs objs))
+
+    \ \ \ \ (and (binary=? comparator a b)
+
+    \ \ \ \ \ \ \ \ \ (if (null? objs) #t (loop b (car objs) (cdr objs))))))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|\<less\>?><index|\<less\>?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (\<less\>? comparator a b . objs)
+
+    \ \ (let loop ((a a) (b b) (objs objs))
+
+    \ \ \ \ (and (binary\<less\>? comparator a b)
+
+    \ \ \ \ \ \ \ \ \ (if (null? objs) #t (loop b (car objs) (cdr objs))))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|\<gtr\>?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (\<gtr\>? comparator a b . objs)
+
+    \ \ (let loop ((a a) (b b) (objs objs))
+
+    \ \ \ \ (and (binary\<gtr\>? comparator a b)
+
+    \ \ \ \ \ \ \ \ \ (if (null? objs) #t (loop b (car objs) (cdr objs))))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|\<less\>=?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (\<less\>=? comparator a b . objs)
+
+    \ \ (let loop ((a a) (b b) (objs objs))
+
+    \ \ \ \ (and (binary\<less\>=? comparator a b)
+
+    \ \ \ \ \ \ \ \ \ (if (null? objs) #t (loop b (car objs) (cdr objs))))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|\<gtr\>=?>
+
+  <\scm-chunk|goldfish/srfi/srfi-128.scm|true|true>
+    (define (\<gtr\>=? comparator a b . objs)
+
+    \ \ (let loop ((a a) (b b) (objs objs))
+
+    \ \ \ \ (and (binary\<gtr\>=? comparator a b)
+
+    \ \ \ \ \ \ \ \ \ (if (null? objs) #t (loop b (car objs) (cdr objs))))))
 
     \;
   </scm-chunk>
