@@ -2681,6 +2681,724 @@
     \;
   </scm-chunk>
 
+  <chapter|(liii check)>
+
+  <section|协议>
+
+  <\scm-chunk|goldfish/liii/check.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|false|true>
+    ; \<less\>PLAINTEXT\<gtr\>
+
+    ; Copyright (c) 2005-2006 Sebastian Egner.
+
+    ;\ 
+
+    ; Permission is hereby granted, free of charge, to any person obtaining
+
+    ; a copy of this software and associated documentation files (the
+
+    ; ''Software''), to deal in the Software without restriction, including
+
+    ; without limitation the rights to use, copy, modify, merge, publish,
+
+    ; distribute, sublicense, and/or sell copies of the Software, and to
+
+    ; permit persons to whom the Software is furnished to do so, subject to
+
+    ; the following conditions:
+
+    ;\ 
+
+    ; The above copyright notice and this permission notice shall be
+
+    ; included in all copies or substantial portions of the Software.
+
+    ;\ 
+
+    ; THE SOFTWARE IS PROVIDED ‘‘AS IS'', WITHOUT WARRANTY OF ANY KIND,
+
+    ; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+
+    ; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+
+    ; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+
+    ; LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+
+    ; OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+
+    ; WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+    ;\ 
+
+    ; -----------------------------------------------------------------------
+
+    ;\ 
+
+    ; Lightweight testing (reference implementation)
+
+    ; ==============================================
+
+    ;
+
+    ; Sebastian.Egner@philips.com
+
+    ; in R5RS + SRFI 23 (error) + SRFI 42 (comprehensions)
+
+    ;
+
+    ; history of this file:
+
+    ; \ \ SE, 25-Oct-2004: first version based on code used in SRFIs 42 and 67
+
+    ; \ \ SE, 19-Jan-2006: (arg ...) made optional in check-ec
+
+    ;
+
+    ; Naming convention "check:\<less\>identifier\<gtr\>" is used only internally.
+
+    ;
+
+    ; Copyright (c) 2024 The Goldfish Scheme Authors
+
+    ; Follow the same License as the original one
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <section|接口>
+
+  将<scm|check:proc>导出的原因是<scm|check>是使用宏实现的，而宏里面用到了<scm|check:proc>，不导出无法生效。
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-library (liii check)
+
+    (export test check check-set-mode! check:proc
+
+    \ \ check-catch check-report check-failed?
+
+    \ \ check-true check-false)
+
+    (import (srfi srfi-78)
+
+    \ \ \ \ \ \ \ \ (rename (srfi srfi-78)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check-report srfi-78-check-report)))
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define-library (srfi srfi-78)
+
+    (export check check-set-mode! check-report check-reset!
+
+    \ \ \ \ \ \ \ \ check-passed? check-failed?
+
+    \ \ \ \ \ \ \ \ check:proc)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  \;
+
+  \;
+
+  <section|实现>
+
+  使用display作为测试结果的展示函数，比write好，因为display可以正常显示文本中的汉字。
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define check:write display)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-set-mode!><index|check-set-mode!>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define check:mode #f)
+
+    \;
+
+    (define (check-set-mode! mode)
+
+    \ \ (set! check:mode
+
+    \ \ \ \ \ \ \ \ (case mode
+
+    \ \ \ \ \ \ \ \ \ \ ((off) \ \ \ \ \ \ \ \ \ \ 0)
+
+    \ \ \ \ \ \ \ \ \ \ ((summary) \ \ \ \ \ \ 1)
+
+    \ \ \ \ \ \ \ \ \ \ ((report-failed) 10)
+
+    \ \ \ \ \ \ \ \ \ \ ((report) \ \ \ \ \ \ \ 100)
+
+    \ \ \ \ \ \ \ \ \ \ (else (error "unrecognized mode" mode)))))
+
+    \;
+
+    \;
+  </scm-chunk>
+
+  将检查模式初始化为<scm|'report>：
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (check-set-mode! 'report)
+
+    \;
+  </scm-chunk>
+
+  以<scm|check>函数为例，不同的检查模式下，得到的结果不同。可以使用单元测试来查看这四种测试用例具体使用方法：
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+    (import (srfi srfi-78))
+
+    \;
+  </scm-chunk>
+
+  <\description>
+    <item*|report>默认检查模式，无论正确还是错误，都会展示详细的信息。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      ;
+
+      ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+      ;
+
+      ; Licensed under the Apache License, Version 2.0 (the "License");
+
+      ; you may not use this file except in compliance with the License.
+
+      ; You may obtain a copy of the License at
+
+      ;
+
+      ; http://www.apache.org/licenses/LICENSE-2.0
+
+      ;
+
+      ; Unless required by applicable law or agreed to in writing, software
+
+      ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+      ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+      ; License for the specific language governing permissions and limitations
+
+      ; under the License.
+
+      ;
+
+      \;
+
+      (display "----------\\n")
+
+      (display "check mode: report\\n")
+
+      \;
+
+      (check-set-mode! 'report)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-reset!)
+
+      \;
+    </scm-chunk>
+
+    <item*|off>设置为off的时候，禁用后续的测试用例。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      (display "\\n----------\\n")
+
+      (display "check mode: off\\n")
+
+      \;
+
+      (check-set-mode! 'off)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-reset!)
+
+      \;
+    </scm-chunk>
+
+    <item*|report-failed>设置为report-failed的时候，在check正确时只返回正确的测试数量，在check错误时，显示错误。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      (display "\\n----------\\n")
+
+      (display "check mode: report-failed\\n")
+
+      \;
+
+      (check-set-mode! 'report-failed)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-reset!)
+
+      \;
+    </scm-chunk>
+
+    <item*|summary>设置为summary的时候，不汇报错误，需要显示调用<scm|check-report>才能显示的测试汇总结果，显式调用<scm|check:failed>显式查看错误的例子。
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|true>
+      (display "\\n----------\\n")
+
+      (display "check mode: summary\\n")
+
+      \;
+
+      (check-set-mode! 'summary)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 3)
+
+      \;
+
+      (check (+ 1 2) =\<gtr\> 4)
+
+      \;
+
+      (check-report)
+
+      \;
+    </scm-chunk>
+
+    这个时候如果需要查看错误，那么可以重新设置检查模式，重新检查报告：
+
+    <\scm-chunk|tests/goldfish/srfi/srfi-78-test.scm|true|false>
+      (check-set-mode! 'report)
+
+      \;
+
+      (check-report)
+
+      \;
+    </scm-chunk>
+  </description>
+
+  <paragraph|check-failed?><index|check-failed?>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define check:correct 0)
+
+    (define check:failed '())
+
+    \;
+
+    (define (check-reset!)
+
+    \ \ (set! check:correct 0)
+
+    \ \ (set! check:failed '()))
+
+    \;
+
+    (define (check:add-correct!)
+
+    \ \ (set! check:correct (+ check:correct 1)))
+
+    \;
+
+    (define (check:add-failed! expression actual-result expected-result)
+
+    \ \ (set! check:failed
+
+    \ \ \ \ \ \ \ \ (cons (list expression actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ check:failed)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define (check:report-expression expression)
+
+    \ \ (newline)
+
+    \ \ (check:write expression)
+
+    \ \ (display " =\<gtr\> "))
+
+    \;
+
+    (define (check:report-actual-result actual-result)
+
+    \ \ (check:write actual-result)
+
+    \ \ (display " ; "))
+
+    \;
+
+    (define (check:report-correct cases)
+
+    \ \ (display "correct")
+
+    \ \ (if (not (= cases 1))
+
+    \ \ \ \ \ \ (begin (display " (")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (display cases)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (display " cases checked)")))
+
+    \ \ (newline))
+
+    \;
+
+    (define (check:report-failed expected-result)
+
+    \ \ (display "*** failed ***")
+
+    \ \ (newline)
+
+    \ \ (display "; expected result: ")
+
+    \ \ (check:write expected-result)
+
+    \ \ (newline))
+
+    \;
+
+    (define (check-passed? expected-total-count)
+
+    \ \ (and (= (length check:failed) 0)
+
+    \ \ \ \ \ \ \ (= check:correct expected-total-count)))
+
+    \;
+
+    (define (check-failed?)
+
+    \ \ (\<gtr\>= (length check:failed) 1))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check><index|check>
+
+  check的具体过程，依据不同的检查模式，做不同的处理：
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define (check:proc expression thunk equal expected-result)
+
+    \ \ (case check:mode
+
+    \ \ \ \ ((0) #f)
+
+    \ \ \ \ ((1)
+
+    \ \ \ \ \ (let ((actual-result (thunk)))
+
+    \ \ \ \ \ \ \ (if (equal actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ (check:add-correct!)
+
+    \ \ \ \ \ \ \ \ \ \ \ (check:add-failed! expression actual-result expected-result))))
+
+    \ \ \ \ ((10)
+
+    \ \ \ \ \ (let ((actual-result (thunk)))
+
+    \ \ \ \ \ \ \ (if (equal actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ (check:add-correct!)
+
+    \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-expression expression)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-actual-result actual-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-failed expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (check:add-failed! expression actual-result expected-result)))))
+
+    \ \ \ \ ((100)
+
+    \ \ \ \ \ (check:report-expression expression)
+
+    \ \ \ \ \ (let ((actual-result (thunk)))
+
+    \ \ \ \ \ \ \ (check:report-actual-result actual-result)
+
+    \ \ \ \ \ \ \ (if (equal actual-result expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ (begin (check:report-correct 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:add-correct!))
+
+    \ \ \ \ \ \ \ \ \ \ \ (begin (check:report-failed expected-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:add-failed! expression\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ actual-result\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected-result)))))
+
+    \ \ \ \ (else (error "unrecognized check:mode" check:mode))))
+
+    \;
+  </scm-chunk>
+
+  check的接口实现，使用S7 Scheme的<scm|define-macro>实现：
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define-macro (check expr =\<gtr\> expected)
+
+    \ \ ‘(check:proc ',expr (lambda () ,expr) equal? ,expected))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-true><index|check-true>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (check-true body)
+
+    \ \ ‘(check ,body =\<gtr\> #t))
+
+    \;
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-false><index|check-false>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (check-false body)
+
+    \ \ ‘(check ,body =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-catch><index|check-catch>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (check-catch error-id body)
+
+    \ \ ‘(check
+
+    \ \ \ \ (catch ,error-id
+
+    \ \ \ \ \ \ (lambda () ,body)
+
+    \ \ \ \ \ \ (lambda args ,error-id))
+
+    \ \ \ \ \ \ =\<gtr\> ,error-id))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|test><index|test><scm|(obj1 obj2) =\<gtr\> boolean>
+
+  <scm|test>函数是为了兼容S7 Scheme仓库里面的测试用例。
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define-macro (test left right)
+
+    \ \ ‘(check ,left =\<gtr\> ,right))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|check-report><index|check-report>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|true>
+    (define (check-report . msg)
+
+    \ \ (if (not (null? msg))
+
+    \ \ \ \ (begin
+
+    \ \ \ \ \ \ (display (car msg))))
+
+    \ \ (srfi-78-check-report)
+
+    \ \ (if (check-failed?) (exit -1)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
+    (define (check-report)
+
+    \ \ (if (\<gtr\>= check:mode 1)
+
+    \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ (display "; *** checks *** : ")
+
+    \ \ \ \ \ \ \ \ (display check:correct)
+
+    \ \ \ \ \ \ \ \ (display " correct, ")
+
+    \ \ \ \ \ \ \ \ (display (length check:failed))
+
+    \ \ \ \ \ \ \ \ (display " failed.")
+
+    \ \ \ \ \ \ \ \ (if (or (null? check:failed) (\<less\>= check:mode 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let* ((w (car (reverse check:failed)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (expression (car w))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (actual-result (cadr w))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (expected-result (caddr w))) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (display " First failed example:")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-expression expression)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-actual-result actual-result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (check:report-failed expected-result))))))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/srfi/srfi-78.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/check.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
   <chapter|(liii string)>
 
   <section|许可证>
