@@ -123,38 +123,6 @@
   => #(#f #f #f #f #f))
 
 (check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (char->integer x) lst)))
-      "12345")
-    lst)
-  => '(53 52 51 50 49))
-
-(check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
-      "12345")
-    lst)
-  => '(5 4 3 2 1))
-
-(check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
-      "123")
-    lst)
-  => '(3 2 1))
-
-(check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
-      "")
-    lst)
-  => '())
-
-(check
   (let ((lst (make-list 5)))
     (vector-for-each
       (lambda (i) (list-set! lst i (* i i)))
@@ -240,6 +208,20 @@
 (check (string? 123) => #f)
 (check (string? '(1 2 3)) => #f)
 
+(check
+  (string->list "MathAgape")
+  =>
+  '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
+
+(check (string->list "") => '())
+
+(check
+  (list->string '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
+  =>
+  "MathAgape")
+
+(check (list->string '()) => "")
+
 (check (string-length "MathAgape") => 9)
 (check (string-length "") => 0)
 
@@ -277,20 +259,6 @@
 (check (string-append "Math" "Agape") => "MathAgape")
 
 (check (string-append) => "")
-
-(check
-  (string->list "MathAgape")
-  =>
-  '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
-
-(check (string->list "") => '())
-
-(check
-  (list->string '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
-  =>
-  "MathAgape")
-
-(check (list->string '()) => "")
 
 (check (make-list 3 #\a) => (list #\a #\a #\a))
 (check (make-list 3) => (list #f #f #f))

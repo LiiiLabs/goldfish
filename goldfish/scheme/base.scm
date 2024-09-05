@@ -108,8 +108,6 @@
 
 (define (vector-map p . args) (apply vector (apply map p args)))
 
-(define string-for-each for-each)
-
 (define vector-for-each for-each)
 
 (define (raise . args)
@@ -164,6 +162,8 @@
         ((= (length start_end) 2)
          (substring str (car start_end) (cadr start_end)))
         (else (error 'wrong-number-of-args))))
+
+(define string-for-each for-each)
 
 (define* (vector-copy v (start 0) (end (vector-length v)))
   (if (or (> start end) (> end (vector-length v)))

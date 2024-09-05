@@ -601,6 +601,38 @@
 (check-catch 'out-of-range (string-reverse "01234" -1 3))
 
 (check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (char->integer x) lst)))
+      "12345")
+    lst)
+  => '(53 52 51 50 49))
+
+(check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
+      "12345")
+    lst)
+  => '(5 4 3 2 1))
+
+(check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
+      "123")
+    lst)
+  => '(3 2 1))
+
+(check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
+      "")
+    lst)
+  => '())
+
+(check
   (string-tokenize "1 22 333")
   => '("1" "22" "333"))
 

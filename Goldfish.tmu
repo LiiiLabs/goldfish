@@ -625,7 +625,11 @@
 
   <section|字符串>
 
+  见<smart-ref|chapter:liii_string>
+
   <section|向量>
+
+  见<smart-ref|chapter:liii_vector>
 
   <section|字节向量>
 
@@ -739,80 +743,6 @@
     \ \ \ \ v)
 
     \ \ =\<gtr\> #(#f #f #f #f #f))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|string-for-each><index|string-for-each><scm|(string-for-each proc str1 [str2 ...])>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define string-for-each for-each)
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (let ((lst '()))
-
-    \ \ \ \ (string-for-each
-
-    \ \ \ \ \ \ (lambda (x) (set! lst (cons (char-\<gtr\>integer x) lst)))
-
-    \ \ \ \ \ \ "12345")
-
-    \ \ \ \ lst)
-
-    \ \ =\<gtr\> '(53 52 51 50 49))
-
-    \;
-
-    (check
-
-    \ \ (let ((lst '()))
-
-    \ \ \ \ (string-for-each
-
-    \ \ \ \ \ \ (lambda (x) (set! lst (cons (- (char-\<gtr\>integer x) (char-\<gtr\>integer #\\0)) lst)))
-
-    \ \ \ \ \ \ "12345")
-
-    \ \ \ \ lst)
-
-    \ \ =\<gtr\> '(5 4 3 2 1))
-
-    \;
-
-    (check
-
-    \ \ (let ((lst '()))
-
-    \ \ \ \ (string-for-each
-
-    \ \ \ \ \ \ (lambda (x) (set! lst (cons (- (char-\<gtr\>integer x) (char-\<gtr\>integer #\\0)) lst)))
-
-    \ \ \ \ \ \ "123")
-
-    \ \ \ \ lst)
-
-    \ \ =\<gtr\> '(3 2 1))
-
-    \;
-
-    (check
-
-    \ \ (let ((lst '()))
-
-    \ \ \ \ (string-for-each
-
-    \ \ \ \ \ \ (lambda (x) (set! lst (cons (- (char-\<gtr\>integer x) (char-\<gtr\>integer #\\0)) lst)))
-
-    \ \ \ \ \ \ "")
-
-    \ \ \ \ lst)
-
-    \ \ =\<gtr\> '())
 
     \;
   </scm-chunk>
@@ -2383,165 +2313,7 @@
     \;
   </scm-chunk>
 
-  <chapter|(liii string)>
-
-  <label|r7rs><paragraph|string?><index|string?>
-
-  <scm|string?>是一个S7内置的谓词函数，当且仅当参数对象类型是字符串（例如<scm|"MathAgape">）时返回<scm|#t>，否则都返回<scm|#f>。当参数为符号（例如<scm|'MathAgape>）、字符（例如<scm|#/MathAgape>）、数字（例如<scm|123>）、列表（例如<scm|'(1 2 3)>）这些非字符串类型时，都返回<scm|#f>。<scm|string?>用于确定对象是否可以被当作字符串处理，在需要执行对字符串特定操作时特别有用，避免类型错误。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string? "MathAgape") =\<gtr\> #t)
-
-    (check (string? "") =\<gtr\> #t)
-
-    \;
-
-    (check (string? 'MathAgape) =\<gtr\> #f)
-
-    (check (string? #/MathAgape) =\<gtr\> #f)
-
-    (check (string? 123) =\<gtr\> #f)
-
-    (check (string? '(1 2 3)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <label|r7rs><paragraph|string-length><index|string-length>
-
-  <scm|string-length>是一个S7内置的函数，它接收一个字符串作为参数，返回一个表示该字符串长度的整数，即字符串中包含的字符数。当参数不是字符串，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string-length "MathAgape") =\<gtr\> 9)
-
-    (check (string-length "") =\<gtr\> 0)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (string-length 'not-a-string))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <label|r7rs><paragraph|string-ref><index|string-ref>
-
-  <scm|string-ref>是一个S7内置的函数，接收一个字符串和一个称为索引值的非负整数k为参数，通过索引值k返回字符串的第k个元素（从0开始计数）。当参数为空字符串时，报错。当k为负数，报错。当k大于等于字符串中字符数时，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string-ref "MathAgape" 0) =\<gtr\> #\\M)
-
-    (check (string-ref "MathAgape" 2) =\<gtr\> #\\t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "MathAgape" -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "MathAgape" 9))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "" 0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <label|r7rs><paragraph|string-append><index|string-append>
-
-  <scm|string-append>是一个S7内置的函数，用于连接两个或多个字符串。它会将所有提供的字符串参数逐个拼接在一起，并返回一个新的字符串，原始字符串不会被修改。当没有参数时，返回空字符串。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string-append "Math" "Agape") =\<gtr\> "MathAgape")
-
-    \;
-
-    (check (string-append) =\<gtr\> "")
-
-    \;
-  </scm-chunk>
-
-  <label|r7rs><paragraph|string-\<gtr\>list><index|string-\<gtr\>list>
-
-  <scm|string-\<gtr\>list>是一个S7内置的函数，用于将字符串转换为字符列表。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (string-\<gtr\>list "MathAgape")
-
-    \ \ =\<gtr\>
-
-    \ \ '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
-
-    \;
-
-    (check (string-\<gtr\>list "") =\<gtr\> '())
-
-    \;
-  </scm-chunk>
-
-  <label|r7rs><paragraph|list-\<gtr\>string><index|list-\<gtr\>string>
-
-  <scm|list-\<gtr\>string>是一个S7内置的函数，用于将字符列表转换为字符串。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (list-\<gtr\>string '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
-
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
-
-    \;
-
-    (check (list-\<gtr\>string '()) =\<gtr\> "")
-
-    \;
-  </scm-chunk>
-
-  \;
+  <chapter|(liii string)><label|chapter:liii_string>
 
   <section|许可证>
 
@@ -2654,9 +2426,13 @@
 
     (export
 
+    \ \ ; S7 built-in
+
+    \ \ string? string-ref string-length
+
     \ \ ; from (scheme base)
 
-    \ \ string-copy
+    \ \ string-copy string-for-each
 
     \ \ ; from (srfi srfi-13)
 
@@ -2781,7 +2557,71 @@
     \;
   </scm-chunk>
 
+  <section|谓词>
+
+  <label|r7rs><paragraph|string?><index|string?>
+
+  <scm|string?>是一个S7内置的谓词函数，当且仅当参数对象类型是字符串（例如<scm|"MathAgape">）时返回<scm|#t>，否则都返回<scm|#f>。当参数为符号（例如<scm|'MathAgape>）、字符（例如<scm|#/MathAgape>）、数字（例如<scm|123>）、列表（例如<scm|'(1 2 3)>）这些非字符串类型时，都返回<scm|#f>。<scm|string?>用于确定对象是否可以被当作字符串处理，在需要执行对字符串特定操作时特别有用，避免类型错误。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string? "MathAgape") =\<gtr\> #t)
+
+    (check (string? "") =\<gtr\> #t)
+
+    \;
+
+    (check (string? 'MathAgape) =\<gtr\> #f)
+
+    (check (string? #/MathAgape) =\<gtr\> #f)
+
+    (check (string? 123) =\<gtr\> #f)
+
+    (check (string? '(1 2 3)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
   <section|列表-字符串转换>
+
+  <label|r7rs><paragraph|string-\<gtr\>list><index|string-\<gtr\>list>
+
+  <scm|string-\<gtr\>list>是一个S7内置的函数，用于将字符串转换为字符列表。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (string-\<gtr\>list "MathAgape")
+
+    \ \ =\<gtr\>
+
+    \ \ '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
+
+    \;
+
+    (check (string-\<gtr\>list "") =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|list-\<gtr\>string><index|list-\<gtr\>string>
+
+  <scm|list-\<gtr\>string>是一个S7内置的函数，用于将字符列表转换为字符串。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (list-\<gtr\>string '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
+
+    \ \ =\<gtr\>
+
+    \ \ "MathAgape")
+
+    \;
+
+    (check (list-\<gtr\>string '()) =\<gtr\> "")
+
+    \;
+  </scm-chunk>
 
   <paragraph|string-join><scm|(l [delim [grammer]]) =\<gtr\> string><index|string-join>
 
@@ -3596,6 +3436,86 @@
   </scm-chunk>
 
   <section|选择器>
+
+  <label|r7rs><paragraph|string-length><index|string-length>
+
+  <scm|string-length>是一个S7内置的函数，它接收一个字符串作为参数，返回一个表示该字符串长度的整数，即字符串中包含的字符数。当参数不是字符串，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-length "MathAgape") =\<gtr\> 9)
+
+    (check (string-length "") =\<gtr\> 0)
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (string-length 'not-a-string))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|string-ref><index|string-ref>
+
+  <scm|string-ref>是一个S7内置的函数，接收一个字符串和一个称为索引值的非负整数k为参数，通过索引值k返回字符串的第k个元素（从0开始计数）。当参数为空字符串时，报错。当k为负数，报错。当k大于等于字符串中字符数时，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-ref "MathAgape" 0) =\<gtr\> #\\M)
+
+    (check (string-ref "MathAgape" 2) =\<gtr\> #\\t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (string-ref "MathAgape" -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (string-ref "MathAgape" 9))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (string-ref "" 0))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
 
   <label|r7rs><paragraph|string-copy><index|string-copy>
 
@@ -4633,6 +4553,98 @@
     \;
 
     (check-catch 'out-of-range (string-reverse "01234" -1 3))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|r7rs><paragraph|string-append><index|string-append>
+
+  <scm|string-append>是一个S7内置的函数，用于连接两个或多个字符串。它会将所有提供的字符串参数逐个拼接在一起，并返回一个新的字符串，原始字符串不会被修改。当没有参数时，返回空字符串。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-append "Math" "Agape") =\<gtr\> "MathAgape")
+
+    \;
+
+    (check (string-append) =\<gtr\> "")
+
+    \;
+  </scm-chunk>
+
+  <section|Fold, unfold & map>
+
+  <label|r7rs><paragraph|string-for-each><scm|(proc str1 [str2 ...])><index|string-for-each>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define string-for-each for-each)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (let ((lst '()))
+
+    \ \ \ \ (string-for-each
+
+    \ \ \ \ \ \ (lambda (x) (set! lst (cons (char-\<gtr\>integer x) lst)))
+
+    \ \ \ \ \ \ "12345")
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '(53 52 51 50 49))
+
+    \;
+
+    (check
+
+    \ \ (let ((lst '()))
+
+    \ \ \ \ (string-for-each
+
+    \ \ \ \ \ \ (lambda (x) (set! lst (cons (- (char-\<gtr\>integer x) (char-\<gtr\>integer #\\0)) lst)))
+
+    \ \ \ \ \ \ "12345")
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '(5 4 3 2 1))
+
+    \;
+
+    (check
+
+    \ \ (let ((lst '()))
+
+    \ \ \ \ (string-for-each
+
+    \ \ \ \ \ \ (lambda (x) (set! lst (cons (- (char-\<gtr\>integer x) (char-\<gtr\>integer #\\0)) lst)))
+
+    \ \ \ \ \ \ "123")
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '(3 2 1))
+
+    \;
+
+    (check
+
+    \ \ (let ((lst '()))
+
+    \ \ \ \ (string-for-each
+
+    \ \ \ \ \ \ (lambda (x) (set! lst (cons (- (char-\<gtr\>integer x) (char-\<gtr\>integer #\\0)) lst)))
+
+    \ \ \ \ \ \ "")
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '())
 
     \;
   </scm-chunk>
@@ -7017,7 +7029,7 @@
     \;
   </scm-chunk>
 
-  <chapter|(liii vector)>
+  <chapter|(liii vector)><label|chapter:liii_vector>
 
   <section|许可证>
 
