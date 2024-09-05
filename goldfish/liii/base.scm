@@ -24,10 +24,8 @@
   ; String
   string-copy
   ; Vector
-  vector->string
-  string->vector
-  vector-copy
-  vector-copy!
+  vector->string string->vector
+  vector-copy vector-copy! vector-fill!
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?

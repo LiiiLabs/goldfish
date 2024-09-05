@@ -328,6 +328,28 @@
   =>
   #t)
 
+(define original-string "MathAgape")
+(define copied-string (string-copy original-string))
+
+(check-true (equal? original-string copied-string))
+(check-false (eq? original-string copied-string))
+
+(check-true
+  (equal? (string-copy "MathAgape" 4)
+          (string-copy "MathAgape" 4)))
+
+(check-false
+  (eq? (string-copy "MathAgape" 4)
+       (string-copy "MathAgape" 4)))
+
+(check-true
+  (equal? (string-copy "MathAgape" 4 9)
+          (string-copy "MathAgape" 4 9)))
+
+(check-false
+  (eq? (string-copy "MathAgape" 4 9)
+       (string-copy "MathAgape" 4 9)))
+
 (check (string-take "MathAgape" 4) => "Math")
 
 (check
@@ -577,6 +599,44 @@
 (check-catch 'out-of-range (string-reverse "01234" 1 6))
 
 (check-catch 'out-of-range (string-reverse "01234" -1 3))
+
+(check
+  (string-map
+    (lambda (ch) (integer->char (+ 1 (char->integer ch))))
+    "HAL")
+  => "IBM")
+
+(check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (char->integer x) lst)))
+      "12345")
+    lst)
+  => '(53 52 51 50 49))
+
+(check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
+      "12345")
+    lst)
+  => '(5 4 3 2 1))
+
+(check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
+      "123")
+    lst)
+  => '(3 2 1))
+
+(check
+  (let ((lst '()))
+    (string-for-each
+      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
+      "")
+    lst)
+  => '())
 
 (check
   (string-tokenize "1 22 333")

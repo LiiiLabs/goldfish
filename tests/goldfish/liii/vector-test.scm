@@ -51,6 +51,30 @@
 (check-false (vector-empty? (vector 1)))
 (check-catch 'type-error (vector-empty? 1))
 
+(check
+  (let ((lst (make-list 5)))
+    (vector-for-each
+      (lambda (i) (list-set! lst i (* i i)))
+      #(0 1 2 3 4))
+    lst)
+  => '(0 1 4 9 16))
+
+(check
+  (let ((lst (make-list 5)))
+    (vector-for-each
+      (lambda (i) (list-set! lst i (* i i)))
+      #(0 1 2))
+    lst)
+  => '(0 1 4 #f #f))
+
+(check
+  (let ((lst (make-list 5)))
+    (vector-for-each
+      (lambda (i) (list-set! lst i (* i i)))
+      #())
+    lst)
+  => '(#f #f #f #f #f))
+
 (check (vector-count even? #()) => 0)
 (check (vector-count even? #(1 3 5 7 9)) => 0)
 (check (vector-count even? #(1 3 4 7 8)) => 2)

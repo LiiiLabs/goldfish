@@ -90,183 +90,8 @@
 (check (char=? #\A #\A #\A) => #t)
 (check (char=? #\A #\a) => #f)
 
-(check (string? "MathAgape") => #t)
-(check (string? "") => #t)
-
-(check (string? 'MathAgape) => #f)
-(check (string? #/MathAgape) => #f)
-(check (string? 123) => #f)
-(check (string? '(1 2 3)) => #f)
-
-(check (string-length "MathAgape") => 9)
-(check (string-length "") => 0)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (string-length 'not-a-string))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (string-ref "MathAgape" 0) => #\M)
-(check (string-ref "MathAgape" 2) => #\t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "MathAgape" -1))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "MathAgape" 9))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "" 0))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (string-append "Math" "Agape") => "MathAgape")
-
-(check (string-append) => "")
-
-(check
-  (string->list "MathAgape")
-  =>
-  '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
-
-(check (string->list "") => '())
-
-(check
-  (list->string '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
-  =>
-  "MathAgape")
-
-(check (list->string '()) => "")
-
-(define original-string "MathAgape")
-(define copied-string (string-copy original-string))
-
-(check (equal? original-string copied-string) => #t)
-(check (eq? original-string copied-string) => #f)
-
-(check
-  (equal? (string-copy "MathAgape" 4)
-          (string-copy "MathAgape" 4))
-  =>
-  #t)
-
-(check
-  (eq? (string-copy "MathAgape" 4)
-       (string-copy "MathAgape" 4))
-  =>
-  #f)
-
-(check
-  (equal? (string-copy "MathAgape" 4 9)
-          (string-copy "MathAgape" 4 9))
-  =>
-  #t)
-
-(check
-  (eq? (string-copy "MathAgape" 4 9)
-       (string-copy "MathAgape" 4 9))
-  =>
-  #f)
-
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
-
-(check (map square (list 1 2 3 4 5)) => '(1 4 9 16 25))
-
-(check
-  (string-map
-    (lambda (ch) (integer->char (+ 1 (char->integer ch))))
-    "HAL")
-  => "IBM")
-
-(check
-  (let ((v (make-vector 5)))
-    (for-each (lambda (i) (vector-set! v i (* i i)))
-              (iota 5))
-    v)
-  => #(0 1 4 9 16))
-
-(check
-  (let ((v (make-vector 5 #f)))
-    (for-each (lambda (i) (vector-set! v i (* i i)))
-              (iota 4))
-    v)
-  => #(0 1 4 9 #f))
-
-(check
-  (let ((v (make-vector 5 #f)))
-    (for-each (lambda (i) (vector-set! v i (* i i)))
-              (iota 0))
-    v)
-  => #(#f #f #f #f #f))
-
-(check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (char->integer x) lst)))
-      "12345")
-    lst)
-  => '(53 52 51 50 49))
-
-(check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
-      "12345")
-    lst)
-  => '(5 4 3 2 1))
-
-(check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
-      "123")
-    lst)
-  => '(3 2 1))
-
-(check
-  (let ((lst '()))
-    (string-for-each
-      (lambda (x) (set! lst (cons (- (char->integer x) (char->integer #\0)) lst)))
-      "")
-    lst)
-  => '())
-
-(check
-  (let ((lst (make-list 5)))
-    (vector-for-each
-      (lambda (i) (list-set! lst i (* i i)))
-      #(0 1 2 3 4))
-    lst)
-  => '(0 1 4 9 16))
-
-(check
-  (let ((lst (make-list 5)))
-    (vector-for-each
-      (lambda (i) (list-set! lst i (* i i)))
-      #(0 1 2))
-    lst)
-  => '(0 1 4 #f #f))
-
-(check
-  (let ((lst (make-list 5)))
-    (vector-for-each
-      (lambda (i) (list-set! lst i (* i i)))
-      #())
-    lst)
-  => '(#f #f #f #f #f))
 
 (guard (condition
          (else
@@ -321,6 +146,66 @@
 (check-catch 'type-error (add3 1.2 2 3))
 
 (check-report)
+
+(check (string? "MathAgape") => #t)
+(check (string? "") => #t)
+
+(check (string? 'MathAgape) => #f)
+(check (string? #/MathAgape) => #f)
+(check (string? 123) => #f)
+(check (string? '(1 2 3)) => #f)
+
+(check
+  (string->list "MathAgape")
+  =>
+  '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
+
+(check (string->list "") => '())
+
+(check
+  (list->string '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
+  =>
+  "MathAgape")
+
+(check (list->string '()) => "")
+
+(check (string-length "MathAgape") => 9)
+(check (string-length "") => 0)
+
+(check
+  (catch 'wrong-type-arg
+    (lambda () (string-length 'not-a-string))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (string-ref "MathAgape" 0) => #\M)
+(check (string-ref "MathAgape" 2) => #\t)
+
+(check
+  (catch 'out-of-range
+    (lambda () (string-ref "MathAgape" -1))
+    (lambda args #t))
+  =>
+  #t)
+
+(check
+  (catch 'out-of-range
+    (lambda () (string-ref "MathAgape" 9))
+    (lambda args #t))
+  =>
+  #t)
+
+(check
+  (catch 'out-of-range
+    (lambda () (string-ref "" 0))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (string-append "Math" "Agape") => "MathAgape")
+
+(check (string-append) => "")
 
 (check (make-list 3 #\a) => (list #\a #\a #\a))
 (check (make-list 3) => (list #f #f #f))
@@ -380,6 +265,29 @@
 
 (check (append () 'c) => 'c)
 (check (append) => '())
+
+(check (map square (list 1 2 3 4 5)) => '(1 4 9 16 25))
+
+(check
+  (let ((v (make-vector 5)))
+    (for-each (lambda (i) (vector-set! v i (* i i)))
+              (iota 5))
+    v)
+  => #(0 1 4 9 16))
+
+(check
+  (let ((v (make-vector 5 #f)))
+    (for-each (lambda (i) (vector-set! v i (* i i)))
+              (iota 4))
+    v)
+  => #(0 1 4 9 #f))
+
+(check
+  (let ((v (make-vector 5 #f)))
+    (for-each (lambda (i) (vector-set! v i (* i i)))
+              (iota 0))
+    v)
+  => #(#f #f #f #f #f))
 
 (check (memq #f '(1 #f 2 3)) => '(#f 2 3))
 (check (memq 'a '(1 a 2 3)) => '(a 2 3))
