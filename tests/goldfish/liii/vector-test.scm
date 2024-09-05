@@ -17,7 +17,7 @@
 (import (liii list)
         (liii check)
         (liii vector)
-        (scheme base))
+        (only (scheme base) let-values))
 
 (check-set-mode! 'report-failed)
 
@@ -28,6 +28,24 @@
    vector-any vector-every vector-copy vector-copy!
    vector-index vector-index-right vector-partition
    vector-swap!))
+
+(check (vector-copy #(0 1 2 3)) => #(0 1 2 3))
+(check (vector-copy #(0 1 2 3) 1) => #(1 2 3))
+(check (vector-copy #(0 1 2 3) 3) => #(3))
+(check (vector-copy #(0 1 2 3) 4) => #())
+
+(check-catch 'out-of-range (vector-copy #(0 1 2 3) 5))
+(check-catch 'out-of-range (vector-copy #(0 1 2 3) 1 5))
+
+(define my-vector #(0 1 2 3))
+(check (eqv? my-vector (vector-copy #(0 1 2 3))) => #f)
+(check-true
+  (eqv? (vector-ref my-vector 2)
+        (vector-ref (vector-copy #(0 1 2 3)) 2)))
+
+(check (vector-copy #(0 1 2 3) 1 1) => #())
+(check (vector-copy #(0 1 2 3) 1 2) => #(1))
+(check (vector-copy #(0 1 2 3) 1 4) => #(1 2 3))
 
 (check-true (vector-empty? (vector)))
 (check-false (vector-empty? (vector 1)))
