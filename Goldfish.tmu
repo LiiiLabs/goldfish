@@ -4893,7 +4893,7 @@
 
   <subsection|构造器>
 
-  <paragraph|cons><index|cons>
+  <label|r7rs><paragraph|cons><index|cons>
 
   S7 Scheme内置的R7RS中定义的函数。
 
@@ -6961,626 +6961,6 @@
 
   <chapter|(liii vector)>
 
-  <paragraph|vector?><index|vector?><scm|(vector? obj) =\<gtr\> bool>
-
-  如果obj是一个向量返回<scm|#t>，否则返回<scm|#f>。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (vector? #(1 2 3)) =\<gtr\> #t)
-
-    (check (vector? #()) =\<gtr\> #t)
-
-    (check (vector? '(1 2 3)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <paragraph|vector-length><index|vector-length><scm|(vector-length v)>
-
-  以整数返回向量中元素的数量。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (vector-length #(1 2 3)) =\<gtr\> 3)
-
-    (check (vector-length #()) =\<gtr\> 0)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|vector-ref><index|vector-ref><scm|(vector-ref v k )>
-
-  返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (vector-ref #(1 2 3) 0) =\<gtr\> 1)
-
-    (check (vector-ref #(1 2 3) 2) =\<gtr\> 3)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-ref #(1 2 3) 3))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \ \ 
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-ref #() 0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \ \ 
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (vector-ref #(1 2 3) 2.0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \ \ 
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (vector-ref #(1 2 3) "2"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|vector-set!><index|vector-set!><scm|(vector-set! v k obj )>
-
-  该函数将对象 obj 存储到向量中索引为 k 的元素里。注意，返回的不是向量，而是那个 obj。当 k 不是向量的有效索引，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (define my-vector #(0 1 2 3))
-
-    (check my-vector =\<gtr\> #(0 1 2 3))
-
-    \;
-
-    (check (vector-set! my-vector 2 10) =\<gtr\> 10)
-
-    (check my-vector =\<gtr\> #(0 1 10 3))
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-set! my-vector 4 10))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|vector-\<gtr\>list><index|vector-\<gtr\>list><scm|(vector-\<gtr\>list v [start [end]])>
-
-  返回一个新分配的列表，包含向量中从 start 到 end 之间的元素中的对象。当 <scm|start>、<scm|end>不是向量的有效索引，报错。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (vector-\<gtr\>list #()) =\<gtr\> '())
-
-    (check (vector-\<gtr\>list #() 0) =\<gtr\> '())
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-\<gtr\>list #() 1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check (vector-\<gtr\>list #(0 1 2 3)) =\<gtr\> '(0 1 2 3))
-
-    (check (vector-\<gtr\>list #(0 1 2 3) 1) =\<gtr\> '(1 2 3))
-
-    (check (vector-\<gtr\>list #(0 1 2 3) 1 1) =\<gtr\> '())
-
-    (check (vector-\<gtr\>list #(0 1 2 3) 1 2) =\<gtr\> '(1))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|list-\<gtr\>vector><index|list-\<gtr\>vector><scm|(list-\<gtr\>vector l)>
-
-  返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
-
-    (check (list-\<gtr\>vector '()) =\<gtr\> #())
-
-    \;
-  </scm-chunk>
-
-  <paragraph|vector-\<gtr\>string><index|vector-\<gtr\>string><scm|(vector-\<gtr\>string v [start [end]]) =\<gtr\> string>
-
-  将向量v转化为字符串，如果指定了起始索引和终止索引，则只将指定范围内的子向量转化为字符串。
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    ; 0-clause BSD
-
-    ; Bill Schottstaedt
-
-    ; from S7 source repo: r7rs.scm
-
-    (define* (vector-\<gtr\>string v (start 0) end)\ 
-
-    \ \ (let ((stop (or end (length v))))\ 
-
-    \ \ \ \ (copy v (make-string (- stop start)) start stop)))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3)) =\<gtr\> "0123")
-
-    (check (vector-\<gtr\>string (vector #\\a #\\b #\\c)) =\<gtr\> "abc")
-
-    \;
-
-    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 0 4) =\<gtr\> "0123")
-
-    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1) =\<gtr\> "123")
-
-    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 4) =\<gtr\> "123")
-
-    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 3) =\<gtr\> "12")
-
-    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 2) =\<gtr\> "1")
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 2 10))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 2 3) =\<gtr\> "2")
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 1 3))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|string-\<gtr\>vector><index|string-\<gtr\>vector><scm|(s [start [end]]) =\<gtr\> vector>
-
-  将字符串s转化为向量，如果指定了起始索引和终止索引，则只将指定范围内的子字符串转化为向量。
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    ; 0-clause BSD
-
-    ; Bill Schottstaedt
-
-    ; from S7 source repo: r7rs.scm
-
-    (define* (string-\<gtr\>vector s (start 0) end)
-
-    \ \ (let ((stop (or end (length s))))\ 
-
-    \ \ \ \ (copy s (make-vector (- stop start)) start stop)))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|goldfish/liii/base-test.scm|false|false>
-    (check (string-\<gtr\>vector "0123") =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
-
-    (check (string-\<gtr\>vector "abc") =\<gtr\> (vector #\\a #\\b #\\c))
-
-    \;
-
-    (check (string-\<gtr\>vector "0123" 0 4) =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
-
-    (check (string-\<gtr\>vector "0123" 1) =\<gtr\> (vector #\\1 #\\2 #\\3))
-
-    (check (string-\<gtr\>vector "0123" 1 4) =\<gtr\> (vector #\\1 #\\2 #\\3))
-
-    (check (string-\<gtr\>vector "0123" 1 3) =\<gtr\> (vector #\\1 #\\2))
-
-    (check (string-\<gtr\>vector "0123" 1 2) =\<gtr\> (vector #\\1))
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-\<gtr\>vector "0123" 2 10))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <paragraph|vector-copy!><index|vector-copy!><scm|(vector-copy! to at from [start [end]])>
-
-  <scm|to>和<scm|from>都是向量，<scm|vector-copy!>就是从<scm|from>向量复制元素依次粘贴到<scm|to>向量，粘贴从<scm|to>向量的第<scm|at>个索引位置开始；<scm|start>和<scm|end>是可选参数，用于指定从<scm|from>向量选取元素的范围。
-
-  <\scm-code>
-    a (vector "a0" "a1" "a2" "a3" "a4")
-
-    b (vector "b0" "b1" "b2" "b3" "b4"
-
-    \;
-
-    (vector-copy! b 1 a 0 2) 就是：
-
-    第一步：从a中选取索引为[0,2)的元素，即"a0" "a1"
-
-    第二步：定位到b的索引为 1 的位置，即"b1"所在的那个位置
-
-    第二步：以刚刚定位到的那个"b1"位置为起点，把刚刚选出的元素"a0" "a1"依次替换，直到
-
-    \;
-
-    \;
-
-    代码实现时要注意
-
-    at、to、from的边界条件，按顺序写它们会导致报错的条件
-
-    要注意每一个参数在后面会遇到怎样的使用
-
-    \;
-
-    第一步：只涉及单个参数的报错条件
-
-    (\<less\> at 0) 可省去
-
-    (\<gtr\> at (vector-length to)) 可省去
-
-    (\<less\> start 0)
-
-    (\<less\> start 0)
-
-    (\<gtr\> start (vector-length from))
-
-    (\<less\> end 0)
-
-    (\<gtr\> end (vector-length from))
-
-    \;
-
-    第二步：两个依赖关系的参数的报错条件
-
-    (\<gtr\> start end)
-
-    \;
-
-    第三步：三个依赖关系参数的报错条件
-
-    (\<gtr\> (+ at (- end start)) (vector-length to))
-
-    \;
-
-    综合上方的报错条件，去掉一些多余的条件：
-
-    (\<less\> start 0)可省去
-
-    因为有(\<gtr\> (+ at (- end start)) (vector-length to))，所以(\<gtr\> at (vector-length to))可省去
-  </scm-code>
-
-  <\session|guile|default>
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      (define a (vector "a0" "a1" "a2" "a3" "a4"))
-    </input>
-
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      (define b (vector "b0" "b1" "b2" "b3" "b4"))
-    </input>
-
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      (vector-copy! b 0 a 1)
-    </input>
-
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      b
-    <|unfolded-io>
-      <guile-result|#("a1" "a2" "a3" "a4" "b4")>
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      a
-    <|unfolded-io>
-      <guile-result|#("a0" "a1" "a2" "a3" "a4")>
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define* (vector-copy! to at from (start 0) (end (vector-length from)))
-
-    \ \ (if (or (\<less\> at 0)
-
-    \ \ \ \ \ \ \ \ \ \ (\<gtr\> start (vector-length from))
-
-    \ \ \ \ \ \ \ \ \ \ (\<less\> end 0)
-
-    \ \ \ \ \ \ \ \ \ \ (\<gtr\> end (vector-length from))
-
-    \ \ \ \ \ \ \ \ \ \ (\<gtr\> start end)
-
-    \ \ \ \ \ \ \ \ \ \ (\<gtr\> (+ at (- end start)) (vector-length to)))
-
-    \ \ \ \ \ \ (error 'out-of-range "vector-copy!")
-
-    \ \ \ \ \ \ (let loop ((to-i at) (from-i start))
-
-    \ \ \ \ \ \ \ \ (if (\<gtr\>= from-i end)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ to
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (begin
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! to to-i (vector-ref from from-i))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ to-i 1) (+ from-i 1)))))))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (define a (vector "a0" "a1" "a2" "a3" "a4"))
-
-    (define b (vector "b0" "b1" "b2" "b3" "b4"))
-
-    \;
-
-    ;(\<less\> at 0)
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b -1 a))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    ;(\<less\> start 0)
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    ;(\<gtr\> start (vector-length from))
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a 6))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    ;(\<gtr\> end (vector-length from))
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a 0 6))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    ;(\<gtr\> start end)
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a 2 1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    ;(\<gtr\> (+ at (- end start)) (vector-length to))
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 6 a))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 1 a))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (define a (vector "a0" "a1" "a2" "a3" "a4"))
-
-    (define b (vector "b0" "b1" "b2" "b3" "b4"))
-
-    (vector-copy! b 0 a 1)
-
-    (check b =\<gtr\> #("a1" "a2" "a3" "a4" "b4"))
-
-    \;
-
-    (define a (vector "a0" "a1" "a2" "a3" "a4"))
-
-    (define b (vector "b0" "b1" "b2" "b3" "b4"))
-
-    (vector-copy! b 0 a 0 5)
-
-    (check b =\<gtr\> #("a0" "a1" "a2" "a3" "a4"))\ 
-
-    \;
-  </scm-chunk>
-
-  <paragraph|vector-append><index|vector-append><scm|(vector-append vector . . . )>
-
-  返回一个新分配的向量，其元素是给定向量的元素的拼接。这是一个S7内置的函数。
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (vector-append #(0 1 2) #(3 4 5)) =\<gtr\> #(0 1 2 3 4 5))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|vector-fill!><index|vector-fill!>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define vector-fill! fill!)
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (define my-vector (vector 0 1 2 3 4))
-
-    (fill! my-vector #f)
-
-    (check my-vector =\<gtr\> #(#f #f #f #f #f))\ 
-
-    \;
-
-    (define my-vector (vector 0 1 2 3 4))
-
-    (fill! my-vector #f 1 2)
-
-    (check my-vector =\<gtr\> #(0 #f 2 3 4))\ 
-
-    \;
-  </scm-chunk>
-
   <section|许可证>
 
   <\scm-chunk|goldfish/srfi/srfi-133.scm|false|true>
@@ -7720,11 +7100,11 @@
 
     \ \ ; S7 Scheme built-in
 
-    \ \ make-vector vector
+    \ \ make-vector vector vector-length vector-ref vector-set! vector-\<gtr\>list list-\<gtr\>vector
 
     \ \ ; from (scheme base)
 
-    \ \ vector-copy
+    \ \ vector-copy vector-fill! vector-copy! vector-\<gtr\>string string-\<gtr\>vector
 
     \ \ ; from (srfi srfi-133)
 
@@ -7785,7 +7165,7 @@
 
   <subsection|构造器>
 
-  <paragraph|make-vector><index|make-vector><scm|(k [fill]) =\<gtr\> vector>
+  <label|r7rs><paragraph|make-vector><scm|(k [fill]) =\<gtr\> vector><index|make-vector>
 
   返回长度为k的向量，如果提供了fill，则采用fill作为每一个元素的初始值，否则每一个元素的初始值是未指定。
 
@@ -7803,11 +7183,11 @@
     \;
   </scm-chunk>
 
-  <paragraph|vector><index|vector><scm|(obj1 obj2 ...) =\<gtr\> vector>
+  <label|r7rs><paragraph|vector><scm|(obj1 obj2 ...) =\<gtr\> vector><index|vector>
 
   返回一个新分配的向量，其元素包含给定的参数。类似于<scm|list>。
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (vector 'a 'b 'c) =\<gtr\> #(a b c))
 
     (check (vector) =\<gtr\> #())
@@ -7819,7 +7199,7 @@
 
   <paragraph|vector-unfold-right>
 
-  <paragraph|vector-copy><index|vector-copy><scm|(v [start [end]]) =\<gtr\> vector>
+  <label|r7rs><paragraph|vector-copy><scm|(v [start [end]]) =\<gtr\> vector><index|vector-copy>
 
   返回一个新的分配副本，包含给定向量从开始到结束的元素。新向量的元素与旧向量的元素相同（在eqv?的意义上）。
 
@@ -7841,7 +7221,7 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)))))))
   </scm-code>
 
-  <\scm-chunk|goldfish/scheme/base.scm|true|false>
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define* (vector-copy v (start 0) (end (vector-length v)))
 
     \ \ (if (or (\<gtr\> start end) (\<gtr\> end (vector-length v)))
@@ -7903,7 +7283,33 @@
     \;
   </scm-chunk>
 
+  <paragraph|vector-reverse-copy>
+
+  <label|r7rs><paragraph|vector-append><scm|(v1 v2 v3 ...) =\<gtr\> vector><index|vector-append>
+
+  返回一个新分配的向量，其元素是给定向量的元素的拼接。这是一个S7内置的函数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (vector-append #(0 1 2) #(3 4 5)) =\<gtr\> #(0 1 2 3 4 5))
+
+    \;
+  </scm-chunk>
+
   <subsection|谓词>
+
+  <paragraph|vector?><index|vector?><scm|(vector? obj) =\<gtr\> bool>
+
+  如果obj是一个向量返回<scm|#t>，否则返回<scm|#f>。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (vector? #(1 2 3)) =\<gtr\> #t)
+
+    (check (vector? #()) =\<gtr\> #t)
+
+    (check (vector? '(1 2 3)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
 
   <paragraph|vector-empty?><index|vector-empty?>
 
@@ -7925,6 +7331,68 @@
     (check-false (vector-empty? (vector 1)))
 
     (check-catch 'type-error (vector-empty? 1))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|vector=>
+
+  <subsection|选择器>
+
+  <label|r7rs><paragraph|vector-length><scm|(v) =\<gtr\> integer><index|vector-length>
+
+  以整数返回向量中元素的数量。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (vector-length #(1 2 3)) =\<gtr\> 3)
+
+    (check (vector-length #()) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|vector-ref><scm|(vector-ref v k )><index|vector-ref>
+
+  返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (vector-ref #(1 2 3) 0) =\<gtr\> 1)
+
+    (check (vector-ref #(1 2 3) 2) =\<gtr\> 3)
+
+    \;
+
+    (check-catch 'out-of-range (vector-ref #(1 2 3) 3))
+
+    (check-catch 'out-of-range (vector-ref #() 0))
+
+    \ \ 
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (vector-ref #(1 2 3) 2.0))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \ \ 
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (vector-ref #(1 2 3) "2"))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
 
     \;
   </scm-chunk>
@@ -8139,6 +7607,38 @@
 
   <subsection|修改器>
 
+  <label|r7rs><paragraph|vector-set!><scm|(vector-set! v k obj )><index|vector-set!>
+
+  该函数将对象 obj 存储到向量中索引为 k 的元素里。注意，返回的不是向量，而是那个 obj。当 k 不是向量的有效索引，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define my-vector #(0 1 2 3))
+
+    (check my-vector =\<gtr\> #(0 1 2 3))
+
+    \;
+
+    (check (vector-set! my-vector 2 10) =\<gtr\> 10)
+
+    (check my-vector =\<gtr\> #(0 1 10 3))
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-set! my-vector 4 10))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
   <paragraph|vector-swap!><index|vector-swap!>
 
   <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
@@ -8187,6 +7687,484 @@
     \ 'out-of-range
 
     \ (vector-swap! my-vector 1 (vector-length my-vector)))
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|vector-fill!><index|vector-fill!>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define vector-fill! fill!)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (define my-vector (vector 0 1 2 3 4))
+
+    (fill! my-vector #f)
+
+    (check my-vector =\<gtr\> #(#f #f #f #f #f))\ 
+
+    \;
+
+    (define my-vector (vector 0 1 2 3 4))
+
+    (fill! my-vector #f 1 2)
+
+    (check my-vector =\<gtr\> #(0 #f 2 3 4))\ 
+
+    \;
+  </scm-chunk>
+
+  <label|r7rs><paragraph|vector-copy!><scm|(vector-copy! to at from [start [end]])><index|vector-copy!>
+
+  <scm|to>和<scm|from>都是向量，<scm|vector-copy!>就是从<scm|from>向量复制元素依次粘贴到<scm|to>向量，粘贴从<scm|to>向量的第<scm|at>个索引位置开始；<scm|start>和<scm|end>是可选参数，用于指定从<scm|from>向量选取元素的范围。
+
+  <\scm-code>
+    a (vector "a0" "a1" "a2" "a3" "a4")
+
+    b (vector "b0" "b1" "b2" "b3" "b4"
+
+    \;
+
+    (vector-copy! b 1 a 0 2) 就是：
+
+    第一步：从a中选取索引为[0,2)的元素，即"a0" "a1"
+
+    第二步：定位到b的索引为 1 的位置，即"b1"所在的那个位置
+
+    第二步：以刚刚定位到的那个"b1"位置为起点，把刚刚选出的元素"a0" "a1"依次替换，直到
+
+    \;
+
+    \;
+
+    代码实现时要注意
+
+    at、to、from的边界条件，按顺序写它们会导致报错的条件
+
+    要注意每一个参数在后面会遇到怎样的使用
+
+    \;
+
+    第一步：只涉及单个参数的报错条件
+
+    (\<less\> at 0) 可省去
+
+    (\<gtr\> at (vector-length to)) 可省去
+
+    (\<less\> start 0)
+
+    (\<less\> start 0)
+
+    (\<gtr\> start (vector-length from))
+
+    (\<less\> end 0)
+
+    (\<gtr\> end (vector-length from))
+
+    \;
+
+    第二步：两个依赖关系的参数的报错条件
+
+    (\<gtr\> start end)
+
+    \;
+
+    第三步：三个依赖关系参数的报错条件
+
+    (\<gtr\> (+ at (- end start)) (vector-length to))
+
+    \;
+
+    综合上方的报错条件，去掉一些多余的条件：
+
+    (\<less\> start 0)可省去
+
+    因为有(\<gtr\> (+ at (- end start)) (vector-length to))，所以(\<gtr\> at (vector-length to))可省去
+  </scm-code>
+
+  <\session|guile|default>
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      (define a (vector "a0" "a1" "a2" "a3" "a4"))
+    </input>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      (define b (vector "b0" "b1" "b2" "b3" "b4"))
+    </input>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      (vector-copy! b 0 a 1)
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      b
+    <|unfolded-io>
+      <guile-result|#("a1" "a2" "a3" "a4" "b4")>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      a
+    <|unfolded-io>
+      <guile-result|#("a0" "a1" "a2" "a3" "a4")>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define* (vector-copy! to at from (start 0) (end (vector-length from)))
+
+    \ \ (if (or (\<less\> at 0)
+
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> start (vector-length from))
+
+    \ \ \ \ \ \ \ \ \ \ (\<less\> end 0)
+
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> end (vector-length from))
+
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> start end)
+
+    \ \ \ \ \ \ \ \ \ \ (\<gtr\> (+ at (- end start)) (vector-length to)))
+
+    \ \ \ \ \ \ (error 'out-of-range "vector-copy!")
+
+    \ \ \ \ \ \ (let loop ((to-i at) (from-i start))
+
+    \ \ \ \ \ \ \ \ (if (\<gtr\>= from-i end)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ to
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! to to-i (vector-ref from from-i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ to-i 1) (+ from-i 1)))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (define a (vector "a0" "a1" "a2" "a3" "a4"))
+
+    (define b (vector "b0" "b1" "b2" "b3" "b4"))
+
+    \;
+
+    ;(\<less\> at 0)
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b -1 a))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<less\> start 0)
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a -1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> start (vector-length from))
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a 6))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> end (vector-length from))
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a 0 6))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> start end)
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 0 a 2 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    ;(\<gtr\> (+ at (- end start)) (vector-length to))
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 6 a))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-copy! b 1 a))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (define a (vector "a0" "a1" "a2" "a3" "a4"))
+
+    (define b (vector "b0" "b1" "b2" "b3" "b4"))
+
+    (vector-copy! b 0 a 1)
+
+    (check b =\<gtr\> #("a1" "a2" "a3" "a4" "b4"))
+
+    \;
+
+    (define a (vector "a0" "a1" "a2" "a3" "a4"))
+
+    (define b (vector "b0" "b1" "b2" "b3" "b4"))
+
+    (vector-copy! b 0 a 0 5)
+
+    (check b =\<gtr\> #("a0" "a1" "a2" "a3" "a4"))\ 
+
+    \;
+  </scm-chunk>
+
+  <subsection|转换>
+
+  <label|r7rs><paragraph|vector-\<gtr\>list><scm|(vector-\<gtr\>list v [start [end]])><index|vector-\<gtr\>list>
+
+  返回一个新分配的列表，包含向量中从 start 到 end 之间的元素中的对象。当 <scm|start>、<scm|end>不是向量的有效索引，报错。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (vector-\<gtr\>list #()) =\<gtr\> '())
+
+    (check (vector-\<gtr\>list #() 0) =\<gtr\> '())
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-\<gtr\>list #() 1))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check (vector-\<gtr\>list #(0 1 2 3)) =\<gtr\> '(0 1 2 3))
+
+    (check (vector-\<gtr\>list #(0 1 2 3) 1) =\<gtr\> '(1 2 3))
+
+    (check (vector-\<gtr\>list #(0 1 2 3) 1 1) =\<gtr\> '())
+
+    (check (vector-\<gtr\>list #(0 1 2 3) 1 2) =\<gtr\> '(1))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|r7rs><paragraph|list-\<gtr\>vector><scm|(list-\<gtr\>vector l)><index|list-\<gtr\>vector>
+
+  返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
+
+    (check (list-\<gtr\>vector '()) =\<gtr\> #())
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|r7rs><paragraph|vector-\<gtr\>string><scm|(v [start [end]]) =\<gtr\> string><index|vector-\<gtr\>string>
+
+  将向量v转化为字符串，如果指定了起始索引和终止索引，则只将指定范围内的子向量转化为字符串。
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    ; 0-clause BSD
+
+    ; Bill Schottstaedt
+
+    ; from S7 source repo: r7rs.scm
+
+    (define* (vector-\<gtr\>string v (start 0) end)\ 
+
+    \ \ (let ((stop (or end (length v))))\ 
+
+    \ \ \ \ (copy v (make-string (- stop start)) start stop)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3)) =\<gtr\> "0123")
+
+    (check (vector-\<gtr\>string (vector #\\a #\\b #\\c)) =\<gtr\> "abc")
+
+    \;
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 0 4) =\<gtr\> "0123")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1) =\<gtr\> "123")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 4) =\<gtr\> "123")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 3) =\<gtr\> "12")
+
+    (check (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 1 2) =\<gtr\> "1")
+
+    \;
+
+    (check
+
+    \ \ (catch 'out-of-range
+
+    \ \ \ \ (lambda () (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 2 10))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+
+    (check (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 2 3) =\<gtr\> "2")
+
+    \;
+
+    (check
+
+    \ \ (catch 'wrong-type-arg
+
+    \ \ \ \ (lambda () (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 1 3))
+
+    \ \ \ \ (lambda args #t))
+
+    \ \ =\<gtr\>
+
+    \ \ #t)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|r7rs><paragraph|string-\<gtr\>vector><scm|(s [start [end]]) =\<gtr\> vector><index|string-\<gtr\>vector>
+
+  将字符串s转化为向量，如果指定了起始索引和终止索引，则只将指定范围内的子字符串转化为向量。
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|false>
+    ; 0-clause BSD
+
+    ; Bill Schottstaedt
+
+    ; from S7 source repo: r7rs.scm
+
+    (define* (string-\<gtr\>vector s (start 0) end)
+
+    \ \ (let ((stop (or end (length s))))\ 
+
+    \ \ \ \ (copy s (make-vector (- stop start)) start stop)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (string-\<gtr\>vector "0123") =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "abc") =\<gtr\> (vector #\\a #\\b #\\c))
+
+    \;
+
+    (check (string-\<gtr\>vector "0123" 0 4) =\<gtr\> (vector #\\0 #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "0123" 1) =\<gtr\> (vector #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "0123" 1 4) =\<gtr\> (vector #\\1 #\\2 #\\3))
+
+    (check (string-\<gtr\>vector "0123" 1 3) =\<gtr\> (vector #\\1 #\\2))
+
+    (check (string-\<gtr\>vector "0123" 1 2) =\<gtr\> (vector #\\1))
+
+    \;
+
+    (check-catch 'out-of-range (string-\<gtr\>vector "0123" 2 10))
 
     \;
   </scm-chunk>
@@ -9864,385 +9842,386 @@
   </scm-chunk>
 
   <\the-index|idx>
-    <index+1|!=|<pageref|auto-154>>
+    <index+1|!=|<pageref|auto-126>>
 
-    <index+1|==|<pageref|auto-152>>
+    <index+1|==|<pageref|auto-124>>
 
-    <index+1|???|<pageref|auto-190>>
+    <index+1|???|<pageref|auto-162>>
 
-    <index+1|any|<pageref|auto-378>>
+    <index+1|any|<pageref|auto-350>>
 
-    <index+1|append|<pageref|auto-343>>
+    <index+1|append|<pageref|auto-315>>
 
-    <index+1|apply|<pageref|auto-77>>
+    <index+1|apply|<pageref|auto-49>>
 
-    <index+1|binary-port?|<pageref|auto-120>>
+    <index+1|binary-port?|<pageref|auto-92>>
 
-    <index+1|caar|<pageref|auto-304>>
+    <index+1|caar|<pageref|auto-276>>
 
-    <index+1|call-with-port|<pageref|auto-110>>
+    <index+1|call-with-port|<pageref|auto-82>>
 
-    <index+1|car|<pageref|auto-300>>
+    <index+1|car|<pageref|auto-272>>
 
     <index+1|case|<pageref|auto-9>>
 
-    <index+1|cdr|<pageref|auto-302>>
+    <index+1|cdr|<pageref|auto-274>>
 
     <index+1|char?|<pageref|auto-25>>
 
     <index+1|char=?|<pageref|auto-27>>
 
-    <index+1|check|<pageref|auto-201>>
+    <index+1|check|<pageref|auto-173>>
 
-    <index+1|check-catch|<pageref|auto-207>>
+    <index+1|check-catch|<pageref|auto-179>>
 
-    <index+1|check-failed?|<pageref|auto-199>>
+    <index+1|check-failed?|<pageref|auto-171>>
 
-    <index+1|check-false|<pageref|auto-205>>
+    <index+1|check-false|<pageref|auto-177>>
 
-    <index+1|check-report|<pageref|auto-211>>
+    <index+1|check-report|<pageref|auto-183>>
 
-    <index+1|check-set-mode!|<pageref|auto-197>>
+    <index+1|check-set-mode!|<pageref|auto-169>>
 
-    <index+1|check-true|<pageref|auto-203>>
+    <index+1|check-true|<pageref|auto-175>>
 
-    <index+1|circular-list|<pageref|auto-286>>
+    <index+1|circular-list|<pageref|auto-258>>
 
-    <index+1|circular-list?|<pageref|auto-295>>
+    <index+1|circular-list?|<pageref|auto-267>>
 
-    <index+1|close-input-port|<pageref|auto-128>>
+    <index+1|close-input-port|<pageref|auto-100>>
 
-    <index+1|close-output-port|<pageref|auto-130>>
+    <index+1|close-output-port|<pageref|auto-102>>
 
-    <index+1|close-port|<pageref|auto-126>>
+    <index+1|close-port|<pageref|auto-98>>
 
-    <index+1|compose|<pageref|auto-164>>
+    <index+1|compose|<pageref|auto-136>>
 
-    <index+1|cons|<pageref|auto-280>>
+    <index+1|cons|<pageref|auto-252>>
 
-    <index+1|count|<pageref|auto-345>>
+    <index+1|count|<pageref|auto-317>>
 
     <index+1|define-record-type|<pageref|auto-14>>
 
-    <index+1|delete|<pageref|auto-383>>
+    <index+1|delete|<pageref|auto-355>>
 
-    <index+1|delete-duplicates|<pageref|auto-385>>
+    <index+1|delete-duplicates|<pageref|auto-357>>
 
-    <index+1|display*|<pageref|auto-156>>
+    <index+1|display*|<pageref|auto-128>>
 
-    <index+1|drop|<pageref|auto-330>>
+    <index+1|drop|<pageref|auto-302>>
 
-    <index+1|drop-right|<pageref|auto-334>>
+    <index+1|drop-right|<pageref|auto-306>>
 
-    <index+1|drop-while|<pageref|auto-374>>
+    <index+1|drop-while|<pageref|auto-346>>
 
-    <index+1|eighth|<pageref|auto-322>>
+    <index+1|eighth|<pageref|auto-294>>
 
-    <index+1|eof-object|<pageref|auto-138>>
+    <index+1|eof-object|<pageref|auto-110>>
 
-    <index+1|every|<pageref|auto-380>>
+    <index+1|every|<pageref|auto-352>>
 
-    <index+1|fifth|<pageref|auto-316>>
+    <index+1|fifth|<pageref|auto-288>>
 
-    <index+1|file-error?|<pageref|auto-106>>
+    <index+1|file-error?|<pageref|auto-78>>
 
-    <index+1|file-exists-error|<pageref|auto-182>>
+    <index+1|file-exists-error|<pageref|auto-154>>
 
-    <index+1|file-not-found-error|<pageref|auto-178>>
+    <index+1|file-not-found-error|<pageref|auto-150>>
 
-    <index+1|filter|<pageref|auto-357>>
+    <index+1|filter|<pageref|auto-329>>
 
-    <index+1|find|<pageref|auto-370>>
+    <index+1|find|<pageref|auto-342>>
 
-    <index+1|first|<pageref|auto-308>>
+    <index+1|first|<pageref|auto-280>>
 
-    <index+1|flatmap|<pageref|auto-394>>
+    <index+1|flatmap|<pageref|auto-366>>
 
-    <index+1|fold|<pageref|auto-348>>
+    <index+1|fold|<pageref|auto-320>>
 
-    <index+1|fold-right|<pageref|auto-350>>
+    <index+1|fold-right|<pageref|auto-322>>
 
-    <index+1|for-each|<pageref|auto-88>>
+    <index+1|for-each|<pageref|auto-60>>
 
-    <index+1|fourth|<pageref|auto-314>>
+    <index+1|fourth|<pageref|auto-286>>
 
-    <index+1|guard|<pageref|auto-102>>
+    <index+1|guard|<pageref|auto-74>>
 
-    <index+1|hash-table?|<pageref|auto-486>>
+    <index+1|hash-table?|<pageref|auto-490>>
 
-    <index+1|hash-table=?|<pageref|auto-496>>
+    <index+1|hash-table=?|<pageref|auto-500>>
 
-    <index+1|hash-table-clear!|<pageref|auto-520>>
+    <index+1|hash-table-clear!|<pageref|auto-524>>
 
-    <index+1|hash-table-contains?|<pageref|auto-488>>
+    <index+1|hash-table-contains?|<pageref|auto-492>>
 
-    <index+1|hash-table-delete!|<pageref|auto-512>>
+    <index+1|hash-table-delete!|<pageref|auto-516>>
 
-    <index+1|hash-table-empty?|<pageref|auto-492>>
+    <index+1|hash-table-empty?|<pageref|auto-496>>
 
-    <index+1|hash-table-\<gtr\>alist|<pageref|auto-538>>
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-542>>
 
-    <index+1|hash-table-keys|<pageref|auto-529>>
+    <index+1|hash-table-keys|<pageref|auto-533>>
 
-    <index+1|hash-table-ref|<pageref|auto-501>>
+    <index+1|hash-table-ref|<pageref|auto-505>>
 
-    <index+1|hash-table-ref/default|<pageref|auto-503>>
+    <index+1|hash-table-ref/default|<pageref|auto-507>>
 
-    <index+1|hash-table-set!|<pageref|auto-508>>
+    <index+1|hash-table-set!|<pageref|auto-512>>
 
-    <index+1|hash-table-size|<pageref|auto-525>>
+    <index+1|hash-table-size|<pageref|auto-529>>
 
-    <index+1|hash-table-update!|<pageref|auto-516>>
+    <index+1|hash-table-update!|<pageref|auto-520>>
 
-    <index+1|hash-table-values|<pageref|auto-533>>
+    <index+1|hash-table-values|<pageref|auto-537>>
 
-    <index+1|identity|<pageref|auto-162>>
+    <index+1|identity|<pageref|auto-134>>
 
-    <index+1|in?|<pageref|auto-158>>
+    <index+1|in?|<pageref|auto-130>>
 
-    <index+1|input-port?|<pageref|auto-112>>
+    <index+1|input-port?|<pageref|auto-84>>
 
-    <index+1|input-port-open?|<pageref|auto-122>>
+    <index+1|input-port-open?|<pageref|auto-94>>
 
-    <index+1|iota|<pageref|auto-288>>
+    <index+1|iota|<pageref|auto-260>>
 
-    <index+1|last|<pageref|auto-338>>
+    <index+1|last|<pageref|auto-310>>
 
-    <index+1|last-pair|<pageref|auto-336>>
+    <index+1|last-pair|<pageref|auto-308>>
 
-    <index+1|length|<pageref|auto-341>>
+    <index+1|length|<pageref|auto-313>>
 
-    <index+1|length=?|<pageref|auto-388>>
+    <index+1|length=?|<pageref|auto-360>>
 
-    <index+1|let1|<pageref|auto-160>>
+    <index+1|let1|<pageref|auto-132>>
 
     <index+1|let-values|<pageref|auto-11>>
 
-    <index+1|list|<pageref|auto-282>>
+    <index+1|list|<pageref|auto-254>>
 
     <index+1|list-\<gtr\>string|<pageref|auto-40>>
 
-    <index+1|list-\<gtr\>vector|<pageref|auto-59>>
+    <index+1|list-\<gtr\>vector|<pageref|auto-386>>
 
-    <index+1|list-index|<pageref|auto-376>>
+    <index+1|list-index|<pageref|auto-348>>
 
-    <index+1|list-not-null?|<pageref|auto-400>>
+    <index+1|list-not-null?|<pageref|auto-372>>
 
-    <index+1|list-ref|<pageref|auto-306>>
+    <index+1|list-ref|<pageref|auto-278>>
 
-    <index+1|list-view|<pageref|auto-390>>
+    <index+1|list-view|<pageref|auto-362>>
 
-    <index+1|make-list|<pageref|auto-284>>
+    <index+1|make-list|<pageref|auto-256>>
 
-    <index+1|make-vector|<pageref|auto-47>>
+    <index+1|make-vector|<pageref|auto-401>>
 
-    <index+1|map|<pageref|auto-80>>
+    <index+1|map|<pageref|auto-52>>
 
-    <index+1|member|<pageref|auto-368>>
+    <index+1|member|<pageref|auto-340>>
 
-    <index+1|memq|<pageref|auto-364>>
+    <index+1|memq|<pageref|auto-336>>
 
-    <index+1|memv|<pageref|auto-366>>
+    <index+1|memv|<pageref|auto-338>>
 
-    <index+1|ninth|<pageref|auto-324>>
+    <index+1|ninth|<pageref|auto-296>>
 
-    <index+1|not-a-directory-error|<pageref|auto-180>>
+    <index+1|not-a-directory-error|<pageref|auto-152>>
 
-    <index+1|not-null-list?|<pageref|auto-396>>
+    <index+1|not-null-list?|<pageref|auto-368>>
 
-    <index+1|null?|<pageref|auto-293>>
+    <index+1|null?|<pageref|auto-265>>
 
-    <index+1|null-list?|<pageref|auto-297>>
+    <index+1|null-list?|<pageref|auto-269>>
 
-    <index+1|os-error|<pageref|auto-176>>
+    <index+1|os-error|<pageref|auto-148>>
 
-    <index+1|output-port?|<pageref|auto-114>>
+    <index+1|output-port?|<pageref|auto-86>>
 
-    <index+1|output-port-open?|<pageref|auto-124>>
+    <index+1|output-port-open?|<pageref|auto-96>>
 
-    <index+1|pair?|<pageref|auto-291>>
+    <index+1|pair?|<pageref|auto-263>>
 
-    <index+1|partition|<pageref|auto-359>>
+    <index+1|partition|<pageref|auto-331>>
 
-    <index+1|port?|<pageref|auto-116>>
+    <index+1|port?|<pageref|auto-88>>
 
-    <index+1|procedure?|<pageref|auto-75>>
+    <index+1|procedure?|<pageref|auto-47>>
 
-    <index+1|queue|<pageref|auto-458>>
+    <index+1|queue|<pageref|auto-462>>
 
-    <index+1|queue-back|<pageref|auto-466>>
+    <index+1|queue-back|<pageref|auto-470>>
 
-    <index+1|queue-empty?|<pageref|auto-460>>
+    <index+1|queue-empty?|<pageref|auto-464>>
 
-    <index+1|queue-front|<pageref|auto-464>>
+    <index+1|queue-front|<pageref|auto-468>>
 
-    <index+1|queue-\<gtr\>list|<pageref|auto-472>>
+    <index+1|queue-\<gtr\>list|<pageref|auto-476>>
 
-    <index+1|queue-pop!|<pageref|auto-470>>
+    <index+1|queue-pop!|<pageref|auto-474>>
 
-    <index+1|queue-push!|<pageref|auto-468>>
+    <index+1|queue-push!|<pageref|auto-472>>
 
-    <index+1|queue-size|<pageref|auto-462>>
+    <index+1|queue-size|<pageref|auto-466>>
 
-    <index+1|read-error?|<pageref|auto-104>>
+    <index+1|read-error?|<pageref|auto-76>>
 
-    <index+1|reduce|<pageref|auto-352>>
+    <index+1|reduce|<pageref|auto-324>>
 
-    <index+1|reduce-right|<pageref|auto-354>>
+    <index+1|reduce-right|<pageref|auto-326>>
 
-    <index+1|remove|<pageref|auto-361>>
+    <index+1|remove|<pageref|auto-333>>
 
-    <index+1|second|<pageref|auto-310>>
+    <index+1|second|<pageref|auto-282>>
 
-    <index+1|seventh|<pageref|auto-320>>
+    <index+1|seventh|<pageref|auto-292>>
 
-    <index+1|sixth|<pageref|auto-318>>
+    <index+1|sixth|<pageref|auto-290>>
 
     <index+1|square|<pageref|auto-21>>
 
-    <index+1|stack|<pageref|auto-438>>
+    <index+1|stack|<pageref|auto-442>>
 
-    <index+1|stack-empty?|<pageref|auto-440>>
+    <index+1|stack-empty?|<pageref|auto-444>>
 
-    <index+1|stack-\<gtr\>list|<pageref|auto-450>>
+    <index+1|stack-\<gtr\>list|<pageref|auto-454>>
 
-    <index+1|stack-pop!|<pageref|auto-448>>
+    <index+1|stack-pop!|<pageref|auto-452>>
 
-    <index+1|stack-push!|<pageref|auto-446>>
+    <index+1|stack-push!|<pageref|auto-450>>
 
-    <index+1|stack-size|<pageref|auto-442>>
+    <index+1|stack-size|<pageref|auto-446>>
 
-    <index+1|stack-top|<pageref|auto-444>>
+    <index+1|stack-top|<pageref|auto-448>>
 
     <index+1|string?|<pageref|auto-30>>
 
-    <index+1|string-any|<pageref|auto-229>>
+    <index+1|string-any|<pageref|auto-201>>
 
     <index+1|string-append|<pageref|auto-36>>
 
-    <index+1|string-contains|<pageref|auto-261>>
+    <index+1|string-contains|<pageref|auto-233>>
 
     <index+1|string-copy|<pageref|auto-42>>
 
-    <index+1|string-count|<pageref|auto-263>>
+    <index+1|string-count|<pageref|auto-235>>
 
-    <index+1|string-drop|<pageref|auto-236>>
+    <index+1|string-drop|<pageref|auto-208>>
 
-    <index+1|string-drop-right|<pageref|auto-238>>
+    <index+1|string-drop-right|<pageref|auto-210>>
 
-    <index+1|string-every|<pageref|auto-227>>
+    <index+1|string-every|<pageref|auto-199>>
 
-    <index+1|string-for-each|<pageref|auto-90>>
+    <index+1|string-for-each|<pageref|auto-62>>
 
     <index+1|string-\<gtr\>list|<pageref|auto-38>>
 
-    <index+1|string-\<gtr\>vector|<pageref|auto-63>>
+    <index+1|string-\<gtr\>vector|<pageref|auto-390>>
 
-    <index+1|string-index|<pageref|auto-257>>
+    <index+1|string-index|<pageref|auto-229>>
 
-    <index+1|string-index-right|<pageref|auto-259>>
+    <index+1|string-index-right|<pageref|auto-231>>
 
-    <index+1|string-join|<pageref|auto-220>>
+    <index+1|string-join|<pageref|auto-192>>
 
     <index+1|string-length|<pageref|auto-32>>
 
-    <index+1|string-map|<pageref|auto-82>>
+    <index+1|string-map|<pageref|auto-54>>
 
-    <index+1|string-null?|<pageref|auto-225>>
+    <index+1|string-null?|<pageref|auto-197>>
 
-    <index+1|string-pad|<pageref|auto-240>>
+    <index+1|string-pad|<pageref|auto-212>>
 
-    <index+1|string-pad-right|<pageref|auto-242>>
+    <index+1|string-pad-right|<pageref|auto-214>>
 
-    <index+1|string-prefix?|<pageref|auto-252>>
+    <index+1|string-prefix?|<pageref|auto-224>>
 
     <index+1|string-ref|<pageref|auto-34>>
 
-    <index+1|string-reverse|<pageref|auto-266>>
+    <index+1|string-reverse|<pageref|auto-238>>
 
-    <index+1|string-suffix?|<pageref|auto-254>>
+    <index+1|string-suffix?|<pageref|auto-226>>
 
-    <index+1|string-take|<pageref|auto-232>>
+    <index+1|string-take|<pageref|auto-204>>
 
-    <index+1|string-take-right|<pageref|auto-234>>
+    <index+1|string-take-right|<pageref|auto-206>>
 
-    <index+1|string-tokenize|<pageref|auto-269>>
+    <index+1|string-tokenize|<pageref|auto-241>>
 
-    <index+1|string-trim|<pageref|auto-245>>
+    <index+1|string-trim|<pageref|auto-217>>
 
-    <index+1|string-trim-both|<pageref|auto-249>>
+    <index+1|string-trim-both|<pageref|auto-221>>
 
-    <index+1|string-trim-right|<pageref|auto-247>>
+    <index+1|string-trim-right|<pageref|auto-219>>
 
-    <index+1|take|<pageref|auto-328>>
+    <index+1|take|<pageref|auto-300>>
 
-    <index+1|take-right|<pageref|auto-332>>
+    <index+1|take-right|<pageref|auto-304>>
 
-    <index+1|take-while|<pageref|auto-372>>
+    <index+1|take-while|<pageref|auto-344>>
 
-    <index+1|tenth|<pageref|auto-326>>
+    <index+1|tenth|<pageref|auto-298>>
 
-    <index+1|test|<pageref|auto-209>>
+    <index+1|test|<pageref|auto-181>>
 
-    <index+1|textual-port?|<pageref|auto-118>>
+    <index+1|textual-port?|<pageref|auto-90>>
 
-    <index+1|third|<pageref|auto-312>>
+    <index+1|third|<pageref|auto-284>>
 
-    <index+1|timeout-error|<pageref|auto-184>>
+    <index+1|timeout-error|<pageref|auto-156>>
 
-    <index+1|typed-lambda|<pageref|auto-166>>
+    <index+1|typed-lambda|<pageref|auto-138>>
 
-    <index+1|type-error|<pageref|auto-186>>
+    <index+1|type-error|<pageref|auto-158>>
 
-    <index+1|value-error|<pageref|auto-188>>
+    <index+1|value-error|<pageref|auto-160>>
 
-    <index+1|vector?|<pageref|auto-45>>
+    <index+1|vector?|<pageref|auto-376>>
 
-    <index+1|vector|<pageref|auto-49>>
+    <index+1|vector|<pageref|auto-403>>
 
-    <index+1|vector-any|<pageref|auto-417>>
+    <index+1|vector-any|<pageref|auto-421>>
 
-    <index+1|vector-append|<pageref|auto-69>>
+    <index+1|vector-append|<pageref|auto-410>>
 
-    <index+1|vector-copy|<pageref|auto-65>>
+    <index+1|vector-copy!|<pageref|auto-392>>
 
-    <index+1|vector-copy!|<pageref|auto-67>>
+    <index+1|vector-copy|<pageref|auto-407>>
 
-    <index+1|vector-count|<pageref|auto-412>>
+    <index+1|vector-count|<pageref|auto-416>>
 
-    <index+1|vector-empty?|<pageref|auto-409>>
+    <index+1|vector-empty?|<pageref|auto-413>>
 
-    <index+1|vector-every|<pageref|auto-421>>
+    <index+1|vector-every|<pageref|auto-425>>
 
-    <index+1|vector-fill!|<pageref|auto-71>>
+    <index+1|vector-fill!|<pageref|auto-394>>
 
-    <index+1|vector-for-each|<pageref|auto-92>>
+    <index+1|vector-for-each|<pageref|auto-64>>
 
-    <index+1|vector-\<gtr\>list|<pageref|auto-57>>
+    <index+1|vector-\<gtr\>list|<pageref|auto-384>>
 
-    <index+1|vector-\<gtr\>string|<pageref|auto-61>>
+    <index+1|vector-\<gtr\>string|<pageref|auto-388>>
 
-    <index+1|vector-index|<pageref|auto-423>>
+    <index+1|vector-index|<pageref|auto-427>>
 
-    <index+1|vector-index-right|<pageref|auto-425>>
+    <index+1|vector-index-right|<pageref|auto-429>>
 
-    <index+1|vector-length|<pageref|auto-51>>
+    <index+1|vector-length|<pageref|auto-378>>
 
-    <index+1|vector-map|<pageref|auto-86>>
+    <index+1|vector-map|<pageref|auto-58>>
 
-    <index+1|vector-partition|<pageref|auto-427>>
+    <index+1|vector-partition|<pageref|auto-431>>
 
-    <index+1|vector-ref|<pageref|auto-53>>
+    <index+1|vector-ref|<pageref|auto-380>>
 
-    <index+1|vector-set!|<pageref|auto-55>>
+    <index+1|vector-set!|<pageref|auto-382>>
 
-    <index+1|vector-swap!|<pageref|auto-430>>
+    <index+1|vector-swap!|<pageref|auto-434>>
   </the-index>
 </body>
 
 <\initial>
   <\collection>
     <associate|font-base-size|8>
+    <associate|info-flag|paper>
     <associate|page-height|auto>
     <associate|page-medium|papyrus>
     <associate|page-screen-margin|false>

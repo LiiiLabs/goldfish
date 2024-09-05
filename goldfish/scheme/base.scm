@@ -170,19 +170,18 @@
 ) ; end of begin
 ) ; end of define-library
 
-; 0-clause BSD
-; Bill Schottstaedt
-; from S7 source repo: r7rs.scm
-(define* (vector->string v (start 0) end) 
-  (let ((stop (or end (length v)))) 
-    (copy v (make-string (- stop start)) start stop)))
+(define* (vector-copy v (start 0) (end (vector-length v)))
+  (if (or (> start end) (> end (vector-length v)))
+      (error 'out-of-range "vector-copy")
+      (let ((new-v (make-vector (- end start))))
+        (let loop ((i start) (j 0))
+          (if (>= i end)
+              new-v
+              (begin
+                (vector-set! new-v j (vector-ref v i))
+                (loop (+ i 1) (+ j 1))))))))
 
-; 0-clause BSD
-; Bill Schottstaedt
-; from S7 source repo: r7rs.scm
-(define* (string->vector s (start 0) end)
-  (let ((stop (or end (length s)))) 
-    (copy s (make-vector (- stop start)) start stop)))
+(define vector-fill! fill!)
 
 (define* (vector-copy! to at from (start 0) (end (vector-length from)))
   (if (or (< at 0)
@@ -199,16 +198,17 @@
               (vector-set! to to-i (vector-ref from from-i))
               (loop (+ to-i 1) (+ from-i 1)))))))
 
-(define vector-fill! fill!)
+; 0-clause BSD
+; Bill Schottstaedt
+; from S7 source repo: r7rs.scm
+(define* (vector->string v (start 0) end) 
+  (let ((stop (or end (length v)))) 
+    (copy v (make-string (- stop start)) start stop)))
 
-(define* (vector-copy v (start 0) (end (vector-length v)))
-  (if (or (> start end) (> end (vector-length v)))
-      (error 'out-of-range "vector-copy")
-      (let ((new-v (make-vector (- end start))))
-        (let loop ((i start) (j 0))
-          (if (>= i end)
-              new-v
-              (begin
-                (vector-set! new-v j (vector-ref v i))
-                (loop (+ i 1) (+ j 1))))))))
+; 0-clause BSD
+; Bill Schottstaedt
+; from S7 source repo: r7rs.scm
+(define* (string->vector s (start 0) end)
+  (let ((stop (or end (length s)))) 
+    (copy s (make-vector (- stop start)) start stop)))
 
