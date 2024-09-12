@@ -13,6 +13,8 @@
     </macro>>
 
     <assign|subparagraph|<macro|title|<assign|subparagraph-numbered|<compound|subparagraph-display-numbers>><assign|subparagraph-prefix|<macro|<compound|the-subparagraph>.>><compound|next-subparagraph><compound|subparagraph-clean><compound|subparagraph-header|<arg|title>><compound|subparagraph-toc|<arg|title>><small|<if|<value|subparagraph-numbered>|<compound|subparagraph-numbered-title|<arg|title>>|<compound|subparagraph-unnumbered-title|<arg|title>>>>>>
+
+    <assign|r7rs|<flag|r7rs|dark cyan>>
   </hide-preamble>
 
   文档许可证暂时没有确定！
@@ -597,7 +599,7 @@
 
   <section|布尔值>
 
-  <label|r7rs><paragraph|boolean=?><scm|(obj1 obj2 ...) =\<gtr\> boolean><index|boolean=?>
+  <r7rs><paragraph|boolean=?><scm|(obj1 obj2 ...) =\<gtr\> boolean><index|boolean=?>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define (boolean=? obj1 obj2 . rest)
@@ -2453,7 +2455,7 @@
 
   <section|谓词>
 
-  <label|r7rs><paragraph|string?><index|string?>
+  <r7rs><paragraph|string?><index|string?>
 
   <scm|string?>是一个S7内置的谓词函数，当且仅当参数对象类型是字符串（例如<scm|"MathAgape">）时返回<scm|#t>，否则都返回<scm|#f>。当参数为符号（例如<scm|'MathAgape>）、字符（例如<scm|#/MathAgape>）、数字（例如<scm|123>）、列表（例如<scm|'(1 2 3)>）这些非字符串类型时，都返回<scm|#f>。<scm|string?>用于确定对象是否可以被当作字符串处理，在需要执行对字符串特定操作时特别有用，避免类型错误。
 
@@ -2477,7 +2479,7 @@
 
   <section|列表-字符串转换>
 
-  <label|r7rs><paragraph|string-\<gtr\>list><index|string-\<gtr\>list>
+  <r7rs><paragraph|string-\<gtr\>list><index|string-\<gtr\>list>
 
   <scm|string-\<gtr\>list>是一个S7内置的函数，用于将字符串转换为字符列表。
 
@@ -2497,7 +2499,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|list-\<gtr\>string><index|list-\<gtr\>string>
+  <r7rs><paragraph|list-\<gtr\>string><index|list-\<gtr\>string>
 
   <scm|list-\<gtr\>string>是一个S7内置的函数，用于将字符列表转换为字符串。
 
@@ -3331,7 +3333,7 @@
 
   <section|选择器>
 
-  <label|r7rs><paragraph|string-length><index|string-length>
+  <r7rs><paragraph|string-length><index|string-length>
 
   <scm|string-length>是一个S7内置的函数，它接收一个字符串作为参数，返回一个表示该字符串长度的整数，即字符串中包含的字符数。当参数不是字符串，报错。
 
@@ -3357,7 +3359,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|string-ref><index|string-ref>
+  <r7rs><paragraph|string-ref><index|string-ref>
 
   <scm|string-ref>是一个S7内置的函数，接收一个字符串和一个称为索引值的非负整数k为参数，通过索引值k返回字符串的第k个元素（从0开始计数）。当参数为空字符串时，报错。当k为负数，报错。当k大于等于字符串中字符数时，报错。
 
@@ -3411,7 +3413,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|string-copy><index|string-copy>
+  <r7rs><paragraph|string-copy><index|string-copy>
 
   <scm|string-copy>是一个S7内置的函数，用于创建一个现有字符串的副本。这个函数返回一个与原始字符串内容完全相同的新字符串，但它们在内存中是两个独立的实体。也就是说，原始字符串和副本字符串内容相同，但它们是不同的对象，这可以用<code|<code*|equal?>>和<code|<code*|eq?>>对比出来。
 
@@ -4453,7 +4455,7 @@
 
   \;
 
-  <label|r7rs><paragraph|string-append><index|string-append>
+  <r7rs><paragraph|string-append><index|string-append>
 
   <scm|string-append>是一个S7内置的函数，用于连接两个或多个字符串。它会将所有提供的字符串参数逐个拼接在一起，并返回一个新的字符串，原始字符串不会被修改。当没有参数时，返回空字符串。
 
@@ -4469,7 +4471,7 @@
 
   <section|Fold, unfold & map>
 
-  <label|r7rs><paragraph|string-map><index|string-map>
+  <r7rs><paragraph|string-map><index|string-map>
 
   <subparagraph|实现>
 
@@ -4497,7 +4499,7 @@
 
   \;
 
-  <label|r7rs><paragraph|string-for-each><scm|(proc str1 [str2 ...])><index|string-for-each>
+  <r7rs><paragraph|string-for-each><scm|(proc str1 [str2 ...])><index|string-for-each>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define string-for-each for-each)
@@ -4889,7 +4891,7 @@
 
   <subsection|构造器>
 
-  <label|r7rs><paragraph|cons><index|cons>
+  <r7rs><paragraph|cons><index|cons>
 
   S7 Scheme内置的R7RS中定义的函数。
 
@@ -5763,7 +5765,7 @@
 
   <subsection|折叠和映射>
 
-  <label|r7rs><paragraph|map><index|map>
+  <r7rs><paragraph|map><index|map>
 
   <scm|map>是S7的内置高阶函数，它接收一个函数和一个列表为从参数，把该函数应用于该列表的每个元素上，并返回一个新列表。
 
@@ -5775,7 +5777,7 @@
 
   \;
 
-  <label|r7rs><paragraph|for-each><index|for-each><scm|(for-each proc list1 [list2 ...])>
+  <r7rs><paragraph|for-each><index|for-each><scm|(for-each proc list1 [list2 ...])>
 
   <scm|for-each>是S7内置的高阶函数。<scm|for-each>的参数与<scm|map>的参数类似，但<scm|for-each>调用<scm|proc>是为了它的副作用，而不是为了它的返回值。与<scm|map>不同，<scm|for-each>保证会按照从第一个元素到最后一个元素的顺序调用<scm|proc>，并且<scm|for-each>返回的值是未指定的。如果给出了多个列表，并且不是所有列表的长度都相同，<scm|for-each>会在最短的列表用尽时终止。当<scm|proc>不接受与<scm|lists>数量相同的参数，报错。
 
@@ -7225,7 +7227,7 @@
 
   <subsection|构造器>
 
-  <label|r7rs><paragraph|make-vector><scm|(k [fill]) =\<gtr\> vector><index|make-vector>
+  <r7rs><paragraph|make-vector><scm|(k [fill]) =\<gtr\> vector><index|make-vector>
 
   返回长度为k的向量，如果提供了fill，则采用fill作为每一个元素的初始值，否则每一个元素的初始值是未指定。
 
@@ -7243,7 +7245,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|vector><scm|(obj1 obj2 ...) =\<gtr\> vector><index|vector>
+  <r7rs><paragraph|vector><scm|(obj1 obj2 ...) =\<gtr\> vector><index|vector>
 
   返回一个新分配的向量，其元素包含给定的参数。类似于<scm|list>。
 
@@ -7259,7 +7261,7 @@
 
   <paragraph|vector-unfold-right>
 
-  <label|r7rs><paragraph|vector-copy><scm|(v [start [end]]) =\<gtr\> vector><index|vector-copy>
+  <r7rs><paragraph|vector-copy><scm|(v [start [end]]) =\<gtr\> vector><index|vector-copy>
 
   返回一个新的分配副本，包含给定向量从开始到结束的元素。新向量的元素与旧向量的元素相同（在eqv?的意义上）。
 
@@ -7345,7 +7347,7 @@
 
   <paragraph|vector-reverse-copy>
 
-  <label|r7rs><paragraph|vector-append><scm|(v1 v2 v3 ...) =\<gtr\> vector><index|vector-append>
+  <r7rs><paragraph|vector-append><scm|(v1 v2 v3 ...) =\<gtr\> vector><index|vector-append>
 
   返回一个新分配的向量，其元素是给定向量的元素的拼接。这是一个S7内置的函数。
 
@@ -7399,7 +7401,7 @@
 
   <subsection|选择器>
 
-  <label|r7rs><paragraph|vector-length><scm|(v) =\<gtr\> integer><index|vector-length>
+  <r7rs><paragraph|vector-length><scm|(v) =\<gtr\> integer><index|vector-length>
 
   以整数返回向量中元素的数量。
 
@@ -7411,7 +7413,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|vector-ref><scm|(vector-ref v k )><index|vector-ref>
+  <r7rs><paragraph|vector-ref><scm|(vector-ref v k )><index|vector-ref>
 
   返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
 
@@ -7459,7 +7461,7 @@
 
   <subsection|迭代>
 
-  <label|r7rs><paragraph|vector-map><index|vector-map>
+  <r7rs><paragraph|vector-map><index|vector-map>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define (vector-map p . args) (apply vector (apply map p args)))
@@ -7467,7 +7469,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|vector-for-each><scm|(proc vector1 [vector2 ...])><index|vector-for-each>
+  <r7rs><paragraph|vector-for-each><scm|(proc vector1 [vector2 ...])><index|vector-for-each>
 
   <subparagraph|实现>
 
@@ -7737,7 +7739,7 @@
 
   <subsection|修改器>
 
-  <label|r7rs><paragraph|vector-set!><scm|(vector-set! v k obj )><index|vector-set!>
+  <r7rs><paragraph|vector-set!><scm|(vector-set! v k obj )><index|vector-set!>
 
   该函数将对象 obj 存储到向量中索引为 k 的元素里。注意，返回的不是向量，而是那个 obj。当 k 不是向量的有效索引，报错。
 
@@ -7821,7 +7823,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|vector-fill!><index|vector-fill!>
+  <r7rs><paragraph|vector-fill!><index|vector-fill!>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define vector-fill! fill!)
@@ -7847,7 +7849,7 @@
     \;
   </scm-chunk>
 
-  <label|r7rs><paragraph|vector-copy!><scm|(vector-copy! to at from [start [end]])><index|vector-copy!>
+  <r7rs><paragraph|vector-copy!><scm|(vector-copy! to at from [start [end]])><index|vector-copy!>
 
   <scm|to>和<scm|from>都是向量，<scm|vector-copy!>就是从<scm|from>向量复制元素依次粘贴到<scm|to>向量，粘贴从<scm|to>向量的第<scm|at>个索引位置开始；<scm|start>和<scm|end>是可选参数，用于指定从<scm|from>向量选取元素的范围。
 
@@ -8129,7 +8131,7 @@
 
   <subsection|转换>
 
-  <label|r7rs><paragraph|vector-\<gtr\>list><scm|(vector-\<gtr\>list v [start [end]])><index|vector-\<gtr\>list>
+  <r7rs><paragraph|vector-\<gtr\>list><scm|(vector-\<gtr\>list v [start [end]])><index|vector-\<gtr\>list>
 
   返回一个新分配的列表，包含向量中从 start 到 end 之间的元素中的对象。当 <scm|start>、<scm|end>不是向量的有效索引，报错。
 
@@ -8167,7 +8169,7 @@
 
   \;
 
-  <label|r7rs><paragraph|list-\<gtr\>vector><scm|(list-\<gtr\>vector l)><index|list-\<gtr\>vector>
+  <r7rs><paragraph|list-\<gtr\>vector><scm|(list-\<gtr\>vector l)><index|list-\<gtr\>vector>
 
   返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
 
@@ -8181,7 +8183,7 @@
 
   \;
 
-  <label|r7rs><paragraph|vector-\<gtr\>string><scm|(v [start [end]]) =\<gtr\> string><index|vector-\<gtr\>string>
+  <r7rs><paragraph|vector-\<gtr\>string><scm|(v [start [end]]) =\<gtr\> string><index|vector-\<gtr\>string>
 
   将向量v转化为字符串，如果指定了起始索引和终止索引，则只将指定范围内的子向量转化为字符串。
 
@@ -8255,7 +8257,7 @@
 
   \;
 
-  <label|r7rs><paragraph|string-\<gtr\>vector><scm|(s [start [end]]) =\<gtr\> vector><index|string-\<gtr\>vector>
+  <r7rs><paragraph|string-\<gtr\>vector><scm|(s [start [end]]) =\<gtr\> vector><index|string-\<gtr\>vector>
 
   将字符串s转化为向量，如果指定了起始索引和终止索引，则只将指定范围内的子字符串转化为向量。
 
@@ -11191,7 +11193,7 @@
 
   <section|实现>
 
-  <label|r7rs><paragraph|char-upcase><index|char-upcase>
+  <flag|r7rs|blue><r7rs><paragraph|char-upcase><index|char-upcase>
 
   S7内置函数。
 
@@ -11289,11 +11291,11 @@
 
   <section|实现>
 
-  <label|r7rs><paragraph|open-input-file><index|open-input-file>
+  <r7rs><paragraph|open-input-file><index|open-input-file>
 
   S7内置函数。
 
-  <label|r7rs><paragraph|open-binary-input-file><index|open-binary-input-file>
+  <r7rs><paragraph|open-binary-input-file><index|open-binary-input-file>
 
   <\scm-chunk|goldfish/scheme/file.scm|true|true>
     (define open-binary-input-file open-input-file)
@@ -11303,11 +11305,11 @@
 
   \;
 
-  <label|r7rs><paragraph|open-output-file><index|open-output-file>
+  <r7rs><paragraph|open-output-file><index|open-output-file>
 
   S7内置函数。
 
-  <label|r7rs><paragraph|open-binary-output-file><index|open-binary-output-file>
+  <r7rs><paragraph|open-binary-output-file><index|open-binary-output-file>
 
   <\scm-chunk|goldfish/scheme/file.scm|true|true>
     (define open-binary-output-file open-output-file)
@@ -11708,379 +11710,459 @@
   </scm-chunk>
 
   <\the-index|idx>
-    <index+1|!=|<pageref|auto-96>>
+    <index+1|!=|<pageref|auto-100>>
 
-    <index+1|==|<pageref|auto-94>>
+    <index+1|==|<pageref|auto-98>>
 
-    <index+1|???|<pageref|auto-132>>
+    <index+1|=?|<pageref|auto-564>>
 
-    <index+1|any|<pageref|auto-347>>
+    <index+1|???|<pageref|auto-136>>
 
-    <index+1|append|<pageref|auto-308>>
+    <index+1|any|<pageref|auto-351>>
 
-    <index+1|apply|<pageref|auto-35>>
+    <index+1|append|<pageref|auto-312>>
 
-    <index+1|binary-port?|<pageref|auto-62>>
+    <index+1|apply|<pageref|auto-39>>
 
-    <index+1|caar|<pageref|auto-269>>
+    <index+1|binary-port?|<pageref|auto-66>>
 
-    <index+1|call-with-port|<pageref|auto-52>>
+    <index+1|boolean=?|<pageref|auto-24>>
 
-    <index+1|car|<pageref|auto-265>>
+    <index+1|boolean-hash|<pageref|auto-543>>
+
+    <index+1|boolean\<less\>?|<pageref|auto-539>>
+
+    <index+1|caar|<pageref|auto-273>>
+
+    <index+1|call-with-port|<pageref|auto-56>>
+
+    <index+1|car|<pageref|auto-269>>
 
     <index+1|case|<pageref|auto-9>>
 
-    <index+1|cdr|<pageref|auto-267>>
+    <index+1|cdr|<pageref|auto-271>>
 
-    <index+1|char?|<pageref|auto-25>>
+    <index+1|char?|<pageref|auto-29>>
 
-    <index+1|char=?|<pageref|auto-27>>
+    <index+1|char=?|<pageref|auto-31>>
 
-    <index+1|check|<pageref|auto-143>>
+    <index+1|char-ci-hash|<pageref|auto-547>>
 
-    <index+1|check-catch|<pageref|auto-149>>
+    <index+1|char-hash|<pageref|auto-545>>
 
-    <index+1|check-failed?|<pageref|auto-141>>
+    <index+1|char-upcase|<pageref|auto-660>>
 
-    <index+1|check-false|<pageref|auto-147>>
+    <index+1|check|<pageref|auto-147>>
 
-    <index+1|check-report|<pageref|auto-153>>
+    <index+1|check-catch|<pageref|auto-153>>
 
-    <index+1|check-set-mode!|<pageref|auto-139>>
+    <index+1|check-failed?|<pageref|auto-145>>
 
-    <index+1|check-true|<pageref|auto-145>>
+    <index+1|check-false|<pageref|auto-151>>
 
-    <index+1|circular-list|<pageref|auto-251>>
+    <index+1|check-report|<pageref|auto-157>>
 
-    <index+1|circular-list?|<pageref|auto-260>>
+    <index+1|check-set-mode!|<pageref|auto-143>>
 
-    <index+1|close-input-port|<pageref|auto-70>>
+    <index+1|check-true|<pageref|auto-149>>
 
-    <index+1|close-output-port|<pageref|auto-72>>
+    <index+1|circular-list|<pageref|auto-255>>
 
-    <index+1|close-port|<pageref|auto-68>>
+    <index+1|circular-list?|<pageref|auto-264>>
 
-    <index+1|compose|<pageref|auto-106>>
+    <index+1|close-input-port|<pageref|auto-74>>
 
-    <index+1|cons|<pageref|auto-245>>
+    <index+1|close-output-port|<pageref|auto-76>>
 
-    <index+1|count|<pageref|auto-310>>
+    <index+1|close-port|<pageref|auto-72>>
+
+    <index+1|comparator?|<pageref|auto-492>>
+
+    <index+1|comparator-check-type|<pageref|auto-508>>
+
+    <index+1|comparator-equality-predicate|<pageref|auto-500>>
+
+    <index+1|comparator-hash|<pageref|auto-510>>
+
+    <index+1|comparator-hashable?|<pageref|auto-496>>
+
+    <index+1|comparator-hash-function|<pageref|auto-504>>
+
+    <index+1|comparator-ordered?|<pageref|auto-494>>
+
+    <index+1|comparator-ordering-predicate|<pageref|auto-502>>
+
+    <index+1|comparator-test-type|<pageref|auto-506>>
+
+    <index+1|comparator-type-test-predicate|<pageref|auto-498>>
+
+    <index+1|compose|<pageref|auto-110>>
+
+    <index+1|cons|<pageref|auto-249>>
+
+    <index+1|count|<pageref|auto-314>>
+
+    <index+1|default-hash|<pageref|auto-557>>
 
     <index+1|define-record-type|<pageref|auto-14>>
 
-    <index+1|delete|<pageref|auto-352>>
+    <index+1|delete|<pageref|auto-356>>
 
-    <index+1|delete-duplicates|<pageref|auto-354>>
+    <index+1|delete-duplicates|<pageref|auto-358>>
 
-    <index+1|display*|<pageref|auto-98>>
+    <index+1|display*|<pageref|auto-102>>
 
-    <index+1|drop|<pageref|auto-295>>
+    <index+1|drop|<pageref|auto-299>>
 
-    <index+1|drop-right|<pageref|auto-299>>
+    <index+1|drop-right|<pageref|auto-303>>
 
-    <index+1|drop-while|<pageref|auto-343>>
+    <index+1|drop-while|<pageref|auto-347>>
 
-    <index+1|eighth|<pageref|auto-287>>
+    <index+1|eighth|<pageref|auto-291>>
 
-    <index+1|eof-object|<pageref|auto-80>>
+    <index+1|eof-object|<pageref|auto-84>>
 
-    <index+1|every|<pageref|auto-349>>
+    <index+1|every|<pageref|auto-353>>
 
-    <index+1|fifth|<pageref|auto-281>>
+    <index+1|fifth|<pageref|auto-285>>
 
-    <index+1|file-error?|<pageref|auto-48>>
+    <index+1|file-error?|<pageref|auto-52>>
 
-    <index+1|file-exists-error|<pageref|auto-124>>
+    <index+1|file-exists-error|<pageref|auto-128>>
 
-    <index+1|file-not-found-error|<pageref|auto-120>>
+    <index+1|file-not-found-error|<pageref|auto-124>>
 
-    <index+1|filter|<pageref|auto-326>>
+    <index+1|filter|<pageref|auto-330>>
 
-    <index+1|find|<pageref|auto-339>>
+    <index+1|find|<pageref|auto-343>>
 
-    <index+1|first|<pageref|auto-273>>
+    <index+1|first|<pageref|auto-277>>
 
-    <index+1|flatmap|<pageref|auto-363>>
+    <index+1|flatmap|<pageref|auto-367>>
 
-    <index+1|fold|<pageref|auto-317>>
+    <index+1|fold|<pageref|auto-321>>
 
-    <index+1|fold-right|<pageref|auto-319>>
+    <index+1|fold-right|<pageref|auto-323>>
 
-    <index+1|for-each|<pageref|auto-315>>
+    <index+1|for-each|<pageref|auto-319>>
 
-    <index+1|fourth|<pageref|auto-279>>
+    <index+1|fourth|<pageref|auto-283>>
 
-    <index+1|guard|<pageref|auto-44>>
+    <index+1|\<gtr\>?|<pageref|auto-568>>
 
-    <index+1|hash-table?|<pageref|auto-496>>
+    <index+1|\<gtr\>=?|<pageref|auto-572>>
 
-    <index+1|hash-table=?|<pageref|auto-506>>
+    <index+1|guard|<pageref|auto-48>>
 
-    <index+1|hash-table-clear!|<pageref|auto-530>>
+    <index+1|hash-table?|<pageref|auto-587>>
 
-    <index+1|hash-table-contains?|<pageref|auto-498>>
+    <index+1|hash-table=?|<pageref|auto-597>>
 
-    <index+1|hash-table-delete!|<pageref|auto-522>>
+    <index+1|hash-table-clear!|<pageref|auto-621>>
 
-    <index+1|hash-table-empty?|<pageref|auto-502>>
+    <index+1|hash-table-contains?|<pageref|auto-589>>
 
-    <index+1|hash-table-\<gtr\>alist|<pageref|auto-548>>
+    <index+1|hash-table-count|<pageref|auto-638>>
 
-    <index+1|hash-table-keys|<pageref|auto-539>>
+    <index+1|hash-table-delete!|<pageref|auto-613>>
 
-    <index+1|hash-table-ref|<pageref|auto-511>>
+    <index+1|hash-table-empty?|<pageref|auto-593>>
 
-    <index+1|hash-table-ref/default|<pageref|auto-513>>
+    <index+1|hash-table-\<gtr\>alist|<pageref|auto-643>>
 
-    <index+1|hash-table-set!|<pageref|auto-518>>
+    <index+1|hash-table-keys|<pageref|auto-630>>
 
-    <index+1|hash-table-size|<pageref|auto-535>>
+    <index+1|hash-table-ref|<pageref|auto-602>>
 
-    <index+1|hash-table-update!|<pageref|auto-526>>
+    <index+1|hash-table-ref/default|<pageref|auto-604>>
 
-    <index+1|hash-table-values|<pageref|auto-543>>
+    <index+1|hash-table-set!|<pageref|auto-609>>
 
-    <index+1|identity|<pageref|auto-104>>
+    <index+1|hash-table-size|<pageref|auto-626>>
 
-    <index+1|in?|<pageref|auto-100>>
+    <index+1|hash-table-update!|<pageref|auto-617>>
 
-    <index+1|input-port?|<pageref|auto-54>>
+    <index+1|hash-table-values|<pageref|auto-634>>
 
-    <index+1|input-port-open?|<pageref|auto-64>>
+    <index+1|identity|<pageref|auto-108>>
 
-    <index+1|iota|<pageref|auto-253>>
+    <index+1|in?|<pageref|auto-104>>
 
-    <index+1|last|<pageref|auto-303>>
+    <index+1|input-port?|<pageref|auto-58>>
 
-    <index+1|last-pair|<pageref|auto-301>>
+    <index+1|input-port-open?|<pageref|auto-68>>
 
-    <index+1|length|<pageref|auto-306>>
+    <index+1|iota|<pageref|auto-257>>
 
-    <index+1|length=?|<pageref|auto-357>>
+    <index+1|last|<pageref|auto-307>>
 
-    <index+1|let1|<pageref|auto-102>>
+    <index+1|last-pair|<pageref|auto-305>>
+
+    <index+1|length|<pageref|auto-310>>
+
+    <index+1|length=?|<pageref|auto-361>>
+
+    <index+1|\<less\>?|<pageref|auto-566>>
+
+    <index+1|\<less\>=?|<pageref|auto-570>>
+
+    <index+1|let1|<pageref|auto-106>>
 
     <index+1|let-values|<pageref|auto-11>>
 
-    <index+1|list|<pageref|auto-247>>
+    <index+1|list|<pageref|auto-251>>
 
-    <index+1|list-\<gtr\>string|<pageref|auto-167>>
+    <index+1|list-\<gtr\>string|<pageref|auto-171>>
 
-    <index+1|list-\<gtr\>vector|<pageref|auto-436>>
+    <index+1|list-\<gtr\>vector|<pageref|auto-440>>
 
-    <index+1|list-index|<pageref|auto-345>>
+    <index+1|list-index|<pageref|auto-349>>
 
-    <index+1|list-not-null?|<pageref|auto-369>>
+    <index+1|list-not-null?|<pageref|auto-373>>
 
-    <index+1|list-ref|<pageref|auto-271>>
+    <index+1|list-ref|<pageref|auto-275>>
 
-    <index+1|list-view|<pageref|auto-359>>
+    <index+1|list-view|<pageref|auto-363>>
 
-    <index+1|make-list|<pageref|auto-249>>
+    <index+1|make-comparator|<pageref|auto-523>>
 
-    <index+1|make-vector|<pageref|auto-378>>
+    <index+1|make-default-comparator|<pageref|auto-561>>
 
-    <index+1|map|<pageref|auto-313>>
+    <index+1|make-eq-comparator|<pageref|auto-525>>
 
-    <index+1|member|<pageref|auto-337>>
+    <index+1|make-equal-comparator|<pageref|auto-529>>
 
-    <index+1|memq|<pageref|auto-333>>
+    <index+1|make-eqv-comparator|<pageref|auto-527>>
 
-    <index+1|memv|<pageref|auto-335>>
+    <index+1|make-hash-table|<pageref|auto-583>>
 
-    <index+1|ninth|<pageref|auto-289>>
+    <index+1|make-list|<pageref|auto-253>>
 
-    <index+1|not-a-directory-error|<pageref|auto-122>>
+    <index+1|make-list-comparator|<pageref|auto-533>>
 
-    <index+1|not-null-list?|<pageref|auto-365>>
+    <index+1|make-pair-comparator|<pageref|auto-531>>
 
-    <index+1|null?|<pageref|auto-258>>
+    <index+1|make-vector|<pageref|auto-382>>
 
-    <index+1|null-list?|<pageref|auto-262>>
+    <index+1|make-vector-comparator|<pageref|auto-535>>
 
-    <index+1|os-error|<pageref|auto-118>>
+    <index+1|map|<pageref|auto-317>>
 
-    <index+1|output-port?|<pageref|auto-56>>
+    <index+1|member|<pageref|auto-341>>
 
-    <index+1|output-port-open?|<pageref|auto-66>>
+    <index+1|memq|<pageref|auto-337>>
 
-    <index+1|pair?|<pageref|auto-256>>
+    <index+1|memv|<pageref|auto-339>>
 
-    <index+1|partition|<pageref|auto-328>>
+    <index+1|ninth|<pageref|auto-293>>
 
-    <index+1|port?|<pageref|auto-58>>
+    <index+1|not-a-directory-error|<pageref|auto-126>>
 
-    <index+1|procedure?|<pageref|auto-33>>
+    <index+1|not-null-list?|<pageref|auto-369>>
 
-    <index+1|queue|<pageref|auto-468>>
+    <index+1|null?|<pageref|auto-262>>
 
-    <index+1|queue-back|<pageref|auto-476>>
+    <index+1|null-list?|<pageref|auto-266>>
 
-    <index+1|queue-empty?|<pageref|auto-470>>
+    <index+1|number-hash|<pageref|auto-555>>
 
-    <index+1|queue-front|<pageref|auto-474>>
+    <index+1|open-binary-input-file|<pageref|auto-669>>
 
-    <index+1|queue-\<gtr\>list|<pageref|auto-482>>
+    <index+1|open-binary-output-file|<pageref|auto-673>>
 
-    <index+1|queue-pop!|<pageref|auto-480>>
+    <index+1|open-input-file|<pageref|auto-667>>
 
-    <index+1|queue-push!|<pageref|auto-478>>
+    <index+1|open-output-file|<pageref|auto-671>>
 
-    <index+1|queue-size|<pageref|auto-472>>
+    <index+1|os-error|<pageref|auto-122>>
 
-    <index+1|read-error?|<pageref|auto-46>>
+    <index+1|output-port?|<pageref|auto-60>>
 
-    <index+1|reduce|<pageref|auto-321>>
+    <index+1|output-port-open?|<pageref|auto-70>>
 
-    <index+1|reduce-right|<pageref|auto-323>>
+    <index+1|pair?|<pageref|auto-260>>
 
-    <index+1|remove|<pageref|auto-330>>
+    <index+1|partition|<pageref|auto-332>>
 
-    <index+1|second|<pageref|auto-275>>
+    <index+1|port?|<pageref|auto-62>>
 
-    <index+1|seventh|<pageref|auto-285>>
+    <index+1|procedure?|<pageref|auto-37>>
 
-    <index+1|sixth|<pageref|auto-283>>
+    <index+1|queue|<pageref|auto-472>>
+
+    <index+1|queue-back|<pageref|auto-480>>
+
+    <index+1|queue-empty?|<pageref|auto-474>>
+
+    <index+1|queue-front|<pageref|auto-478>>
+
+    <index+1|queue-\<gtr\>list|<pageref|auto-486>>
+
+    <index+1|queue-pop!|<pageref|auto-484>>
+
+    <index+1|queue-push!|<pageref|auto-482>>
+
+    <index+1|queue-size|<pageref|auto-476>>
+
+    <index+1|read-error?|<pageref|auto-50>>
+
+    <index+1|reduce|<pageref|auto-325>>
+
+    <index+1|reduce-right|<pageref|auto-327>>
+
+    <index+1|remove|<pageref|auto-334>>
+
+    <index+1|second|<pageref|auto-279>>
+
+    <index+1|seventh|<pageref|auto-289>>
+
+    <index+1|sixth|<pageref|auto-287>>
 
     <index+1|square|<pageref|auto-21>>
 
-    <index+1|stack|<pageref|auto-448>>
+    <index+1|stack|<pageref|auto-452>>
 
-    <index+1|stack-empty?|<pageref|auto-450>>
+    <index+1|stack-empty?|<pageref|auto-454>>
 
-    <index+1|stack-\<gtr\>list|<pageref|auto-460>>
+    <index+1|stack-\<gtr\>list|<pageref|auto-464>>
 
-    <index+1|stack-pop!|<pageref|auto-458>>
+    <index+1|stack-pop!|<pageref|auto-462>>
 
-    <index+1|stack-push!|<pageref|auto-456>>
+    <index+1|stack-push!|<pageref|auto-460>>
 
-    <index+1|stack-size|<pageref|auto-452>>
+    <index+1|stack-size|<pageref|auto-456>>
 
-    <index+1|stack-top|<pageref|auto-454>>
+    <index+1|stack-top|<pageref|auto-458>>
 
-    <index+1|string?|<pageref|auto-162>>
+    <index+1|string?|<pageref|auto-166>>
 
-    <index+1|string-any|<pageref|auto-178>>
+    <index+1|string-any|<pageref|auto-182>>
 
-    <index+1|string-append|<pageref|auto-224>>
+    <index+1|string-append|<pageref|auto-228>>
 
-    <index+1|string-contains|<pageref|auto-217>>
+    <index+1|string-ci-hash|<pageref|auto-551>>
 
-    <index+1|string-copy|<pageref|auto-185>>
+    <index+1|string-contains|<pageref|auto-221>>
 
-    <index+1|string-count|<pageref|auto-219>>
+    <index+1|string-copy|<pageref|auto-189>>
 
-    <index+1|string-drop|<pageref|auto-192>>
+    <index+1|string-count|<pageref|auto-223>>
 
-    <index+1|string-drop-right|<pageref|auto-194>>
+    <index+1|string-drop|<pageref|auto-196>>
 
-    <index+1|string-every|<pageref|auto-176>>
+    <index+1|string-drop-right|<pageref|auto-198>>
 
-    <index+1|string-for-each|<pageref|auto-231>>
+    <index+1|string-every|<pageref|auto-180>>
 
-    <index+1|string-\<gtr\>list|<pageref|auto-165>>
+    <index+1|string-for-each|<pageref|auto-235>>
 
-    <index+1|string-\<gtr\>vector|<pageref|auto-440>>
+    <index+1|string-\<gtr\>list|<pageref|auto-169>>
 
-    <index+1|string-index|<pageref|auto-213>>
+    <index+1|string-\<gtr\>vector|<pageref|auto-444>>
 
-    <index+1|string-index-right|<pageref|auto-215>>
+    <index+1|string-hash|<pageref|auto-549>>
 
-    <index+1|string-join|<pageref|auto-169>>
+    <index+1|string-index|<pageref|auto-217>>
 
-    <index+1|string-length|<pageref|auto-181>>
+    <index+1|string-index-right|<pageref|auto-219>>
 
-    <index+1|string-map|<pageref|auto-227>>
+    <index+1|string-join|<pageref|auto-173>>
 
-    <index+1|string-null?|<pageref|auto-174>>
+    <index+1|string-length|<pageref|auto-185>>
 
-    <index+1|string-pad|<pageref|auto-196>>
+    <index+1|string-map|<pageref|auto-231>>
 
-    <index+1|string-pad-right|<pageref|auto-198>>
+    <index+1|string-null?|<pageref|auto-178>>
 
-    <index+1|string-prefix?|<pageref|auto-208>>
+    <index+1|string-pad|<pageref|auto-200>>
 
-    <index+1|string-ref|<pageref|auto-183>>
+    <index+1|string-pad-right|<pageref|auto-202>>
 
-    <index+1|string-reverse|<pageref|auto-222>>
+    <index+1|string-prefix?|<pageref|auto-212>>
 
-    <index+1|string-suffix?|<pageref|auto-210>>
+    <index+1|string-ref|<pageref|auto-187>>
 
-    <index+1|string-take|<pageref|auto-188>>
+    <index+1|string-reverse|<pageref|auto-226>>
 
-    <index+1|string-take-right|<pageref|auto-190>>
+    <index+1|string-suffix?|<pageref|auto-214>>
 
-    <index+1|string-tokenize|<pageref|auto-234>>
+    <index+1|string-take|<pageref|auto-192>>
 
-    <index+1|string-trim|<pageref|auto-201>>
+    <index+1|string-take-right|<pageref|auto-194>>
 
-    <index+1|string-trim-both|<pageref|auto-205>>
+    <index+1|string-tokenize|<pageref|auto-238>>
 
-    <index+1|string-trim-right|<pageref|auto-203>>
+    <index+1|string-trim|<pageref|auto-205>>
 
-    <index+1|take|<pageref|auto-293>>
+    <index+1|string-trim-both|<pageref|auto-209>>
 
-    <index+1|take-right|<pageref|auto-297>>
+    <index+1|string-trim-right|<pageref|auto-207>>
 
-    <index+1|take-while|<pageref|auto-341>>
+    <index+1|symbol-hash|<pageref|auto-553>>
 
-    <index+1|tenth|<pageref|auto-291>>
+    <index+1|take|<pageref|auto-297>>
 
-    <index+1|test|<pageref|auto-151>>
+    <index+1|take-right|<pageref|auto-301>>
 
-    <index+1|textual-port?|<pageref|auto-60>>
+    <index+1|take-while|<pageref|auto-345>>
 
-    <index+1|third|<pageref|auto-277>>
+    <index+1|tenth|<pageref|auto-295>>
 
-    <index+1|timeout-error|<pageref|auto-126>>
+    <index+1|test|<pageref|auto-155>>
 
-    <index+1|typed-lambda|<pageref|auto-108>>
+    <index+1|textual-port?|<pageref|auto-64>>
 
-    <index+1|type-error|<pageref|auto-128>>
+    <index+1|third|<pageref|auto-281>>
 
-    <index+1|value-error|<pageref|auto-130>>
+    <index+1|timeout-error|<pageref|auto-130>>
 
-    <index+1|vector|<pageref|auto-380>>
+    <index+1|typed-lambda|<pageref|auto-112>>
 
-    <index+1|vector?|<pageref|auto-390>>
+    <index+1|type-error|<pageref|auto-132>>
 
-    <index+1|vector-any|<pageref|auto-412>>
+    <index+1|value-error|<pageref|auto-134>>
 
-    <index+1|vector-append|<pageref|auto-387>>
+    <index+1|vector|<pageref|auto-384>>
 
-    <index+1|vector-copy|<pageref|auto-384>>
+    <index+1|vector?|<pageref|auto-394>>
 
-    <index+1|vector-copy!|<pageref|auto-431>>
+    <index+1|vector-any|<pageref|auto-416>>
 
-    <index+1|vector-count|<pageref|auto-407>>
+    <index+1|vector-append|<pageref|auto-391>>
 
-    <index+1|vector-empty?|<pageref|auto-392>>
+    <index+1|vector-copy|<pageref|auto-388>>
 
-    <index+1|vector-every|<pageref|auto-416>>
+    <index+1|vector-copy!|<pageref|auto-435>>
 
-    <index+1|vector-fill!|<pageref|auto-429>>
+    <index+1|vector-count|<pageref|auto-411>>
 
-    <index+1|vector-for-each|<pageref|auto-403>>
+    <index+1|vector-empty?|<pageref|auto-396>>
 
-    <index+1|vector-\<gtr\>list|<pageref|auto-434>>
+    <index+1|vector-every|<pageref|auto-420>>
 
-    <index+1|vector-\<gtr\>string|<pageref|auto-438>>
+    <index+1|vector-fill!|<pageref|auto-433>>
 
-    <index+1|vector-index|<pageref|auto-418>>
+    <index+1|vector-for-each|<pageref|auto-407>>
 
-    <index+1|vector-index-right|<pageref|auto-420>>
+    <index+1|vector-\<gtr\>list|<pageref|auto-438>>
 
-    <index+1|vector-length|<pageref|auto-396>>
+    <index+1|vector-\<gtr\>string|<pageref|auto-442>>
 
-    <index+1|vector-map|<pageref|auto-401>>
+    <index+1|vector-index|<pageref|auto-422>>
 
-    <index+1|vector-partition|<pageref|auto-422>>
+    <index+1|vector-index-right|<pageref|auto-424>>
 
-    <index+1|vector-ref|<pageref|auto-398>>
+    <index+1|vector-length|<pageref|auto-400>>
 
-    <index+1|vector-set!|<pageref|auto-425>>
+    <index+1|vector-map|<pageref|auto-405>>
 
-    <index+1|vector-swap!|<pageref|auto-427>>
+    <index+1|vector-partition|<pageref|auto-426>>
+
+    <index+1|vector-ref|<pageref|auto-402>>
+
+    <index+1|vector-set!|<pageref|auto-429>>
+
+    <index+1|vector-swap!|<pageref|auto-431>>
   </the-index>
 </body>
 
