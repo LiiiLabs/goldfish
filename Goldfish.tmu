@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.3|1.2.9.1>>
+<TMU|<tuple|1.0.3|1.2.9.2-rc3>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
@@ -10743,6 +10743,82 @@
     \ \ (hash-table-set! ht 'k1 'v1)
 
     \ \ (check (hash-table-values ht) =\<gtr\> '(v1)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-count><index|hash-table-count>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-count pred ht)
+
+    \ \ (let ((l (map values ht))
+
+    \ \ \ \ \ \ \ \ (pred-l (lambda (x) (pred (car x) (cdr x)))))
+
+    \ \ \ \ (count pred-l l)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (check (hash-table-count (lambda (k v) #f) (hash-table)) =\<gtr\> 0)
+
+    (check (hash-table-count (lambda (k v) #t) (hash-table 'a 1 'b 2 'c 3)) =\<gtr\> 3)
+
+    (check (hash-table-count (lambda (k v) #f) (hash-table 'a 1 'b 2 'c 3)) =\<gtr\> 0)
+
+    \;
+
+    (check (hash-table-count (lambda (k v) (eq? k 'b)) (hash-table 'a 1 'b 2 'c 3)) =\<gtr\> 1)
+
+    \;
+
+    (check (hash-table-count (lambda (k v) (\<gtr\> v 1)) (hash-table 'a 1 'b 2 'c 3)) =\<gtr\> 2)
+
+    \;
+
+    (check (hash-table-count (lambda (k v) (string? k))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table "apple" 1 "banana" 2)) =\<gtr\> 2)
+
+    \;
+
+    (check (hash-table-count (lambda (k v) (and (symbol? k) (even? v)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table 'apple 2 'banana 3 'cherry 4)) =\<gtr\> 2)
+
+    \;
+
+    \;
+
+    (check (hash-table-count (lambda (k v) (eq? k v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table 'a 'a 'b 'b 'c 'd)) =\<gtr\> 2)
+
+    \;
+
+    (check (hash-table-count (lambda (k v) (number? k))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table 1 100 2 200 3 300)) =\<gtr\> 3)
+
+    \;
+
+    (check (hash-table-count (lambda (k v) (list? v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table 'a '(1 2) 'b '(3 4) 'c 3)) =\<gtr\> 2)
+
+    \;
+
+    (check (hash-table-count (lambda (k v) \ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (= (char-\<gtr\>integer (string-ref (symbol-\<gtr\>string k) 0)) v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table 'a 97 'b 98 'c 99)) =\<gtr\> 3)
 
     \;
   </scm-chunk>

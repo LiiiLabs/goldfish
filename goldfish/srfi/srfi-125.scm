@@ -96,6 +96,11 @@
 (define (hash-table-values ht)
   (map cdr (map values ht)))
 
+(define (hash-table-count pred ht)
+  (let ((l (map values ht))
+        (pred-l (lambda (x) (pred (car x) (cdr x)))))
+    (count pred-l l)))
+
 (define (hash-table->alist table)
   (map values table))
 

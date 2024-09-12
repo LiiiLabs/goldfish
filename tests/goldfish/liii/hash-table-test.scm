@@ -137,5 +137,33 @@
   (hash-table-set! ht 'k1 'v1)
   (check (hash-table-values ht) => '(v1)))
 
+(check (hash-table-count (lambda (k v) #f) (hash-table)) => 0)
+(check (hash-table-count (lambda (k v) #t) (hash-table 'a 1 'b 2 'c 3)) => 3)
+(check (hash-table-count (lambda (k v) #f) (hash-table 'a 1 'b 2 'c 3)) => 0)
+
+(check (hash-table-count (lambda (k v) (eq? k 'b)) (hash-table 'a 1 'b 2 'c 3)) => 1)
+
+(check (hash-table-count (lambda (k v) (> v 1)) (hash-table 'a 1 'b 2 'c 3)) => 2)
+
+(check (hash-table-count (lambda (k v) (string? k))
+                         (hash-table "apple" 1 "banana" 2)) => 2)
+
+(check (hash-table-count (lambda (k v) (and (symbol? k) (even? v)))
+                         (hash-table 'apple 2 'banana 3 'cherry 4)) => 2)
+
+
+(check (hash-table-count (lambda (k v) (eq? k v))
+                         (hash-table 'a 'a 'b 'b 'c 'd)) => 2)
+
+(check (hash-table-count (lambda (k v) (number? k))
+                         (hash-table 1 100 2 200 3 300)) => 3)
+
+(check (hash-table-count (lambda (k v) (list? v))
+                         (hash-table 'a '(1 2) 'b '(3 4) 'c 3)) => 2)
+
+(check (hash-table-count (lambda (k v)  
+                           (= (char->integer (string-ref (symbol->string k) 0)) v))
+                         (hash-table 'a 97 'b 98 'c 99)) => 3)
+
 (check-report)
 
