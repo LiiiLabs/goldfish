@@ -116,6 +116,12 @@
  (+ 1 (raise 'an-error)))
 ; PRINTS: something went wrong
 
+(with-input-from-string "(+ 1 2)"
+  (lambda ()
+    (let ((datum (read))) 
+      (check-true (list? datum))
+      (check datum => '(+ 1 2)))))
+
 (check (eof-object) => #<eof>)
 
 (check (== (list 1 2) (list 1 2)) => #t)
