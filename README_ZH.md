@@ -87,6 +87,7 @@ sudo rm -rf /opt/goldfish
 ## 命令行技巧
 本节假设您已成功执行 `xmake b goldfish` 并且 `bin/goldfish` 可用。
 
+### 零选项
 不使用任何选项时，它将打印帮助信息：
 
 ```
@@ -98,6 +99,7 @@ Goldfish Scheme 17.10.0 by LiiiLabs
 FILE            Load the scheme code on path and print the evaluated result
 ```
 
+### 版本选项
 `--version` 将打印 金鱼Scheme 的版本和 S7 Scheme 的版本：
 
 ```
@@ -106,6 +108,16 @@ Goldfish Scheme 17.10.0 by LiiiLabs
 based on S7 Scheme 10.11 (2-July-2024)
 ```
 
+### 模式选项
+`-m`帮助您指定预加载的标准库。
+
++ `default`: `-m default`等价于`-m liii`
++ `liii`: 预加载`(liii base)`和`(liii error)`的金鱼Scheme
++ `sicp`: 预加载`(srfi sicp)`和`(scheme base)`的S7 Scheme
++ `r7rs`: 预加载`(scheme base)`的S7 Scheme
++ `s7`: 无任何无加载库的S7 Scheme
+
+### 其它选项
 `-e` 帮助您即时求值 Scheme 代码：
 
 ```

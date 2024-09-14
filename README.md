@@ -85,6 +85,7 @@ sudo rm -rf /opt/goldfish
 ## Commandlinefu
 This section assumes you have executed `xmake b goldfish` sucessfully and `bin/goldfish` is available.
 
+### Zero Option
 Without any options, it will print the help message:
 ```
 > bin/goldfish 
@@ -95,6 +96,7 @@ Goldfish Scheme 17.10.0 by LiiiLabs
 FILE            Load the scheme code on path and print the evaluated result
 ```
 
+### Version Option
 `--version` will print the Goldfish Scheme version and the underlying S7 Scheme version:
 ```
 > bin/goldfish --version
@@ -102,6 +104,16 @@ Goldfish Scheme 17.10.0 by LiiiLabs
 based on S7 Scheme 10.11 (2-July-2024)
 ```
 
+### Mode Option
+`-m` helps you specify the standard libray mode.
+
++ `default`: `-m default` is the equiv of `-m liii`
++ `liii`: Goldfish Scheme with `(liii base)` and `(liii error)`
++ `sicp`: S7 Scheme with `(scheme base)` and `(srfi sicp)`
++ `r7rs`: S7 Scheme with `(scheme base)`
++ `s7`: S7 Scheme without any extra library
+
+### Other Options
 `-e` helps you evaluate the scheme code on the fly:
 ```
 > bin/goldfish -e "(+ 1 2)"
