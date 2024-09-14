@@ -21,7 +21,8 @@
   let-values
   define-record-type
   square
-  floor-quotient
+  exact inexact
+  floor-quotient floor s7-floor
   boolean=?
   ; String
   string-copy

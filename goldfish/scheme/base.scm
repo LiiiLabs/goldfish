@@ -19,7 +19,8 @@
   let-values
   define-record-type
   square
-  floor-quotient
+  exact inexact
+  floor-quotient floor s7-floor
   boolean=?
   ; String
   string-copy
@@ -104,7 +105,18 @@
           fields)
        ',type)))
 
+(define exact inexact->exact)
+
+(define inexact exact->inexact)
+
 (define (floor-quotient x y) (floor (/ x y)))
+
+(define s7-floor floor)
+
+(define (floor x)
+  (if (inexact? x)
+      (inexact (s7-floor x))
+      (s7-floor x)))
 
 (define (square x) (* x x))
 
