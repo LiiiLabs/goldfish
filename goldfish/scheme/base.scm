@@ -21,6 +21,7 @@
   square
   exact inexact
   floor-quotient floor s7-floor
+  gcd lcm s7-lcm
   boolean=?
   ; String
   string-copy
@@ -117,6 +118,26 @@
       (s7-floor x)))
 
 (define (floor-quotient x y) (floor (/ x y)))
+
+(define s7-lcm lcm)
+
+(define (lcm2 x y)
+  (cond ((and (inexact? x) (exact? y))
+         (inexact (s7-lcm (exact x) y)))
+        ((and (exact? x) (inexact? y))
+         (inexact (s7-lcm x (exact y))))
+        ((and (inexact? x) (inexact? y))
+         (inexact (s7-lcm (exact x) (exact y))))
+        (else (s7-lcm x y))))
+
+(define (lcm . args)
+  (cond ((null? args) 1)
+        ((null? (cdr args))
+         (car args))
+        ((null? (cddr args))
+         (lcm2 (car args) (cadr args)))
+        (else (apply lcm (cons (lcm (car args) (cadr args))
+                               (cddr args))))))
 
 (define (square x) (* x x))
 

@@ -67,7 +67,7 @@
 
   <value|r7rs><paragraph|define-library><index|define-library>
 
-  <\scm-chunk|goldfish/scheme/boot.scm|true|false>
+  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
     ; 0-clause BSD
 
     ; Adapted from S7 Scheme's r7rs.scm
@@ -378,6 +378,8 @@
 
     \ \ floor-quotient floor s7-floor
 
+    \ \ gcd lcm s7-lcm
+
     \ \ boolean=?
 
     \ \ ; String
@@ -433,6 +435,8 @@
     \ \ exact inexact
 
     \ \ floor-quotient floor s7-floor
+
+    \ \ gcd lcm s7-lcm
 
     \ \ boolean=?
 
@@ -1011,9 +1015,113 @@
 
   <paragraph|modulo>
 
-  <paragraph|gcd>
+  <value|r7rs><paragraph|gcd><index|gcd><scm|(x ...) =\<gtr\> (y positive?)>
+
+  求n个数的最大公约数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (gcd) =\<gtr\> 0)
+
+    (check (gcd 0) =\<gtr\> 0)
+
+    (check (gcd 1) =\<gtr\> 1)
+
+    (check (gcd 2) =\<gtr\> 2)
+
+    (check (gcd -1) =\<gtr\> 1)
+
+    \;
+
+    (check (gcd 0 1) =\<gtr\> 1)
+
+    (check (gcd 1 0) =\<gtr\> 1)
+
+    (check (gcd 1 2) =\<gtr\> 1)
+
+    (check (gcd 1 10) =\<gtr\> 1)
+
+    (check (gcd 2 10) =\<gtr\> 2)
+
+    (check (gcd -2 10) =\<gtr\> 2)
+
+    \;
+
+    (check (gcd 2 3 4) =\<gtr\> 1)
+
+    (check (gcd 2 4 8) =\<gtr\> 2)
+
+    (check (gcd -2 4 8) =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
 
   <paragraph|lcm>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define s7-lcm lcm)
+
+    \;
+
+    (define (lcm2 x y)
+
+    \ \ (cond ((and (inexact? x) (exact? y))
+
+    \ \ \ \ \ \ \ \ \ (inexact (s7-lcm (exact x) y)))
+
+    \ \ \ \ \ \ \ \ ((and (exact? x) (inexact? y))
+
+    \ \ \ \ \ \ \ \ \ (inexact (s7-lcm x (exact y))))
+
+    \ \ \ \ \ \ \ \ ((and (inexact? x) (inexact? y))
+
+    \ \ \ \ \ \ \ \ \ (inexact (s7-lcm (exact x) (exact y))))
+
+    \ \ \ \ \ \ \ \ (else (s7-lcm x y))))
+
+    \;
+
+    (define (lcm . args)
+
+    \ \ (cond ((null? args) 1)
+
+    \ \ \ \ \ \ \ \ ((null? (cdr args))
+
+    \ \ \ \ \ \ \ \ \ (car args))
+
+    \ \ \ \ \ \ \ \ ((null? (cddr args))
+
+    \ \ \ \ \ \ \ \ \ (lcm2 (car args) (cadr args)))
+
+    \ \ \ \ \ \ \ \ (else (apply lcm (cons (lcm (car args) (cadr args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr args))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (lcm) =\<gtr\> 1)
+
+    (check (lcm 1) =\<gtr\> 1)
+
+    (check (lcm 0) =\<gtr\> 0)
+
+    (check (lcm 32 -36) =\<gtr\> \ 288)
+
+    (check (lcm 32 -36.0) =\<gtr\> 288.0)
+
+    (check (lcm 2 4) =\<gtr\> 4)
+
+    (check (lcm 2 4.0) =\<gtr\> 4.0)
+
+    (check (lcm 2.0 4.0) =\<gtr\> 4.0)
+
+    (check (lcm 2.0 4) =\<gtr\> 4.0)
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <value|r7rs><paragraph|square><index|square>
 

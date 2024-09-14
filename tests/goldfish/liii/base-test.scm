@@ -120,6 +120,33 @@
 (check-catch 'division-by-zero (quotient 0 0))
 (check-catch 'wrong-type-arg (quotient 1+i 2))
 
+(check (gcd) => 0)
+(check (gcd 0) => 0)
+(check (gcd 1) => 1)
+(check (gcd 2) => 2)
+(check (gcd -1) => 1)
+
+(check (gcd 0 1) => 1)
+(check (gcd 1 0) => 1)
+(check (gcd 1 2) => 1)
+(check (gcd 1 10) => 1)
+(check (gcd 2 10) => 2)
+(check (gcd -2 10) => 2)
+
+(check (gcd 2 3 4) => 1)
+(check (gcd 2 4 8) => 2)
+(check (gcd -2 4 8) => 2)
+
+(check (lcm) => 1)
+(check (lcm 1) => 1)
+(check (lcm 0) => 0)
+(check (lcm 32 -36) =>  288)
+(check (lcm 32 -36.0) => 288.0)
+(check (lcm 2 4) => 4)
+(check (lcm 2 4.0) => 4.0)
+(check (lcm 2.0 4.0) => 4.0)
+(check (lcm 2.0 4) => 4.0)
+
 (check (square 2) => 4)
 
 (check-true (boolean=? #t #t))

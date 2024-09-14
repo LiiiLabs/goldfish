@@ -23,6 +23,7 @@
   square
   exact inexact
   floor-quotient floor s7-floor
+  gcd lcm s7-lcm
   boolean=?
   ; String
   string-copy
