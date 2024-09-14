@@ -21,6 +21,7 @@
   let-values
   define-record-type
   square
+  floor-quotient
   boolean=?
   ; String
   string-copy

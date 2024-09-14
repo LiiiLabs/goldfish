@@ -19,6 +19,7 @@
   let-values
   define-record-type
   square
+  floor-quotient
   boolean=?
   ; String
   string-copy
@@ -102,6 +103,8 @@
                            (let-set! ,obj ',(car field) val)))))))
           fields)
        ',type)))
+
+(define (floor-quotient x y) (floor (/ x y)))
 
 (define (square x) (* x x))
 

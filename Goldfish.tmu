@@ -142,6 +142,8 @@
 
     \ \ square
 
+    \ \ floor-quotient
+
     \ \ boolean=?
 
     \ \ ; String
@@ -193,6 +195,8 @@
     \ \ define-record-type
 
     \ \ square
+
+    \ \ floor-quotient
 
     \ \ boolean=?
 
@@ -579,7 +583,113 @@
 
   <section|相等性判断>
 
-  <section|数值>
+  <section|数>
+
+  <value|r7rs><paragraph|number?><index|number?><scm|(number? obj) =\<gtr\> boolean>
+
+  判断一个对象是否是数。
+
+  <paragraph|complex?>
+
+  判断一个对象是否是复数。
+
+  <paragraph|real?>
+
+  <paragraph|rational?>
+
+  <paragraph|integer?>
+
+  <paragraph|zero?>
+
+  <value|r7rs><paragraph|floor-quotient><index|floor-quotient><scm|((x real?) (y real?)) =\<gtr\> integer>
+
+  <\equation*>
+    floor_quotient<around*|(|y,x|)>=<around*|\<lfloor\>|y/x|\<rfloor\>>
+  </equation*>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (floor-quotient x y) (floor (/ x y)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  正常情况测试
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (floor-quotient 11 2) =\<gtr\> 5)
+
+    (check (floor-quotient 11 -2) =\<gtr\> -6)
+
+    (check (floor-quotient -11 2) =\<gtr\> -6)
+
+    (check (floor-quotient -11 -2) =\<gtr\> 5)
+
+    \;
+
+    (check (floor-quotient 10 2) =\<gtr\> 5)
+
+    (check (floor-quotient 10 -2) =\<gtr\> -5)
+
+    (check (floor-quotient -10 2) =\<gtr\> -5)
+
+    (check (floor-quotient -10 -2) =\<gtr\> 5)
+
+    \;
+  </scm-chunk>
+
+  特殊情况测试
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'division-by-zero (floor-quotient 11 0))
+
+    (check-catch 'division-by-zero (floor-quotient 0 0))
+
+    \;
+
+    (check (floor-quotient 0 2) =\<gtr\> 0)
+
+    (check (floor-quotient 0 -2) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|quotient><index|quotient><scm|(quotient (y real?) (x real?)) =\<gtr\> integer>
+
+  求两个数的商。
+
+  <\equation*>
+    quotient<around*|(|y,x|)>=truncate<around*|(|y/x|)>
+  </equation*>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (quotient 11 2) =\<gtr\> 5)
+
+    (check (quotient 11 -2) =\<gtr\> -5)
+
+    (check (quotient -11 2) =\<gtr\> -5)
+
+    (check (quotient -11 -2) =\<gtr\> 5)
+
+    \;
+
+    (check-catch 'division-by-zero (quotient 11 0))
+
+    (check-catch 'division-by-zero (quotient 0 0))
+
+    (check-catch 'wrong-type-arg (quotient 1+i 2))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|remainder>
+
+  <paragraph|modulo>
+
+  <paragraph|gcd>
+
+  <paragraph|lcm>
 
   <paragraph|square><index|square>
 
@@ -1318,7 +1428,7 @@
 
     \ \ timeout-error
 
-    \ \ type-error value-error)
+    \ \ type-error type-error? value-error)
 
     (begin
 
@@ -1330,7 +1440,9 @@
   <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
     (import (liii check)
 
-    \ \ \ \ \ \ \ \ (liii error))
+    \ \ \ \ \ \ \ \ (liii error)
+
+    \ \ \ \ \ \ \ \ (liii base))
 
     \;
 
@@ -1449,6 +1561,24 @@
     (check-catch 'type-error (type-error "msg"))
 
     (check-catch 'type-error (type-error "msg" "msg2"))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|type-error?><index|type-error?>
+
+  <\scm-chunk|goldfish/liii/error.scm|true|true>
+    (define (type-error? err)
+
+    \ \ (in? err ‘(type-error wrong-type-arg)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+    (check-true (type-error? 'type-error))
+
+    (check-true (type-error? 'wrong-type-arg))
 
     \;
   </scm-chunk>
@@ -5176,13 +5306,13 @@
   注意<scm|(cons '(1 2) '(3 4))>其实是一个列表，但这个列表的元素不都是整数。这个例子容易理解成结果是一个序对且不是列表。
 
   <\session|goldfish|default>
-    <\folded-io>
+    <\unfolded-io>
       \<gtr\>\ 
-    <|folded-io>
+    <|unfolded-io>
       (cons '(1 2) '(3 4))
-    <|folded-io>
+    <|unfolded-io>
       ((1 2) 3 4)
-    </folded-io>
+    </unfolded-io>
 
     <\input>
       \<gtr\>\ 
@@ -11374,13 +11504,13 @@
       receive
     </unfolded-io>
 
-    <\unfolded-io>
+    <\folded-io>
       \<gtr\>\ 
-    <|unfolded-io>
+    <|folded-io>
       (receive (a b) (values 1 2) (+ a b))
-    <|unfolded-io>
+    <|folded-io>
       3
-    </unfolded-io>
+    </folded-io>
 
     <\folded-io>
       \<gtr\>\ 
@@ -12189,6 +12319,7 @@
     <associate|page-screen-margin|false>
     <associate|page-type|a5>
     <associate|page-width|auto>
+    <associate|par-par-sep|0.3333fn>
     <associate|save-aux|false>
   </collection>
 </initial>

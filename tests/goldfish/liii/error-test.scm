@@ -15,7 +15,8 @@
 ;
 
 (import (liii check)
-        (liii error))
+        (liii error)
+        (liii base))
 
 (check-set-mode! 'report-failed)
 
@@ -32,6 +33,9 @@
 (check-catch 'type-error (type-error))
 (check-catch 'type-error (type-error "msg"))
 (check-catch 'type-error (type-error "msg" "msg2"))
+
+(check-true (type-error? 'type-error))
+(check-true (type-error? 'wrong-type-arg))
 
 (check-catch 'value-error (value-error))
 

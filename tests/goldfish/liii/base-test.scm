@@ -81,6 +81,31 @@
     (get-name da))
   => "Darcy")
 
+(check (floor-quotient 11 2) => 5)
+(check (floor-quotient 11 -2) => -6)
+(check (floor-quotient -11 2) => -6)
+(check (floor-quotient -11 -2) => 5)
+
+(check (floor-quotient 10 2) => 5)
+(check (floor-quotient 10 -2) => -5)
+(check (floor-quotient -10 2) => -5)
+(check (floor-quotient -10 -2) => 5)
+
+(check-catch 'division-by-zero (floor-quotient 11 0))
+(check-catch 'division-by-zero (floor-quotient 0 0))
+
+(check (floor-quotient 0 2) => 0)
+(check (floor-quotient 0 -2) => 0)
+
+(check (quotient 11 2) => 5)
+(check (quotient 11 -2) => -5)
+(check (quotient -11 2) => -5)
+(check (quotient -11 -2) => 5)
+
+(check-catch 'division-by-zero (quotient 11 0))
+(check-catch 'division-by-zero (quotient 0 0))
+(check-catch 'wrong-type-arg (quotient 1+i 2))
+
 (check (square 2) => 4)
 
 (check-true (boolean=? #t #t))
