@@ -15,7 +15,6 @@
 ;
 
 (import (liii check)
-        (liii base)
         (liii list))
 
 (check-set-mode! 'report-failed)
@@ -86,6 +85,16 @@
 (check-false (exact? 0.3))
 ; (check-true (exact? #e3.0))
 
+(check (floor 1.1) => 1.0)
+(check (floor 1) => 1)
+(check (floor 1/2) => 0)
+(check (floor 0) => 0)
+(check (floor -1) => -1)
+(check (floor -1.2) => -2.0)
+
+(check (s7-floor 1.1) => 1)
+(check (s7-floor -1.2) => -2)
+
 (check (floor-quotient 11 2) => 5)
 (check (floor-quotient 11 -2) => -6)
 (check (floor-quotient -11 2) => -6)
@@ -110,16 +119,6 @@
 (check-catch 'division-by-zero (quotient 11 0))
 (check-catch 'division-by-zero (quotient 0 0))
 (check-catch 'wrong-type-arg (quotient 1+i 2))
-
-(check (floor 1.1) => 1.0)
-(check (floor 1) => 1)
-(check (floor 1/2) => 0)
-(check (floor 0) => 0)
-(check (floor -1) => -1)
-(check (floor -1.2) => -2.0)
-
-(check (s7-floor 1.1) => 1)
-(check (s7-floor -1.2) => -2)
 
 (check (square 2) => 4)
 

@@ -109,14 +109,14 @@
 
 (define inexact exact->inexact)
 
-(define (floor-quotient x y) (floor (/ x y)))
-
 (define s7-floor floor)
 
 (define (floor x)
   (if (inexact? x)
       (inexact (s7-floor x))
       (s7-floor x)))
+
+(define (floor-quotient x y) (floor (/ x y)))
 
 (define (square x) (* x x))
 

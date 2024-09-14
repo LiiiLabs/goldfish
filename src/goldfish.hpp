@@ -37,7 +37,7 @@
 #include <wordexp.h>
 #endif
 
-#define GOLDFISH_VERSION "17.10.5"
+#define GOLDFISH_VERSION "17.10.6"
 #define GOLDFISH_PATH_MAXN TB_PATH_MAXN
 
 static std::vector<std::string> command_args= std::vector<std::string> ();
@@ -539,6 +539,8 @@ repl_for_community_edition (int argc, char** argv) {
   sc= s7_init ();
   s7_load (sc, gf_boot);
   s7_add_to_load_path (sc, gf_lib);
+  s7_eval_c_string (sc, "(import (liii base) (liii error))");
+
   const char* errmsg= NULL;
   s7_pointer  old_port=
       s7_set_current_error_port (sc, s7_open_output_string (sc));
