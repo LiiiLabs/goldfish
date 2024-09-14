@@ -4952,7 +4952,7 @@
 
     \ \ count fold fold-right reduce reduce-right
 
-    \ \ filter partition remove
+    \ \ filter partition remove append-map
 
     \ \ ; SRFI 1: Searching
 
@@ -4986,7 +4986,9 @@
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     (define-library (srfi srfi-1)
 
-    (import (liii error))
+    (import (liii error)
+
+    \ \ \ \ \ \ \ \ (liii base))
 
     (export
 
@@ -4998,7 +5000,7 @@
 
     \ \ take drop take-right drop-right count fold fold-right
 
-    \ \ reduce reduce-right filter partition remove find
+    \ \ reduce reduce-right append-map filter partition remove find
 
     \ \ delete delete-duplicates
 
@@ -6026,8 +6028,6 @@
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (check (fold + 0 '(1 2 3 4)) =\<gtr\> 10)
 
-    \;
-
     (check (fold + 0 '()) =\<gtr\> 0)
 
     \;
@@ -6162,8 +6162,6 @@
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (check (reduce + 0 '(1 2 3 4)) =\<gtr\> 10)
 
-    \;
-
     (check (reduce + 0 '()) =\<gtr\> 0)
 
     \;
@@ -6180,25 +6178,13 @@
   不适用于统计列表中满足谓词的元素数量，因为<scm|reduce>会把非空列表的第一个元素取出来作为<scm|fold>的初始值，引发错误。
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
-    (check
+    (check-catch 'wrong-type-arg\ 
 
-    \ \ (catch 'wrong-type-arg
+    \ \ (reduce (lambda (x count) (if (symbol? x) (+ count 1) count))
 
-    \ \ \ \ (lambda
+    \ \ \ \ \ \ \ \ \ \ 0
 
-    \ \ \ \ \ \ ()
-
-    \ \ \ \ \ \ (reduce (lambda (x count) (if (symbol? x) (+ count 1) count))
-
-    \ \ \ \ \ \ \ \ 0
-
-    \ \ \ \ \ \ \ \ '(a b 1 2 3 4)))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    \ \ \ \ \ \ \ \ \ \ '(a b 1 2 3 4)))
 
     \;
   </scm-chunk>
@@ -6256,6 +6242,30 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|append-map><index|append-map>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define append-map
+
+    \ \ (typed-lambda ((proc procedure?) (lst list?))
+
+    \ \ \ \ (let loop ((rest lst)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (result '()))
+
+    \ \ \ \ \ \ (if (null? rest)
+
+    \ \ \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ \ \ (loop (cdr rest)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (append result (proc (car rest))))))))
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <subsection|过滤和分组>
 
@@ -7018,9 +7028,21 @@
   <paragraph|flatmap><index|flatmap>
 
   <\scm-chunk|goldfish/liii/list.scm|true|true>
-    (define (flatmap f seq)
+    (define flatmap append-map)
 
-    \ \ (fold-right append () (map f seq)))
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (flatmap (lambda (x) (list x x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list 1 2 3))
+
+    \ \ =\<gtr\> (list 1 1 2 2 3 3))
+
+    \;
+
+    (check-catch 'type-error (flatmap 1 (list 1 2 3)))
 
     \;
   </scm-chunk>
@@ -10298,7 +10320,11 @@
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
     (define-library (srfi srfi-125)
 
-    (import (srfi srfi-1))
+    (import (srfi srfi-1)
+
+    \ \ \ \ \ \ \ \ (liii base)
+
+    \ \ \ \ \ \ \ \ (liii error))
 
     (export
 
@@ -10317,6 +10343,8 @@
     \ \ hash-table-size hash-table-keys hash-table-values hash-table-entries
 
     \ \ hash-table-find hash-table-count
+
+    \ \ hash-table-\<gtr\>alist
 
     )
 
@@ -10349,6 +10377,8 @@
     \ \ hash-table-size hash-table-keys hash-table-values hash-table-entries
 
     \ \ hash-table-find hash-table-count
+
+    \ \ hash-table-\<gtr\>alist
 
     )
 
@@ -10387,6 +10417,8 @@
     (define s7-hash-table-set! hash-table-set!)
 
     (define s7-make-hash-table make-hash-table)
+
+    (define s7-hash-table-entries hash-table-entries)
 
     \;
   </scm-chunk>
@@ -10445,13 +10477,41 @@
 
   <paragraph|hash-table>
 
+  <paragraph|alist-\<gtr\>hash-table><index|alist-\<gtr\>hash-table>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define alist-\<gtr\>hash-table
+
+    \ \ (typed-lambda ((lst list?))
+
+    \ \ \ \ (when (odd? (length lst))
+
+    \ \ \ \ \ \ (value-error "The length of lst must be even!"))
+
+    \ \ \ \ (let1 ht (make-hash-table)
+
+    \ \ \ \ \ \ (let loop ((rest lst))
+
+    \ \ \ \ \ \ \ \ (if (null? rest)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ht
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! ht (car rest) (cadr rest))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr rest))))))))
+
+    \;
+  </scm-chunk>
+
   <subsection|谓词>
 
   <paragraph|hash-table?><index|hash-table?>
 
   S7内置函数。判断一个对象是不是哈希表。
 
-  <paragraph|hash-table-contains?><index|hash-table-contains?><scm|(hash-table key) =\<gtr\> bool>
+  <paragraph|hash-table-contains?><index|hash-table-contains?><scm|((ht hash-table?) key) =\<gtr\> bool>
 
   <subparagraph|实现>
 
@@ -10812,7 +10872,7 @@
   <subparagraph|实现>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define hash-table-size hash-table-entries)
+    (define hash-table-size s7-hash-table-entries)
 
     \;
   </scm-chunk>
@@ -10889,6 +10949,30 @@
     \ \ (hash-table-set! ht 'k1 'v1)
 
     \ \ (check (hash-table-values ht) =\<gtr\> '(v1)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|hash-table-entries><index|hash-table-entries>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define hash-table-entries
+
+    \ \ (typed-lambda ((ht hash-table?))
+
+    \ \ \ \ (map values ht)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (check (hash-table-entries ht) =\<gtr\> (list))
+
+    \ \ (hash-table-set! ht 'k1 'v1)
+
+    \ \ (check (hash-table-entries ht) =\<gtr\> (list (cons 'k1 'v1))))
 
     \;
   </scm-chunk>
@@ -10974,9 +11058,33 @@
   <paragraph|hash-table-\<gtr\>alist><index|hash-table-\<gtr\>alist>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-\<gtr\>alist table)
+    (define hash-table-\<gtr\>alist
 
-    \ \ (map values table))
+    \ \ (typed-lambda ((ht hash-table?))
+
+    \ \ \ \ (append-map
+
+    \ \ \ \ \ \ (lambda (x) (list (car x) (cdr x)))
+
+    \ \ \ \ \ \ (map values ht))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (check (hash-table-\<gtr\>alist ht) =\<gtr\> (list))
+
+    \ \ (hash-table-set! ht 'k1 'v1)
+
+    \ \ (check (hash-table-\<gtr\>alist ht) =\<gtr\> '(k1 v1)))
+
+    \;
+
+    (check (hash-table-\<gtr\>alist (alist-\<gtr\>hash-table (list 'k1 'v1)))
+
+    \ \ \ \ \ \ \ =\<gtr\> (list 'k1 'v1))
 
     \;
   </scm-chunk>

@@ -180,7 +180,6 @@
 (check (count even? '(3 1 4 1 5 9 2 5 6)) => 3)
 
 (check (fold + 0 '(1 2 3 4)) => 10)
-
 (check (fold + 0 '()) => 0)
 
 (check-catch 'type-error (fold 0 + '(1 2 3 4)))
@@ -207,21 +206,14 @@
 (check (fold-right cons () '(1 2 3 4)) => '(1 2 3 4))
 
 (check (reduce + 0 '(1 2 3 4)) => 10)
-
 (check (reduce + 0 '()) => 0)
 
 (check (reduce cons () '(1 2 3 4)) => '(4 3 2 . 1))
 
-(check
-  (catch 'wrong-type-arg
-    (lambda
-      ()
-      (reduce (lambda (x count) (if (symbol? x) (+ count 1) count))
-        0
-        '(a b 1 2 3 4)))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg 
+  (reduce (lambda (x count) (if (symbol? x) (+ count 1) count))
+          0
+          '(a b 1 2 3 4)))
 
 (check (reduce-right + 0 '(1 2 3 4)) => 10)
 
@@ -341,6 +333,12 @@
         map (lambda (x) (+ x 1))
         map (lambda (x) (* x x))))
        => (list 4 9 16))
+
+(check (flatmap (lambda (x) (list x x))
+                (list 1 2 3))
+  => (list 1 1 2 2 3 3))
+
+(check-catch 'type-error (flatmap 1 (list 1 2 3)))
 
 (check (not-null-list? (list 1)) => #t)
 (check (list-not-null? (list 1)) => #t)

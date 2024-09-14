@@ -137,6 +137,11 @@
   (hash-table-set! ht 'k1 'v1)
   (check (hash-table-values ht) => '(v1)))
 
+(let1 ht (make-hash-table)
+  (check (hash-table-entries ht) => (list))
+  (hash-table-set! ht 'k1 'v1)
+  (check (hash-table-entries ht) => (list (cons 'k1 'v1))))
+
 (check (hash-table-count (lambda (k v) #f) (hash-table)) => 0)
 (check (hash-table-count (lambda (k v) #t) (hash-table 'a 1 'b 2 'c 3)) => 3)
 (check (hash-table-count (lambda (k v) #f) (hash-table 'a 1 'b 2 'c 3)) => 0)
@@ -164,6 +169,14 @@
 (check (hash-table-count (lambda (k v)  
                            (= (char->integer (string-ref (symbol->string k) 0)) v))
                          (hash-table 'a 97 'b 98 'c 99)) => 3)
+
+(let1 ht (make-hash-table)
+  (check (hash-table->alist ht) => (list))
+  (hash-table-set! ht 'k1 'v1)
+  (check (hash-table->alist ht) => '(k1 v1)))
+
+(check (hash-table->alist (alist->hash-table (list 'k1 'v1)))
+       => (list 'k1 'v1))
 
 (check-report)
 
