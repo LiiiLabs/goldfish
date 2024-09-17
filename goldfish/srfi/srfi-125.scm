@@ -27,6 +27,7 @@
   hash-table-update!/default hash-table-pop! hash-table-clear!
   hash-table-size hash-table-keys hash-table-values hash-table-entries
   hash-table-find hash-table-count
+  hash-table-for-each
   hash-table->alist
 )
 (begin
@@ -119,10 +120,15 @@
       (values ks vs))))
 
 
-(define (hash-table-count pred ht)
-  (let ((l (map values ht))
-        (pred-l (lambda (x) (pred (car x) (cdr x)))))
-    (count pred-l l)))
+(define hash-table-count
+  (typed-lambda ((pred? procedure?) (ht hash-table?))
+    (count (lambda (x) (pred? (car x) (cdr x)))
+           (map values ht))))
+
+(define hash-table-for-each
+  (typed-lambda ((proc procedure?) (ht hash-table?))
+    (for-each (lambda (x) (proc (car x) (cdr x)))
+              ht)))
 
 (define hash-table->alist
   (typed-lambda ((ht hash-table?))

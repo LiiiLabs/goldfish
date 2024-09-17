@@ -10928,6 +10928,8 @@
 
     \ \ hash-table-find hash-table-count
 
+    \ \ hash-table-for-each
+
     \ \ hash-table-\<gtr\>alist
 
     )
@@ -10961,6 +10963,8 @@
     \ \ hash-table-size hash-table-keys hash-table-values hash-table-entries
 
     \ \ hash-table-find hash-table-count
+
+    \ \ hash-table-for-each
 
     \ \ hash-table-\<gtr\>alist
 
@@ -11594,13 +11598,13 @@
   <subparagraph|实现>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define (hash-table-count pred ht)
+    (define hash-table-count
 
-    \ \ (let ((l (map values ht))
+    \ \ (typed-lambda ((pred? procedure?) (ht hash-table?))
 
-    \ \ \ \ \ \ \ \ (pred-l (lambda (x) (pred (car x) (cdr x)))))
+    \ \ \ \ (count (lambda (x) (pred? (car x) (cdr x)))
 
-    \ \ \ \ (count pred-l l)))
+    \ \ \ \ \ \ \ \ \ \ \ (map values ht))))
 
     \;
   </scm-chunk>
@@ -11661,6 +11665,38 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (= (char-\<gtr\>integer (string-ref (symbol-\<gtr\>string k) 0)) v))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table 'a 97 'b 98 'c 99)) =\<gtr\> 3)
+
+    \;
+  </scm-chunk>
+
+  <subsection|映射和折叠>
+
+  <paragraph|hash-table-foreach><index|hash-table-foreach>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define hash-table-for-each
+
+    \ \ (typed-lambda ((proc procedure?) (ht hash-table?))
+
+    \ \ \ \ (for-each (lambda (x) (proc (car x) (cdr x)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ht)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 cnt 0
+
+    \ \ (hash-table-for-each
+
+    \ \ \ \ (lambda (k v)
+
+    \ \ \ \ \ \ (set! cnt (+ cnt v)))
+
+    \ \ \ \ (hash-table 'a 1 'b 2 'c 3))
+
+    \ \ (check cnt =\<gtr\> 6))
 
     \;
   </scm-chunk>

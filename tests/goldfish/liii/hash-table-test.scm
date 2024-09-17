@@ -176,6 +176,13 @@
                            (= (char->integer (string-ref (symbol->string k) 0)) v))
                          (hash-table 'a 97 'b 98 'c 99)) => 3)
 
+(let1 cnt 0
+  (hash-table-for-each
+    (lambda (k v)
+      (set! cnt (+ cnt v)))
+    (hash-table 'a 1 'b 2 'c 3))
+  (check cnt => 6))
+
 (let1 ht (make-hash-table)
   (check (hash-table->alist ht) => (list))
   (hash-table-set! ht 'k1 'v1)
