@@ -376,7 +376,9 @@
 
     \ \ exact inexact
 
-    \ \ floor-quotient floor s7-floor
+    \ \ floor s7-floor ceiling s7-ceiling truncate s7-truncate round s7-round
+
+    \ \ floor-quotient
 
     \ \ gcd lcm s7-lcm
 
@@ -434,7 +436,9 @@
 
     \ \ exact inexact
 
-    \ \ floor-quotient floor s7-floor
+    \ \ floor s7-floor ceiling s7-ceiling truncate s7-truncate round s7-round
+
+    \ \ floor-quotient
 
     \ \ gcd lcm s7-lcm
 
@@ -928,6 +932,126 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|ceiling>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define s7-ceiling ceiling)
+
+    \;
+
+    (define (ceiling x)
+
+    \ \ (if (inexact? x)
+
+    \ \ \ \ \ \ (inexact (s7-ceiling x))
+
+    \ \ \ \ \ \ (s7-ceiling x)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (ceiling 1.1) =\<gtr\> 2.0)
+
+    (check (ceiling 1) =\<gtr\> 1)
+
+    (check (ceiling 1/2) =\<gtr\> 1)
+
+    (check (ceiling 0) =\<gtr\> 0)
+
+    (check (ceiling -1) =\<gtr\> -1)
+
+    (check (ceiling -1.2) =\<gtr\> -1.0)
+
+    \;
+
+    (check (s7-ceiling 1.1) =\<gtr\> 2)
+
+    (check (s7-ceiling -1.2) =\<gtr\> -1)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|truncate>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define s7-truncate truncate)
+
+    \;
+
+    (define (truncate x)
+
+    \ \ (if (inexact? x)
+
+    \ \ \ \ \ \ (inexact (s7-truncate x))
+
+    \ \ \ \ \ \ (s7-truncate x)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (truncate 1.1) =\<gtr\> 1.0)
+
+    (check (truncate 1) =\<gtr\> 1)
+
+    (check (truncate 1/2) =\<gtr\> 0)
+
+    (check (truncate 0) =\<gtr\> 0)
+
+    (check (truncate -1) =\<gtr\> -1)
+
+    (check (truncate -1.2) =\<gtr\> -1.0)
+
+    \;
+
+    (check (s7-truncate 1.1) =\<gtr\> 1)
+
+    (check (s7-truncate -1.2) =\<gtr\> -1)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|round>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define s7-round round)
+
+    \;
+
+    (define (round x)
+
+    \ \ (if (inexact? x)
+
+    \ \ \ \ \ \ (inexact (s7-round x))
+
+    \ \ \ \ \ \ (s7-round x)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (round 1.1) =\<gtr\> 1.0)
+
+    (check (round 1.5) =\<gtr\> 2.0)
+
+    (check (round 1) =\<gtr\> 1)
+
+    (check (round 1/2) =\<gtr\> 0)
+
+    (check (round 0) =\<gtr\> 0)
+
+    (check (round -1) =\<gtr\> -1)
+
+    (check (round -1.2) =\<gtr\> -1.0)
+
+    (check (round -1.5) =\<gtr\> -2.0)
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <value|r7rs><paragraph|floor-quotient><index|floor-quotient><scm|((x real?) (y real?)) =\<gtr\> integer>
 

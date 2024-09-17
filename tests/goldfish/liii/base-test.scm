@@ -15,6 +15,7 @@
 ;
 
 (import (liii check)
+        (liii base)
         (liii list))
 
 (check-set-mode! 'report-failed)
@@ -94,6 +95,35 @@
 
 (check (s7-floor 1.1) => 1)
 (check (s7-floor -1.2) => -2)
+
+(check (ceiling 1.1) => 2.0)
+(check (ceiling 1) => 1)
+(check (ceiling 1/2) => 1)
+(check (ceiling 0) => 0)
+(check (ceiling -1) => -1)
+(check (ceiling -1.2) => -1.0)
+
+(check (s7-ceiling 1.1) => 2)
+(check (s7-ceiling -1.2) => -1)
+
+(check (truncate 1.1) => 1.0)
+(check (truncate 1) => 1)
+(check (truncate 1/2) => 0)
+(check (truncate 0) => 0)
+(check (truncate -1) => -1)
+(check (truncate -1.2) => -1.0)
+
+(check (s7-truncate 1.1) => 1)
+(check (s7-truncate -1.2) => -1)
+
+(check (round 1.1) => 1.0)
+(check (round 1.5) => 2.0)
+(check (round 1) => 1)
+(check (round 1/2) => 0)
+(check (round 0) => 0)
+(check (round -1) => -1)
+(check (round -1.2) => -1.0)
+(check (round -1.5) => -2.0)
 
 (check (floor-quotient 11 2) => 5)
 (check (floor-quotient 11 -2) => -6)

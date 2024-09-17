@@ -20,7 +20,8 @@
   define-record-type
   square
   exact inexact
-  floor-quotient floor s7-floor
+  floor s7-floor ceiling s7-ceiling truncate s7-truncate round s7-round
+  floor-quotient
   gcd lcm s7-lcm
   boolean=?
   ; String
@@ -116,6 +117,27 @@
   (if (inexact? x)
       (inexact (s7-floor x))
       (s7-floor x)))
+
+(define s7-ceiling ceiling)
+
+(define (ceiling x)
+  (if (inexact? x)
+      (inexact (s7-ceiling x))
+      (s7-ceiling x)))
+
+(define s7-truncate truncate)
+
+(define (truncate x)
+  (if (inexact? x)
+      (inexact (s7-truncate x))
+      (s7-truncate x)))
+
+(define s7-round round)
+
+(define (round x)
+  (if (inexact? x)
+      (inexact (s7-round x))
+      (s7-round x)))
 
 (define (floor-quotient x y) (floor (/ x y)))
 

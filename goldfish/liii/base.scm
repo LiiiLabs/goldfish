@@ -22,7 +22,8 @@
   define-record-type
   square
   exact inexact
-  floor-quotient floor s7-floor
+  floor s7-floor ceiling s7-ceiling truncate s7-truncate round s7-round
+  floor-quotient
   gcd lcm s7-lcm
   boolean=?
   ; String

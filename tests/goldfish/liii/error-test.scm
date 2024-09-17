@@ -14,7 +14,9 @@
 ; under the License.
 ;
 
-(import (liii check))
+(import (liii check)
+        (liii error)
+        (liii base))
 
 (check-set-mode! 'report-failed)
 
