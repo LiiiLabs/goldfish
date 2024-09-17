@@ -116,6 +116,7 @@
   (typed-lambda ((ht hash-table?))
     (map values ht)))
 
+
 (define (hash-table-count pred ht)
   (let ((l (map values ht))
         (pred-l (lambda (x) (pred (car x) (cdr x)))))

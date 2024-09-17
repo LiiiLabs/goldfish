@@ -142,6 +142,7 @@
   (hash-table-set! ht 'k1 'v1)
   (check (hash-table-entries ht) => (list (cons 'k1 'v1))))
 
+
 (check (hash-table-count (lambda (k v) #f) (hash-table)) => 0)
 (check (hash-table-count (lambda (k v) #t) (hash-table 'a 1 'b 2 'c 3)) => 3)
 (check (hash-table-count (lambda (k v) #f) (hash-table 'a 1 'b 2 'c 3)) => 0)

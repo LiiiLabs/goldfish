@@ -195,6 +195,13 @@
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
+(check (call-with-values (lambda () (values 4 5))
+                         (lambda (x y) x))
+       => 4)
+
+(check (*) => 1)
+(check (call-with-values * -) => -1)
+
 (guard (condition
          (else
           (display "condition: ")

@@ -1385,7 +1385,27 @@
 
   <paragraph|values>
 
-  <paragraph|call-with-values>
+  <value|r7rs><paragraph|call-with-values><scm|(producer consumer)>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (call-with-values (lambda () (values 4 5))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda (x y) x))
+
+    \ \ \ \ \ \ \ =\<gtr\> 4)
+
+    \;
+  </scm-chunk>
+
+  由于<scm|*>这个函数在没有参数时返回1，而<scm|->在只有一个参数的时候，返回该值的相反数。故而下面这个测试用例的返回值是<scm|-1>。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (*) =\<gtr\> 1)
+
+    (check (call-with-values * -) =\<gtr\> -1)
+
+    \;
+  </scm-chunk>
 
   <paragraph|dynamic-wind>
 
@@ -11540,6 +11560,20 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|hash-table-find><index|hash-table-find><scm|(proc (ht hash-table?) failure) =\<gtr\> obj>
+
+  对于哈希表中的每个关联项，调用proc函数处理它的键和值。如果proc返回真（true），那么hash-table-find函数将返回proc返回的结果。如果所有对proc的调用都返回假（#f），则返回调用thunk failure函数的结果。
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    \;
+  </scm-chunk>
+
+  \;
 
   <paragraph|hash-table-count><index|hash-table-count>
 
