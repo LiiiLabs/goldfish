@@ -183,6 +183,16 @@
     (hash-table 'a 1 'b 2 'c 3))
   (check cnt => 6))
 
+(let* ((ht (hash-table 'a 1 'b 2 'c 3))
+       (ks (hash-table-map->list (lambda (k v) k) ht))
+       (vs (hash-table-map->list (lambda (k v) v) ht)))
+  (check-true (in? 'a ks))
+  (check-true (in? 'b ks))
+  (check-true (in? 'c ks))
+  (check-true (in? 1 vs))
+  (check-true (in? 2 vs))
+  (check-true (in? 3 vs)))
+
 (let1 ht (make-hash-table)
   (check (hash-table->alist ht) => (list))
   (hash-table-set! ht 'k1 'v1)
