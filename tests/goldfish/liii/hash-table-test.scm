@@ -138,9 +138,14 @@
   (check (hash-table-values ht) => '(v1)))
 
 (let1 ht (make-hash-table)
-  (check (hash-table-entries ht) => (list))
+  (check (call-with-values (lambda () (hash-table-entries ht))
+                           (lambda (ks vs) (list ks vs)))
+         => (list (list ) (list )))
+  
   (hash-table-set! ht 'k1 'v1)
-  (check (hash-table-entries ht) => (list (cons 'k1 'v1))))
+  (check (call-with-values (lambda () (hash-table-entries ht))
+                           (lambda (ks vs) (list ks vs)))
+         => (list (list 'k1) (list 'v1))))
 
 
 (check (hash-table-count (lambda (k v) #f) (hash-table)) => 0)

@@ -107,14 +107,16 @@
 (define hash-table-size s7-hash-table-entries)
 
 (define (hash-table-keys ht)
-  (map car (map values ht)))
+  (map car ht))
 
 (define (hash-table-values ht)
-  (map cdr (map values ht)))
+  (map cdr ht))
 
 (define hash-table-entries
   (typed-lambda ((ht hash-table?))
-    (map values ht)))
+    (let ((ks (hash-table-keys ht))
+          (vs (hash-table-values ht)))
+      (values ks vs))))
 
 
 (define (hash-table-count pred ht)
