@@ -253,7 +253,21 @@
 
   <chapter|(liii base)>
 
-  Goldfish Scheme解释器默认会加载<scm|(liii base)>。
+  \;
+
+  Goldfish Scheme解释器默认会加载<scm|(liii base)>。如果不想默认加载<scm|(liii base)>，请使用s7、r7rs或者sicp模式。
+
+  <scm|(liii base)>由以下函数库组成：
+
+  <\description>
+    <item*|(scheme base)>由R7RS定义的Scheme基础函数库
+
+    <item*|(srfi srfi-2)>由SRFI-2定义的<scm|and-let*>
+
+    <item*|(srfi srfi-8)>由SRFI-8定义的<scm|receive>
+
+    <item*|(liii base)>三鲤扩展函数和S7内置的非R7RS函数，例如<scm|display*>
+  </description>
 
   <section|许可证>
 
@@ -424,7 +438,9 @@
 
     (import (scheme base)
 
-    \ \ \ \ \ \ \ \ (srfi srfi-2))
+    \ \ \ \ \ \ \ \ (srfi srfi-2)
+
+    \ \ \ \ \ \ \ \ (srfi srfi-8))
 
     (export
 
@@ -479,6 +495,10 @@
     \ \ ; SRFI-2
 
     \ \ and-let*
+
+    \ \ ; SRFI-8
+
+    \ \ receive
 
     \ \ ; Extra routines for (liii base)
 
@@ -1569,6 +1589,130 @@
     (check (*) =\<gtr\> 1)
 
     (check (call-with-values * -) =\<gtr\> -1)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|receive><index|receive>
+
+  官网：<slink|https://srfi.schemers.org/srfi-8/srfi-8.html>
+
+  官网的参考实现是：
+
+  <\scm-code>
+    (define-syntax receive
+
+    \ \ (syntax-rules ()
+
+    \ \ \ \ ((receive formals expression body ...)
+
+    \ \ \ \ \ (call-with-values (lambda () expression)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda formals body ...)))))
+  </scm-code>
+
+  但是S7 Scheme里面没有define-syntax和syntax-rule，在墨干中的实现是这样的：
+
+  <\session|goldfish|default>
+    <\folded-io>
+      \<gtr\>\ 
+    <|folded-io>
+      (define-macro (receive vars vals . body)
+
+      \ \ ‘((lambda ,vars ,@body) ,vals)) ; GPL
+    <|folded-io>
+      receive
+    </folded-io>
+
+    <\folded-io>
+      \<gtr\>\ 
+    <|folded-io>
+      (receive (a b) (values 1 2) (+ a b))
+    <|folded-io>
+      3
+    </folded-io>
+
+    <\folded-io>
+      \<gtr\>\ 
+    <|folded-io>
+      ((lambda (a b) (+ a b)) 1 2)
+    <|folded-io>
+      3
+    </folded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  S7里面有<scm|call-with-values>，使用<scm|define-macro>就可以实现SRFI-8。
+
+  <\scm-chunk|goldfish/srfi/srfi-8.scm|false|false>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+
+    (define-library (srfi srfi-8)
+
+    (export receive) \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    (begin
+
+    \;
+
+    (define-macro (receive formals expression . body)
+
+    \ \ ‘(call-with-values
+
+    \ \ \ \ (lambda () (values ,expression))
+
+    \ \ \ \ (lambda ,formals ,@body)))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (receive (a b) (values 1 2) (+ a b))
+
+    \ \ =\<gtr\> 3)
 
     \;
   </scm-chunk>
@@ -12733,182 +12877,6 @@
     ) ; end of begin
 
     ) ; end of define-library
-
-    \;
-  </scm-chunk>
-
-  <chapter|(srfi srfi-8)>
-
-  \;
-
-  官网：<slink|https://srfi.schemers.org/srfi-8/srfi-8.html>
-
-  官网的参考实现是：
-
-  <\scm-code>
-    (define-syntax receive
-
-    \ \ (syntax-rules ()
-
-    \ \ \ \ ((receive formals expression body ...)
-
-    \ \ \ \ \ (call-with-values (lambda () expression)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda formals body ...)))))
-  </scm-code>
-
-  但是S7 Scheme里面没有define-syntax和syntax-rule，在墨干中的实现是这样的：
-
-  <\session|goldfish|default>
-    <\folded-io>
-      \<gtr\>\ 
-    <|folded-io>
-      (define-macro (receive vars vals . body)
-
-      \ \ ‘((lambda ,vars ,@body) ,vals)) ; GPL
-    <|folded-io>
-      receive
-    </folded-io>
-
-    <\folded-io>
-      \<gtr\>\ 
-    <|folded-io>
-      (receive (a b) (values 1 2) (+ a b))
-    <|folded-io>
-      3
-    </folded-io>
-
-    <\folded-io>
-      \<gtr\>\ 
-    <|folded-io>
-      ((lambda (a b) (+ a b)) 1 2)
-    <|folded-io>
-      3
-    </folded-io>
-
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
-  S7里面有<scm|call-with-values>，使用<scm|define-macro>就可以实现SRFI-8。
-
-  <\scm-chunk|goldfish/srfi/srfi-8.scm|false|false>
-    ;
-
-    ; Copyright (C) 2024 The Goldfish Scheme Authors
-
-    ;
-
-    ; Licensed under the Apache License, Version 2.0 (the "License");
-
-    ; you may not use this file except in compliance with the License.
-
-    ; You may obtain a copy of the License at
-
-    ;
-
-    ; http://www.apache.org/licenses/LICENSE-2.0
-
-    ;
-
-    ; Unless required by applicable law or agreed to in writing, software
-
-    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    ; License for the specific language governing permissions and limitations
-
-    ; under the License.
-
-    ;
-
-    \;
-
-    (define-library (srfi srfi-8)
-
-    (export receive) \ \ \ \ \ \ \ \ \ \ \ \ \ 
-
-    (begin
-
-    \;
-
-    (define-macro (receive formals expression . body)
-
-    \ \ ‘(call-with-values
-
-    \ \ \ \ (lambda () (values ,expression))
-
-    \ \ \ \ (lambda ,formals ,@body)))
-
-    \;
-
-    ) ; end of begin
-
-    ) ; end of define-library
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <\scm-chunk|tests/goldfish/srfi/srfi-8-test.scm|false|false>
-    ;
-
-    ; Copyright (C) 2024 The Goldfish Scheme Authors
-
-    ;
-
-    ; Licensed under the Apache License, Version 2.0 (the "License");
-
-    ; you may not use this file except in compliance with the License.
-
-    ; You may obtain a copy of the License at
-
-    ;
-
-    ; http://www.apache.org/licenses/LICENSE-2.0
-
-    ;
-
-    ; Unless required by applicable law or agreed to in writing, software
-
-    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    ; License for the specific language governing permissions and limitations
-
-    ; under the License.
-
-    ;
-
-    \;
-
-    (import (srfi srfi-8)
-
-    \ \ \ \ \ \ \ \ (liii check))
-
-    \;
-
-    (check-set-mode! 'report-failed)
-
-    \;
-
-    (check
-
-    \ \ (receive (a b) (values 1 2) (+ a b))
-
-    \ \ =\<gtr\>
-
-    \ \ 3)
-
-    \;
-
-    (check-report)
 
     \;
   </scm-chunk>

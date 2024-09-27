@@ -246,6 +246,10 @@
 (check (*) => 1)
 (check (call-with-values * -) => -1)
 
+(check
+  (receive (a b) (values 1 2) (+ a b))
+  => 3)
+
 (guard (condition
          (else
           (display "condition: ")
