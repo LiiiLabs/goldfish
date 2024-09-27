@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.3|1.2.9.2-rc4>>
+<TMU|<tuple|1.0.3|1.2.9.2-rc6>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
@@ -8007,6 +8007,28 @@
     \;
   </scm-chunk>
 
+  <paragraph|int-vector><scm|(integer integer ...) =\<gtr\> vector><index|int-vector>
+
+  返回一个所有元素都是integer类型的int-vector。int-vector是vector的子类型。
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check-true (vector? (int-vector 1 2 3)))
+
+    (check-catch 'wrong-type-arg (int-vector 1 2 'a))
+
+    \;
+
+    (let1 v (int-vector 1 2 3)
+
+    \ \ (check (vector-ref v 0) =\<gtr\> 1)
+
+    \ \ (check (vector-ref v 1) =\<gtr\> 2)
+
+    \ \ (check (vector-ref v 2) =\<gtr\> 3))
+
+    \;
+  </scm-chunk>
+
   <paragraph|vector-unfold>
 
   <paragraph|vector-unfold-right>
@@ -8119,6 +8141,18 @@
     (check (vector? #()) =\<gtr\> #t)
 
     (check (vector? '(1 2 3)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|int-vector?><scm|(int-vector? obj) =\<gtr\> bool>
+
+  只有使用int-vector构造的vector，才能在判定为真。
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check-true (int-vector? (int-vector 1 2 3)))
+
+    (check-false (int-vector? (vector 1 2 3)))
 
     \;
   </scm-chunk>
