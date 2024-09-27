@@ -404,18 +404,11 @@
 (check (null? '(1 2)) => #f)
 
 (check (car '(a b c . d)) => 'a)
-
 (check (car '(a b c)) => 'a)
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (car '()))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (car '()))
 
 (check (cdr '(a b c . d)) => '(b c . d))
-
 (check (cdr '(a b c)) => '(b c))
   
 (check-catch 'wrong-type-arg (cdr '()))
@@ -423,7 +416,6 @@
 (check (caar '((a . b) . c)) => 'a)
 
 (check-catch 'wrong-type-arg (caar '(a b . c)))
-
 (check-catch 'wrong-type-arg (caar '()))
 
 (check (list-ref (cons '(1 2) '(3 4)) 1) => 3)

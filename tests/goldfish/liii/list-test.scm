@@ -38,28 +38,18 @@
 (check (null? 1) => #f)
 
 (check (first '(1 2 3 4 5 6 7 8 9 10)) => 1)
+(check (first '(left . right)) => 'left)
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (first '()))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (first '()))
 
 (check (second '(1 2 3 4 5 6 7 8 9 10)) => 2)
+(check (second '(left . right)) => 'right)
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (second '(1)))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (second '(1)))
 
 (check (third '(1 2 3 4 5 6 7 8 9 10)) => 3)
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (third '(1 2)))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (third '(1 2)))
 
 (check (fourth '(1 2 3 4 5 6)) => 4)
 
@@ -76,22 +66,11 @@
 (check (tenth '(1 2 3 4 5 6 7 8 9 10)) => 10)
 
 (check (take '(1 2 3 4) 3) => '(1 2 3))
-
 (check (take '(1 2 3 4) 4) => '(1 2 3 4))
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (take '(1 2 3 4) 5))
-    (lambda args #t))
-  => #t)
-
 (check (take '(1 2 3 . 4) 3) => '(1 2 3))
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (take '(1 2 3 . 4) 4))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (take '(1 2 3 4) 5))
+(check-catch 'wrong-type-arg (take '(1 2 3 . 4) 4))
 
 (check (drop '(1 2 3 4) 2) => '(3 4))
 
