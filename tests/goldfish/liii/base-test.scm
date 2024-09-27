@@ -45,9 +45,53 @@
          ((* /) 'p1))
   => #<unspecified>)
 
-(check (let-values (((ret) (+ 1 2))) (+ ret 4)) => 7)
+(check-true (and #t #t #t))
+(check-false (and #t #f #t))
+(check-false (and #f #t #f))
+(check-false (and #f #f #f))
 
+(check-true (and))
+
+(check-true (and 1 '() "non-empty" #t))
+(check-false (and #f '() "non-empty" #t))
+(check-false (and 1 '() "non-empty" #f))
+
+(check-true (and (> 5 3) (< 5 10)))
+(check-false (and (> 5 3) (> 5 10)))
+
+(check-catch 'error-name
+  (and (error 'error-name "This should not be evaluated") #f))
+(check-false (and #f (error "This should not be evaluated")))
+
+(check (and #t 1) => 1)
+
+(define (test-letrec)
+  (letrec ((even?
+             (lambda (n)
+               (if (= n 0)
+                   #t
+                   (odd? (- n 1)))))
+            (odd?
+             (lambda (n)
+               (if (= n 0)
+                   #f
+                   (even? (- n 1))))))
+    (list (even? 10) (odd? 10))))
+
+(check (test-letrec) => (list #t #f))
+
+(check-catch 'wrong-type-arg
+  (letrec ((a 1) (b (+ a 1))) (list a b)))
+
+(check
+  (letrec* ((a 1) (b (+ a 1))) (list a b))
+  => (list 1 2))
+
+(check (let-values (((ret) (+ 1 2))) (+ ret 4)) => 7)
 (check (let-values (((a b) (values 3 4))) (+ a b)) => 7)
+
+(check (and-let* ((hi 3) (ho #f)) (+ hi 1)) => #f)
+(check (and-let* ((hi 3) (ho #t)) (+ hi 1)) => 4)
 
 (define-record-type :pare
   (kons x y)

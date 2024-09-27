@@ -422,7 +422,9 @@
   <\scm-chunk|goldfish/liii/base.scm|true|true>
     (define-library (liii base)
 
-    (import (scheme base))
+    (import (scheme base)
+
+    \ \ \ \ \ \ \ \ (srfi srfi-2))
 
     (export
 
@@ -474,7 +476,9 @@
 
     \ \ raise guard read-error? file-error?
 
-    \;
+    \ \ ; SRFI-2
+
+    \ \ and-let*
 
     \ \ ; Extra routines for (liii base)
 
@@ -511,7 +515,9 @@
 
   <subsection|派生表达式>
 
-  <paragraph|case><index|case>
+  <paragraph|cond>
+
+  <value|r7rs><paragraph|case><index|case>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (case '+
@@ -565,11 +571,137 @@
     \;
   </scm-chunk>
 
+  <value|r7rs><paragraph|and><index|and>
+
+  检查 <code*|and> 是否正确处理多个布尔表达式。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (and #t #t #t))
+
+    (check-false (and #t #f #t))
+
+    (check-false (and #f #t #f))
+
+    (check-false (and #f #f #f))
+
+    \;
+  </scm-chunk>
+
+  验证当 <code*|and> 没有参数时的行为。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (and))
+
+    \;
+  </scm-chunk>
+
+  测试 <code*|and> 与混合类型参数的组合。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (and 1 '() "non-empty" #t))
+
+    (check-false (and #f '() "non-empty" #t))
+
+    (check-false (and 1 '() "non-empty" #f))
+
+    \;
+  </scm-chunk>
+
+  检查 <code*|and> 在复合表达式中的行为。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (and (\<gtr\> 5 3) (\<less\> 5 10)))
+
+    (check-false (and (\<gtr\> 5 3) (\<gtr\> 5 10)))
+
+    \;
+  </scm-chunk>
+
+  验证 <code*|and> 的短路行为。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'error-name
+
+    \ \ (and (error 'error-name "This should not be evaluated") #f))
+
+    (check-false (and #f (error "This should not be evaluated")))
+
+    \;
+  </scm-chunk>
+
+  验证and返回值非布尔值的情况。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (and #t 1) =\<gtr\> 1)
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|or><index|or>
+
+  <value|r7rs><paragraph|when>
+
+  <value|r7rs><paragraph|unless>
+
+  <value|r7rs><paragraph|let><index|let>
+
+  <value|r7rs><paragraph|let*>
+
+  <value|r7rs><paragraph|letrec>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define (test-letrec)
+
+    \ \ (letrec ((even?
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda (n)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (= n 0)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #t
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (odd? (- n 1)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (odd?
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda (n)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (= n 0)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #f
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (even? (- n 1))))))
+
+    \ \ \ \ (list (even? 10) (odd? 10))))
+
+    \;
+
+    (check (test-letrec) =\<gtr\> (list #t #f))
+
+    \;
+
+    (check-catch 'wrong-type-arg
+
+    \ \ (letrec ((a 1) (b (+ a 1))) (list a b)))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|letrec*><index|letrec*>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (letrec* ((a 1) (b (+ a 1))) (list a b))
+
+    \ \ =\<gtr\> (list 1 2))
+
+    \;
+  </scm-chunk>
+
   \;
 
-  <paragraph|let-values><index|let-values>
-
-  \;
+  <value|r7rs><paragraph|let-values><index|let-values>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     ; 0-clause BSD
@@ -642,14 +774,48 @@
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (let-values (((ret) (+ 1 2))) (+ ret 4)) =\<gtr\> 7)
 
-    \;
-
     (check (let-values (((a b) (values 3 4))) (+ a b)) =\<gtr\> 7)
 
     \;
   </scm-chunk>
 
-  \;
+  <value|r7rs><paragraph|let*-values>
+
+  <paragraph|and-let*><index|and-let*>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (and-let* ((hi 3) (ho #f)) (+ hi 1)) =\<gtr\> #f)
+
+    (check (and-let* ((hi 3) (ho #t)) (+ hi 1)) =\<gtr\> 4)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|SRFI>
+
+  <\scm-chunk|goldfish/srfi/srfi-2.scm|false|false>
+    ; 0-clause BSD by Bill Schottstaedt from S7 source repo: s7test.scm
+
+    (define-library (srfi srfi-2)
+
+    (export and-let*)
+
+    (begin
+
+    \;
+
+    (define-macro (and-let* vars . body)
+
+    \ \ ‘(let () (and ,@(map (lambda (v) ‘(define ,@v)) vars) (begin ,@body))))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
 
   <section|程序结构>
 
