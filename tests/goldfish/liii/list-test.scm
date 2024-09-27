@@ -43,8 +43,8 @@
 (check-catch 'wrong-type-arg (first '()))
 
 (check (second '(1 2 3 4 5 6 7 8 9 10)) => 2)
-(check (second '(left . right)) => 'right)
 
+(check-catch 'wrong-type-arg (second '(left . right)))
 (check-catch 'wrong-type-arg (second '(1)))
 
 (check (third '(1 2 3 4 5 6 7 8 9 10)) => 3)
@@ -76,19 +76,11 @@
 
 (check (drop '(1 2 3 4) 4) => '())
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (drop '(1 2 3 4) 5))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (drop '(1 2 3 4) 5))
 
 (check (drop '(1 2 3 . 4) 3) => 4)
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (drop '(1 2 3 . 4) 4))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (drop '(1 2 3 . 4) 4))
 
 (check (take-right '(1 2 3 4) 3) => '(2 3 4))
 
@@ -138,11 +130,7 @@
 (check (last-pair '(a b . c)) => '(b . c))
 (check (last-pair '(b . c)) => '(b . c))
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (last-pair '()))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (last-pair '()))
 
 (check (last '(a b c)) => 'c)
 (check (last '(c)) => 'c)
@@ -150,11 +138,7 @@
 (check (last '(a b . c)) => 'b)
 (check (last '(b . c)) => 'b)
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (last '()))
-    (lambda args #t))
-  => #t)
+(check-catch 'wrong-type-arg (last '()))
 
 (check (count even? '(3 1 4 1 5 9 2 5 6)) => 3)
 

@@ -34,14 +34,7 @@
 (check-catch 'value-error (string-join '() ":" 'strict-infix))
 (check-catch 'type-error (string-join '() ":" 2))
 (check-catch 'value-error (string-join '() ":" 'no-such-grammer))
-
-(check
-  (catch 'wrong-number-of-args
-    (lambda () 
-      (string-join '() ":" 1 2 3))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-number-of-args (string-join '() ":" 1 2 3))
 
 (check-true (string-null? ""))
 
@@ -52,29 +45,10 @@
 (check-true (string-every #\x "xxxxxx"))
 (check-false (string-every #\x "xxx0xx"))
 
-(check
-  (string-every 
-    char-numeric?
-    "012345")
-  =>
-  #t)
+(check-true (string-every char-numeric? "012345"))
+(check-false (string-every char-numeric? "012d45"))
 
-(check
-  (string-every 
-    char-numeric?
-    "012d45")
-  =>
-  #f)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-every
-         1
-         "012345"))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (string-every 1 "012345"))
 
 (check
   (catch 'wrong-type-arg
@@ -96,49 +70,15 @@
   =>
   #t)
 
-(check
-  (string-every 
-    char-numeric?
-    "012345")
-  =>
-  #t)
-
-(check
-  (string-every 
-    number?
-    "012345")
-  =>
-  #f)
+(check-true (string-every char-numeric? "012345"))
+(check-false (string-every number? "012345"))
 
 (check-true (string-every char-numeric? "ab2345" 2))
-
 (check-false (string-every char-numeric? "ab2345" 1))
+(check-false (string-every  char-numeric? "ab234f" 2))
 
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    2)
-  =>
-  #f)
-
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    2
-    4)
-  =>
-  #t)
-
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    2
-    2)
-  =>
-  #t)
+(check-true (string-every char-numeric? "ab234f" 2 4))
+(check-true (string-every char-numeric? "ab234f" 2 2))
 
 (check
   (string-every 
@@ -206,20 +146,8 @@
 
 (check-true (string-any #\0 "xxx0xx"))
 (check-false (string-any #\0 "xxxxxx"))
-
-(check
-  (string-any 
-    char-numeric?
-    "xxx0xx")
-  =>
-  #t)
-
-(check
-  (string-any
-    char-numeric?
-    "xxxxxx")
-  =>
-  #f)
+(check-true (string-any char-numeric? "xxx0xx"))
+(check-false (string-any char-numeric? "xxxxxx"))
 
 (check
   (catch 'wrong-type-arg

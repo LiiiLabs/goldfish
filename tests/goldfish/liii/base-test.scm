@@ -318,17 +318,14 @@
 (check (string? 123) => #f)
 (check (string? '(1 2 3)) => #f)
 
-(check
-  (string->list "MathAgape")
-  =>
-  '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
+(check (string->list "MathAgape")
+  => '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
 
 (check (string->list "") => '())
 
 (check
   (list->string '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
-  =>
-  "MathAgape")
+  => "MathAgape")
 
 (check (list->string '()) => "")
 

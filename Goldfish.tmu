@@ -3652,13 +3652,9 @@
   <scm|string-\<gtr\>list>是一个S7内置的函数，用于将字符串转换为字符列表。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
+    (check (string-\<gtr\>list "MathAgape")
 
-    \ \ (string-\<gtr\>list "MathAgape")
-
-    \ \ =\<gtr\>
-
-    \ \ '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
+    \ \ =\<gtr\> '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
 
     \;
 
@@ -3676,9 +3672,7 @@
 
     \ \ (list-\<gtr\>string '(#\\M #\\a #\\t #\\h #\\A #\\g #\\a #\\p #\\e))
 
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
+    \ \ =\<gtr\> "MathAgape")
 
     \;
 
@@ -3806,21 +3800,7 @@
 
     (check-catch 'value-error (string-join '() ":" 'no-such-grammer))
 
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-number-of-args
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-join '() ":" 1 2 3))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'wrong-number-of-args (string-join '() ":" 1 2 3))
 
     \;
   </scm-chunk>
@@ -3892,31 +3872,9 @@
 
     \;
 
-    (check
+    (check-true (string-every char-numeric? "012345"))
 
-    \ \ (string-every\ 
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "012345")
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (string-every\ 
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "012d45")
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
+    (check-false (string-every char-numeric? "012d45"))
 
     \;
   </scm-chunk>
@@ -3924,23 +3882,7 @@
   注意，评估规则<scm|criterion>必须是谓词或字符，否则报错。
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every
-
-    \ \ \ \ \ \ \ \ \ 1
-
-    \ \ \ \ \ \ \ \ \ "012345"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'wrong-type-arg (string-every 1 "012345"))
 
     \;
 
@@ -3988,31 +3930,9 @@
   注意，谓词要使用字符属性测试函数（例如<scm|char-numeric?>），不要用类型检查函数（例如<scm|<code*|number?>>），否则失去了检查的意义。
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check
+    (check-true (string-every char-numeric? "012345"))
 
-    \ \ (string-every\ 
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "012345")
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (string-every\ 
-
-    \ \ \ \ <code*|number?>
-
-    \ \ \ \ "012345")
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
+    (check-false (string-every number? "012345"))
 
     \;
   </scm-chunk>
@@ -4022,61 +3942,15 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check-true (string-every char-numeric? "ab2345" 2))
 
-    \;
-
     (check-false (string-every char-numeric? "ab2345" 1))
 
-    \;
-
-    (check
-
-    \ \ (string-every\ 
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "ab234f"
-
-    \ \ \ \ 2)
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
+    (check-false (string-every \ char-numeric? "ab234f" 2))
 
     \;
 
-    (check
+    (check-true (string-every char-numeric? "ab234f" 2 4))
 
-    \ \ (string-every\ 
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "ab234f"
-
-    \ \ \ \ 2
-
-    \ \ \ \ 4)
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (string-every\ 
-
-    \ \ \ \ <code*|char-numeric?>
-
-    \ \ \ \ "ab234f"
-
-    \ \ \ \ 2
-
-    \ \ \ \ 2)
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-true (string-every char-numeric? "ab234f" 2 2))
 
     \;
 
@@ -4246,33 +4120,9 @@
 
     (check-false (string-any #\\0 "xxxxxx"))
 
-    \;
+    (check-true (string-any char-numeric? "xxx0xx"))
 
-    (check
-
-    \ \ (string-any\ 
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "xxx0xx")
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (string-any
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "xxxxxx")
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
+    (check-false (string-any char-numeric? "xxxxxx"))
 
     \;
   </scm-chunk>
@@ -6436,9 +6286,9 @@
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (check (second '(1 2 3 4 5 6 7 8 9 10)) =\<gtr\> 2)
 
-    (check (second '(left . right)) =\<gtr\> 'right)
-
     \;
+
+    (check-catch 'wrong-type-arg (second '(left . right)))
 
     (check-catch 'wrong-type-arg (second '(1)))
 
@@ -6626,15 +6476,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (drop '(1 2 3 4) 5))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'wrong-type-arg (drop '(1 2 3 4) 5))
 
     \;
 
@@ -6642,15 +6484,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (drop '(1 2 3 . 4) 4))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'wrong-type-arg (drop '(1 2 3 . 4) 4))
 
     \;
   </scm-chunk>
@@ -6820,15 +6654,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (last-pair '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'wrong-type-arg (last-pair '()))
 
     \;
   </scm-chunk>
@@ -6858,24 +6684,16 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (last '()))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'wrong-type-arg (last '()))
 
     \;
   </scm-chunk>
 
   <subsection|常用函数>
 
-  <paragraph|length><index|length><scm|(l) -\<gtr\> integer>
+  <value|r7rs><paragraph|length><scm|(lst) -\<gtr\> integer><index|length>
 
-  <scm|length>是一个S7内置的R7RS定义的函数，它接收一个列表为参数，返回该列表中元素的数量。如果参数不是列表，返回0。
+  <scm|length>是一个S7内置函数，它接收一个列表为参数，返回该列表中元素的数量。如果参数不是列表，返回0。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (length ()) =\<gtr\> 0)
