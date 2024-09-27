@@ -324,6 +324,26 @@
 (check-true (length=? 0 (list )))
 (check-catch 'value-error (length=? -1 (list )))
 
+(check-true (length>? '(1 2 3 4 5) 3))
+(check-false (length>? '(1 2) 3))
+(check-false (length>? '() 0))
+
+(check-true (length>? '(1) 0))
+(check-false (length>? '() 1))
+
+(check-false (length>? '(1 2 . 3) 2))
+(check-true (length>? '(1 2 . 3) 1))
+
+(check-true (length>=? '(1 2 3 4 5) 3))
+(check-false (length>=? '(1 2) 3))
+(check-true (length>=? '() 0))
+
+(check-true (length>=? '(1) 0))
+(check-false (length>=? '() 1))
+
+(check-false (length>=? '(1 2 . 3) 3))
+(check-true (length>=? '(1 2 . 3) 2))
+
 (check ((list-view (list 1 2 3))) => (list 1 2 3))
 
 (check (((list-view (list 1 2 3))

@@ -332,6 +332,25 @@
 (check (pair? '()) => #f)
 (check (pair? '#(a b)) => #f)
 
+(check-true (list? '()))
+(check-true (list? '(a)))
+(check-true (list? '(a b c)))
+(check-true (list? '(1 . 2)))
+(check-true (list? '(1 2 . 3)))
+
+(check-true (list? '((a) (b) (c))))
+(check-true (list? '(a (b) c)))
+
+(check-true (list? (let ((x '(1 2 3))) (set-cdr! (cddr x) x) x)))
+
+(check-false (list? #t))
+(check-false (list? #f))
+(check-false (list? 123))
+(check-false (list? "Hello"))
+(check-false (list? '#(1 2 3))) 
+(check-false (list? '#()))
+(check-false (list? '12345))
+
 (check (null? '()) => #t)
 (check (null? '(1)) => #f)
 (check (null? '(1 2)) => #f)
