@@ -38,6 +38,8 @@
   list-view flatmap
   list-null? list-not-null? not-null-list?
   length=? length>? length>=?
+  duple invert down up tree-swapper list-product
+  flatten copy-list sort
 )
 (import (srfi srfi-1)
         (liii error))
@@ -100,6 +102,104 @@
 (define (list-not-null? l)
   (and (pair? l)
        (or (null? (cdr l)) (pair? (cdr l)))))
+
+;;; some code from book Essential of Programming Language
+
+;; duple : number X any -> listof(any)
+;; usage : (duple n x) = a list with n values x, unsafe with set-car! and
+;; set-cdr! 
+(define (duple n x)
+  (define (duple-iter n x res)
+    (if (= n 0)
+      res
+      (duple-iter (- n 1) x (cons x res))))
+  (duple-iter n x '()))
+
+;; invert : listof(any) -> listof(any)
+;; usage : (invert '((a b) ...) ) = ((b a) ...)
+(define (invert lst)
+  (map reverse lst))
+
+;; down : listof(any) -> listof(listof(any))
+;; usage : (down x ...) = ((x) ...)
+(define (down lst)
+  (map list lst))
+
+;; up : listof(listof(any)) -> listof(any)
+;; usage : (up '((a ...) ...)) = (a ...)
+(define (up lst)
+  (define (up2 lst res)
+    (if (null? lst)
+      res
+      (cons (car lst)
+            (up2 (cdr lst) res))))
+  (cond ((null? lst)
+         '())
+        ((null? (car lst))
+         (up (cdr lst)))
+        ((pair? (car lst))
+         (up2 (car lst) (up (cdr lst))))
+        (else
+         (cons (car lst) (up (cdr lst))))))
+
+;; tree-swapper : any X any X treeof(any)
+;; usage : (swapper s1 s2 stree) returns a list the same as stree, but with all
+;; occurrences of s1 replaced by s2 and all occurrences of s2 replaced by s1.
+(define (tree-swapper s1 s2 stree)
+  (define (mapper v)
+    (if (pair? v)
+      (tree-swapper s1 s2 v)
+      (cond ((equal? s1 v) s2)
+            ((equal? s2 v) s1)
+            (else v))))
+  (map mapper stree))
+
+;; list-product : listof(any) X listof(any) -> listof(listof(any))
+;; usage: (list-product lst1 lst2), where lst1 and lst2 are each a list of
+;; symbols without repetitions, returns a list of 2-value-lists that represents
+;; the Cartesian product of lst2 and lst2 The 2-value-lists may appear in any
+;; order.
+(define (list-product lst1 lst2)
+  (flatmap
+   (lambda (x)
+     (map
+      (lambda (y)
+        (list x y))
+      lst2))
+   lst1))
+
+;; flatten : listof(any) -> listof(any)
+;; usage : (flatten lst) returns a list of the values contained in lst in the
+;; order in which they occur when slist is printed. Intuitively, flatten removes
+;; all the inner parentheses from its argument.
+(define (flatten lst)
+  (define (flatten2 lst res)
+    (cond ((null? lst)
+           res)
+          ((null? (car lst))
+           (flatten2 (cdr lst) res))
+          ((pair? (car lst))
+           (flatten2
+            (car lst)
+            (flatten2 (cdr lst) res)))
+          (else
+           (cons
+            (car lst)
+            (flatten2 (cdr lst) res)))))
+  (flatten2 lst '()))
+
+;; copy-list : listof(any) -> listof(any)A
+;; usage : copy a list of lst
+(define (copy-list lst)
+  (if (null? lst)
+    '()
+    (cons (car lst) (copy-list (cdr lst)))))
+
+;; sort : function X listof(any) -> listof(any)
+;; usage : (sort pred lst) returns a list of elements sorted by the pred.
+(define (sort pred lst)
+  (sort! (copy-list lst) pred))
+
 
 ) ; end of begin
 ) ; end of library

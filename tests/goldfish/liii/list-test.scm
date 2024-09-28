@@ -353,5 +353,26 @@
 (check (list-not-null? 1) => #f)
 (check (list-null? 1) => #f)
 
+(check (duple 3 1) => (list 1 1 1))
+(check (duple 3 '(a b)) => '((a b) (a b) (a b)))
+
+(check (invert '((a b) (c d) (e f g))) => '((b a) (d c) (g f e)))
+
+(check (down '(1 2 3)) => '((1) (2) (3)))
+(check (up '((1) (2) (3))) => '(1 2 3))
+
+(check (tree-swapper 'x 'y '((x) y (z (x)))) => '((y) x (z (y))))
+(check (tree-swapper 'a 'd '(a b c d)) => '(d b c a))
+
+(check (list-product '(1 2 3) '(a b)) => '((1 a) (1 b) (2 a) (2 b) (3 a) (3 b)))
+
+(check (flatten '(a b c)) => '(a b c))
+(check (flatten '((a) () (b ()) () (c))) => '(a b c))
+(check (flatten '((a b) c (((d)) e))) => '(a b c d e))
+(check (flatten '((a b (() (c))))) => '(a b c))
+
+(check (copy-list '((1) ((b)) (3) d)) => '((1) ((b)) (3) d))
+(check (sort < '(4 2 3 1)) => '(1 2 3 4))
+
 (check-report)
 
