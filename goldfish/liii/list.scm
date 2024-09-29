@@ -37,7 +37,7 @@
   ; Liii List extensions
   list-view flatmap
   list-null? list-not-null? not-null-list?
-  length=? length>? length>=?
+  length=? length>? length>=? flatten
 )
 (import (srfi srfi-1)
         (liii error))
@@ -100,6 +100,57 @@
 (define (list-not-null? l)
   (and (pair? l)
        (or (null? (cdr l)) (pair? (cdr l)))))
+
+(define* (flatten lst (depth 'deepest))
+  (define (flatten-deepest2 rest res-node)
+    (if (null? rest)
+      res-node
+      (let ((first (car rest))
+            (tail  (cdr rest)))
+        (cond ((pair? first)
+               (flatten-deepest2
+                tail
+                (flatten-deepest2
+                 first
+                 res-node)))
+              ((null? first)
+               (flatten-deepest2 tail res-node))
+              (else
+               (set-cdr! res-node (cons first '()))
+               (flatten-deepest2 tail (cdr res-node)))))))
+  (define (flatten-deepest lst)
+    (let ((res (cons #f '())))
+      (flatten-deepest2 lst res)
+      (cdr res)))
+  (define (flatten-depth2 rest depth res-node)
+    (if (null? rest)
+        res-node
+        (let ((first (car rest))
+              (tail  (cdr rest)))
+          (cond ((and (null? first) (not (= 0 depth)))
+                 (flatten-depth2 tail depth res-node))
+                ((or (= depth 0) (not (pair? first)))
+                 (set-cdr! res-node (cons first '()))
+                 (flatten-depth2 tail depth (cdr res-node)))
+                (else
+                 (flatten-depth2
+                  tail
+                  depth
+                  (flatten-depth2
+                   first
+                   (- depth 1)
+                   res-node)))))))
+  (define (flatten-depth lst depth)
+    (let ((res (cons #f '())))
+      (flatten-depth2 lst depth res)
+      (cdr res)))
+  (cond ((eq? depth 'deepest)
+         (flatten-deepest lst))
+        ((integer? depth)
+         (flatten-depth lst depth))
+        (else
+         (error 'type-error "flatten: the second argument depth should be symbol `deepest' or a integer, which will be uesd as depth, but got a ~A" depth)))
+  ) ; end of (define (flatten))
 
 ) ; end of begin
 ) ; end of library
