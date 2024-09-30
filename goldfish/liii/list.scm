@@ -37,7 +37,7 @@
   ; Liii List extensions
   list-view flatmap
   list-null? list-not-null? not-null-list?
-  length=? length>? length>=?
+  length=? length>? length>=? flatten
 )
 (import (srfi srfi-1)
         (liii error))

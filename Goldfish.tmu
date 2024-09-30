@@ -5844,7 +5844,7 @@
 
     \ \ list-null? list-not-null? not-null-list?
 
-    \ \ length=? length\<gtr\>? length\<gtr\>=?
+    \ \ length=? length\<gtr\>? length\<gtr\>=? flatten
 
     )
 
@@ -8087,7 +8087,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|flatten><scm|(lst [depth]) =\<gtr\> lst>
+  <paragraph|flatten><index|flatten><scm|(lst [depth]) =\<gtr\> lst>
+
+  (lst [depth]) =\<gtr\> lst
 
   压平 lst，压为更扁的形状。直观来说，去掉内层列表的括号。例如，<scm|(flatten '(a b (c (d)) (e) ((f))) 'deepest) =\<gtr\> (a b c d e f)>。参数 depth 可选，指定最深压平层数，depth 为 <scm|n> 时，最深压平 n 层列表，depth 为 <scm|'deepest> 时，压平整个列表。
 
