@@ -101,7 +101,7 @@
   (and (pair? l)
        (or (null? (cdr l)) (pair? (cdr l)))))
 
-(define* (flatten lst (depth 'deepest))
+(define* (flatten lst (depth 1))
   (define (flatten-depth-iter rest depth res-node)
     (if (null? rest)
         res-node

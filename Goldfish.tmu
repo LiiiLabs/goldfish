@@ -8091,12 +8091,12 @@
 
   (lst [depth]) =\<gtr\> lst
 
-  压平 lst，压为更扁的形状。直观来说，去掉内层列表的括号。例如，<scm|(flatten '(a b (c (d)) (e) ((f))) 'deepest) =\<gtr\> (a b c d e f)>。参数 depth 可选，指定最深压平层数，depth 为 <scm|n> 时，最深压平 n 层列表，depth 为 <scm|'deepest> 时，压平整个列表。
+  压平 lst，压为更扁的形状。直观来说，去掉内层列表的括号。例如，<scm|(flatten '(a b (c (d)) (e) ((f))) 'deepest) =\<gtr\> (a b c d e f)>。参数 depth 可选，默认为 1，指定最深压平层数，depth 为 <scm|n> 时，最深压平 n 层列表，depth 为 <scm|'deepest> 时，压平整个列表。
 
   注意，定义 flatten 应当使用 <scm|define*> 而非 <scm|define> 以支持可选参数。
 
   <\scm-chunk|goldfish/liii/list.scm|true|true>
-    (define* (flatten lst (depth 'deepest))
+    (define* (flatten lst (depth 1))
   </scm-chunk>
 
   包装一般化的 flatten，使用 <scm|set-cdr!> 加速构建列表，
@@ -8224,17 +8224,19 @@
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     ; deepest flatten
 
-    (check (flatten '((a) () (b ()) () (c))) =\<gtr\> '(a b c))
+    (check (flatten '((a) () (b ()) () (c)) 'deepest) =\<gtr\> '(a b c))
 
-    (check (flatten '((a b) c (((d)) e))) =\<gtr\> '(a b c d e))
+    (check (flatten '((a b) c (((d)) e)) 'deepest) =\<gtr\> '(a b c d e))
 
-    (check (flatten '(a b (() (c)))) =\<gtr\> '(a b c))
+    (check (flatten '(a b (() (c))) 'deepest) =\<gtr\> '(a b c))
 
     ; depth flatten
 
     (check (flatten '((a) () (b ()) () (c)) 0) =\<gtr\> '((a) () (b ()) () (c)))
 
     (check (flatten '((a) () (b ()) () (c)) 1) =\<gtr\> '(a b () c))
+
+    (check (flatten '((a) () (b ()) () (c))) =\<gtr\> '(a b () c))
 
     (check (flatten '((a) () (b ()) () (c)) 2) =\<gtr\> '(a b c))
 
@@ -8243,6 +8245,8 @@
     (check (flatten '((a b) c (((d)) e)) 0) =\<gtr\> '((a b) c (((d)) e)))
 
     (check (flatten '((a b) c (((d)) e)) 1) =\<gtr\> '(a b c ((d)) e))
+
+    (check (flatten '((a b) c (((d)) e))) =\<gtr\> '(a b c ((d)) e))
 
     (check (flatten '((a b) c (((d)) e)) 2) =\<gtr\> '(a b c (d) e))
 
@@ -8253,6 +8257,8 @@
     (check (flatten '(a b (() (c))) 0) =\<gtr\> '(a b (() (c))))
 
     (check (flatten '(a b (() (c))) 1) =\<gtr\> '(a b () (c)))
+
+    (check (flatten '(a b (() (c)))) =\<gtr\> '(a b () (c)))
 
     (check (flatten '(a b (() (c))) 2) =\<gtr\> '(a b c))
 

@@ -354,21 +354,24 @@
 (check (list-null? 1) => #f)
 
 ; deepest flatten
-(check (flatten '((a) () (b ()) () (c))) => '(a b c))
-(check (flatten '((a b) c (((d)) e))) => '(a b c d e))
-(check (flatten '(a b (() (c)))) => '(a b c))
+(check (flatten '((a) () (b ()) () (c)) 'deepest) => '(a b c))
+(check (flatten '((a b) c (((d)) e)) 'deepest) => '(a b c d e))
+(check (flatten '(a b (() (c))) 'deepest) => '(a b c))
 ; depth flatten
 (check (flatten '((a) () (b ()) () (c)) 0) => '((a) () (b ()) () (c)))
 (check (flatten '((a) () (b ()) () (c)) 1) => '(a b () c))
+(check (flatten '((a) () (b ()) () (c))) => '(a b () c))
 (check (flatten '((a) () (b ()) () (c)) 2) => '(a b c))
 (check (flatten '((a) () (b ()) () (c)) -1) => '(a b c))
 (check (flatten '((a b) c (((d)) e)) 0) => '((a b) c (((d)) e)))
 (check (flatten '((a b) c (((d)) e)) 1) => '(a b c ((d)) e))
+(check (flatten '((a b) c (((d)) e))) => '(a b c ((d)) e))
 (check (flatten '((a b) c (((d)) e)) 2) => '(a b c (d) e))
 (check (flatten '((a b) c (((d)) e)) 3) => '(a b c d e))
 (check (flatten '((a b) c (((d)) e)) -1) => '(a b c d e))
 (check (flatten '(a b (() (c))) 0) => '(a b (() (c))))
 (check (flatten '(a b (() (c))) 1) => '(a b () (c)))
+(check (flatten '(a b (() (c)))) => '(a b () (c)))
 (check (flatten '(a b (() (c))) 2) => '(a b c))
 (check (flatten '(a b (() (c))) -1) => '(a b c))
 ; error depth flatten
