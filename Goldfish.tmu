@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.3|1.2.9.2-rc6>>
+<TMU|<tuple|1.0.3|1.2.9>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
@@ -5844,7 +5844,7 @@
 
     \ \ list-null? list-not-null? not-null-list?
 
-    \ \ length=? length\<gtr\>? length\<gtr\>=?
+    \ \ length=? length\<gtr\>? length\<gtr\>=? flatten
 
     )
 
@@ -8083,6 +8083,192 @@
     (check (list-not-null? 1) =\<gtr\> #f)
 
     (check (list-null? 1) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|flatten><index|flatten><scm|(lst [depth]) =\<gtr\> lst>
+
+  (lst [depth]) =\<gtr\> lst
+
+  压平 lst，压为更扁的形状。直观来说，去掉内层列表的括号。例如，<scm|(flatten '(a b (c (d)) (e) ((f))) 'deepest) =\<gtr\> (a b c d e f)>。参数 depth 可选，默认为 1，指定最深压平层数，depth 为 <scm|n> 时，最深压平 n 层列表，depth 为 <scm|'deepest> 时，压平整个列表。
+
+  注意，定义 flatten 应当使用 <scm|define*> 而非 <scm|define> 以支持可选参数。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define* (flatten lst (depth 1))
+  </scm-chunk>
+
+  包装一般化的 flatten，使用 <scm|set-cdr!> 加速构建列表，
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (define (flatten-depth-iter rest depth res-node)
+
+    \ \ \ \ (if (null? rest)
+
+    \ \ \ \ \ \ \ \ res-node
+
+    \ \ \ \ \ \ \ \ (let ((first (car rest))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (tail \ (cdr rest)))
+
+    \ \ \ \ \ \ \ \ \ \ (cond ((and (null? first) (not (= 0 depth)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-depth-iter tail depth res-node))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((or (= depth 0) (not (pair? first)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! res-node (cons first '()))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-depth-iter tail depth (cdr res-node)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-depth-iter
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tail
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ depth
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-depth-iter
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (- depth 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ res-node)))))))
+  </scm-chunk>
+
+  因为要 <scm|set-cdr!> 参数 <scm|res-node> ，所以必须保证后者是 pair，不能是 null。为达成这个目的，可以先 <scm|cons> 一个 pair，之后返回它的 <scm|\<less\>cdr\<gtr\>>。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (define (flatten-depth lst depth)
+
+    \ \ \ \ (let ((res (cons #f '())))
+
+    \ \ \ \ \ \ (flatten-depth-iter lst depth res)
+
+    \ \ \ \ \ \ (cdr res)))
+
+    \;
+  </scm-chunk>
+
+  注意到 flatten-depth-iter 迭代中（<scm|cond> 第二个子句），不断传递 depth 参数，只是重新绑定而不加改变。然而 goldfish 访问自由变量不比直接传递参数效率更高，只好辗转传递 depth。<scm|(flatten-depth lst -1)> 固然可以用来实现 <scm|(flatten lst -1)>，但总是额外传递一个无意义的参数 depth，效率较低，可以针对这一点进行优化。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (define (flatten-deepest-iter rest res-node)
+
+    \ \ \ \ (if (null? rest)
+
+    \ \ \ \ \ \ res-node
+
+    \ \ \ \ \ \ (let ((first (car rest))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (tail \ (cdr rest)))
+
+    \ \ \ \ \ \ \ \ (cond ((pair? first)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-deepest-iter
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tail
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-deepest-iter
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ first
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ res-node)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((null? first)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-deepest-iter tail res-node))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! res-node (cons first '()))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (flatten-deepest-iter tail (cdr res-node)))))))
+
+    \ \ (define (flatten-deepest lst)
+
+    \ \ \ \ (let ((res (cons #f '())))
+
+    \ \ \ \ \ \ (flatten-deepest-iter lst res)
+
+    \ \ \ \ \ \ (cdr res)))
+
+    \;
+  </scm-chunk>
+
+  最后，分派 <scm|flatten-depth> 和 <scm|flatten-deepest>。注意 <scm|flatten> 参数 depth 不应该是除 <scm|n> 和 <scm|'deepest> 以外的任何值，因而，当出现其它值时抛出错误。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (cond ((eq? depth 'deepest)
+
+    \ \ \ \ \ \ \ \ \ (flatten-deepest lst))
+
+    \ \ \ \ \ \ \ \ ((integer? depth)
+
+    \ \ \ \ \ \ \ \ \ (flatten-depth lst depth))
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ (error 'type-error "flatten: the second argument depth should be symbol ‘deepest' or a integer, which will be uesd as depth, but got a ~A" depth)))
+
+    \ \ ) ; end of (define* (flatten))
+
+    \;
+  </scm-chunk>
+
+  测试代码如下。
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    ; deepest flatten
+
+    (check (flatten '((a) () (b ()) () (c)) 'deepest) =\<gtr\> '(a b c))
+
+    (check (flatten '((a b) c (((d)) e)) 'deepest) =\<gtr\> '(a b c d e))
+
+    (check (flatten '(a b (() (c))) 'deepest) =\<gtr\> '(a b c))
+
+    ; depth flatten
+
+    (check (flatten '((a) () (b ()) () (c)) 0) =\<gtr\> '((a) () (b ()) () (c)))
+
+    (check (flatten '((a) () (b ()) () (c)) 1) =\<gtr\> '(a b () c))
+
+    (check (flatten '((a) () (b ()) () (c))) =\<gtr\> '(a b () c))
+
+    (check (flatten '((a) () (b ()) () (c)) 2) =\<gtr\> '(a b c))
+
+    (check (flatten '((a) () (b ()) () (c)) -1) =\<gtr\> '(a b c))
+
+    (check (flatten '((a b) c (((d)) e)) 0) =\<gtr\> '((a b) c (((d)) e)))
+
+    (check (flatten '((a b) c (((d)) e)) 1) =\<gtr\> '(a b c ((d)) e))
+
+    (check (flatten '((a b) c (((d)) e))) =\<gtr\> '(a b c ((d)) e))
+
+    (check (flatten '((a b) c (((d)) e)) 2) =\<gtr\> '(a b c (d) e))
+
+    (check (flatten '((a b) c (((d)) e)) 3) =\<gtr\> '(a b c d e))
+
+    (check (flatten '((a b) c (((d)) e)) -1) =\<gtr\> '(a b c d e))
+
+    (check (flatten '(a b (() (c))) 0) =\<gtr\> '(a b (() (c))))
+
+    (check (flatten '(a b (() (c))) 1) =\<gtr\> '(a b () (c)))
+
+    (check (flatten '(a b (() (c)))) =\<gtr\> '(a b () (c)))
+
+    (check (flatten '(a b (() (c))) 2) =\<gtr\> '(a b c))
+
+    (check (flatten '(a b (() (c))) -1) =\<gtr\> '(a b c))
+
+    ; error depth flatten
+
+    (check-catch 'type-error (flatten '((a) () (b ()) () (c)) 'a))
+
+    (check-catch 'type-error (flatten '((a) () (b ()) () (c)) (make-vector 1 1)))
 
     \;
   </scm-chunk>
