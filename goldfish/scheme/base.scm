@@ -24,6 +24,7 @@
   floor-quotient
   gcd lcm s7-lcm
   boolean=?
+  symbol=?
   ; String
   string-copy
   ; Vector
@@ -173,6 +174,17 @@
         ((not (boolean? obj2)) #f)
         ((not (equal? obj1 obj2)) #f)
         (else (same-boolean obj1 rest))))
+
+(define (symbol=? sym1 sym2 . rest)
+  (define (same-symbol sym rest)
+    (if (null? rest)
+        #t
+        (and (eq? sym (car rest))
+             (same-symbol sym (cdr rest)))))
+  (cond ((not (symbol? sym1)) #f)
+        ((not (symbol? sym2)) #f)
+        ((not (eq? sym1 sym2)) #f)
+        (else (same-symbol sym1 rest))))
 
 (define (raise . args)
   (apply throw #t args))
