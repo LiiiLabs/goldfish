@@ -229,6 +229,29 @@
 (check-false (boolean=? #t #f))
 (check-false (boolean=? #f #t))
 
+;; list-copy tests
+
+;; Check that copying an empty list works as expected
+(check (list-copy '()) => '())
+
+;; Check that copying a list of numbers works correctly
+(check (list-copy '(1 2 3 4 5)) => '(1 2 3 4 5))
+
+;; Check that copying a list of symbols works correctly
+(check (list-copy '(a b c d)) => '(a b c d))
+
+;; Check that copying nested lists works correctly
+(check (list-copy '((1 2) (3 4) (5 6))) => '((1 2) (3 4) (5 6)))
+
+;; Check that copying the list does not result in the same object
+(check-false (eq? (list-copy '(1 2 3)) '(1 2 3)))
+
+;; Check deep copying of nested lists
+(define original '((a b) (c d)))
+(define copied (list-copy original))
+(check-true (equal? copied original))
+(check-false (eq? copied original))
+
 (check (char? #\A) => #t)
 (check (char? 1) => #f)
 

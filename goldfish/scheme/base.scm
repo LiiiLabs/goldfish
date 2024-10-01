@@ -24,6 +24,8 @@
   floor-quotient
   gcd lcm s7-lcm
   boolean=?
+  ; List
+  list-copy
   ; String
   string-copy
   ; Vector
@@ -173,6 +175,8 @@
         ((not (boolean? obj2)) #f)
         ((not (equal? obj1 obj2)) #f)
         (else (same-boolean obj1 rest))))
+
+(define list-copy copy)
 
 (define (raise . args)
   (apply throw #t args))
