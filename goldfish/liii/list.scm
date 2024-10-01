@@ -19,7 +19,7 @@
   ; S7 built-in
   cons car cdr map for-each
   ; SRFI 1: Constructors
-  circular-list iota
+  circular-list iota list-copy
   ; SRFI 1: Predicates
   null-list? circular-list?
   ; SRFI 1: Selectors
