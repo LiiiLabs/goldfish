@@ -15,7 +15,9 @@
 (import (liii error)
         (liii base))
 (export
-  circular-list iota circular-list? null-list?
+  ; SRFI 1: Constructors
+  circular-list iota list-copy 
+  circular-list? null-list?
   first second third fourth fifth
   sixth seventh eighth ninth tenth
   take drop take-right drop-right count fold fold-right

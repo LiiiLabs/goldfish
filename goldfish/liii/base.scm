@@ -28,6 +28,8 @@
   floor-quotient
   gcd lcm s7-lcm
   boolean=?
+  ; List
+  list-copy
   ; String
   string-copy
   ; Vector

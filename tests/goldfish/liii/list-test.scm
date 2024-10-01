@@ -27,6 +27,30 @@
 (check-catch 'value-error (iota -1))
 (check-catch 'type-error (iota 'a))
 
+;; list-copy tests
+
+;; Check that copying an empty list works as expected
+(check (list-copy '()) => '())
+
+;; Check that copying a list of numbers works correctly
+(check (list-copy '(1 2 3 4 5)) => '(1 2 3 4 5))
+
+;; Check that copying a list of symbols works correctly
+(check (list-copy '(a b c d)) => '(a b c d))
+
+;; Check that copying nested lists works correctly
+(check (list-copy '((1 2) (3 4) (5 6))) => '((1 2) (3 4) (5 6)))
+
+;; Check that copying the list does not result in the same object
+(check-false (eq? (list-copy '(1 2 3)) '(1 2 3)))
+
+;; Check if list-copy is a deep copy or not 
+(let ((obj1 '(1 2 3 4))
+      (obj2 (list-copy '(1 2 3 4))))
+  (check obj1 => obj2)
+  (set-car! obj1 3)
+  (check-false (eq? obj1 obj2)))
+
 ; (check (circular-list? (circular-list 1 2)) => #t)
 
 (check (null-list? '()) => #t)

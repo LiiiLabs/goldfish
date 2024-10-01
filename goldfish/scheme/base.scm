@@ -24,6 +24,8 @@
   floor-quotient
   gcd lcm s7-lcm
   boolean=?
+  ; list
+  list-copy
   ; String
   string-copy
   ; Vector
@@ -230,6 +232,9 @@
 (define (string-map p . args) (apply string (apply map p args)))
 
 (define string-for-each for-each)
+
+; 0 clause BSD, from S7 repo r7rs.scm
+(define list-copy copy)
 
 (define* (vector-copy v (start 0) (end (vector-length v)))
   (if (or (> start end) (> end (vector-length v)))
