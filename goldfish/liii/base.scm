@@ -28,9 +28,11 @@
   floor-quotient
   gcd lcm s7-lcm
   boolean=?
-  ; List
+  ; R7RS 6.4: list
   list-copy
-  ; String
+  ; R7RS 6.5: Symbol
+  symbol=?
+  ; R7RS 6.7: String
   string-copy
   ; Vector
   vector->string string->vector
