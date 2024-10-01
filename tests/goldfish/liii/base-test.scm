@@ -229,6 +229,21 @@
 (check-false (boolean=? #t #f))
 (check-false (boolean=? #f #t))
 
+(check-true (symbol=? 'a 'a))
+(check-true (symbol=? 'foo 'foo))
+(check-true (symbol=? 'bar 'bar 'bar))
+(check-false (symbol=? 'a 'b))
+(check-false (symbol=? 'foo 'bar))
+
+(check-true (symbol=? (string->symbol "foo") (string->symbol "foo")))
+(check-false (symbol=? (string->symbol "foo") (string->symbol "bar")))
+
+(check-false (symbol=? 1 1))
+(check-false (symbol=? 'a 1))
+(check-false (symbol=? (string->symbol "foo") 1))
+
+(check-false (symbol=? 'a 'b '()))
+
 (check (char? #\A) => #t)
 (check (char? 1) => #f)
 
