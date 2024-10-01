@@ -229,11 +229,15 @@
 (check-false (boolean=? #t #f))
 (check-false (boolean=? #f #t))
 
+(check-catch 'wrong-number-of-args (symbol=? 'a))
+(check-catch 'wrong-number-of-args (symbol=? 1))
+
 (check-true (symbol=? 'a 'a))
 (check-true (symbol=? 'foo 'foo))
-(check-true (symbol=? 'bar 'bar 'bar))
 (check-false (symbol=? 'a 'b))
 (check-false (symbol=? 'foo 'bar))
+
+(check-true (symbol=? 'bar 'bar 'bar))
 
 (check-true (symbol=? (string->symbol "foo") (string->symbol "foo")))
 (check-false (symbol=? (string->symbol "foo") (string->symbol "bar")))

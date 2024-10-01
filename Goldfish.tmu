@@ -1529,6 +1529,8 @@
 
   <value|r7rs><paragraph|symbol=?><index|symbol=?>
 
+  如果所有参数都是符号并且它们的名称通过string=?测试是相同的，返回#t（真），否则返回#f（假）。
+
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define (symbol=? sym1 sym2 . rest)
 
@@ -1556,15 +1558,23 @@
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-number-of-args (symbol=? 'a))
+
+    (check-catch 'wrong-number-of-args (symbol=? 1))
+
+    \;
+
     (check-true (symbol=? 'a 'a))
 
     (check-true (symbol=? 'foo 'foo))
 
-    (check-true (symbol=? 'bar 'bar 'bar))
-
     (check-false (symbol=? 'a 'b))
 
     (check-false (symbol=? 'foo 'bar))
+
+    \;
+
+    (check-true (symbol=? 'bar 'bar 'bar))
 
     \;
   </scm-chunk>
