@@ -266,6 +266,8 @@
 
 (check-catch 'wrong-type-arg (bytevector 256))
 
+(check (utf8->string #u8(#xE4 #xB8 #xAD)) => "中")
+
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
