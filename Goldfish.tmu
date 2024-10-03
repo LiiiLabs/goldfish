@@ -1657,14 +1657,52 @@
 
   <value|r7rs><paragraph|bytevector?><index|bytevector?>
 
-  <\scm-chunk|goldfish/scheme/base.scm|true|false>
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector? byte-vector?)
 
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check-true (bytevector? #u8(0)))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|make-bytevector><index|make-bytevector>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define make-bytevector make-byte-vector)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (make-bytevector 3 0) =\<gtr\> #u8(0 0 0))
+
+    (check (make-bytevector 3 3) =\<gtr\> #u8(3 3 3))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|bytevector><index|bytevector>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define bytevector byte-vector)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (bytevector 1) =\<gtr\> #u8(1))
+
+    (check (bytevector) =\<gtr\> #u8())
+
+    (check (bytevector 1 2 3) =\<gtr\> #u8(1 2 3))
+
+    \;
+
+    (check-catch 'wrong-type-arg (bytevector 256))
 
     \;
   </scm-chunk>

@@ -193,6 +193,10 @@
 
 (define bytevector? byte-vector?)
 
+(define make-bytevector make-byte-vector)
+
+(define bytevector byte-vector)
+
 (define (raise . args)
   (apply throw #t args))
 
