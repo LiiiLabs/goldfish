@@ -18,8 +18,10 @@
 
 (check-set-mode! 'report-failed)
 
-(check (char-upcase #\A) => #\A)
+(check (char-upcase #\z) => #\Z)
 (check (char-upcase #\a) => #\A)
+
+(check (char-upcase #\A) => #\A)
 (check (char-upcase #\?) => #\?)
 (check (char-upcase #\$) => #\$)
 (check (char-upcase #\.) => #\.)
@@ -33,6 +35,11 @@
 (check (char-upcase #\space) => #\space)
 (check (char-upcase #\newline) => #\newline)
 (check (char-upcase #\null) => #\null)
+
+(check (char-downcase #\A) => #\a)
+(check (char-downcase #\Z) => #\z)
+
+(check (char-downcase #\a) => #\a)
 
 (check-report)
 
