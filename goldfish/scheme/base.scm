@@ -30,9 +30,11 @@
   symbol=?
   ; R7RS 6.7: String
   string-copy
-  ; Vector
+  ; R7RS 6.8: Vector
   vector->string string->vector
   vector-copy vector-copy! vector-fill!
+  ; R7RS 6.9: Bytevectors
+  bytevector? make-bytevector bytevector
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?
@@ -188,6 +190,12 @@
         ((not (symbol? sym2)) #f)
         ((not (eq? sym1 sym2)) #f)
         (else (same-symbol sym1 rest))))
+
+(define bytevector? byte-vector?)
+
+(define make-bytevector make-byte-vector)
+
+(define bytevector byte-vector)
 
 (define (raise . args)
   (apply throw #t args))

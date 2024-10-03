@@ -255,6 +255,17 @@
 (check (char=? #\A #\A #\A) => #t)
 (check (char=? #\A #\a) => #f)
 
+(check-true (bytevector? #u8(0)))
+
+(check (make-bytevector 3 0) => #u8(0 0 0))
+(check (make-bytevector 3 3) => #u8(3 3 3))
+
+(check (bytevector 1) => #u8(1))
+(check (bytevector) => #u8())
+(check (bytevector 1 2 3) => #u8(1 2 3))
+
+(check-catch 'wrong-type-arg (bytevector 256))
+
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
