@@ -508,7 +508,7 @@
 
     \ \ bytevector-u8-ref bytevector-u8-set!
 
-    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
+    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length u8-substring
 
     \ \ ; Input and Output
 
@@ -1743,11 +1743,13 @@
     \;
   </scm-chunk>
 
-  <paragraph|u8-string-length>
+  <paragraph|u8-string-length><index|u8-string-length>
 
   <value|r7rs><paragraph|utf8-\<gtr\>string><index|utf8-\<gtr\>string>
 
   <value|r7rs><paragraph|string-\<gtr\>utf8><index|string-\<gtr\>utf8>
+
+  <paragraph|u8-substring><index|u8-substring>
 
   这三个函数依赖于一样的公共子函数，故而放在一起实现。
 
@@ -1974,6 +1976,10 @@
 
     \ \ 
 
+    \ \ (when (not (string? str))
+
+    \ \ \ \ (error 'type-error "str must be string"))
+
     \ \ (let ((N (u8-string-length str)))
 
     \ \ \ \ (when (or (\<less\> start 0) (\<gtr\>= start N))
@@ -2042,6 +2048,28 @@
 
     \;
   </scm-chunk>
+
+  <subparagraph|实现u8-substring>
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define* (u8-substring str (start 0) (end #t))
+
+    \ \ (utf8-\<gtr\>string (string-\<gtr\>utf8 str start end)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (u8-substring "汉字书写" 0 1) =\<gtr\> "汉")
+
+    (check (u8-substring "汉字书写" 0 4) =\<gtr\> "汉字书写")
+
+    (check (u8-substring "汉字书写" 0) =\<gtr\> "汉字书写")
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <section|控制流>
 

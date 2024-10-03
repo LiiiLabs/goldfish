@@ -292,6 +292,8 @@
            (else
             (loop next-pos (+ cnt 1) start-pos)))))))
   
+  (when (not (string? str))
+    (error 'type-error "str must be string"))
   (let ((N (u8-string-length str)))
     (when (or (< start 0) (>= start N))
         (error 'out-of-range

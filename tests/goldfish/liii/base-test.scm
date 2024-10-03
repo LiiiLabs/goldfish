@@ -294,6 +294,10 @@
 (check (string->utf8 "中") => #u8(#xE4 #xB8 #xAD))
 (check (string->utf8 "👍") => #u8(#xF0 #x9F #x91 #x8D))
 
+(check (u8-substring "汉字书写" 0 1) => "汉")
+(check (u8-substring "汉字书写" 0 4) => "汉字书写")
+(check (u8-substring "汉字书写" 0) => "汉字书写")
+
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
