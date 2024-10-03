@@ -34,7 +34,8 @@
   vector->string string->vector
   vector-copy vector-copy! vector-fill!
   ; R7RS 6.9: Bytevectors
-  bytevector? make-bytevector bytevector
+  bytevector? make-bytevector bytevector bytevector-length
+  bytevector-u8-ref bytevector-u8-set! utf8->string
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?
@@ -196,6 +197,65 @@
 (define make-bytevector make-byte-vector)
 
 (define bytevector byte-vector)
+
+(define bytevector-length length)
+
+(define bytevector-u8-ref byte-vector-ref)
+
+(define bytevector-u8-set! byte-vector-set!)
+
+(define* (utf8->string bv (start 0) (end (bytevector-length bv)))
+  (define (validate-utf8 bv index end)
+    (if (>= index end)
+        #t  ; Reached the end without errors, sequence is valid
+        (let ((byte (bytevector-u8-ref bv index)))
+          (cond
+           ;; 1-byte sequence (0xxxxxxx)
+           ((< byte #x80)
+            (validate-utf8 bv (+ index 1) end))
+           
+           ;; 2-byte sequence (110xxxxx 10xxxxxx)
+           ((< byte #xe0)
+            (if (>= (+ index 1) end)
+                index  ; Incomplete sequence
+                (let ((next-byte (bytevector-u8-ref bv (+ index 1))))
+                  (if (not (= (logand next-byte #xc0) #x80))
+                      index  ; Invalid continuation byte
+                      (validate-utf8 bv (+ index 2) end)))))
+           
+           ;; 3-byte sequence (1110xxxx 10xxxxxx 10xxxxxx)
+           ((< byte #xf0)
+            (if (>= (+ index 2) end)
+                index  ; Incomplete sequence
+                (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
+                      (next-byte2 (bytevector-u8-ref bv (+ index 2))))
+                  (if (or (not (= (logand next-byte1 #xc0) #x80))
+                          (not (= (logand next-byte2 #xc0) #x80)))
+                      index  ; Invalid continuation byte(s)
+                      (validate-utf8 bv (+ index 3) end)))))
+           
+           ;; 4-byte sequence (11110xxx 10xxxxxx 10xxxxxx 10xxxxxx)
+           ((< byte #xf8)
+            (if (>= (+ index 3) end)
+                index  ; Incomplete sequence
+                (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
+                      (next-byte2 (bytevector-u8-ref bv (+ index 2)))
+                      (next-byte3 (bytevector-u8-ref bv (+ index 3))))
+                  (if (or (not (= (logand next-byte1 #xc0) #x80))
+                          (not (= (logand next-byte2 #xc0) #x80))
+                          (not (= (logand next-byte3 #xc0) #x80)))
+                      index  ; Invalid continuation byte(s)
+                      (validate-utf8 bv (+ index 4) end)))))
+           
+           (else index)))))  ; Invalid leading byte
+  
+  (if (or (< start 0) (> end (bytevector-length bv)) (> start end))
+      (error 'out-of-range start end)
+      (let ((validation-result (validate-utf8 bv start end)))
+        (if (eq? validation-result #t)
+            (copy bv (make-string (- end start)) start end)
+            (error 'value-error
+                   "Invalid UTF-8 sequence at index: " validation-result)))))
 
 (define (raise . args)
   (apply throw #t args))
