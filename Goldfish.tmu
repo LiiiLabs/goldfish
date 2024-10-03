@@ -1848,9 +1848,15 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (utf8-\<gtr\>string <code|<code*|(bytevector #x48 #x65 #x6C #x6C #x6F)>>) =\<gtr\> "Hello")
+
+    (check (utf8-\<gtr\>string #u8(#xC3 #xA4)) =\<gtr\> "ä")
+
     (check (utf8-\<gtr\>string #u8(#xE4 #xB8 #xAD)) =\<gtr\> "中")
 
-    (check (utf8-\<gtr\>string <code|<code*|(bytevector #x48 #x65 #x6C #x6C #x6F)>>) =\<gtr\> "Hello")
+    (check (utf8-\<gtr\>string #u8(#xF0 #x9F #x91 #x8D)) =\<gtr\> "👍")
+
+    \;
 
     (check-catch 'value-error (utf8-\<gtr\>string (bytevector #xFF #x65 #x6C #x6C #x6F)))
 

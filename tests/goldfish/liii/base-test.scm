@@ -266,8 +266,11 @@
 
 (check-catch 'wrong-type-arg (bytevector 256))
 
-(check (utf8->string #u8(#xE4 #xB8 #xAD)) => "中")
 (check (utf8->string (bytevector #x48 #x65 #x6C #x6C #x6F)) => "Hello")
+(check (utf8->string #u8(#xC3 #xA4)) => "ä")
+(check (utf8->string #u8(#xE4 #xB8 #xAD)) => "中")
+(check (utf8->string #u8(#xF0 #x9F #x91 #x8D)) => "👍")
+
 (check-catch 'value-error (utf8->string (bytevector #xFF #x65 #x6C #x6C #x6F)))
 
 (check (apply + (list 3 4)) => 7)
