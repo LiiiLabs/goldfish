@@ -35,7 +35,8 @@
   vector-copy vector-copy! vector-fill!
   ; R7RS 6.9: Bytevectors
   bytevector? make-bytevector bytevector bytevector-length
-  bytevector-u8-ref bytevector-u8-set! utf8->string
+  bytevector-u8-ref bytevector-u8-set!
+  utf8->string string->utf8 u8-string-length
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?
@@ -247,6 +248,18 @@
                     (+ index 4)))))
          (else index)))))  ; Invalid leading byte
 
+(define (u8-string-length str)
+  (let ((bv (string->byte-vector str))
+        (N (string-length str)))
+    (let loop ((pos 0) (cnt 0))
+      (let ((next-pos (bytevector-advance-u8 bv pos N)))
+        (cond
+         ((= next-pos N)
+          (+ cnt 1))
+         ((= next-pos pos)
+          (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+         (else (loop next-pos (+ cnt 1))))))))
+
 (define* (utf8->string bv (start 0) (end (bytevector-length bv)))
   (if (or (< start 0) (> end (bytevector-length bv)) (> start end))
       (error 'out-of-range start end)
@@ -259,6 +272,37 @@
             (error 'value-error "Invalid UTF-8 sequence at index: " pos))
            (else
             (loop next-pos)))))))
+
+(define* (string->utf8 str (start 0) (end #t))
+  ; start < end in this case
+  (define (string->utf8-sub str start end)
+    (let ((bv (string->byte-vector str))
+          (N (string-length str)))
+      (let loop ((pos 0) (cnt 0) (start-pos 0))
+        (let ((next-pos (bytevector-advance-u8 bv pos N)))
+          (cond
+           ((and (not (zero? start)) (= cnt start))
+            (loop next-pos (+ cnt 1) pos))
+           ((and (integer? end) (= cnt end))
+            (copy bv (make-byte-vector (- pos start-pos)) pos next-pos))
+           ((and end (= next-pos N))
+            (copy bv (make-byte-vector (- N start-pos)) start-pos N))
+           ((= next-pos pos)
+            (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+           (else
+            (loop next-pos (+ cnt 1) start-pos)))))))
+
+  (when (< start 0)
+        (error 'out-of-range "start must be greater than 0"))
+  (when (and (integer? end) (>= end (string-length str)))
+        (error 'out-of-range "end must be smaller than string length: "
+               end (string-length str)))
+  (when (and (integer? end) (> start end))
+        (error 'out-of-range "start <= end failed" start end))
+  
+  (if (and (integer? end) (= start end))
+      (byte-vector)
+      (string->utf8-sub str start end)))
 
 (define (raise . args)
   (apply throw #t args))

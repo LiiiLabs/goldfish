@@ -424,7 +424,9 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length
 
-    \ \ bytevector-u8-ref bytevector-u8-set! utf8-\<gtr\>string
+    \ \ bytevector-u8-ref bytevector-u8-set!
+
+    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
 
     \ \ ; Input and Output
 
@@ -502,7 +504,11 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length
 
-    \ \ bytevector-u8-ref bytevector-u8-set! utf8-\<gtr\>string
+    \ \ bytevector-u8-ref bytevector-u8-set!
+
+    \ \ bytevector-u8-ref bytevector-u8-set!
+
+    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
 
     \ \ ; Input and Output
 
@@ -1737,39 +1743,15 @@
     \;
   </scm-chunk>
 
-  <paragraph|u8-decode>
+  <paragraph|u8-string-length>
 
-  \;
+  <value|r7rs><paragraph|utf8-\<gtr\>string><index|utf8-\<gtr\>string>
 
-  <\session|goldfish|default>
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      \;
-    <|unfolded-io>
-      <goldfish-result|bytevector-advance-u8>
-    </unfolded-io>
+  <value|r7rs><paragraph|string-\<gtr\>utf8><index|string-\<gtr\>utf8>
 
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      (bytevector-advance-u8 #u8(#xF0 #x9F #x91 #x8D) 4)
-    <|unfolded-io>
-      <goldfish-result|4>
-    </unfolded-io>
+  这三个函数依赖于一样的公共子函数，故而放在一起实现。
 
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
-  \;
-
-  <paragraph|utf8-\<gtr\>string>
-
-  <paragraph|string-\<gtr\>utf8>
+  <subparagraph|公共子函数>
 
   首先定义公共子函数<scm|bytevector-advance-u8>：<scm|(bv index end) =\<gtr\> index>。
 
@@ -1869,6 +1851,42 @@
     \;
   </scm-chunk>
 
+  <subparagraph|实现u8-string-length>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (u8-string-length str)
+
+    \ \ (let ((bv (string-\<gtr\>byte-vector str))
+
+    \ \ \ \ \ \ \ \ (N (string-length str)))
+
+    \ \ \ \ (let loop ((pos 0) (cnt 0))
+
+    \ \ \ \ \ \ (let ((next-pos (bytevector-advance-u8 bv pos N)))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ ((= next-pos N)
+
+    \ \ \ \ \ \ \ \ \ \ (+ cnt 1))
+
+    \ \ \ \ \ \ \ \ \ ((= next-pos pos)
+
+    \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+
+    \ \ \ \ \ \ \ \ \ (else (loop next-pos (+ cnt 1))))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (u8-string-length "中文") =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现utf8-\<gtr\>string>
+
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define* (utf8-\<gtr\>string bv (start 0) (end (bytevector-length bv)))
 
@@ -1913,11 +1931,87 @@
     \;
   </scm-chunk>
 
-  <paragraph|string-\<gtr\>utf8>
-
   \;
 
-  \;
+  <subparagraph|实现string-\<gtr\>utf8>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define* (string-\<gtr\>utf8 str (start 0) (end #t))
+
+    \ \ ; start \<less\> end in this case
+
+    \ \ (define (string-\<gtr\>utf8-sub str start end)
+
+    \ \ \ \ (let ((bv (string-\<gtr\>byte-vector str))
+
+    \ \ \ \ \ \ \ \ \ \ (N (string-length str)))
+
+    \ \ \ \ \ \ (let loop ((pos 0) (cnt 0) (start-pos 0))
+
+    \ \ \ \ \ \ \ \ (let ((next-pos (bytevector-advance-u8 bv pos N)))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ ((and (not (zero? start)) (= cnt start))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop next-pos (+ cnt 1) pos))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((and (integer? end) (= cnt end))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-byte-vector (- pos start-pos)) pos next-pos))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((and end (= next-pos N))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-byte-vector (- N start-pos)) start-pos N))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((= next-pos pos)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop next-pos (+ cnt 1) start-pos)))))))
+
+    \;
+
+    \ \ (when (\<less\> start 0)
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range "start must be greater than 0"))
+
+    \ \ (when (and (integer? end) (\<gtr\>= end (string-length str)))
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range "end must be smaller than string length: "
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ end (string-length str)))
+
+    \ \ (when (and (integer? end) (\<gtr\> start end))
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range "start \<less\>= end failed" start end))
+
+    \ \ 
+
+    \ \ (if (and (integer? end) (= start end))
+
+    \ \ \ \ \ \ (byte-vector)
+
+    \ \ \ \ \ \ (string-\<gtr\>utf8-sub str start end)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-\<gtr\>utf8 "Hello") =\<gtr\> (bytevector #x48 #x65 #x6C #x6C #x6F))
+
+    (check (string-\<gtr\>utf8 "Hello" 1 2) =\<gtr\> #u8(#x65))
+
+    (check (string-\<gtr\>utf8 "ä") =\<gtr\> #u8(#xC3 #xA4))
+
+    (check (string-\<gtr\>utf8 "中") =\<gtr\> #u8(#xE4 #xB8 #xAD))
+
+    (check (string-\<gtr\>utf8 "👍") =\<gtr\> #u8(#xF0 #x9F #x91 #x8D))
+
+    \;
+  </scm-chunk>
 
   <section|控制流>
 
