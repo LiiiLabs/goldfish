@@ -284,7 +284,7 @@
            ((and (not (zero? start)) (= cnt start))
             (loop next-pos (+ cnt 1) pos))
            ((and (integer? end) (= cnt end))
-            (copy bv (make-byte-vector (- pos start-pos)) pos next-pos))
+            (copy bv (make-byte-vector (- pos start-pos)) start-pos pos))
            ((and end (= next-pos N))
             (copy bv (make-byte-vector (- N start-pos)) start-pos N))
            ((= next-pos pos)

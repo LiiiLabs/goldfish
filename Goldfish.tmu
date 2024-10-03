@@ -1958,7 +1958,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ ((and (integer? end) (= cnt end))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-byte-vector (- pos start-pos)) pos next-pos))
+    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-byte-vector (- pos start-pos)) start-pos pos))
 
     \ \ \ \ \ \ \ \ \ \ \ ((and end (= next-pos N))
 
