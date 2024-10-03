@@ -1952,7 +1952,7 @@
 
     \ \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ \ ((and (not (zero? start)) (= cnt start))
+    \ \ \ \ \ \ \ \ \ \ \ ((and (not (zero? start)) (zero? start-pos) (= cnt start))
 
     \ \ \ \ \ \ \ \ \ \ \ \ (loop next-pos (+ cnt 1) pos))
 
@@ -1972,29 +1972,33 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ (loop next-pos (+ cnt 1) start-pos)))))))
 
-    \;
-
-    \ \ (when (\<less\> start 0)
-
-    \ \ \ \ \ \ \ \ (error 'out-of-range "start must be greater than 0"))
-
-    \ \ (when (and (integer? end) (\<gtr\>= end (string-length str)))
-
-    \ \ \ \ \ \ \ \ (error 'out-of-range "end must be smaller than string length: "
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ end (string-length str)))
-
-    \ \ (when (and (integer? end) (\<gtr\> start end))
-
-    \ \ \ \ \ \ \ \ (error 'out-of-range "start \<less\>= end failed" start end))
-
     \ \ 
 
-    \ \ (if (and (integer? end) (= start end))
+    \ \ (let ((N (u8-string-length str)))
+
+    \ \ \ \ (when (or (\<less\> start 0) (\<gtr\>= start N))
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append "start must \<gtr\>= 0 and \<less\> " (number-\<gtr\>string N))))
+
+    \ \ \ \ (when (and (integer? end) (or (\<less\> end 0) (\<gtr\>= end (+ N 1))))
+
+    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append "end must \<gtr\>= 0 and \<less\> " (number-\<gtr\>string (+ N 1))))) \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ (when (and (integer? end) (\<gtr\> start end))
+
+    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range "start \<less\>= end failed" start end))
+
+    \ \ \ \ 
+
+    \ \ \ \ (if (and (integer? end) (= start end))
 
     \ \ \ \ \ \ (byte-vector)
 
-    \ \ \ \ \ \ (string-\<gtr\>utf8-sub str start end)))
+    \ \ \ \ \ \ (string-\<gtr\>utf8-sub str start end))))
 
     \;
   </scm-chunk>
@@ -2002,7 +2006,27 @@
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (string-\<gtr\>utf8 "Hello") =\<gtr\> (bytevector #x48 #x65 #x6C #x6C #x6F))
 
-    (check (string-\<gtr\>utf8 "Hello" 1 2) =\<gtr\> #u8(#x65))
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 1 2)) =\<gtr\> "e")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 0 2)) =\<gtr\> "He")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 2)) =\<gtr\> "llo")
+
+    \;
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写")) =\<gtr\> "汉字书写")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写" 1)) =\<gtr\> "字书写")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写" 2)) =\<gtr\> "书写")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写" 3)) =\<gtr\> "写")
+
+    \;
+
+    (check-catch 'out-of-range (string-\<gtr\>utf8 "汉字书写" 4))
+
+    \;
 
     (check (string-\<gtr\>utf8 "ä") =\<gtr\> #u8(#xC3 #xA4))
 

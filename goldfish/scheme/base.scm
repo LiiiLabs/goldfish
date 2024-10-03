@@ -281,7 +281,7 @@
       (let loop ((pos 0) (cnt 0) (start-pos 0))
         (let ((next-pos (bytevector-advance-u8 bv pos N)))
           (cond
-           ((and (not (zero? start)) (= cnt start))
+           ((and (not (zero? start)) (zero? start-pos) (= cnt start))
             (loop next-pos (+ cnt 1) pos))
            ((and (integer? end) (= cnt end))
             (copy bv (make-byte-vector (- pos start-pos)) start-pos pos))
@@ -291,18 +291,20 @@
             (error 'value-error "Invalid UTF-8 sequence at index: " pos))
            (else
             (loop next-pos (+ cnt 1) start-pos)))))))
-
-  (when (< start 0)
-        (error 'out-of-range "start must be greater than 0"))
-  (when (and (integer? end) (>= end (string-length str)))
-        (error 'out-of-range "end must be smaller than string length: "
-               end (string-length str)))
-  (when (and (integer? end) (> start end))
-        (error 'out-of-range "start <= end failed" start end))
   
-  (if (and (integer? end) (= start end))
+  (let ((N (u8-string-length str)))
+    (when (or (< start 0) (>= start N))
+        (error 'out-of-range
+               (string-append "start must >= 0 and < " (number->string N))))
+    (when (and (integer? end) (or (< end 0) (>= end (+ N 1))))
+          (error 'out-of-range
+                 (string-append "end must >= 0 and < " (number->string (+ N 1)))))         
+    (when (and (integer? end) (> start end))
+          (error 'out-of-range "start <= end failed" start end))
+    
+    (if (and (integer? end) (= start end))
       (byte-vector)
-      (string->utf8-sub str start end)))
+      (string->utf8-sub str start end))))
 
 (define (raise . args)
   (apply throw #t args))

@@ -276,7 +276,17 @@
 (check-catch 'value-error (utf8->string (bytevector #xFF #x65 #x6C #x6C #x6F)))
 
 (check (string->utf8 "Hello") => (bytevector #x48 #x65 #x6C #x6C #x6F))
-(check (string->utf8 "Hello" 1 2) => #u8(#x65))
+(check (utf8->string (string->utf8 "Hello" 1 2)) => "e")
+(check (utf8->string (string->utf8 "Hello" 0 2)) => "He")
+(check (utf8->string (string->utf8 "Hello" 2)) => "llo")
+
+(check (utf8->string (string->utf8 "汉字书写")) => "汉字书写")
+(check (utf8->string (string->utf8 "汉字书写" 1)) => "字书写")
+(check (utf8->string (string->utf8 "汉字书写" 2)) => "书写")
+(check (utf8->string (string->utf8 "汉字书写" 3)) => "写")
+
+(check-catch 'out-of-range (string->utf8 "汉字书写" 4))
+
 (check (string->utf8 "ä") => #u8(#xC3 #xA4))
 (check (string->utf8 "中") => #u8(#xE4 #xB8 #xAD))
 (check (string->utf8 "👍") => #u8(#xF0 #x9F #x91 #x8D))
