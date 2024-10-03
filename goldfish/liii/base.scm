@@ -34,9 +34,11 @@
   symbol=?
   ; R7RS 6.7: String
   string-copy
-  ; Vector
+  ; R7RS 6.8 Vector
   vector->string string->vector
   vector-copy vector-copy! vector-fill!
+  ; R7RS 6.9 Bytevectors
+  bytevector? make-bytevector bytevector
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?

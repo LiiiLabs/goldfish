@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.3|1.2.9.2>>
+<TMU|<tuple|1.0.4|1.2.9.3-rc1>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
@@ -414,11 +414,15 @@
 
     \ \ string-copy
 
-    \ \ ; Vector
+    \ \ ; R7RS 6.8: Vector
 
     \ \ vector-\<gtr\>string string-\<gtr\>vector
 
     \ \ vector-copy vector-copy! vector-fill!
+
+    \ \ ; R7RS 6.9: Bytevectors
+
+    \ \ bytevector? make-bytevector bytevector
 
     \ \ ; Input and Output
 
@@ -486,11 +490,15 @@
 
     \ \ string-copy
 
-    \ \ ; Vector
+    \ \ ; R7RS 6.8 Vector
 
     \ \ vector-\<gtr\>string string-\<gtr\>vector
 
     \ \ vector-copy vector-copy! vector-fill!
+
+    \ \ ; R7RS 6.9 Bytevectors
+
+    \ \ bytevector? make-bytevector bytevector
 
     \ \ ; Input and Output
 
@@ -1646,6 +1654,20 @@
   见<smart-ref|chapter:liii_vector>
 
   <section|字节向量>
+
+  <value|r7rs><paragraph|bytevector?><index|bytevector?>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|false>
+    (define bytevector? byte-vector?)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (check-true (bytevector? #u8(0)))
+
+    \;
+  </scm-chunk>
 
   <section|控制流>
 

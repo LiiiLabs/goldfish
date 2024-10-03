@@ -255,6 +255,8 @@
 (check (char=? #\A #\A #\A) => #t)
 (check (char=? #\A #\a) => #f)
 
+(check-true (bytevector? #u8(0)))
+
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
