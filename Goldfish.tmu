@@ -2012,6 +2012,12 @@
 
     (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 2)) =\<gtr\> "llo")
 
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 2 5)) =\<gtr\> "llo")
+
+    \;
+
+    (check-catch 'out-of-range (string-\<gtr\>utf8 "Hello" 2 6))
+
     \;
 
     (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写")) =\<gtr\> "汉字书写")

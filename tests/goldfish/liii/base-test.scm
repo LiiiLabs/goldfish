@@ -279,6 +279,9 @@
 (check (utf8->string (string->utf8 "Hello" 1 2)) => "e")
 (check (utf8->string (string->utf8 "Hello" 0 2)) => "He")
 (check (utf8->string (string->utf8 "Hello" 2)) => "llo")
+(check (utf8->string (string->utf8 "Hello" 2 5)) => "llo")
+
+(check-catch 'out-of-range (string->utf8 "Hello" 2 6))
 
 (check (utf8->string (string->utf8 "汉字书写")) => "汉字书写")
 (check (utf8->string (string->utf8 "汉字书写" 1)) => "字书写")
