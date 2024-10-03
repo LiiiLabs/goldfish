@@ -14,7 +14,8 @@
 ; under the License.
 ;
 
-(import (liii check))
+(import (liii check)
+        (scheme char))
 
 (check-set-mode! 'report-failed)
 
@@ -40,6 +41,18 @@
 (check (char-downcase #\Z) => #\z)
 
 (check (char-downcase #\a) => #\a)
+
+(check-true (char-upper-case? #\A))
+(check-true (char-upper-case? #\Z))
+
+(check-false (char-upper-case? #\a))
+(check-false (char-upper-case? #\z))
+
+(check-true (char-lower-case? #\a))
+(check-true (char-lower-case? #\z))
+
+(check-false (char-lower-case? #\A))
+(check-false (char-lower-case? #\Z))
 
 (check-report)
 
