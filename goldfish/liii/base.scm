@@ -17,7 +17,8 @@
 (define-library (liii base)
 (import (scheme base)
         (srfi srfi-2)
-        (srfi srfi-8))
+        (srfi srfi-8)
+        (srfi srfi-151))
 (export
   ; (scheme base) defined by R7RS
   let-values
@@ -58,6 +59,9 @@
   and-let*
   ; SRFI-8
   receive
+  ; SRFI-151
+  bitwise-or
+  bitwise-and
   ; Extra routines for (liii base)
   == != display* in? let1 compose identity typed-lambda
 )

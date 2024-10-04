@@ -464,7 +464,9 @@
 
     \ \ \ \ \ \ \ \ (srfi srfi-2)
 
-    \ \ \ \ \ \ \ \ (srfi srfi-8))
+    \ \ \ \ \ \ \ \ (srfi srfi-8)
+
+    \ \ \ \ \ \ \ \ (srfi srfi-151))
 
     (export
 
@@ -545,6 +547,12 @@
     \ \ ; SRFI-8
 
     \ \ receive
+
+    \ \ ; SRFI-151
+
+    \ \ bitwise-or
+
+    \ \ bitwise-and
 
     \ \ ; Extra routines for (liii base)
 
@@ -1502,6 +1510,72 @@
   <paragraph|expt>
 
   <subsection|数的转换>
+
+  <section|位运算 (Bitwise Operations)>
+
+  <subparagraph|SRFI-151 库定义>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|false|true>
+    (define-library (srfi srfi-151)
+
+    (import (scheme base))
+
+    (export bitwise-and bitwise-or)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|srfi><paragraph|bitwise-and><index|bitwise-and>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define bitwise-and logand)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (bitwise-and 5 3) =\<gtr\> 1) \ ; 5 (101) AND 3 (011) = 1 (001)
+
+    (check (bitwise-and 8 4) =\<gtr\> 0) \ ; 8 (1000) AND 4 (0100) = 0 (0000)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|srfi><paragraph|bitwise-or><index|bitwise-or>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define bitwise-or logior)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (bitwise-or 5 3) =\<gtr\> 7) \ ; 5 (101) OR 3 (011) = 7 (111)
+
+    (check (bitwise-or 8 4) =\<gtr\> 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|SRFI-151 End>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
 
   <section|布尔值>
 

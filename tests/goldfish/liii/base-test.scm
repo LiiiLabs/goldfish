@@ -223,6 +223,12 @@
 
 (check (square 2) => 4)
 
+(check (bitwise-and 5 3) => 1)  ; 5 (101) AND 3 (011) = 1 (001)
+(check (bitwise-and 8 4) => 0)  ; 8 (1000) AND 4 (0100) = 0 (0000)
+
+(check (bitwise-or 5 3) => 7)  ; 5 (101) OR 3 (011) = 7 (111)
+(check (bitwise-or 8 4) => 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
+
 (check-true (boolean=? #t #t))
 (check-true (boolean=? #f #f))
 (check-true (boolean=? #t #t #t))
