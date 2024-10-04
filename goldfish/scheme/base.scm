@@ -28,6 +28,8 @@
   list-copy
   ; R7RS 6.5: Symbol
   symbol=?
+  ; R7RS 6.6: Characters
+  digit-value
   ; R7RS 6.7: String
   string-copy
   ; R7RS 6.8: Vector
