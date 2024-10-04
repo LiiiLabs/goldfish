@@ -54,5 +54,16 @@
 (check-false (char-lower-case? #\A))
 (check-false (char-lower-case? #\Z))
 
+(check (digit-value #\1) => 1)
+(check (digit-value #\2) => 2)
+(check (digit-value #\3) => 3)
+(check (digit-value #\4) => 4)
+(check (digit-value #\5) => 5)
+(check (digit-value #\6) => 6)
+(check (digit-value #\7) => 7)
+(check (digit-value #\8) => 8)
+(check (digit-value #\9) => 9)
+(check (digit-value #\0) => 0)
+
 (check-report)
 

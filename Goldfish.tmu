@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.4|1.2.9.3-rc1>>
+<TMU|<tuple|1.0.3|1.2.9.2>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
@@ -410,6 +410,10 @@
 
     \ \ symbol=?
 
+    \ \ ; R7RS 6.6: Characters
+
+    \ \ digit-value
+
     \ \ ; R7RS 6.7: String
 
     \ \ string-copy
@@ -487,6 +491,10 @@
     \ \ ; R7RS 6.5: Symbol
 
     \ \ symbol=?
+
+    \ \ ; R7RS 6.6: Characters
+
+    \ \ digit-value
 
     \ \ ; R7RS 6.7: String
 
@@ -13110,7 +13118,7 @@
 
     (export
 
-    \ \ char-upcase char-downcase char-upper-case? char-lower-case?
+    \ \ char-upcase char-downcase char-upper-case? char-lower-case? digit-value
 
     )
 
@@ -13191,6 +13199,8 @@
 
   <value|r7rs><paragraph|char-upper-case?><index|char-upper-case?>
 
+  S7内置函数。检查是否是大写英文字母。
+
   <\scm-chunk|tests/goldfish/scheme/char-test.scm|true|true>
     (check-true (char-upper-case? #\\A))
 
@@ -13207,6 +13217,8 @@
 
   <value|r7rs><paragraph|char-lower-case?><index|char-lower-case?>
 
+  S7内置函数。检查是否是小写英文字母。
+
   <\scm-chunk|tests/goldfish/scheme/char-test.scm|true|true>
     (check-true (char-lower-case? #\\a))
 
@@ -13217,6 +13229,48 @@
     (check-false (char-lower-case? #\\A))
 
     (check-false (char-lower-case? #\\Z))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|digit-value><index|digit-value>
+
+  <paragraph|实现>
+
+  <\scm-chunk|goldfish/scheme/char.scm|true|true>
+    (define (digit-value ch)
+
+    \ \ (if (char-numeric? ch)
+
+    \ \ \ \ \ \ (- (char-\<gtr\>integer ch) (char-\<gtr\>integer #\\0))
+
+    \ \ \ \ \ \ #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|测试>
+
+  <\scm-chunk|tests/goldfish/scheme/char-test.scm|true|true>
+    (check (digit-value #\\1) =\<gtr\> 1)
+
+    (check (digit-value #\\2) =\<gtr\> 2)
+
+    (check (digit-value #\\3) =\<gtr\> 3)
+
+    (check (digit-value #\\4) =\<gtr\> 4)
+
+    (check (digit-value #\\5) =\<gtr\> 5)
+
+    (check (digit-value #\\6) =\<gtr\> 6)
+
+    (check (digit-value #\\7) =\<gtr\> 7)
+
+    (check (digit-value #\\8) =\<gtr\> 8)
+
+    (check (digit-value #\\9) =\<gtr\> 9)
+
+    (check (digit-value #\\0) =\<gtr\> 0)
 
     \;
   </scm-chunk>

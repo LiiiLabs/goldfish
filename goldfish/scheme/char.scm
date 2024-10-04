@@ -16,9 +16,14 @@
 
 (define-library (scheme char)
 (export
-  char-upcase char-downcase char-upper-case? char-lower-case?
+  char-upcase char-downcase char-upper-case? char-lower-case? digit-value
 )
 (begin
+(define (digit-value ch)
+  (if (char-numeric? ch)
+      (- (char->integer ch) (char->integer #\0))
+      #f))
+
 ) ; end of begin
 ) ; end of define-library
 
