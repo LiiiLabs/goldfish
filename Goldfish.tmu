@@ -4367,15 +4367,7 @@
 
   <r7rs><paragraph|string-\<gtr\>symbol><index|string-\<gtr\>symbol>
 
-  <scm|string-\<gtr\>symbol> 在S7 Scheme 中被symbol函数替代，用于将字符串转换为符号。
-
-  <paragraph|实现>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define (string-\<gtr\>symbol str) (symbol str))
-
-    \;
-  </scm-chunk>
+  <scm|string-\<gtr\>symbol> 是一个S7内置的函数，用于将字符串转换为符号。
 
   <paragraph|测试>
 

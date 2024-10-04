@@ -355,8 +355,6 @@
 
 (define (eof-object) #<eof>)
 
-(define (string->symbol str) (symbol str))
-
 (define (string-copy str . start_end)
   (cond ((null? start_end)
          (substring str 0))
