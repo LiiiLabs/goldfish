@@ -428,7 +428,9 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length
 
-    \ \ bytevector-u8-ref bytevector-u8-set! utf8-\<gtr\>string
+    \ \ bytevector-u8-ref bytevector-u8-set!
+
+    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
 
     \ \ ; Input and Output
 
@@ -510,7 +512,11 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length
 
-    \ \ bytevector-u8-ref bytevector-u8-set! utf8-\<gtr\>string
+    \ \ bytevector-u8-ref bytevector-u8-set!
+
+    \ \ bytevector-u8-ref bytevector-u8-set!
+
+    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length u8-substring
 
     \ \ ; Input and Output
 
@@ -1719,7 +1725,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|bytevector-length>
+  <value|r7rs><paragraph|bytevector-length>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-length length)
@@ -1727,7 +1733,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|bytevector-u8-ref>
+  <value|r7rs><paragraph|bytevector-u8-ref>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-u8-ref byte-vector-ref)
@@ -1737,7 +1743,7 @@
 
   \;
 
-  <paragraph|bytevector-u8-set!>
+  <value|r7rs><paragraph|bytevector-u8-set!>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-u8-set! byte-vector-set!)
@@ -1745,112 +1751,176 @@
     \;
   </scm-chunk>
 
-  <paragraph|utf8-\<gtr\>string>
+  <paragraph|u8-string-length><index|u8-string-length>
+
+  <value|r7rs><paragraph|utf8-\<gtr\>string><index|utf8-\<gtr\>string>
+
+  <value|r7rs><paragraph|string-\<gtr\>utf8><index|string-\<gtr\>utf8>
+
+  <paragraph|u8-substring><index|u8-substring>
+
+  这三个函数依赖于一样的公共子函数，故而放在一起实现。
+
+  <subparagraph|公共子函数>
+
+  首先定义公共子函数<scm|bytevector-advance-u8>：<scm|(bv index end) =\<gtr\> index>。
+
+  <\enumerate>
+    <item>当前位置超过指定的开区间的结尾时，直接返回当前位置
+
+    <item>当前位置是非法位置，直接返回当前位置
+
+    <item>当前位置是合法位置，返回下一个位置
+  </enumerate>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define* (bytevector-advance-u8 bv index (end (length bv)))
+
+    \ \ (if (\<gtr\>= index end)
+
+    \ \ \ \ \ \ index \ ; Reached the end without errors, sequence is valid
+
+    \ \ \ \ \ \ (let ((byte (bv index)))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ ;; 1-byte sequence (0xxxxxxx)
+
+    \ \ \ \ \ \ \ \ \ ((\<less\> byte #x80)
+
+    \ \ \ \ \ \ \ \ \ \ (+ index 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ ;; 2-byte sequence (110xxxxx 10xxxxxx)
+
+    \ \ \ \ \ \ \ \ \ ((\<less\> byte #xe0)
+
+    \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= (+ index 1) end)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte (bv (+ index 1))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (not (= (logand next-byte #xc0) #x80))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Invalid continuation byte
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ index 2)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ ;; 3-byte sequence (1110xxxx 10xxxxxx 10xxxxxx)
+
+    \ \ \ \ \ \ \ \ \ ((\<less\> byte #xf0)
+
+    \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= (+ index 2) end)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bytevector-u8-ref bv (+ index 2))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (not (= (logand next-byte1 #xc0) #x80))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (= (logand next-byte2 #xc0) #x80)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Invalid continuation byte(s)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ index 3)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ ;; 4-byte sequence (11110xxx 10xxxxxx 10xxxxxx 10xxxxxx)
+
+    \ \ \ \ \ \ \ \ \ ((\<less\> byte #xf8)
+
+    \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= (+ index 3) end)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bv (+ index 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bv (+ index 2)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte3 (bv (+ index 3))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (not (= (logand next-byte1 #xc0) #x80))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (= (logand next-byte2 #xc0) #x80))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (= (logand next-byte3 #xc0) #x80)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Invalid continuation byte(s)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ index 4)))))
+
+    \ \ \ \ \ \ \ \ \ (else index))))) \ ; Invalid leading byte
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现u8-string-length>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define (u8-string-length str)
+
+    \ \ (let ((bv (string-\<gtr\>byte-vector str))
+
+    \ \ \ \ \ \ \ \ (N (string-length str)))
+
+    \ \ \ \ (let loop ((pos 0) (cnt 0))
+
+    \ \ \ \ \ \ (let ((next-pos (bytevector-advance-u8 bv pos N)))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ ((= next-pos N)
+
+    \ \ \ \ \ \ \ \ \ \ (+ cnt 1))
+
+    \ \ \ \ \ \ \ \ \ ((= next-pos pos)
+
+    \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+
+    \ \ \ \ \ \ \ \ \ (else (loop next-pos (+ cnt 1))))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (u8-string-length "中文") =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现utf8-\<gtr\>string>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define* (utf8-\<gtr\>string bv (start 0) (end (bytevector-length bv)))
-
-    \ \ (define (validate-utf8 bv index end)
-
-    \ \ \ \ (if (\<gtr\>= index end)
-
-    \ \ \ \ \ \ \ \ #t \ ; Reached the end without errors, sequence is valid
-
-    \ \ \ \ \ \ \ \ (let ((byte (bytevector-u8-ref bv index)))
-
-    \ \ \ \ \ \ \ \ \ \ (cond
-
-    \ \ \ \ \ \ \ \ \ \ \ ;; 1-byte sequence (0xxxxxxx)
-
-    \ \ \ \ \ \ \ \ \ \ \ ((\<less\> byte #x80)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (validate-utf8 bv (+ index 1) end))
-
-    \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ \ \ \ ;; 2-byte sequence (110xxxxx 10xxxxxx)
-
-    \ \ \ \ \ \ \ \ \ \ \ ((\<less\> byte #xe0)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= (+ index 1) end)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte (bytevector-u8-ref bv (+ index 1))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (not (= (logand next-byte #xc0) #x80))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Invalid continuation byte
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (validate-utf8 bv (+ index 2) end)))))
-
-    \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ \ \ \ ;; 3-byte sequence (1110xxxx 10xxxxxx 10xxxxxx)
-
-    \ \ \ \ \ \ \ \ \ \ \ ((\<less\> byte #xf0)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= (+ index 2) end)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bytevector-u8-ref bv (+ index 2))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (not (= (logand next-byte1 #xc0) #x80))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (= (logand next-byte2 #xc0) #x80)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Invalid continuation byte(s)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (validate-utf8 bv (+ index 3) end)))))
-
-    \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ \ \ \ ;; 4-byte sequence (11110xxx 10xxxxxx 10xxxxxx 10xxxxxx)
-
-    \ \ \ \ \ \ \ \ \ \ \ ((\<less\> byte #xf8)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= (+ index 3) end)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bytevector-u8-ref bv (+ index 2)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte3 (bytevector-u8-ref bv (+ index 3))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (not (= (logand next-byte1 #xc0) #x80))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (= (logand next-byte2 #xc0) #x80))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (= (logand next-byte3 #xc0) #x80)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Invalid continuation byte(s)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (validate-utf8 bv (+ index 4) end)))))
-
-    \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ \ \ \ (else index))))) \ ; Invalid leading byte
-
-    \ \ 
 
     \ \ (if (or (\<less\> start 0) (\<gtr\> end (bytevector-length bv)) (\<gtr\> start end))
 
     \ \ \ \ \ \ (error 'out-of-range start end)
 
-    \ \ \ \ \ \ (let ((validation-result (validate-utf8 bv start end)))
+    \ \ \ \ \ \ (let loop ((pos start))
 
-    \ \ \ \ \ \ \ \ (if (eq? validation-result #t)
+    \ \ \ \ \ \ \ \ (let ((next-pos (bytevector-advance-u8 bv pos end)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-string (- end start)) start end)
+    \ \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (error 'value-error
+    \ \ \ \ \ \ \ \ \ \ \ ((= next-pos end)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Invalid UTF-8 sequence at index: " validation-result)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-string (- end start)) start end))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((= next-pos pos)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop next-pos)))))))
 
     \;
   </scm-chunk>
@@ -1870,6 +1940,144 @@
 
     \;
   </scm-chunk>
+
+  \;
+
+  <subparagraph|实现string-\<gtr\>utf8>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define* (string-\<gtr\>utf8 str (start 0) (end #t))
+
+    \ \ ; start \<less\> end in this case
+
+    \ \ (define (string-\<gtr\>utf8-sub str start end)
+
+    \ \ \ \ (let ((bv (string-\<gtr\>byte-vector str))
+
+    \ \ \ \ \ \ \ \ \ \ (N (string-length str)))
+
+    \ \ \ \ \ \ (let loop ((pos 0) (cnt 0) (start-pos 0))
+
+    \ \ \ \ \ \ \ \ (let ((next-pos (bytevector-advance-u8 bv pos N)))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ ((and (not (zero? start)) (zero? start-pos) (= cnt start))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop next-pos (+ cnt 1) pos))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((and (integer? end) (= cnt end))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-byte-vector (- pos start-pos)) start-pos pos))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((and end (= next-pos N))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (copy bv (make-byte-vector (- N start-pos)) start-pos N))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((= next-pos pos)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop next-pos (+ cnt 1) start-pos)))))))
+
+    \ \ 
+
+    \ \ (when (not (string? str))
+
+    \ \ \ \ (error 'type-error "str must be string"))
+
+    \ \ (let ((N (u8-string-length str)))
+
+    \ \ \ \ (when (or (\<less\> start 0) (\<gtr\>= start N))
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append "start must \<gtr\>= 0 and \<less\> " (number-\<gtr\>string N))))
+
+    \ \ \ \ (when (and (integer? end) (or (\<less\> end 0) (\<gtr\>= end (+ N 1))))
+
+    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append "end must \<gtr\>= 0 and \<less\> " (number-\<gtr\>string (+ N 1))))) \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ (when (and (integer? end) (\<gtr\> start end))
+
+    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range "start \<less\>= end failed" start end))
+
+    \ \ \ \ 
+
+    \ \ \ \ (if (and (integer? end) (= start end))
+
+    \ \ \ \ \ \ (byte-vector)
+
+    \ \ \ \ \ \ (string-\<gtr\>utf8-sub str start end))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (string-\<gtr\>utf8 "Hello") =\<gtr\> (bytevector #x48 #x65 #x6C #x6C #x6F))
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 1 2)) =\<gtr\> "e")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 0 2)) =\<gtr\> "He")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 2)) =\<gtr\> "llo")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "Hello" 2 5)) =\<gtr\> "llo")
+
+    \;
+
+    (check-catch 'out-of-range (string-\<gtr\>utf8 "Hello" 2 6))
+
+    \;
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写")) =\<gtr\> "汉字书写")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写" 1)) =\<gtr\> "字书写")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写" 2)) =\<gtr\> "书写")
+
+    (check (utf8-\<gtr\>string (string-\<gtr\>utf8 "汉字书写" 3)) =\<gtr\> "写")
+
+    \;
+
+    (check-catch 'out-of-range (string-\<gtr\>utf8 "汉字书写" 4))
+
+    \;
+
+    (check (string-\<gtr\>utf8 "ä") =\<gtr\> #u8(#xC3 #xA4))
+
+    (check (string-\<gtr\>utf8 "中") =\<gtr\> #u8(#xE4 #xB8 #xAD))
+
+    (check (string-\<gtr\>utf8 "👍") =\<gtr\> #u8(#xF0 #x9F #x91 #x8D))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实现u8-substring>
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define* (u8-substring str (start 0) (end #t))
+
+    \ \ (utf8-\<gtr\>string (string-\<gtr\>utf8 str start end)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (u8-substring "汉字书写" 0 1) =\<gtr\> "汉")
+
+    (check (u8-substring "汉字书写" 0 4) =\<gtr\> "汉字书写")
+
+    (check (u8-substring "汉字书写" 0) =\<gtr\> "汉字书写")
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <section|控制流>
 

@@ -41,7 +41,9 @@
   vector-copy vector-copy! vector-fill!
   ; R7RS 6.9 Bytevectors
   bytevector? make-bytevector bytevector bytevector-length
-  bytevector-u8-ref bytevector-u8-set! utf8->string
+  bytevector-u8-ref bytevector-u8-set!
+  bytevector-u8-ref bytevector-u8-set!
+  utf8->string string->utf8 u8-string-length u8-substring
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?
@@ -60,6 +62,9 @@
   == != display* in? let1 compose identity typed-lambda
 )
 (begin
+
+(define* (u8-substring str (start 0) (end #t))
+  (utf8->string (string->utf8 str start end)))
 
 (define == equal?)
 

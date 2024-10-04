@@ -37,7 +37,8 @@
   vector-copy vector-copy! vector-fill!
   ; R7RS 6.9: Bytevectors
   bytevector? make-bytevector bytevector bytevector-length
-  bytevector-u8-ref bytevector-u8-set! utf8->string
+  bytevector-u8-ref bytevector-u8-set!
+  utf8->string string->utf8 u8-string-length
   ; Input and Output
   call-with-port port? binary-port? textual-port?
   input-port-open? output-port-open?
@@ -206,58 +207,108 @@
 
 (define bytevector-u8-set! byte-vector-set!)
 
+(define* (bytevector-advance-u8 bv index (end (length bv)))
+  (if (>= index end)
+      index  ; Reached the end without errors, sequence is valid
+      (let ((byte (bv index)))
+        (cond
+         ;; 1-byte sequence (0xxxxxxx)
+         ((< byte #x80)
+          (+ index 1))
+           
+         ;; 2-byte sequence (110xxxxx 10xxxxxx)
+         ((< byte #xe0)
+          (if (>= (+ index 1) end)
+              index  ; Incomplete sequence
+              (let ((next-byte (bv (+ index 1))))
+                (if (not (= (logand next-byte #xc0) #x80))
+                    index  ; Invalid continuation byte
+                    (+ index 2)))))
+           
+         ;; 3-byte sequence (1110xxxx 10xxxxxx 10xxxxxx)
+         ((< byte #xf0)
+          (if (>= (+ index 2) end)
+              index  ; Incomplete sequence
+              (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
+                    (next-byte2 (bytevector-u8-ref bv (+ index 2))))
+                (if (or (not (= (logand next-byte1 #xc0) #x80))
+                        (not (= (logand next-byte2 #xc0) #x80)))
+                    index  ; Invalid continuation byte(s)
+                    (+ index 3)))))
+           
+         ;; 4-byte sequence (11110xxx 10xxxxxx 10xxxxxx 10xxxxxx)
+         ((< byte #xf8)
+          (if (>= (+ index 3) end)
+              index  ; Incomplete sequence
+              (let ((next-byte1 (bv (+ index 1)))
+                    (next-byte2 (bv (+ index 2)))
+                    (next-byte3 (bv (+ index 3))))
+                (if (or (not (= (logand next-byte1 #xc0) #x80))
+                        (not (= (logand next-byte2 #xc0) #x80))
+                        (not (= (logand next-byte3 #xc0) #x80)))
+                    index  ; Invalid continuation byte(s)
+                    (+ index 4)))))
+         (else index)))))  ; Invalid leading byte
+
+(define (u8-string-length str)
+  (let ((bv (string->byte-vector str))
+        (N (string-length str)))
+    (let loop ((pos 0) (cnt 0))
+      (let ((next-pos (bytevector-advance-u8 bv pos N)))
+        (cond
+         ((= next-pos N)
+          (+ cnt 1))
+         ((= next-pos pos)
+          (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+         (else (loop next-pos (+ cnt 1))))))))
+
 (define* (utf8->string bv (start 0) (end (bytevector-length bv)))
-  (define (validate-utf8 bv index end)
-    (if (>= index end)
-        #t  ; Reached the end without errors, sequence is valid
-        (let ((byte (bytevector-u8-ref bv index)))
-          (cond
-           ;; 1-byte sequence (0xxxxxxx)
-           ((< byte #x80)
-            (validate-utf8 bv (+ index 1) end))
-           
-           ;; 2-byte sequence (110xxxxx 10xxxxxx)
-           ((< byte #xe0)
-            (if (>= (+ index 1) end)
-                index  ; Incomplete sequence
-                (let ((next-byte (bytevector-u8-ref bv (+ index 1))))
-                  (if (not (= (logand next-byte #xc0) #x80))
-                      index  ; Invalid continuation byte
-                      (validate-utf8 bv (+ index 2) end)))))
-           
-           ;; 3-byte sequence (1110xxxx 10xxxxxx 10xxxxxx)
-           ((< byte #xf0)
-            (if (>= (+ index 2) end)
-                index  ; Incomplete sequence
-                (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
-                      (next-byte2 (bytevector-u8-ref bv (+ index 2))))
-                  (if (or (not (= (logand next-byte1 #xc0) #x80))
-                          (not (= (logand next-byte2 #xc0) #x80)))
-                      index  ; Invalid continuation byte(s)
-                      (validate-utf8 bv (+ index 3) end)))))
-           
-           ;; 4-byte sequence (11110xxx 10xxxxxx 10xxxxxx 10xxxxxx)
-           ((< byte #xf8)
-            (if (>= (+ index 3) end)
-                index  ; Incomplete sequence
-                (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
-                      (next-byte2 (bytevector-u8-ref bv (+ index 2)))
-                      (next-byte3 (bytevector-u8-ref bv (+ index 3))))
-                  (if (or (not (= (logand next-byte1 #xc0) #x80))
-                          (not (= (logand next-byte2 #xc0) #x80))
-                          (not (= (logand next-byte3 #xc0) #x80)))
-                      index  ; Invalid continuation byte(s)
-                      (validate-utf8 bv (+ index 4) end)))))
-           
-           (else index)))))  ; Invalid leading byte
-  
   (if (or (< start 0) (> end (bytevector-length bv)) (> start end))
       (error 'out-of-range start end)
-      (let ((validation-result (validate-utf8 bv start end)))
-        (if (eq? validation-result #t)
-            (copy bv (make-string (- end start)) start end)
-            (error 'value-error
-                   "Invalid UTF-8 sequence at index: " validation-result)))))
+      (let loop ((pos start))
+        (let ((next-pos (bytevector-advance-u8 bv pos end)))
+          (cond
+           ((= next-pos end)
+            (copy bv (make-string (- end start)) start end))
+           ((= next-pos pos)
+            (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+           (else
+            (loop next-pos)))))))
+
+(define* (string->utf8 str (start 0) (end #t))
+  ; start < end in this case
+  (define (string->utf8-sub str start end)
+    (let ((bv (string->byte-vector str))
+          (N (string-length str)))
+      (let loop ((pos 0) (cnt 0) (start-pos 0))
+        (let ((next-pos (bytevector-advance-u8 bv pos N)))
+          (cond
+           ((and (not (zero? start)) (zero? start-pos) (= cnt start))
+            (loop next-pos (+ cnt 1) pos))
+           ((and (integer? end) (= cnt end))
+            (copy bv (make-byte-vector (- pos start-pos)) start-pos pos))
+           ((and end (= next-pos N))
+            (copy bv (make-byte-vector (- N start-pos)) start-pos N))
+           ((= next-pos pos)
+            (error 'value-error "Invalid UTF-8 sequence at index: " pos))
+           (else
+            (loop next-pos (+ cnt 1) start-pos)))))))
+  
+  (when (not (string? str))
+    (error 'type-error "str must be string"))
+  (let ((N (u8-string-length str)))
+    (when (or (< start 0) (>= start N))
+        (error 'out-of-range
+               (string-append "start must >= 0 and < " (number->string N))))
+    (when (and (integer? end) (or (< end 0) (>= end (+ N 1))))
+          (error 'out-of-range
+                 (string-append "end must >= 0 and < " (number->string (+ N 1)))))         
+    (when (and (integer? end) (> start end))
+          (error 'out-of-range "start <= end failed" start end))
+    
+    (if (and (integer? end) (= start end))
+      (byte-vector)
+      (string->utf8-sub str start end))))
 
 (define (raise . args)
   (apply throw #t args))
