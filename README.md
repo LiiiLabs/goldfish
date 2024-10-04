@@ -40,11 +40,12 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 | `(srfi srfi-9)`   | Complete | Provide `define-record-type` |
 | `(srfi srfi-13)`  | Complete | String Library | 
 | `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
-| `(srfi srfi-39)`  | Complete | Parameter objects |
+| `(srfi srfi-39)`  | Complete | Parameter Objects |
 | `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
 | `(srfi srfi-125)` | Part | Hash Table |
 | `(srfi srfi-133)` | Part | Vector |
 | `(srfi srfi-216)` | Part | SICP |
+| `(srfi srfi-151)` | Part | Bitwise Operations |
 
 ### R7RS Standard Libraries
 | Library | Description | 
