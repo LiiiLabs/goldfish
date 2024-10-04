@@ -1531,6 +1531,8 @@
 
   <label|srfi><paragraph|bitwise-and><index|bitwise-and>
 
+  使用S7内置的<with|font-family|tt|logand>实现。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
+
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define bitwise-and logand)
 
@@ -1550,6 +1552,8 @@
   \;
 
   <label|srfi><paragraph|bitwise-or><index|bitwise-or>
+
+  使用S7内置的<with|font-family|tt|logior>实现。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define bitwise-or logior)
