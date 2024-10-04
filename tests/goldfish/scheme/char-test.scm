@@ -64,6 +64,8 @@
 (check (digit-value #\8) => 8)
 (check (digit-value #\9) => 9)
 (check (digit-value #\0) => 0)
+(check (digit-value #\a) => #f)
+(check (digit-value #\c) => #f)
 
 (check-report)
 

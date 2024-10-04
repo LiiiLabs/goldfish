@@ -391,6 +391,17 @@
 
 (check (list->string '()) => "")
 
+(check (symbol->string `MathAgape)
+  => "MathAgape")
+
+(check (symbol->string (string->symbol "MathApage")) => "MathApage")
+
+(check (string->symbol "MathAgape")
+  => `MathAgape)
+
+(check (string->symbol (symbol->string `MathAgape))
+  => `MathAgape)
+
 (check (string-length "MathAgape") => 9)
 (check (string-length "") => 0)
 

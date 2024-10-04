@@ -28,6 +28,7 @@
   list-copy
   ; R7RS 6.5: Symbol
   symbol=?
+  string->symbol
   ; R7RS 6.6: Characters
   digit-value
   ; R7RS 6.7: String
@@ -353,6 +354,8 @@
       (close-output-port p)))
 
 (define (eof-object) #<eof>)
+
+(define (string->symbol str) (symbol str))
 
 (define (string-copy str . start_end)
   (cond ((null? start_end)
