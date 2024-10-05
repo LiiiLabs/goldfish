@@ -6223,7 +6223,7 @@
     \;
   </scm-chunk>
 
-  <section|三鲤扩展库>
+  <section|三鲤扩展函数>
 
   <paragraph|length=?><index|length=?><scm|(x l) =\<gtr\> boolean>
 
@@ -6974,19 +6974,19 @@
 
     \ \ string-tokenize
 
+    \ \ ; Liii extras
+
+    \ \ string-remove-prefix string-remove-suffix
+
     )
 
     (import (srfi srfi-13)
 
-    \ \ \ \ \ \ \ \ (scheme base)
+    \ \ \ \ \ \ \ \ (liii base)
 
     \ \ \ \ \ \ \ \ (liii error))
 
     (begin
-
-    ) ; end of begin
-
-    ) ; end of library
 
     \;
   </scm-chunk>
@@ -7041,7 +7041,9 @@
     \;
   </scm-chunk>
 
-  <section|内部公共子函数>
+  <section|SRFI 13>
+
+  <subsection|内部公共子函数>
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define (%string-from-range str start_end)
@@ -7075,7 +7077,7 @@
     \;
   </scm-chunk>
 
-  <section|谓词>
+  <subsection|谓词>
 
   <r7rs><paragraph|string?><index|string?>
 
@@ -7099,7 +7101,7 @@
     \;
   </scm-chunk>
 
-  <section|列表-字符串转换>
+  <subsection|列表-字符串转换>
 
   <r7rs><paragraph|string-\<gtr\>list><index|string-\<gtr\>list>
 
@@ -7259,7 +7261,7 @@
     \;
   </scm-chunk>
 
-  <section|谓词>
+  <subsection|谓词>
 
   <paragraph|string-null?><index|string-null?><scm|(str) =\<gtr\> boolean>
 
@@ -7657,7 +7659,7 @@
     \;
   </scm-chunk>
 
-  <section|选择器>
+  <subsection|选择器>
 
   <r7rs><paragraph|string-length><index|string-length>
 
@@ -8447,7 +8449,7 @@
     \;
   </scm-chunk>
 
-  <section|前缀和后缀>
+  <subsection|前缀和后缀>
 
   <paragraph|string-prefix?><index|string-prefix?>
 
@@ -8527,7 +8529,7 @@
     \;
   </scm-chunk>
 
-  <section|搜索>
+  <subsection|搜索>
 
   <paragraph|string-index><index|string-index>
 
@@ -8687,7 +8689,7 @@
     \;
   </scm-chunk>
 
-  <section|翻转和追加>
+  <subsection|翻转和追加>
 
   <paragraph|string-reverse><index|string-reverse>
 
@@ -8779,7 +8781,7 @@
     \;
   </scm-chunk>
 
-  <section|Fold, unfold & map>
+  <subsection|Fold, unfold & map>
 
   <r7rs><paragraph|string-map><index|string-map>
 
@@ -8883,7 +8885,7 @@
     \;
   </scm-chunk>
 
-  <section|插入和解析>
+  <subsection|插入和解析>
 
   <paragraph|string-tokenize><index|string-tokenize>
 
@@ -8944,32 +8946,56 @@
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check
+    (check (string-tokenize "1 22 333") =\<gtr\> '("1" "22" "333"))
 
-    \ \ (string-tokenize "1 22 333")
+    (check (string-tokenize "1 22 333" #\\2) =\<gtr\> '("1 " " 333"))
 
-    \ \ =\<gtr\> '("1" "22" "333"))
-
-    \;
-
-    (check
-
-    \ \ (string-tokenize "1 22 333" #\\2)
-
-    \ \ =\<gtr\> '("1 " " 333"))
+    (check (string-tokenize "1 22 333" #\\ \ 2) =\<gtr\> ‘("22" "333"))
 
     \;
+  </scm-chunk>
 
-    (check
+  <section|三鲤扩展函数>
 
-    \ \ (string-tokenize "1 22 333" #\\ \ 2)
+  <paragraph|string-remove-prefix><index|string-remove-prefix>
 
-    \ \ =\<gtr\> ‘("22" "333"))
+  在编程实践中，移除字符串的前缀是非常常用的功能。
+
+  <\scm-chunk|goldfish/liii/string.scm|true|false>
+    (define string-remove-prefix
+
+    \ \ (typed-lambda ((str string?) (prefix string?))
+
+    \ \ \ \ (if (string-prefix? prefix str)
+
+    \ \ \ \ \ \ \ \ (substring str (string-length prefix))
+
+    \ \ \ \ \ \ \ \ str)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+    (check (string-remove-prefix "浙江省杭州市西湖区" "浙江省") =\<gtr\> "杭州市西湖区")
+
+    (check (string-remove-prefix "aaa" "a") =\<gtr\> "aa")
+
+    (check (string-remove-prefix "abc" "bc") =\<gtr\> "abc")
+
+    (check (string-remove-prefix "abc" "") =\<gtr\> "abc")
 
     \;
   </scm-chunk>
 
   <section|结尾>
+
+  <\scm-chunk|goldfish/liii/string.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|false>
     ) ; end of begin

@@ -471,17 +471,14 @@
     lst)
   => '())
 
-(check
-  (string-tokenize "1 22 333")
-  => '("1" "22" "333"))
+(check (string-tokenize "1 22 333") => '("1" "22" "333"))
+(check (string-tokenize "1 22 333" #\2) => '("1 " " 333"))
+(check (string-tokenize "1 22 333" #\  2) => `("22" "333"))
 
-(check
-  (string-tokenize "1 22 333" #\2)
-  => '("1 " " 333"))
-
-(check
-  (string-tokenize "1 22 333" #\  2)
-  => `("22" "333"))
+(check (string-remove-prefix "浙江省杭州市西湖区" "浙江省") => "杭州市西湖区")
+(check (string-remove-prefix "aaa" "a") => "aa")
+(check (string-remove-prefix "abc" "bc") => "abc")
+(check (string-remove-prefix "abc" "") => "abc")
 
 (check-report)
 

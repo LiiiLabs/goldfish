@@ -31,11 +31,20 @@
   string-contains string-count
   string-reverse
   string-tokenize
+  ; Liii extras
+  string-remove-prefix string-remove-suffix
 )
 (import (srfi srfi-13)
-        (scheme base)
+        (liii base)
         (liii error))
 (begin
+
+(define string-remove-prefix
+  (typed-lambda ((str string?) (prefix string?))
+    (if (string-prefix? prefix str)
+        (substring str (string-length prefix))
+        str)))
+
 ) ; end of begin
-) ; end of library
+) ; end of define-library
 
