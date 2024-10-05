@@ -17,7 +17,9 @@
 (define-library (scheme base)
 (export
   let-values
-  define-record-type
+  ; R7RS 5: Program Structure
+  define-values define-record-type
+  ; R7RS 6.2: Numbers
   square
   exact inexact
   floor s7-floor ceiling s7-ceiling truncate s7-truncate round s7-round
@@ -85,6 +87,11 @@
                    ,(cadr v)))
                 vars)))
         ,@body)))
+
+; 0-clause BSD by Bill Schottstaedt from S7 source repo: s7test.scm
+(define-macro (define-values vars expression)
+  `(if (not (null? ',vars))
+       (varlet (curlet) ((lambda ,vars (curlet)) ,expression))))
 
 ; 0-clause BSD by Bill Schottstaedt from S7 source repo: r7rs.scm
 (define-macro (define-record-type type make ? . fields)

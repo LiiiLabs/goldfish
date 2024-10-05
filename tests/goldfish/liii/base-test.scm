@@ -93,6 +93,11 @@
 (check (and-let* ((hi 3) (ho #f)) (+ hi 1)) => #f)
 (check (and-let* ((hi 3) (ho #t)) (+ hi 1)) => 4)
 
+(let ()
+  (define-values (value1 value2) (values 1 2))
+  (check value1 => 1)
+  (check value2 => 2))
+
 (define-record-type :pare
   (kons x y)
   pare?
@@ -389,6 +394,11 @@
 
 (check-true ((compose not zero?) 1))
 (check-false ((compose not zero?) 0))
+
+(let1 add1/add (lambda* (x (y 1)) (+ x y))
+  (check (add1/add 1) => 2)
+  (check (add1/add 0) => 1)
+  (check (add1/add 1 2)=> 3))
 
 (define add3
   (typed-lambda
