@@ -229,6 +229,14 @@
 (check-false (boolean=? #t #f))
 (check-false (boolean=? #f #t))
 
+(check-true (symbol? 'foo))
+(check-true (symbol? (car '(foo bar))))
+(check-true (symbol? 'nil))
+
+(check-false (symbol? "bar"))
+(check-false (symbol? #f))
+(check-false (symbol? '()))
+
 (check-catch 'wrong-number-of-args (symbol=? 'a))
 (check-catch 'wrong-number-of-args (symbol=? 1))
 
@@ -247,6 +255,18 @@
 (check-false (symbol=? (string->symbol "foo") 1))
 
 (check-false (symbol=? 'a 'b '()))
+
+(check (symbol->string `MathAgape) => "MathAgape")
+(check (symbol->string 'goldfish-scheme) => "goldfish-scheme")
+
+(check (symbol->string (string->symbol "MathApage")) => "MathApage")
+(check (symbol->string (string->symbol "Hello World")) => "Hello World")
+
+(check (string->symbol "MathAgape") => `MathAgape)
+(check (string->symbol "123") => '123)
+(check (string->symbol "+") => '+)
+
+(check (string->symbol (symbol->string `MathAgape)) => `MathAgape)
 
 (check (char? #\A) => #t)
 (check (char? 1) => #f)
@@ -397,17 +417,6 @@
   => "MathAgape")
 
 (check (list->string '()) => "")
-
-(check (symbol->string `MathAgape)
-  => "MathAgape")
-
-(check (symbol->string (string->symbol "MathApage")) => "MathApage")
-
-(check (string->symbol "MathAgape")
-  => `MathAgape)
-
-(check (string->symbol (symbol->string `MathAgape))
-  => `MathAgape)
 
 (check (string-length "MathAgape") => 9)
 (check (string-length "") => 0)
