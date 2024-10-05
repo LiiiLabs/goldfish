@@ -236,6 +236,7 @@
 (check-false (symbol? "bar"))
 (check-false (symbol? #f))
 (check-false (symbol? '()))
+(check-false (symbol? '123))
 
 (check-catch 'wrong-number-of-args (symbol=? 'a))
 (check-catch 'wrong-number-of-args (symbol=? 1))
@@ -263,7 +264,7 @@
 (check (symbol->string (string->symbol "Hello World")) => "Hello World")
 
 (check (string->symbol "MathAgape") => `MathAgape)
-(check (string->symbol "123") => '123)
+(check-false (equal? (string->symbol "123") '123))
 (check (string->symbol "+") => '+)
 
 (check (string->symbol (symbol->string `MathAgape)) => `MathAgape)

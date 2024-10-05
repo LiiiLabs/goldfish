@@ -1553,7 +1553,7 @@
 
   <value|r7rs><paragraph|symbol?><scm|(obj) =\<gtr\> bool><index|symbol?>
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check-true (symbol? 'foo))
 
     (check-true (symbol? (car '(foo bar))))
@@ -1567,6 +1567,8 @@
     (check-false (symbol? #f))
 
     (check-false (symbol? '()))
+
+    (check-false (symbol? '123))
 
     \;
   </scm-chunk>
@@ -1679,10 +1681,48 @@
 
   <subparagraph|测试>
 
+  <\session|goldfish|default>
+    <\output>
+      Goldfish Scheme 17.10.6 Community Edition by LiiiLabs
+
+      implemented on S7 Scheme (10.12, 16-Aug-2024)
+    </output>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (string-\<gtr\>symbol "123")
+    <|unfolded-io>
+      <goldfish-result|(symbol "123")>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      '123
+    <|unfolded-io>
+      <goldfish-result|123>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      ‘123
+    <|unfolded-io>
+      <goldfish-result|123>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (string-\<gtr\>symbol "MathAgape") =\<gtr\> ‘MathAgape)
 
-    (check (string-\<gtr\>symbol "123") =\<gtr\> '123)
+    (check-false (equal? (string-\<gtr\>symbol "123") '123))
 
     (check (string-\<gtr\>symbol "+") =\<gtr\> '+)
 
