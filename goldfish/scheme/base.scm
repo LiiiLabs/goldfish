@@ -37,7 +37,7 @@
   vector-copy vector-copy! vector-fill!
   ; R7RS 6.9: Bytevectors
   bytevector? make-bytevector bytevector bytevector-length
-  bytevector-u8-ref bytevector-u8-set!
+  bytevector-u8-ref bytevector-u8-set! bytevector-append
   utf8->string string->utf8 u8-string-length
   ; Input and Output
   call-with-port port? binary-port? textual-port?
@@ -195,11 +195,11 @@
         ((not (eq? sym1 sym2)) #f)
         (else (same-symbol sym1 rest))))
 
+(define bytevector byte-vector)
+
 (define bytevector? byte-vector?)
 
 (define make-bytevector make-byte-vector)
-
-(define bytevector byte-vector)
 
 (define bytevector-length length)
 

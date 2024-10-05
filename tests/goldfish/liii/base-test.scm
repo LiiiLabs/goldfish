@@ -255,16 +255,23 @@
 (check (char=? #\A #\A #\A) => #t)
 (check (char=? #\A #\a) => #f)
 
-(check-true (bytevector? #u8(0)))
-
-(check (make-bytevector 3 0) => #u8(0 0 0))
-(check (make-bytevector 3 3) => #u8(3 3 3))
-
 (check (bytevector 1) => #u8(1))
 (check (bytevector) => #u8())
 (check (bytevector 1 2 3) => #u8(1 2 3))
 
+(check (bytevector 255) => #u8(255))
 (check-catch 'wrong-type-arg (bytevector 256))
+(check-catch 'wrong-type-arg (bytevector -1))
+
+(check-true (bytevector? #u8(0)))
+(check-true (bytevector? #u8()))
+
+(check (make-bytevector 3 0) => #u8(0 0 0))
+(check (make-bytevector 3 3) => #u8(3 3 3))
+
+(check (bytevector-append #u8() #u8()) => #u8())
+(check (bytevector-append #u8() #u8(1)) => #u8(1))
+(check (bytevector-append #u8(1) #u8()) => #u8(1))
 
 (check (u8-string-length "中文") => 2)
 
