@@ -1,6 +1,6 @@
 <TMU|<tuple|1.0.4|1.2.9.3-rc1>>
 
-<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
+<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
 <\body>
   <\hide-preamble>
@@ -13342,7 +13342,11 @@
 
     (import (liii base))
 
-    (export base64-encode)
+    (export
+
+    \ \ string-base64-encode bytevector-base64-encode
+
+    )
 
     (begin
   </scm-chunk>
@@ -13379,8 +13383,6 @@
     </itemize>
   </enumerate>
 
-  \;
-
   <\scm-chunk|goldfish/liii/base64.scm|true|true>
     (define-constant BYTE2BASE64_BV
 
@@ -13394,52 +13396,94 @@
 
     \;
 
-    (define (base64-encode bv)
+    (define bytevector-base64-encode
 
-    \ \ (let* ((input-N (bytevector-length bv))
+    \ \ (typed-lambda ((bv bytevector?))
 
-    \ \ \ \ \ \ \ \ \ (output-N (* 4 (ceiling (/ input-N 3))))
+    \ \ \ \ (let* ((input-N (bytevector-length bv))
 
-    \ \ \ \ \ \ \ \ \ (output (make-bytevector output-N)))
+    \ \ \ \ \ \ \ \ \ \ \ (output-N (* 4 (ceiling (/ input-N 3))))
 
-    \ \ \ \ (let loop ((i 0) (j 0))
+    \ \ \ \ \ \ \ \ \ \ \ (output (make-bytevector output-N)))
 
-    \ \ \ \ \ \ (when (\<less\> i input-N)
+    \ \ \ \ \ \ (let loop ((i 0) (j 0))
 
-    \ \ \ \ \ \ \ \ (let* ((b1 (bv i))
+    \ \ \ \ \ \ \ \ (when (\<less\> i input-N)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (if (\<less\> (+ i 1) input-N) (bv (+ i 1)) 0))
+    \ \ \ \ \ \ \ \ \ \ (let* ((b1 (bv i))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (if (\<less\> (+ i 2) input-N) (bv (+ i 2)) 0))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (if (\<less\> (+ i 1) input-N) (bv (+ i 1)) 0))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (combined (logior (ash b1 16) (ash b2 8) b3))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (if (\<less\> (+ i 2) input-N) (bv (+ i 2)) 0))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c1 (logand (ash combined -18) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (combined (logior (ash b1 16) (ash b2 8) b3))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (logand (ash combined -12) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c1 (logand (ash combined -18) #x3F))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (logand (ash combined -6) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (logand (ash combined -12) #x3F))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (logand combined #x3F)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (logand (ash combined -6) #x3F))
 
-    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output j (BYTE2BASE64_BV c1))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (logand combined #x3F)))
 
-    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 1) (BYTE2BASE64_BV c2))
+    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output j (BYTE2BASE64_BV c1))
 
-    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 2)
+    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 1) (BYTE2BASE64_BV c2))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 1) input-N) (BYTE2BASE64_BV c3) BASE64_PAD_INT))
+    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 2)
 
-    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 3)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 1) input-N) (BYTE2BASE64_BV c3) BASE64_PAD_INT))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 2) input-N) (BYTE2BASE64_BV c4) BASE64_PAD_INT))
+    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 3)
 
-    \ \ \ \ \ \ \ \ \ \ (loop (+ i 3) (+ j 4)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 2) input-N) (BYTE2BASE64_BV c4) BASE64_PAD_INT))
 
-    \ \ \ \ output))
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 3) (+ j 4)))))
+
+    \ \ \ \ \ \ output)))
+
+    \;
+
+    (define string-base64-encode
+
+    \ \ (typed-lambda ((str string?))
+
+    \ \ \ \ (utf8-\<gtr\>string (bytevector-base64-encode (string-\<gtr\>utf8 str)))))
 
     \;
   </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\session|python|default>
+    <\output>
+      Python 3.11.2 [/usr/bin/python3]
+
+      Python plugin for TeXmacs.
+
+      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
+    </output>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      import base64
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      base64.b64encode(b"f")
+    <|unfolded-io>
+      b'Zg=='
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
 
   <\scm-chunk|tests/goldfish/liii/base64-test.scm|false|false>
     (import (liii check)
@@ -13448,7 +13492,23 @@
 
     \;
 
-    (check (utf8-\<gtr\>string (base64-encode (string-\<gtr\>utf8 "a"))) =\<gtr\> "YQ==")
+    (check (string-base64-encode "") =\<gtr\> "")
+
+    (check (string-base64-encode "a") =\<gtr\> "YQ==")
+
+    (check (string-base64-encode "z") =\<gtr\> "eg==")
+
+    (check (string-base64-encode "f") =\<gtr\> "Zg==")
+
+    (check (string-base64-encode "fo") =\<gtr\> "Zm8=")
+
+    (check (string-base64-encode "foo") =\<gtr\> "Zm9v")
+
+    (check (string-base64-encode "foob") =\<gtr\> "Zm9vYg==")
+
+    (check (string-base64-encode "fooba") =\<gtr\> "Zm9vYmE=")
+
+    (check (string-base64-encode "foobar") =\<gtr\> "Zm9vYmFy")
 
     \;
 
