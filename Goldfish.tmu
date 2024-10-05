@@ -2356,15 +2356,15 @@
   但是S7 Scheme里面没有define-syntax和syntax-rule，在墨干中的实现是这样的：
 
   <\session|goldfish|default>
-    <\folded-io>
+    <\unfolded-io>
       \<gtr\>\ 
-    <|folded-io>
+    <|unfolded-io>
       (define-macro (receive vars vals . body)
 
       \ \ ‘((lambda ,vars ,@body) ,vals)) ; GPL
-    <|folded-io>
+    <|unfolded-io>
       receive
-    </folded-io>
+    </unfolded-io>
 
     <\folded-io>
       \<gtr\>\ 
@@ -13414,6 +13414,8 @@
 
     \ \ string-base64-encode bytevector-base64-encode base64-encode
 
+    \ \ string-base64-decode bytevector-base64-decode base64-decode
+
     )
 
     (begin
@@ -13470,7 +13472,7 @@
 
     \;
 
-    (define-constant BASE64_PAD_INT
+    (define-constant BASE64_PAD_BYTE
 
     \ \ (char-\<gtr\>integer #\\=))
 
@@ -13512,11 +13514,11 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 2)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 1) input-N) (BYTE2BASE64_BV c3) BASE64_PAD_INT))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 1) input-N) (BYTE2BASE64_BV c3) BASE64_PAD_BYTE))
 
     \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 3)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 2) input-N) (BYTE2BASE64_BV c4) BASE64_PAD_INT))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 2) input-N) (BYTE2BASE64_BV c4) BASE64_PAD_BYTE))
 
     \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 3) (+ j 4)))))
 
@@ -13575,13 +13577,163 @@
     (check (base64-encode "foobar") =\<gtr\> "Zm9vYmFy")
 
     \;
+
+    (check-catch 'type-error (base64-encode 1))
+
+    \;
   </scm-chunk>
 
   <paragraph|bytevector-base64-decode><index|bytevector-base64-decode>
 
   <paragraph|string-base64-decode><index|string-base64-decode>
 
-  \;
+  <paragraph|base64-decode><index|base64-decode>
+
+  <\scm-chunk|goldfish/liii/base64.scm|true|true>
+    (define-constant gen-base64-byte-vector
+
+    \ \ (let1 byte2base64-N (bytevector-length BYTE2BASE64_BV)
+
+    \ \ \ \ (let loop ((i 0) (v (make-vector 256 -1)))
+
+    \ \ \ \ \ \ (if (\<less\> i byte2base64-N)
+
+    \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! v (BYTE2BASE64_BV i) i)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) v))
+
+    \ \ \ \ \ \ \ \ \ \ v))))
+
+    \;
+
+    (define (bytevector-base64-decode bv)
+
+    \ \ (let* ((base64-table gen-base64-byte-vector)
+
+    \ \ \ \ \ \ \ \ \ (input-N (bytevector-length bv))
+
+    \ \ \ \ \ \ \ \ \ (output-N (* input-N 3/4))
+
+    \ \ \ \ \ \ \ \ \ (final-N 0)
+
+    \ \ \ \ \ \ \ \ \ (output (make-bytevector output-N)))
+
+    \;
+
+    \ \ \ \ (unless (zero? (modulo input-N 4))
+
+    \ \ \ \ \ \ (value-error "length of the input bytevector must be 4X"))
+
+    \ \ \ \ 
+
+    \ \ \ \ (let loop ((i 0) (j 0))
+
+    \ \ \ \ \ \ (when (\<less\> i input-N)
+
+    \ \ \ \ \ \ \ \ (let* ((b1 (base64-table (bv i)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (base64-table (bv (+ i 1))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (base64-table (bv (+ i 2))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b4 (base64-table (bv (+ i 3)))))
+
+    \ \ \ \ \ \ \ \ \ \ (if (or (negative? b1) (negative? b2)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (negative? b3) (not (equal? (bv (+ i 2)) BASE64_PAD_BYTE)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (negative? b4) (not (equal? (bv (+ i 3)) BASE64_PAD_BYTE))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error "Invalid base64 input")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output j
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (logior (ash b1 2) (ash b2 -4)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (when (and (not (negative? b3)) (\<less\> j (- output-N 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (logand (logior (ash b2 4) (ash b3 -2)) #xFF)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (when (and (not (negative? b4)) (\<less\> j (- output-N 2)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 2)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (logand (logior (ash b3 6) b4) #xFF)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! final-N
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ final-N (if (negative? b3) 1 (if (negative? b4) 2 3))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 4)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ j (if (negative? b3) 1 (if (negative? b4) 2 3)))))))))
+
+    \ \ \ \ (let ((final (make-bytevector final-N)))
+
+    \ \ \ \ \ \ (vector-copy! final 0 output 0 final-N)
+
+    \ \ \ \ \ \ final)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/base64.scm|true|true>
+    (define string-base64-decode
+
+    \ \ (typed-lambda ((str string?))
+
+    \ \ \ \ (utf8-\<gtr\>string (bytevector-base64-decode (string-\<gtr\>utf8 str)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/base64.scm|true|true>
+    (define (base64-decode x)
+
+    \ \ (cond ((string? x)
+
+    \ \ \ \ \ \ \ \ \ (string-base64-decode x))
+
+    \ \ \ \ \ \ \ \ ((bytevector? x)
+
+    \ \ \ \ \ \ \ \ \ (bytevector-base64-decode x))
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ (type-error "input must be string or bytevector"))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|true>
+    (check (base64-decode "") =\<gtr\> "")
+
+    \;
+
+    (check (base64-decode "YQ==") =\<gtr\> "a")
+
+    (check (base64-decode "eg==") =\<gtr\> "z")
+
+    (check (base64-decode "Zg==") =\<gtr\> "f")
+
+    (check (base64-decode "Zm8=") =\<gtr\> "fo")
+
+    (check (base64-decode "Zm9v") =\<gtr\> "foo")
+
+    (check (base64-decode "Zm9vYg==") =\<gtr\> "foob")
+
+    (check (base64-decode "Zm9vYmE=") =\<gtr\> "fooba")
+
+    (check (base64-decode "Zm9vYmFy") =\<gtr\> "foobar")
+
+    \;
+  </scm-chunk>
 
   <section|结尾>
 

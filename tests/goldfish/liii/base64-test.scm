@@ -27,5 +27,18 @@
 (check (base64-encode "fooba") => "Zm9vYmE=")
 (check (base64-encode "foobar") => "Zm9vYmFy")
 
+(check-catch 'type-error (base64-encode 1))
+
+(check (base64-decode "") => "")
+
+(check (base64-decode "YQ==") => "a")
+(check (base64-decode "eg==") => "z")
+(check (base64-decode "Zg==") => "f")
+(check (base64-decode "Zm8=") => "fo")
+(check (base64-decode "Zm9v") => "foo")
+(check (base64-decode "Zm9vYg==") => "foob")
+(check (base64-decode "Zm9vYmE=") => "fooba")
+(check (base64-decode "Zm9vYmFy") => "foobar")
+
 (check-report)
 
