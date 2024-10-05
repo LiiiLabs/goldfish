@@ -102,8 +102,7 @@
 
 (define (string-any char/pred? str . start+end)
   (define (string-any-sub pred? str)
-    (let
-      loop ((i 0) (len (string-length str)))
+    (let loop ((i 0) (len (string-length str)))
       (if (= i len)
           #f   
           (or (pred? (string-ref str i)) 

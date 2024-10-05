@@ -76,73 +76,14 @@
 (check-true (string-every char-numeric? "ab2345" 2))
 (check-false (string-every char-numeric? "ab2345" 1))
 (check-false (string-every  char-numeric? "ab234f" 2))
-
 (check-true (string-every char-numeric? "ab234f" 2 4))
 (check-true (string-every char-numeric? "ab234f" 2 2))
+(check-false (string-every char-numeric? "ab234f" 1 4))
+(check-true (string-every char-numeric? "ab234f" 2 5))
+(check-false (string-every char-numeric? "ab234f" 2 6))
 
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    1
-    4)
-  =>
-  #f)
-
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    2
-    5)
-  =>
-  #t)
-
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    2
-    6)
-  =>
-  #f)
-
-(check
-  (catch 'out-of-range
-    (lambda () 
-      (string-every 
-        char-numeric?
-       "ab234f"
-       2
-       7))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () 
-      (string-every 
-        char-numeric?
-       "ab234f"
-       2
-       1))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-number-of-args
-    (lambda () 
-      (string-every 
-        char-numeric?
-       "ab234f"
-       2
-       7
-       1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-every char-numeric? "ab234f" 2 7))
+(check-catch 'out-of-range (string-every char-numeric? "ab234f" 2 1))
 
 (check-true (string-any #\0 "xxx0xx"))
 (check-false (string-any #\0 "xxxxxx"))

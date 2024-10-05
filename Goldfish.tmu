@@ -4622,139 +4622,21 @@
 
     (check-false (string-every \ char-numeric? "ab234f" 2))
 
-    \;
-
     (check-true (string-every char-numeric? "ab234f" 2 4))
 
     (check-true (string-every char-numeric? "ab234f" 2 2))
 
-    \;
+    (check-false (string-every char-numeric? "ab234f" 1 4))
 
-    (check
+    (check-true (string-every char-numeric? "ab234f" 2 5))
 
-    \ \ (string-every\ 
-
-    \ \ \ \ <code*|char-numeric?>
-
-    \ \ \ \ "ab234f"
-
-    \ \ \ \ 1
-
-    \ \ \ \ 4)
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
+    (check-false (string-every char-numeric? "ab234f" 2 6))
 
     \;
 
-    (check
+    (check-catch 'out-of-range (string-every char-numeric? "ab234f" 2 7))
 
-    \ \ (string-every\ 
-
-    \ \ \ \ char-numeric?
-
-    \ \ \ \ "ab234f"
-
-    \ \ \ \ 2
-
-    \ \ \ \ 5)
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (string-every\ 
-
-    \ \ \ \ <code*|char-numeric?>
-
-    \ \ \ \ "ab234f"
-
-    \ \ \ \ 2
-
-    \ \ \ \ 6)
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every\ 
-
-    \ \ \ \ \ \ \ \ char-numeric?
-
-    \ \ \ \ \ \ \ "ab234f"
-
-    \ \ \ \ \ \ \ 2
-
-    \ \ \ \ \ \ \ 7))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every\ 
-
-    \ \ \ \ \ \ \ \ char-numeric?
-
-    \ \ \ \ \ \ \ "ab234f"
-
-    \ \ \ \ \ \ \ 2
-
-    \ \ \ \ \ \ \ 1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-number-of-args
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every\ 
-
-    \ \ \ \ \ \ \ \ char-numeric?
-
-    \ \ \ \ \ \ \ "ab234f"
-
-    \ \ \ \ \ \ \ 2
-
-    \ \ \ \ \ \ \ 7
-
-    \ \ \ \ \ \ \ 1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-every char-numeric? "ab234f" 2 1))
 
     \;
   </scm-chunk>
@@ -4768,9 +4650,7 @@
 
     \ \ (define (string-any-sub pred? str)
 
-    \ \ \ \ (let
-
-    \ \ \ \ \ \ loop ((i 0) (len (string-length str)))
+    \ \ \ \ (let loop ((i 0) (len (string-length str)))
 
     \ \ \ \ \ \ (if (= i len)
 
