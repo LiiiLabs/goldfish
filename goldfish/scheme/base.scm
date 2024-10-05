@@ -207,6 +207,8 @@
 
 (define bytevector-u8-set! byte-vector-set!)
 
+(define bytevector-append append)
+
 (define* (bytevector-advance-u8 bv index (end (length bv)))
   (if (>= index end)
       index  ; Reached the end without errors, sequence is valid
@@ -229,8 +231,8 @@
          ((< byte #xf0)
           (if (>= (+ index 2) end)
               index  ; Incomplete sequence
-              (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
-                    (next-byte2 (bytevector-u8-ref bv (+ index 2))))
+              (let ((next-byte1 (bv (+ index 1)))
+                    (next-byte2 (bv (+ index 2))))
                 (if (or (not (= (logand next-byte1 #xc0) #x80))
                         (not (= (logand next-byte2 #xc0) #x80)))
                     index  ; Invalid continuation byte(s)

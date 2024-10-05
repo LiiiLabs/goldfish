@@ -62,8 +62,6 @@
 )
 (begin
 
-(define bytevector-append append)
-
 (define* (u8-substring str (start 0) (end #t))
   (utf8->string (string->utf8 str start end)))
 

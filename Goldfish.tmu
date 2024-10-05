@@ -1767,11 +1767,15 @@
 
   <value|r7rs><paragraph|bytevector-append><index|bytevector-append>
 
-  <\scm-chunk|goldfish/liii/base.scm|true|true>
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-append append)
 
     \;
   </scm-chunk>
+
+  <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (bytevector-append #u8() #u8()) =\<gtr\> #u8())
@@ -1850,9 +1854,9 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bv (+ index 1)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bytevector-u8-ref bv (+ index 2))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bv (+ index 2))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (not (= (logand next-byte1 #xc0) #x80))
 
