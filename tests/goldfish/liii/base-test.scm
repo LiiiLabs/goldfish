@@ -400,63 +400,6 @@
 
 (check-report)
 
-(check (string? "MathAgape") => #t)
-(check (string? "") => #t)
-
-(check (string? 'MathAgape) => #f)
-(check (string? #/MathAgape) => #f)
-(check (string? 123) => #f)
-(check (string? '(1 2 3)) => #f)
-
-(check (string->list "MathAgape")
-  => '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
-
-(check (string->list "") => '())
-
-(check
-  (list->string '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
-  => "MathAgape")
-
-(check (list->string '()) => "")
-
-(check (string-length "MathAgape") => 9)
-(check (string-length "") => 0)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (string-length 'not-a-string))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (string-ref "MathAgape" 0) => #\M)
-(check (string-ref "MathAgape" 2) => #\t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "MathAgape" -1))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "MathAgape" 9))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "" 0))
-    (lambda args #t))
-  =>
-  #t)
-
-(check (string-append "Math" "Agape") => "MathAgape")
-
-(check (string-append) => "")
-
 (check (make-list 3 #\a) => (list #\a #\a #\a))
 (check (make-list 3) => (list #f #f #f))
 
@@ -584,6 +527,63 @@
 (check (member "1" '(0 "1" 2 3)) => '("1" 2 3))
 (check (member '(1 . 2) '(0 (1 . 2) 3)) => '((1 . 2) 3))
 (check (member '(1 2) '(0 (1 2) 3)) => '((1 2) 3))
+
+(check (string? "MathAgape") => #t)
+(check (string? "") => #t)
+
+(check (string? 'MathAgape) => #f)
+(check (string? #/MathAgape) => #f)
+(check (string? 123) => #f)
+(check (string? '(1 2 3)) => #f)
+
+(check (string->list "MathAgape")
+  => '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
+
+(check (string->list "") => '())
+
+(check
+  (list->string '(#\M #\a #\t #\h #\A #\g #\a #\p #\e))
+  => "MathAgape")
+
+(check (list->string '()) => "")
+
+(check (string-length "MathAgape") => 9)
+(check (string-length "") => 0)
+
+(check
+  (catch 'wrong-type-arg
+    (lambda () (string-length 'not-a-string))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (string-ref "MathAgape" 0) => #\M)
+(check (string-ref "MathAgape" 2) => #\t)
+
+(check
+  (catch 'out-of-range
+    (lambda () (string-ref "MathAgape" -1))
+    (lambda args #t))
+  =>
+  #t)
+
+(check
+  (catch 'out-of-range
+    (lambda () (string-ref "MathAgape" 9))
+    (lambda args #t))
+  =>
+  #t)
+
+(check
+  (catch 'out-of-range
+    (lambda () (string-ref "" 0))
+    (lambda args #t))
+  =>
+  #t)
+
+(check (string-append "Math" "Agape") => "MathAgape")
+
+(check (string-append) => "")
 
 (check (make-vector 1 1) => (vector 1))
 (check (make-vector 3 'a) => (vector 'a 'a 'a))
