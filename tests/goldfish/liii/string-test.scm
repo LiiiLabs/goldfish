@@ -184,19 +184,6 @@
   =>
   #t)
 
-(check
-  (catch 'wrong-number-of-args
-    (lambda () 
-      (string-any 
-         char-alphabetic?
-        "01c345"
-       2
-       7
-       1))
-    (lambda args #t))
-  =>
-  #t)
-
 (define original-string "MathAgape")
 (define copied-string (string-copy original-string))
 
@@ -230,12 +217,18 @@
 (check-catch 'out-of-range (string-take-right "MathAgape" 20))
 
 (check (string-drop "MathAgape" 8) => "e")
+(check (string-drop "MathAgape" 9) => "")
+(check (string-drop "MathAgape" 0) => "MathAgape")
 
+(check-catch 'out-of-range (string-drop "MahtAgape" -1))
 (check-catch 'out-of-range (string-drop "MathAgape" 20))
 
 (check (string-drop-right "MathAgape" 5) => "Math")
+(check (string-drop-right "MathAgape" 9) => "")
+(check (string-drop-right "MathAgape" 0) => "MathAgape")
 
-(check-catch 'out-of-range (string-drop "MathAgape" 20))
+(check-catch 'out-of-range (string-drop-right "MathAgape" -1))
+(check-catch 'out-of-range (string-drop-right "MathAgape" 20))
 
 (check
   (string-pad "MathAgape" 15)

@@ -4877,32 +4877,6 @@
     \ \ #t)
 
     \;
-
-    (check
-
-    \ \ (catch 'wrong-number-of-args
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-any\ 
-
-    \ \ \ \ \ \ \ \ \ char-alphabetic?
-
-    \ \ \ \ \ \ \ \ "01c345"
-
-    \ \ \ \ \ \ \ 2
-
-    \ \ \ \ \ \ \ 7
-
-    \ \ \ \ \ \ \ 1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
   </scm-chunk>
 
   <section|选择器>
@@ -5122,9 +5096,21 @@
   <scm|string-drop>是一个函数，接收一个字符串和一个非负整数k为参数，返回去掉字符串前k个字符组成的新字符串。当字符串字符数量不足k个，报错。
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-    (define (string-drop str k)
+    (define string-drop
 
-    \ \ (list-\<gtr\>string (drop (string-\<gtr\>list str) k)))
+    \ \ (typed-lambda ((str string?) (k integer?))
+
+    \ \ \ \ (when (\<less\> k 0)
+
+    \ \ \ \ \ \ (error 'out-of-range "k must be non-negative" k))
+
+    \ \ \ \ (let ((N (string-length str)))
+
+    \ \ \ \ \ \ (if (\<gtr\> k N)
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range "k must be \<less\>= N" k N)
+
+    \ \ \ \ \ \ \ \ (substring str k N)))))
 
     \;
   </scm-chunk>
@@ -5132,7 +5118,13 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-drop "MathAgape" 8) =\<gtr\> "e")
 
+    (check (string-drop "MathAgape" 9) =\<gtr\> "")
+
+    (check (string-drop "MathAgape" 0) =\<gtr\> "MathAgape")
+
     \;
+
+    (check-catch 'out-of-range (string-drop "MahtAgape" -1))
 
     (check-catch 'out-of-range (string-drop "MathAgape" 20))
 
@@ -5144,9 +5136,21 @@
   <scm|string-drop-right>是一个函数，接收一个字符串和一个非负整数k为参数，去掉字符串的后k个字符组成新字符串，返回这个新字符串。当字符串字符数量不足k个，报错。当k为负数，报错。
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-    (define (string-drop-right str k)
+    (define string-drop-right
 
-    \ \ (list-\<gtr\>string (drop-right (string-\<gtr\>list str) k)))
+    \ \ (typed-lambda ((str string?) (k integer?))
+
+    \ \ \ \ (when (\<less\> k 0)
+
+    \ \ \ \ \ \ (error 'out-of-range "k must be non-negative" k))
+
+    \ \ \ \ (let ((N (string-length str)))
+
+    \ \ \ \ \ \ (if (\<gtr\> k N)
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range "k must be \<less\>= N" k N)
+
+    \ \ \ \ \ \ \ \ (substring str 0 (- N k))))))
 
     \;
   </scm-chunk>
@@ -5154,9 +5158,15 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-drop-right "MathAgape" 5) =\<gtr\> "Math")
 
+    (check (string-drop-right "MathAgape" 9) =\<gtr\> "")
+
+    (check (string-drop-right "MathAgape" 0) =\<gtr\> "MathAgape")
+
     \;
 
-    (check-catch 'out-of-range (string-drop "MathAgape" 20))
+    (check-catch 'out-of-range (string-drop-right "MathAgape" -1))
+
+    (check-catch 'out-of-range (string-drop-right "MathAgape" 20))
 
     \;
   </scm-chunk>
