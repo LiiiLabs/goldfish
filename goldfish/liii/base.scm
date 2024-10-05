@@ -17,8 +17,7 @@
 (define-library (liii base)
 (import (scheme base)
         (srfi srfi-2)
-        (srfi srfi-8)
-        (srfi srfi-151))
+        (srfi srfi-8))
 (export
   ; (scheme base) defined by R7RS
   let-values

@@ -464,9 +464,7 @@
 
     \ \ \ \ \ \ \ \ (srfi srfi-2)
 
-    \ \ \ \ \ \ \ \ (srfi srfi-8)
-
-    \ \ \ \ \ \ \ \ (srfi srfi-151))
+    \ \ \ \ \ \ \ \ (srfi srfi-8))
 
     (export
 
@@ -1513,73 +1511,7 @@
 
   <section|位运算 (Bitwise Operations)>
 
-  <subparagraph|SRFI-151 库定义>
-
-  <\scm-chunk|goldfish/srfi/srfi-151.scm|false|true>
-    (define-library (srfi srfi-151)
-
-    (import (scheme base))
-
-    (export bitwise-and bitwise-or)
-
-    (begin
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <label|srfi><paragraph|bitwise-and><index|bitwise-and>
-
-  使用S7内置的<with|font-family|tt|logand>实现。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
-
-  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
-    (define bitwise-and logand)
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (bitwise-and 5 3) =\<gtr\> 1) \ ; 5 (101) AND 3 (011) = 1 (001)
-
-    (check (bitwise-and 8 4) =\<gtr\> 0) \ ; 8 (1000) AND 4 (0100) = 0 (0000)
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <label|srfi><paragraph|bitwise-or><index|bitwise-or>
-
-  使用S7内置的<with|font-family|tt|logior>实现。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
-
-  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
-    (define bitwise-or logior)
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|测试>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (bitwise-or 5 3) =\<gtr\> 7) \ ; 5 (101) OR 3 (011) = 7 (111)
-
-    (check (bitwise-or 8 4) =\<gtr\> 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|SRFI-151 End>
-
-  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|false>
-    ) ; end of begin
-
-    ) ; end of define-library
-
-    \;
-  </scm-chunk>
+  见章 <reference|chapter:liii_bitwise>.
 
   <section|布尔值>
 
@@ -3982,6 +3914,238 @@
   <section|结尾>
 
   <\scm-chunk|tests/goldfish/liii/case-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <chapter|(liii bitwise)><label|chapter:liii_bitwise>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/liii/bitwise.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/bitwise.scm|true|false>
+    (define-library (liii bitwise)
+
+    (import (srfi srfi-151)
+
+    \ \ \ \ \ \ \ \ (liii error))
+
+    (export
+
+    \ \ ; S7 built-in
+
+    \ 
+
+    \ \ ; from (scheme base)
+
+    \ 
+
+    \ \ ; from (srfi srfi-151)
+
+    \ \ bitwise-and\ 
+
+    \ \ bitwise-or
+
+    )
+
+    (begin
+
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define-library (srfi srfi-151)
+
+    (export bitwise-and bitwise-or)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii bitwise))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <section|位逻辑运算>
+
+  \;
+
+  <label|srfi><paragraph|bitwise-and><index|bitwise-and>
+
+  使用S7内置的<with|font-family|tt|logand>实现。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define bitwise-and logand)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bitwise-and 5 3) =\<gtr\> 1) \ ; 5 (101) AND 3 (011) = 1 (001)
+
+    (check (bitwise-and 8 4) =\<gtr\> 0) \ ; 8 (1000) AND 4 (0100) = 0 (0000)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <label|srfi><paragraph|bitwise-or><index|bitwise-or>
+
+  使用S7内置的<with|font-family|tt|logior>实现。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define bitwise-or logior)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bitwise-or 5 3) =\<gtr\> 7) \ ; 5 (101) OR 3 (011) = 7 (111)
+
+    (check (bitwise-or 8 4) =\<gtr\> 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
+
+    \;
+  </scm-chunk>
+
+  <section|结束>
+
+  <paragraph|SRFI-151 End>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <paragraph|Report Test Result>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|false>
     (check-report)
 
     \;

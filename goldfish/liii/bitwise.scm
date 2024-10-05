@@ -14,14 +14,19 @@
 ; under the License.
 ;
 
-(define-library (srfi srfi-151)
-(export bitwise-and bitwise-or)
+(define-library (liii bitwise)
+(import (srfi srfi-151)
+        (liii error))
+(export
+  ; S7 built-in
+ 
+  ; from (scheme base)
+ 
+  ; from (srfi srfi-151)
+  bitwise-and 
+  bitwise-or
+)
 (begin
-
-(define bitwise-and logand)
-
-(define bitwise-or logior)
-
 ) ; end of begin
-) ; end of define-library
+) ; end of library
 
