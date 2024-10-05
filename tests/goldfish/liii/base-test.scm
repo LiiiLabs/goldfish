@@ -93,6 +93,11 @@
 (check (and-let* ((hi 3) (ho #f)) (+ hi 1)) => #f)
 (check (and-let* ((hi 3) (ho #t)) (+ hi 1)) => 4)
 
+(let ()
+  (define-values (value1 value2) (values 1 2))
+  (check value1 => 1)
+  (check value2 => 2))
+
 (define-record-type :pare
   (kons x y)
   pare?

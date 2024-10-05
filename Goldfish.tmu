@@ -388,7 +388,11 @@
 
     \ \ let-values
 
-    \ \ define-record-type
+    \ \ ; R7RS 5: Program Structure
+
+    \ \ define-values define-record-type
+
+    \ \ ; R7RS 6.2: Numbers
 
     \ \ square
 
@@ -476,7 +480,11 @@
 
     \ \ let-values
 
-    \ \ define-record-type
+    \ \ ; R7RS 5: Program Structure
+
+    \ \ define-values define-record-type
+
+    \ \ ; R7RS 6.2: Numbers
 
     \ \ square
 
@@ -487,6 +495,8 @@
     \ \ floor-quotient
 
     \ \ gcd lcm s7-lcm
+
+    \ \ ; R7RS 6.3: Booleans
 
     \ \ boolean=?
 
@@ -917,7 +927,35 @@
 
   本节对应R7RS的第5节：程序结构。
 
-  <paragraph|define-record-type><index|define-record-type>
+  <value|r7rs><paragraph|define><index|define>
+
+  <value|r7rs><paragraph|define-values><index|define-values>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|false>
+    ; 0-clause BSD by Bill Schottstaedt from S7 source repo: s7test.scm
+
+    (define-macro (define-values vars expression)
+
+    \ \ ‘(if (not (null? ',vars))
+
+    \ \ \ \ \ \ \ (varlet (curlet) ((lambda ,vars (curlet)) ,expression))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (let ()
+
+    \ \ (define-values (value1 value2) (values 1 2))
+
+    \ \ (check value1 =\<gtr\> 1)
+
+    \ \ (check value2 =\<gtr\> 2))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|define-record-type><index|define-record-type>
 
   <subparagraph|实现>
 
@@ -2855,7 +2893,9 @@
 
   <paragraph|lambda*><index|lambda*>
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  S7 Scheme内置宏。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (let1 add1/add (lambda* (x (y 1)) (+ x y))
 
     \ \ (check (add1/add 1) =\<gtr\> 2)
