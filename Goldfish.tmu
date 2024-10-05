@@ -13443,30 +13443,24 @@
 
   <paragraph|base64-encode><index|base64-encode>
 
-  Base64编码的规则如下：
-
   <\enumerate>
-    <item><strong|字符集>：Base64编码使用一个包含64个字符的字符集，这些字符包括大小写字母、数字和两个特殊符号（通常是<code*|+>和<code*|/>）。还有一个等号<code*|=>用于填充。
+    <item>计算base64编码的长度
 
-    <item><strong|分组>：原始数据被分为3个字节的组。每组3个字节表示为24位。
+    <\equation*>
+      length<around*|(|output|)>=<around*|\<lceil\>|length<around*|(|input|)>/3|\<rceil\>>\<times\>4
+    </equation*>
 
-    <item><strong|索引映射>：每组24位被分成4个6位的块。每个6位块映射到Base64字符集的一个字符上。
+    <item>将输入的字节向量分组，每组三个元素，最后一组存在三种情况：
 
-    <item><strong|编码>：
+    <\big-table|<scm|<tabular|<tformat|<table|<row|<cell|b1>|<cell|b2>|<cell|b3>>|<row|<cell|0-255>|<cell|0-255>|<cell|0-255>>|<row|<cell|0-255>|<cell|0-255>|<cell|#f>>|<row|<cell|0-255>|<cell|#f>|<cell|#f>>>>>>>
+      最后一组不足的元素需要设置为<scm|#f>
+    </big-table>
 
-    <\itemize>
-      <item>将24位的二进制数分成4个6位的块。
+    <item>对每一组的<math|<around*|[|b<rsub|1>,b<rsub|2>,b<rsub|3>|]>>映射为<math|<around*|[|c<rsub|1>,c<rsub|2>,c<rsub|3>,c<rsub|4>|]>>，其中<math|c<rsub|n>>必须是字母、数字、<scm|+>、<scm|/>或者<scm|=>。
 
-      <item>每个6位块在Base64字符集中查找对应的字符。
-    </itemize>
+    <todo|描述一下base64的映射规则>
 
-    <item><strong|填充>：
-
-    <\itemize>
-      <item>如果原始数据的长度不是3的倍数，最后一组将不足3个字节。这种情况下，不足的部分用0填充到3个字节。
-
-      <item>编码后，如果最后一组6位块不足6位，使用<code*|=>进行填充。
-    </itemize>
+    \;
   </enumerate>
 
   <\scm-chunk|goldfish/liii/base64.scm|true|true>
@@ -13486,6 +13480,36 @@
 
     \ \ (typed-lambda ((bv bytevector?))
 
+    \ \ \ \ (define (encode b1 b2 b3)
+
+    \ \ \ \ \ \ (let* ((p1 b1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (p2 (if b2 b2 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (p3 (if b3 b3 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (combined (logior (ash p1 16) (ash p2 8) p3))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c1 (logand (ash combined -18) #x3F))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (logand (ash combined -12) #x3F))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (logand (ash combined -6) #x3F))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (logand combined #x3F)))
+
+    \ \ \ \ \ \ \ \ (values
+
+    \ \ \ \ \ \ \ \ \ \ (BYTE2BASE64_BV c1)
+
+    \ \ \ \ \ \ \ \ \ \ (BYTE2BASE64_BV c2)
+
+    \ \ \ \ \ \ \ \ \ \ (if b2 (BYTE2BASE64_BV c3) BASE64_PAD_BYTE)
+
+    \ \ \ \ \ \ \ \ \ \ (if b3 (BYTE2BASE64_BV c4) BASE64_PAD_BYTE))))
+
+    \ \ \ \ 
+
     \ \ \ \ (let* ((input-N (bytevector-length bv))
 
     \ \ \ \ \ \ \ \ \ \ \ (output-N (* 4 (ceiling (/ input-N 3))))
@@ -13498,33 +13522,21 @@
 
     \ \ \ \ \ \ \ \ \ \ (let* ((b1 (bv i))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (if (\<less\> (+ i 1) input-N) (bv (+ i 1)) 0))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (if (\<less\> (+ i 1) input-N) (bv (+ i 1)) #f))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (if (\<less\> (+ i 2) input-N) (bv (+ i 2)) 0))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (if (\<less\> (+ i 2) input-N) (bv (+ i 2)) #f)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (combined (logior (ash b1 16) (ash b2 8) b3))
+    \ \ \ \ \ \ \ \ \ \ \ \ (receive (r1 r2 r3 r4) (encode b1 b2 b3)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c1 (logand (ash combined -18) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output j r1)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (logand (ash combined -12) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 1) r2)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (logand (ash combined -6) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 2) r3)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (logand combined #x3F)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 3) r4)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output j (BYTE2BASE64_BV c1))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 1) (BYTE2BASE64_BV c2))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 2)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 1) input-N) (BYTE2BASE64_BV c3) BASE64_PAD_BYTE))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 3)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 2) input-N) (BYTE2BASE64_BV c4) BASE64_PAD_BYTE))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 3) (+ j 4)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 3) (+ j 4))))))
 
     \ \ \ \ \ \ output)))
 
