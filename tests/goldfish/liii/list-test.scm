@@ -18,7 +18,7 @@
         (liii check)
         (only (srfi srfi-1) delete-duplicates))
 
-(check-set-mode! 'report-failed)
+;(check-set-mode! 'report-failed)
 
 (check (iota 3) => (list 0 1 2))
 (check (iota 3 7) => (list 7 8 9))
@@ -97,56 +97,26 @@
 (check-catch 'wrong-type-arg (take '(1 2 3 . 4) 4))
 
 (check (drop '(1 2 3 4) 2) => '(3 4))
-
 (check (drop '(1 2 3 4) 4) => '())
-
-(check-catch 'wrong-type-arg (drop '(1 2 3 4) 5))
-
 (check (drop '(1 2 3 . 4) 3) => 4)
 
-(check-catch 'wrong-type-arg (drop '(1 2 3 . 4) 4))
+(check-catch 'out-of-range (drop '(1 2 3 4) 5))
+(check-catch 'out-of-range (drop '(1 2 3 . 4) 4))
 
 (check (take-right '(1 2 3 4) 3) => '(2 3 4))
-
 (check (take-right '(1 2 3 4) 4) => '(1 2 3 4))
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (take-right '(1 2 3 4) 5))
-    (lambda args #t))
-  => #t)
-
 (check (take-right '(1 2 3 . 4) 3) => '(1 2 3 . 4))
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (take-right '(1 2 3 . 4) 4))
-    (lambda args #t))
-  => #t)
+(check-catch 'out-of-range (take-right '(1 2 3 4) 5))
+(check-catch 'out-of-range (take-right '(1 2 3 . 4) 4))
 
 (check (drop-right '(1 2 3 4) 2) => '(1 2))
-
 (check (drop-right '(1 2 3 4) 4) => '())
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (drop-right '(1 2 3 4) 5))
-    (lambda args #t))
-  => #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (drop-right '(1 2 3 4) -1))
-    (lambda args #t))
-  => #t)
-
 (check (drop-right '(1 2 3 . 4) 3) => '())
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (drop-right '(1 2 3 . 4) 4))
-    (lambda args #t))
-  => #t)
+(check-catch 'out-of-range (drop-right '(1 2 3 4) 5))
+(check-catch 'out-of-range (drop-right '(1 2 3 4) -1))
+(check-catch 'out-of-range (drop-right '(1 2 3 . 4) 4))
 
 (check (last-pair '(a b c)) => '(c))
 (check (last-pair '(c)) => '(c))
