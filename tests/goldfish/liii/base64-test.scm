@@ -17,6 +17,8 @@
 (import (liii check)
         (liii base64))
 
+(check-set-mode! 'report-failed)
+
 (check (base64-encode "") => "")
 (check (base64-encode "a") => "YQ==")
 (check (base64-encode "z") => "eg==")

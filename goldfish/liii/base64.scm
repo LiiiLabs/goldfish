@@ -63,7 +63,7 @@
         (else
          (type-error "input must be string or bytevector"))))
 
-(define-constant gen-base64-byte-vector
+(define-constant BASE64_TO_BYTE_V
   (let1 byte2base64-N (bytevector-length BYTE2BASE64_BV)
     (let loop ((i 0) (v (make-vector 256 -1)))
       (if (< i byte2base64-N)
@@ -73,45 +73,41 @@
           v))))
 
 (define (bytevector-base64-decode bv)
-  (let* ((base64-table gen-base64-byte-vector)
-         (input-N (bytevector-length bv))
+  (define (decode c1 c2 c3 c4)
+    (let* ((b1 (BASE64_TO_BYTE_V c1))
+           (b2 (BASE64_TO_BYTE_V c2))
+           (b3 (BASE64_TO_BYTE_V c3))
+           (b4 (BASE64_TO_BYTE_V c4)))
+      (if (or (negative? b1) (negative? b2)
+              (and (negative? b3) (!= c3 BASE64_PAD_BYTE))
+              (and (negative? b4) (!= c4 BASE64_PAD_BYTE)))
+          (value-error "Invalid base64 input")
+          (values
+            (logior (ash b1 2) (ash b2 -4))
+            (logand (logior (ash b2 4) (ash b3 -2)) #xFF)
+            (logand (logior (ash b3 6) b4) #xFF)
+            (if (negative? b3) 1 (if (negative? b4) 2 3))))))
+  
+  (let* ((input-N (bytevector-length bv))
          (output-N (* input-N 3/4))
-         (final-N 0)
          (output (make-bytevector output-N)))
 
     (unless (zero? (modulo input-N 4))
       (value-error "length of the input bytevector must be 4X"))
     
     (let loop ((i 0) (j 0))
-      (when (< i input-N)
-        (let* ((c1 (bv i))
-               (c2 (bv (+ i 1)))
-               (c3 (bv (+ i 2)))
-               (c4 (bv (+ i 3)))
-               (b1 (base64-table c1))
-               (b2 (base64-table c2))
-               (b3 (base64-table c3))
-               (b4 (base64-table c4)))
-          (if (or (negative? b1) (negative? b2)
-                  (and (negative? b3) (!= c3 BASE64_PAD_BYTE))
-                  (and (negative? b4) (!= c4 BASE64_PAD_BYTE)))
-              (value-error "Invalid base64 input")
-              (begin
-                (bytevector-u8-set! output j
-                  (logior (ash b1 2) (ash b2 -4)))
-                (when (and (not (negative? b3)) (< j (- output-N 1)))
-                  (bytevector-u8-set! output (+ j 1)
-                    (logand (logior (ash b2 4) (ash b3 -2)) #xFF)))
-                (when (and (not (negative? b4)) (< j (- output-N 2)))
-                  (bytevector-u8-set! output (+ j 2)
-                    (logand (logior (ash b3 6) b4) #xFF)))
-                (set! final-N
-                      (+ final-N (if (negative? b3) 1 (if (negative? b4) 2 3))))
-                (loop (+ i 4)
-                      (+ j (if (negative? b3) 1 (if (negative? b4) 2 3)))))))))
-    (let ((final (make-bytevector final-N)))
-      (vector-copy! final 0 output 0 final-N)
-      final)))
+      (if (< i input-N)
+          (receive (r1 r2 r3 cnt)
+                   (decode (bv i) (bv (+ i 1)) (bv (+ i 2)) (bv (+ i 3)))
+            (bytevector-u8-set! output j r1)
+            (when (>= cnt 2)
+              (bytevector-u8-set! output (+ j 1) r2))
+            (when (>= cnt 3)
+              (bytevector-u8-set! output (+ j 2) r3))
+            (loop (+ i 4) (+ j cnt)))
+          (let ((final (make-bytevector j)))
+            (vector-copy! final 0 output 0 j)
+            final)))))
 
 (define string-base64-decode
   (typed-lambda ((str string?))
