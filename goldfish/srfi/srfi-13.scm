@@ -102,8 +102,7 @@
 
 (define (string-any char/pred? str . start+end)
   (define (string-any-sub pred? str)
-    (let
-      loop ((i 0) (len (string-length str)))
+    (let loop ((i 0) (len (string-length str)))
       (if (= i len)
           #f   
           (or (pred? (string-ref str i)) 
@@ -122,11 +121,23 @@
         (error 'out-of-range "k must be <= N" k N))
         (substring str (- N k) N)))
 
-(define (string-drop str k)
-  (list->string (drop (string->list str) k)))
+(define string-drop
+  (typed-lambda ((str string?) (k integer?))
+    (when (< k 0)
+      (error 'out-of-range "k must be non-negative" k))
+    (let ((N (string-length str)))
+      (if (> k N)
+        (error 'out-of-range "k must be <= N" k N)
+        (substring str k N)))))
 
-(define (string-drop-right str k)
-  (list->string (drop-right (string->list str) k)))
+(define string-drop-right
+  (typed-lambda ((str string?) (k integer?))
+    (when (< k 0)
+      (error 'out-of-range "k must be non-negative" k))
+    (let ((N (string-length str)))
+      (if (> k N)
+        (error 'out-of-range "k must be <= N" k N)
+        (substring str 0 (- N k))))))
 
 (define (string-pad str len . char+start+end)
   (define (string-pad-sub str len ch)

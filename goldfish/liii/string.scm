@@ -20,8 +20,6 @@
   string? string-ref string-length
   ; from (scheme base)
   string-copy string-for-each string-map
-    ;R7RS 6.5 Symbols
-    string->symbol
   ; from (srfi srfi-13)
   string-null? string-join
   string-every string-any
@@ -33,11 +31,26 @@
   string-contains string-count
   string-reverse
   string-tokenize
+  ; Liii extras
+  string-remove-prefix string-remove-suffix
 )
 (import (srfi srfi-13)
-        (scheme base)
+        (liii base)
         (liii error))
 (begin
+
+(define string-remove-prefix
+  (typed-lambda ((str string?) (prefix string?))
+    (if (string-prefix? prefix str)
+        (substring str (string-length prefix))
+        str)))
+
+(define string-remove-suffix
+  (typed-lambda ((str string?) (suffix string?))
+    (if (string-suffix? suffix str)
+        (substring str 0 (- (string-length str) (string-length suffix)))
+        (string-copy str))))
+
 ) ; end of begin
-) ; end of library
+) ; end of define-library
 

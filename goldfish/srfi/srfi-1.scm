@@ -17,7 +17,9 @@
 (export
   ; SRFI 1: Constructors
   circular-list iota list-copy 
-  circular-list? null-list?
+  ; SRFI 1: Predicates
+  circular-list? null-list? proper-list? dotted-list?
+  ; SRFI 1: Selectors
   first second third fourth fifth
   sixth seventh eighth ninth tenth
   take drop take-right drop-right count fold fold-right
@@ -26,12 +28,6 @@
   take-while drop-while list-index any every
   last-pair last)
 (begin
-
-; 0 clause BSD, from S7 repo stuff.scm
-(define circular-list
-  (lambda objs
-    (let ((lst (copy objs)))
-      (set-cdr! (list-tail lst (- (length lst) 1)) lst))))
 
 ; 0 clause BSD, from S7 repo stuff.scm
 (define* (iota n (start 0) (incr 1))
@@ -45,12 +41,27 @@
       ((null? p) lst)
       (set! (car p) i))))
 
-; 0 clause BSD, from S7 repo stuff.scm
-(define circular-list?
-  (lambda (obj)
-    (catch #t
-      (lambda () (infinite? (length obj)))
-      (lambda args #f))))
+(define (proper-list? x)
+  (let loop ((x x) (lag x))
+    (if (pair? x)
+        (let ((x (cdr x)))
+          (if (pair? x)
+              (let ((x   (cdr x))
+                    (lag (cdr lag)))
+                (and (not (eq? x lag)) (loop x lag)))
+              (null? x)))
+        (null? x))))
+
+(define (dotted-list? x)
+  (let loop ((x x) (lag x))
+    (if (pair? x)
+        (let ((x (cdr x)))
+          (if (pair? x)
+              (let ((x   (cdr x))
+                    (lag (cdr lag)))
+                (and (not (eq? x lag)) (loop x lag)))
+              (not (null? x))))
+        (not (null? x)))))
 
 (define (null-list? l)
   (cond ((pair? l) #f)
@@ -103,7 +114,8 @@
 
 (define (last-pair l)
   (if (pair? (cdr l))
-      (last-pair (cdr l)) l))
+      (last-pair (cdr l))
+      l))
 
 (define (last l)
   (car (last-pair l)))
@@ -241,6 +253,20 @@
             (if (eq? tail new-tail)
                 lis
                 (cons x new-tail)))))))
+
+(define (circular-list val1 . vals)
+  (let ((ans (cons val1 vals)))
+    (set-cdr! (last-pair ans) ans)
+    ans))
+
+(define (circular-list? x)
+  (let loop ((x x) (lag x))
+    (and (pair? x)
+         (let ((x (cdr x)))
+           (and (pair? x)
+                (let ((x   (cdr x))
+                      (lag (cdr lag)))
+                  (or (eq? x lag) (loop x lag))))))))
 
 ) ; end of begin
 ) ; end of define-library

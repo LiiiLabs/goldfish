@@ -51,7 +51,21 @@
   (set-car! obj1 3)
   (check-false (eq? obj1 obj2)))
 
-; (check (circular-list? (circular-list 1 2)) => #t)
+(check-true (proper-list? (list 1 2)))
+(check-true (proper-list? '()))
+(check-true (proper-list? '(1 2 3)))
+
+(check-false (proper-list? '(a . b)))
+(check-false (proper-list? '(a b . c)))
+(check-false (proper-list? (circular-list 1 2 3)))
+
+(check-true (dotted-list? 1))
+(check-true (dotted-list? '(1 . 2)))
+(check-true (dotted-list? '(1 2 . 3)))
+
+(check-false (dotted-list? (circular-list 1 2 3)))
+(check-false (dotted-list? '()))
+(check-false (dotted-list? '(a)))
 
 (check (null-list? '()) => #t)
 
@@ -273,6 +287,22 @@
       (check (delete-duplicates (list 1 1 2 3) 'not-pred) => 1))
     (lambda args #t))
   => #t)
+
+(let1 cl (circular-list 1 2 3)
+  (check (cl 3) => 1)
+  (check (cl 4) => 2)
+  (check (cl 5) => 3)
+  (check (cl 6) => 1))
+
+(check-true (circular-list? (circular-list 1 2)))
+(check-true (circular-list? (circular-list 1)))
+
+(let* ((l (list 1 2 3))
+       (end (last-pair l)))
+  (set-cdr! end (cdr l))
+  (check-true (circular-list? l)))
+
+(check-false (circular-list? (list 1 2)))
 
 (check-true (length=? 3 (list 1 2 3)))
 (check-false (length=? 2 (list 1 2 3)))

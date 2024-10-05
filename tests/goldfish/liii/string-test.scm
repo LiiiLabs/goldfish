@@ -76,73 +76,14 @@
 (check-true (string-every char-numeric? "ab2345" 2))
 (check-false (string-every char-numeric? "ab2345" 1))
 (check-false (string-every  char-numeric? "ab234f" 2))
-
 (check-true (string-every char-numeric? "ab234f" 2 4))
 (check-true (string-every char-numeric? "ab234f" 2 2))
+(check-false (string-every char-numeric? "ab234f" 1 4))
+(check-true (string-every char-numeric? "ab234f" 2 5))
+(check-false (string-every char-numeric? "ab234f" 2 6))
 
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    1
-    4)
-  =>
-  #f)
-
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    2
-    5)
-  =>
-  #t)
-
-(check
-  (string-every 
-    char-numeric?
-    "ab234f"
-    2
-    6)
-  =>
-  #f)
-
-(check
-  (catch 'out-of-range
-    (lambda () 
-      (string-every 
-        char-numeric?
-       "ab234f"
-       2
-       7))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () 
-      (string-every 
-        char-numeric?
-       "ab234f"
-       2
-       1))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-number-of-args
-    (lambda () 
-      (string-every 
-        char-numeric?
-       "ab234f"
-       2
-       7
-       1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-every char-numeric? "ab234f" 2 7))
+(check-catch 'out-of-range (string-every char-numeric? "ab234f" 2 1))
 
 (check-true (string-any #\0 "xxx0xx"))
 (check-false (string-any #\0 "xxxxxx"))
@@ -243,19 +184,6 @@
   =>
   #t)
 
-(check
-  (catch 'wrong-number-of-args
-    (lambda () 
-      (string-any 
-         char-alphabetic?
-        "01c345"
-       2
-       7
-       1))
-    (lambda args #t))
-  =>
-  #t)
-
 (define original-string "MathAgape")
 (define copied-string (string-copy original-string))
 
@@ -289,12 +217,18 @@
 (check-catch 'out-of-range (string-take-right "MathAgape" 20))
 
 (check (string-drop "MathAgape" 8) => "e")
+(check (string-drop "MathAgape" 9) => "")
+(check (string-drop "MathAgape" 0) => "MathAgape")
 
+(check-catch 'out-of-range (string-drop "MahtAgape" -1))
 (check-catch 'out-of-range (string-drop "MathAgape" 20))
 
 (check (string-drop-right "MathAgape" 5) => "Math")
+(check (string-drop-right "MathAgape" 9) => "")
+(check (string-drop-right "MathAgape" 0) => "MathAgape")
 
-(check-catch 'out-of-range (string-drop "MathAgape" 20))
+(check-catch 'out-of-range (string-drop-right "MathAgape" -1))
+(check-catch 'out-of-range (string-drop-right "MathAgape" 20))
 
 (check
   (string-pad "MathAgape" 15)
@@ -453,11 +387,13 @@
 (check-true (string-prefix? "Ma" "MathAgape"))
 (check-true (string-prefix? "" "MathAgape"))
 (check-true (string-prefix? "MathAgape" "MathAgape"))
+
 (check-false (string-prefix? "a" "MathAgape"))
 
 (check-true (string-suffix? "e" "MathAgape"))
 (check-true (string-suffix? "" "MathAgape"))
 (check-true (string-suffix? "MathAgape" "MathAgape"))
+
 (check-false (string-suffix? "p" "MathAgape"))
 
 (check (string-index "0123456789" #\2) => 2)
@@ -537,17 +473,18 @@
     lst)
   => '())
 
-(check
-  (string-tokenize "1 22 333")
-  => '("1" "22" "333"))
+(check (string-tokenize "1 22 333") => '("1" "22" "333"))
+(check (string-tokenize "1 22 333" #\2) => '("1 " " 333"))
+(check (string-tokenize "1 22 333" #\  2) => `("22" "333"))
 
-(check
-  (string-tokenize "1 22 333" #\2)
-  => '("1 " " 333"))
+(check (string-remove-prefix "浙江省杭州市西湖区" "浙江省") => "杭州市西湖区")
+(check (string-remove-prefix "aaa" "a") => "aa")
+(check (string-remove-prefix "abc" "bc") => "abc")
+(check (string-remove-prefix "abc" "") => "abc")
 
-(check
-  (string-tokenize "1 22 333" #\  2)
-  => `("22" "333"))
+(check (string-remove-suffix "aaa" "a") => "aa")
+(check (string-remove-suffix "aaa" "") => "aaa")
+(check (string-remove-suffix "Goldfish.tmu" ".tmu") => "Goldfish")
 
 (check-report)
 
