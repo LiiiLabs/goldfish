@@ -404,7 +404,11 @@
 
     \ \ ; R7RS 6.4: list
 
-    \ \ list-copy
+    \ \ pair? cons car cdr set-car! set-cdr! caar cadr cdar cddr
+
+    \ \ null? list? make-list list length append reverse list-tail
+
+    \ \ list-ref list-set! memq memv member assq assv assoc list-copy
 
     \ \ ; R7RS 6.5: Symbol
 
@@ -488,7 +492,11 @@
 
     \ \ ; R7RS 6.4: list
 
-    \ \ list-copy
+    \ \ pair? cons car cdr set-car! set-cdr! caar cadr cdar cddr
+
+    \ \ null? list? make-list list length append reverse list-tail
+
+    \ \ list-ref list-set! memq memv member assq assv assoc list-copy
 
     \ \ ; R7RS 6.5: Symbol
 
@@ -5182,7 +5190,7 @@
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define (string-take str k)
 
-    \ \ (list-\<gtr\>string (take (string-\<gtr\>list str) k)))
+    \ \ (substring str 0 k))
 
     \;
   </scm-chunk>
@@ -5192,17 +5200,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (string-take "MathAgape" 20))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-take "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5214,17 +5212,27 @@
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define (string-take-right str k)
 
-    \ \ (list-\<gtr\>string (take-right (string-\<gtr\>list str) k)))
+    \ \ (let ((N (string-length str)))
+
+    \ \ \ \ (if (\<gtr\> k N)
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range "k must be \<less\>= N" k N))
+
+    \ \ \ \ \ \ \ \ (substring str (- N k) N)))
 
     \;
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-take-right "MathAgape" 0) =\<gtr\> "")
+
     (check (string-take-right "MathAgape" 1) =\<gtr\> "e")
+
+    (check (string-take-right "MathAgape" 9) =\<gtr\> "MathAgape")
 
     \;
 
-    (check-catch 'wrong-type-arg (string-take-right "MathAgape" 20))
+    (check-catch 'out-of-range (string-take-right "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5246,7 +5254,7 @@
 
     \;
 
-    (check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
+    (check-catch 'out-of-range (string-drop "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5268,7 +5276,7 @@
 
     \;
 
-    (check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
+    (check-catch 'out-of-range (string-drop "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5374,7 +5382,7 @@
 
     (check
 
-    \ \ (catch 'wrong-type-arg
+    \ \ (catch 'out-of-range
 
     \ \ \ \ (lambda () (string-pad "MathAgape" -1))
 
@@ -5430,73 +5438,21 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-pad-right "MathAgape" 15) =\<gtr\> "MathAgape \ \ \ \ \ ")
 
-    \;
-
     (check (string-pad-right "MathAgape" 12 #\\1) =\<gtr\> "MathAgape111")
 
-    \;
+    (check (string-pad-right "MathAgape" 6 #\\1 0 4) =\<gtr\> "Math11")
 
-    (check
+    (check (string-pad-right "MathAgape" 9) =\<gtr\> "MathAgape")
 
-    \ \ (string-pad-right "MathAgape" 6 #\\1 0 4)
+    (check (string-pad-right "MathAgape" 9 #\\1) =\<gtr\> "MathAgape")
 
-    \ \ =\<gtr\>
+    (check (string-pad-right "MathAgape" 4) =\<gtr\> "Math")
 
-    \ \ "Math11")
-
-    \;
-
-    (check
-
-    \ \ (string-pad-right "MathAgape" 9)
-
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
+    (check (string-pad "MathAgape" 2 #\\1 0 4) =\<gtr\> "th")
 
     \;
 
-    (check
-
-    \ \ (string-pad-right "MathAgape" 9 #\\1)
-
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
-
-    \;
-
-    (check
-
-    \ \ (string-pad-right "MathAgape" 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "Math")
-
-    \;
-
-    (check
-
-    \ \ (string-pad "MathAgape" 2 #\\1 0 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "th")
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (string-pad-right "MathAgape" -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-pad-right "MathAgape" -1))
 
     \;
   </scm-chunk>
@@ -6587,11 +6543,11 @@
 
   S7 Scheme内置的R7RS中定义的函数。
 
-  <paragraph|list><index|list>
+  <value|r7rs><paragraph|list><index|list>
 
   S7 Scheme内置的R7RS中定义的函数。
 
-  <paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
+  <value|r7rs><paragraph|make-list><index|make-list><scm|(make-list k [fill]) =\<gtr\> list>
 
   S7 Scheme内置的R7RS中定义的函数。
 
@@ -6738,13 +6694,15 @@
   <scm|pair?>是S7 Scheme内置的函数：当且仅当obj是序对时，返回真。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (pair? '(a . b)) =\<gtr\> #t)
+    (check-true (pair? '(a . b)))
 
-    (check (pair? '(a b c)) =\<gtr\> #t)
+    (check-true (pair? '(a b c)))
 
-    (check (pair? '()) =\<gtr\> #f)
+    \;
 
-    (check (pair? '#(a b)) =\<gtr\> #f)
+    (check-false (pair? '()))
+
+    (check-false (pair? '#(a b)))
 
     \;
   </scm-chunk>
@@ -6899,7 +6857,7 @@
 
   <subsection|选择器>
 
-  <paragraph|car><index|car>
+  <value|r7rs><paragraph|car><index|car>
 
   一个序对由<scm|\<less\>car\<gtr\>>部分与<scm|\<less\>cdr\<gtr\>>部分组成，形如：<scm|(\<less\>car\<gtr\> . \<less\>cdr\<gtr\>)>。<scm|car>是S7 Scheme内置的R7RS定义的函数，用于返回序对的<scm|\<less\>car\<gtr\>>部分。<scm|car>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
 
@@ -6915,7 +6873,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|cdr><index|cdr>
+  <value|r7rs><paragraph|cdr><index|cdr>
 
   <scm|cdr>是S7 Scheme内置的R7RS定义的函数，用于返回序对的<scm|\<less\>cdr\<gtr\>>部分。<scm|cdr>的参数必须是序对，否则报错；特别地，空列表不是序对，报错。
 
@@ -6947,7 +6905,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|list-ref><index|list-ref>
+  <value|r7rs><paragraph|list-ref><index|list-ref>
 
   <scm|list-ref>是S7 Scheme内置的R7RS定义的函数，接收一个列表和一个称为索引值的非负整数k为参数，通过索引值k返回列表的第k个元素（从0开始计数）。当参数为空列表时，报错。当k为负数，报错。当k大于等于列表中元素数时，报错。
 
@@ -7187,7 +7145,9 @@
 
       \ \ (let loop ((l l) (k k))
 
-      \ \ \ \ (if (zero? k) '()
+      \ \ \ \ (if (zero? k)
+
+      \ \ \ \ \ \ \ \ '()
 
       \ \ \ \ \ \ \ \ (cons (car l)
 
@@ -7197,28 +7157,24 @@
     </scm-chunk>
   </session>
 
+  <value|r7rs><paragraph|list-tail><index|list-tail>
+
   <paragraph|drop><index|drop>
 
-  <scm|drop>是一个函数，接收一个列表和一个非负整数k为参数，返回去掉列表前k个元素组成的新列表。当列表元素数量不足k个，报错。
+  <scm|list-tail>是S7 Scheme的内置函数。<scm|drop>是SRFI定义的函数，语义和<scm|list-tail>一致，接收一个列表和一个非负整数k为参数，返回去掉列表前k个元素组成的新列表。当列表元素数量不足k个，报错。
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (check (drop '(1 2 3 4) 2) =\<gtr\> '(3 4))
 
-    \;
-
     (check (drop '(1 2 3 4) 4) =\<gtr\> '())
-
-    \;
-
-    (check-catch 'wrong-type-arg (drop '(1 2 3 4) 5))
-
-    \;
 
     (check (drop '(1 2 3 . 4) 3) =\<gtr\> 4)
 
     \;
 
-    (check-catch 'wrong-type-arg (drop '(1 2 3 . 4) 4))
+    (check-catch 'out-of-range (drop '(1 2 3 4) 5))
+
+    (check-catch 'out-of-range (drop '(1 2 3 . 4) 4))
 
     \;
   </scm-chunk>
@@ -7227,11 +7183,7 @@
     \;
 
     <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
-      (define (drop l k)
-
-      \ \ (let iter ((l l) (k k))
-
-      \ \ \ \ (if (zero? k) l (iter (cdr l) (- k 1)))))
+      (define drop list-tail)
 
       \;
     </scm-chunk>
@@ -7244,37 +7196,15 @@
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (check (take-right '(1 2 3 4) 3) =\<gtr\> '(2 3 4))
 
-    \;
-
     (check (take-right '(1 2 3 4) 4) =\<gtr\> '(1 2 3 4))
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (take-right '(1 2 3 4) 5))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
-
-    \;
 
     (check (take-right '(1 2 3 . 4) 3) =\<gtr\> '(1 2 3 . 4))
 
     \;
 
-    (check
+    (check-catch 'out-of-range (take-right '(1 2 3 4) 5))
 
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (take-right '(1 2 3 . 4) 4))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'out-of-range (take-right '(1 2 3 . 4) 4))
 
     \;
   </scm-chunk>
@@ -7282,11 +7212,13 @@
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     (define (take-right l k)
 
-    \ \ (let lp ((lag l) \ (lead (drop l k)))
+    \ \ (let loop ((lag l)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (lead (drop l k)))
 
     \ \ \ \ (if (pair? lead)
 
-    \ \ \ \ \ \ \ \ (lp (cdr lag) (cdr lead))
+    \ \ \ \ \ \ \ \ (loop (cdr lag) (cdr lead))
 
     \ \ \ \ \ \ \ \ lag)))
 
@@ -7300,11 +7232,11 @@
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     (define (drop-right l k)
 
-    \ \ (let recur ((lag l) (lead (drop l k)))
+    \ \ (let loop ((lag l) (lead (drop l k)))
 
     \ \ \ \ (if (pair? lead)
 
-    \ \ \ \ \ \ \ \ (cons (car lag) (recur (cdr lag) (cdr lead)))
+    \ \ \ \ \ \ \ \ (cons (car lag) (loop (cdr lag) (cdr lead)))
 
     \ \ \ \ \ \ \ \ '())))
 
@@ -7314,49 +7246,17 @@
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (check (drop-right '(1 2 3 4) 2) =\<gtr\> '(1 2))
 
-    \;
-
     (check (drop-right '(1 2 3 4) 4) =\<gtr\> '())
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (drop-right '(1 2 3 4) 5))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (drop-right '(1 2 3 4) -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
-
-    \;
 
     (check (drop-right '(1 2 3 . 4) 3) =\<gtr\> '())
 
     \;
 
-    (check
+    (check-catch 'out-of-range (drop-right '(1 2 3 4) 5))
 
-    \ \ (catch 'wrong-type-arg
+    (check-catch 'out-of-range (drop-right '(1 2 3 4) -1))
 
-    \ \ \ \ (lambda () (drop-right '(1 2 3 . 4) 4))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\> #t)
+    (check-catch 'out-of-range (drop-right '(1 2 3 . 4) 4))
 
     \;
   </scm-chunk>
@@ -7445,7 +7345,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|append><index|append>
+  <value|r7rs><paragraph|append><index|append>
 
   <scm|append>是一个S7内置的R7RS定义的函数，它接收多个列表为参数，按顺序拼接在一起，返回一个新的列表。<scm|append>没有参数时，返回空列表。
 
@@ -7459,6 +7359,18 @@
     (check (append () 'c) =\<gtr\> 'c)
 
     (check (append) =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|reverse><index|reverse>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (reverse '()) =\<gtr\> '())
+
+    (check (reverse '(a)) =\<gtr\> '(a))
+
+    (check (reverse '(a b)) =\<gtr\> '(b a))
 
     \;
   </scm-chunk>

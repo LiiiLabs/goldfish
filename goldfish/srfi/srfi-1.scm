@@ -81,24 +81,24 @@
 
 (define (take l k)
   (let loop ((l l) (k k))
-    (if (zero? k) '()
+    (if (zero? k)
+        '()
         (cons (car l)
               (loop (cdr l) (- k 1))))))
 
-(define (drop l k)
-  (let iter ((l l) (k k))
-    (if (zero? k) l (iter (cdr l) (- k 1)))))
+(define drop list-tail)
 
 (define (take-right l k)
-  (let lp ((lag l)  (lead (drop l k)))
+  (let loop ((lag l)
+             (lead (drop l k)))
     (if (pair? lead)
-        (lp (cdr lag) (cdr lead))
+        (loop (cdr lag) (cdr lead))
         lag)))
 
 (define (drop-right l k)
-  (let recur ((lag l) (lead (drop l k)))
+  (let loop ((lag l) (lead (drop l k)))
     (if (pair? lead)
-        (cons (car lag) (recur (cdr lag) (cdr lead)))
+        (cons (car lag) (loop (cdr lag) (cdr lead)))
         '())))
 
 (define (last-pair l)

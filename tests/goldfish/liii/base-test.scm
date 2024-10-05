@@ -462,10 +462,11 @@
 
 (check (make-list 0) => (list ))
 
-(check (pair? '(a . b)) => #t)
-(check (pair? '(a b c)) => #t)
-(check (pair? '()) => #f)
-(check (pair? '#(a b)) => #f)
+(check-true (pair? '(a . b)))
+(check-true (pair? '(a b c)))
+
+(check-false (pair? '()))
+(check-false (pair? '#(a b)))
 
 (check-true (list? '()))
 (check-true (list? '(a)))
@@ -526,6 +527,10 @@
 
 (check (append () 'c) => 'c)
 (check (append) => '())
+
+(check (reverse '()) => '())
+(check (reverse '(a)) => '(a))
+(check (reverse '(a b)) => '(b a))
 
 (check (map square (list 1 2 3 4 5)) => '(1 4 9 16 25))
 
