@@ -16,7 +16,7 @@
 
     <assign|r7rs|<flag|r7rs|dark cyan>>
 
-    <assign|goldfish-version|17.10.6>
+    <assign|goldfish-version|17.10.7>
   </hide-preamble>
 
   文档许可证暂时没有确定！
@@ -1753,7 +1753,7 @@
 
   <\session|goldfish|default>
     <\output>
-      Goldfish Scheme 17.10.6 Community Edition by LiiiLabs
+      Goldfish Scheme 17.10.7 Community Edition by LiiiLabs
 
       implemented on S7 Scheme (10.12, 16-Aug-2024)
     </output>
