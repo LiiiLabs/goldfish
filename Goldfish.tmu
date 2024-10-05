@@ -10307,7 +10307,7 @@
 
   返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
 
     (check (list-\<gtr\>vector '()) =\<gtr\> #())
@@ -13335,9 +13335,77 @@
 
   <section|协议>
 
+  <\scm-chunk|goldfish/liii/base64.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
   <section|接口>
 
-  <\scm-chunk|goldfish/liii/base64.scm|false|true>
+  <\scm-chunk|goldfish/liii/base64.scm|true|true>
     (define-library (liii base64)
 
     (import (liii base))
@@ -13352,6 +13420,14 @@
   </scm-chunk>
 
   <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|false>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii base64))
+
+    \;
+  </scm-chunk>
 
   <section|实现>
 
@@ -13455,43 +13531,7 @@
 
   <subparagraph|测试>
 
-  <\session|python|default>
-    <\output>
-      Python 3.11.2 [/usr/bin/python3]
-
-      Python plugin for TeXmacs.
-
-      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
-    </output>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      import base64
-    </input>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      base64.b64encode(b"f")
-    <|unfolded-io>
-      b'Zg=='
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
-  <\scm-chunk|tests/goldfish/liii/base64-test.scm|false|false>
-    (import (liii check)
-
-    \ \ \ \ \ \ \ \ (liii base64))
-
-    \;
-
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|false>
     (check (string-base64-encode "") =\<gtr\> "")
 
     (check (string-base64-encode "a") =\<gtr\> "YQ==")
