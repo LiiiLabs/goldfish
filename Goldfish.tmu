@@ -8339,6 +8339,8 @@
 
   <paragraph|circular-list><index|circular-list>
 
+  使用该构造器构造的列表是循环列表，每一个循环的单元包含构造器中的所有参数。
+
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     (define (circular-list val1 . vals)
 
@@ -8351,7 +8353,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (let1 cl (circular-list 1 2 3)
 
     \ \ (check (cl 3) =\<gtr\> 1)
@@ -8367,26 +8369,48 @@
 
   <paragraph|circular-list?><index|circular-list?>
 
+  判断一个列表是不是循环列表，这里采用的是判断链表这个数据结构的是否循环的经典算法，使用两个指针，第一个指针每轮迭代移动两次，第二个指针每轮迭代移动一次，如果两个指针在某一次迭代中指向的是同一个位置，那么该列表就是循环列表。
+
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
-    ; 0 clause BSD, from S7 repo stuff.scm
+    (define (circular-list? x)
 
-    (define circular-list?
+    \ \ (let loop ((x x) (lag x))
 
-    \ \ (lambda (obj)
+    \ \ \ \ (and (pair? x)
 
-    \ \ \ \ (catch #t
+    \ \ \ \ \ \ \ \ \ (let ((x (cdr x)))
 
-    \ \ \ \ \ \ (lambda () (infinite? (length obj)))
+    \ \ \ \ \ \ \ \ \ \ \ (and (pair? x)
 
-    \ \ \ \ \ \ (lambda args #f))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((x \ \ (cdr x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lag (cdr lag)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (or (eq? x lag) (loop x lag))))))))
 
     \;
   </scm-chunk>
 
-  <todo|在Windows上CI的结果是#f，需要修复这个问题>
+  <paragraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
-    ; (check (circular-list? (circular-list 1 2)) =\<gtr\> #t)
+    (check-true (circular-list? (circular-list 1 2)))
+
+    (check-true (circular-list? (circular-list 1)))
+
+    \;
+
+    (let* ((l (list 1 2 3))
+
+    \ \ \ \ \ \ \ (end (last-pair l)))
+
+    \ \ (set-cdr! end (cdr l))
+
+    \ \ (check-true (circular-list? l)))
+
+    \;
+
+    (check-false (circular-list? (list 1 2)))
 
     \;
   </scm-chunk>

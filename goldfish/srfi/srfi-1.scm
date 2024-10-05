@@ -248,12 +248,14 @@
     (set-cdr! (last-pair ans) ans)
     ans))
 
-; 0 clause BSD, from S7 repo stuff.scm
-(define circular-list?
-  (lambda (obj)
-    (catch #t
-      (lambda () (infinite? (length obj)))
-      (lambda args #f))))
+(define (circular-list? x)
+  (let loop ((x x) (lag x))
+    (and (pair? x)
+         (let ((x (cdr x)))
+           (and (pair? x)
+                (let ((x   (cdr x))
+                      (lag (cdr lag)))
+                  (or (eq? x lag) (loop x lag))))))))
 
 ) ; end of begin
 ) ; end of define-library

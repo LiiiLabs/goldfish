@@ -278,7 +278,15 @@
   (check (cl 5) => 3)
   (check (cl 6) => 1))
 
-; (check (circular-list? (circular-list 1 2)) => #t)
+(check-true (circular-list? (circular-list 1 2)))
+(check-true (circular-list? (circular-list 1)))
+
+(let* ((l (list 1 2 3))
+       (end (last-pair l)))
+  (set-cdr! end (cdr l))
+  (check-true (circular-list? l)))
+
+(check-false (circular-list? (list 1 2)))
 
 (check-true (length=? 3 (list 1 2 3)))
 (check-false (length=? 2 (list 1 2 3)))
