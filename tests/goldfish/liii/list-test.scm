@@ -18,7 +18,7 @@
         (liii check)
         (only (srfi srfi-1) delete-duplicates))
 
-;(check-set-mode! 'report-failed)
+(check-set-mode! 'report-failed)
 
 (check (iota 3) => (list 0 1 2))
 (check (iota 3 7) => (list 7 8 9))

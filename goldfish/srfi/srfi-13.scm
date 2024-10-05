@@ -114,10 +114,13 @@
     (string-any-sub criterion str_sub)))
 
 (define (string-take str k)
-  (list->string (take (string->list str) k)))
+  (substring str 0 k))
 
 (define (string-take-right str k)
-  (list->string (take-right (string->list str) k)))
+  (let ((N (string-length str)))
+    (if (> k N)
+        (error 'out-of-range "k must be <= N" k N))
+        (substring str (- N k) N)))
 
 (define (string-drop str k)
   (list->string (drop (string->list str) k)))

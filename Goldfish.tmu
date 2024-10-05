@@ -5190,7 +5190,7 @@
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define (string-take str k)
 
-    \ \ (list-\<gtr\>string (take (string-\<gtr\>list str) k)))
+    \ \ (substring str 0 k))
 
     \;
   </scm-chunk>
@@ -5200,17 +5200,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (string-take "MathAgape" 20))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-take "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5222,17 +5212,27 @@
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define (string-take-right str k)
 
-    \ \ (list-\<gtr\>string (take-right (string-\<gtr\>list str) k)))
+    \ \ (let ((N (string-length str)))
+
+    \ \ \ \ (if (\<gtr\> k N)
+
+    \ \ \ \ \ \ \ \ (error 'out-of-range "k must be \<less\>= N" k N))
+
+    \ \ \ \ \ \ \ \ (substring str (- N k) N)))
 
     \;
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-take-right "MathAgape" 0) =\<gtr\> "")
+
     (check (string-take-right "MathAgape" 1) =\<gtr\> "e")
+
+    (check (string-take-right "MathAgape" 9) =\<gtr\> "MathAgape")
 
     \;
 
-    (check-catch 'wrong-type-arg (string-take-right "MathAgape" 20))
+    (check-catch 'out-of-range (string-take-right "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5254,7 +5254,7 @@
 
     \;
 
-    (check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
+    (check-catch 'out-of-range (string-drop "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5276,7 +5276,7 @@
 
     \;
 
-    (check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
+    (check-catch 'out-of-range (string-drop "MathAgape" 20))
 
     \;
   </scm-chunk>
@@ -5382,7 +5382,7 @@
 
     (check
 
-    \ \ (catch 'wrong-type-arg
+    \ \ (catch 'out-of-range
 
     \ \ \ \ (lambda () (string-pad "MathAgape" -1))
 
@@ -5438,73 +5438,21 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-pad-right "MathAgape" 15) =\<gtr\> "MathAgape \ \ \ \ \ ")
 
-    \;
-
     (check (string-pad-right "MathAgape" 12 #\\1) =\<gtr\> "MathAgape111")
 
-    \;
+    (check (string-pad-right "MathAgape" 6 #\\1 0 4) =\<gtr\> "Math11")
 
-    (check
+    (check (string-pad-right "MathAgape" 9) =\<gtr\> "MathAgape")
 
-    \ \ (string-pad-right "MathAgape" 6 #\\1 0 4)
+    (check (string-pad-right "MathAgape" 9 #\\1) =\<gtr\> "MathAgape")
 
-    \ \ =\<gtr\>
+    (check (string-pad-right "MathAgape" 4) =\<gtr\> "Math")
 
-    \ \ "Math11")
-
-    \;
-
-    (check
-
-    \ \ (string-pad-right "MathAgape" 9)
-
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
+    (check (string-pad "MathAgape" 2 #\\1 0 4) =\<gtr\> "th")
 
     \;
 
-    (check
-
-    \ \ (string-pad-right "MathAgape" 9 #\\1)
-
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
-
-    \;
-
-    (check
-
-    \ \ (string-pad-right "MathAgape" 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "Math")
-
-    \;
-
-    (check
-
-    \ \ (string-pad "MathAgape" 2 #\\1 0 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "th")
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (string-pad-right "MathAgape" -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-pad-right "MathAgape" -1))
 
     \;
   </scm-chunk>
@@ -6580,7 +6528,7 @@
 
     \;
 
-    ;(check-set-mode! 'report-failed)
+    (check-set-mode! 'report-failed)
 
     \;
   </scm-chunk>

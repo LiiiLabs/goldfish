@@ -280,24 +280,21 @@
 
 (check (string-take "MathAgape" 4) => "Math")
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (string-take "MathAgape" 20))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-take "MathAgape" 20))
 
+(check (string-take-right "MathAgape" 0) => "")
 (check (string-take-right "MathAgape" 1) => "e")
+(check (string-take-right "MathAgape" 9) => "MathAgape")
 
-(check-catch 'wrong-type-arg (string-take-right "MathAgape" 20))
+(check-catch 'out-of-range (string-take-right "MathAgape" 20))
 
 (check (string-drop "MathAgape" 8) => "e")
 
-(check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
+(check-catch 'out-of-range (string-drop "MathAgape" 20))
 
 (check (string-drop-right "MathAgape" 5) => "Math")
 
-(check-catch 'wrong-type-arg (string-drop "MathAgape" 20))
+(check-catch 'out-of-range (string-drop "MathAgape" 20))
 
 (check
   (string-pad "MathAgape" 15)
@@ -330,47 +327,21 @@
   "th")
 
 (check
-  (catch 'wrong-type-arg
+  (catch 'out-of-range
     (lambda () (string-pad "MathAgape" -1))
     (lambda args #t))
   =>
   #t)
 
 (check (string-pad-right "MathAgape" 15) => "MathAgape      ")
-
 (check (string-pad-right "MathAgape" 12 #\1) => "MathAgape111")
+(check (string-pad-right "MathAgape" 6 #\1 0 4) => "Math11")
+(check (string-pad-right "MathAgape" 9) => "MathAgape")
+(check (string-pad-right "MathAgape" 9 #\1) => "MathAgape")
+(check (string-pad-right "MathAgape" 4) => "Math")
+(check (string-pad "MathAgape" 2 #\1 0 4) => "th")
 
-(check
-  (string-pad-right "MathAgape" 6 #\1 0 4)
-  =>
-  "Math11")
-
-(check
-  (string-pad-right "MathAgape" 9)
-  =>
-  "MathAgape")
-
-(check
-  (string-pad-right "MathAgape" 9 #\1)
-  =>
-  "MathAgape")
-
-(check
-  (string-pad-right "MathAgape" 4)
-  =>
-  "Math")
-
-(check
-  (string-pad "MathAgape" 2 #\1 0 4)
-  =>
-  "th")
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () (string-pad-right "MathAgape" -1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-pad-right "MathAgape" -1))
 
 (check (string-trim "  2 4  ") => "2 4  ")
 (check (string-trim "  2 4  " 2) => "2 4  ")
