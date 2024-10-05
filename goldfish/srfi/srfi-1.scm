@@ -52,6 +52,17 @@
               (null? x)))
         (null? x))))
 
+(define (dotted-list? x)
+  (let loop ((x x) (lag x))
+    (if (pair? x)
+        (let ((x (cdr x)))
+          (if (pair? x)
+              (let ((x   (cdr x))
+                    (lag (cdr lag)))
+                (and (not (eq? x lag)) (loop x lag)))
+              (not (null? x))))
+        (not (null? x)))))
+
 (define (null-list? l)
   (cond ((pair? l) #f)
         ((null? l) #t)

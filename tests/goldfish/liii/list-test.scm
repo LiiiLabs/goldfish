@@ -51,6 +51,22 @@
   (set-car! obj1 3)
   (check-false (eq? obj1 obj2)))
 
+(check-true (proper-list? (list 1 2)))
+(check-true (proper-list? '()))
+(check-true (proper-list? '(1 2 3)))
+
+(check-false (proper-list? '(a . b)))
+(check-false (proper-list? '(a b . c)))
+(check-false (proper-list? (circular-list 1 2 3)))
+
+(check-true (dotted-list? 1))
+(check-true (dotted-list? '(1 . 2)))
+(check-true (dotted-list? '(1 2 . 3)))
+
+(check-false (dotted-list? (circular-list 1 2 3)))
+(check-false (dotted-list? '()))
+(check-false (dotted-list? '(a)))
+
 (check (null-list? '()) => #t)
 
 (check (null-list? '(1 . 2)) => #f)

@@ -6772,10 +6772,10 @@
   <\enumerate>
     <item><strong|空列表>：也写作 <code*|()>，它是唯一的一个既是正规列表也是空列表的数据结构。空列表在 Scheme 中被认为是正规列表。
 
-    <item><strong|非空列表>：如果一个列表的每个元素都是通过<code*|cons>过程构造的，并且每个列表元素的<code*|cdr>部分（除了最后一个元素）都是正规列表，那么这个列表就是正规列表。
+    <item><strong|非空列表>：如果一个列表的每个元素都是通过<code*|cons>过程构造的，并且该列表的<code*|cdr>部分是正规列表，那么这个列表就是正规列表。
   </enumerate>
 
-  \;
+  上述递归定义中，该列表通过<scm|cons>过程构造保证了列表不会是循环列表。在判断一个列表是否是正规列表时，我们需要考虑该列表是循环列表的这种情况。
 
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
     (define (proper-list? x)
@@ -6800,6 +6800,78 @@
 
     \;
   </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check-true (proper-list? (list 1 2)))
+
+    (check-true (proper-list? '()))
+
+    (check-true (proper-list? '(1 2 3)))
+
+    \;
+
+    (check-false (proper-list? '(a . b)))
+
+    (check-false (proper-list? '(a b . c)))
+
+    (check-false (proper-list? (circular-list 1 2 3)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|dotted-list?>
+
+  点状列表（dotted list）是一种列表：
+
+  <\description>
+    <item*|空的点状列表>不是空列表、不是序对的任意Scheme对象都是空的点状列表
+
+    <item*|非空点状列表>其中除了最后一个元素之外，其他元素的<code*|cdr>指向另一个元素，最后一个元素的<code*|cdr>指向一个空的点状列表。
+  </description>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (dotted-list? x)
+
+    \ \ (let loop ((x x) (lag x))
+
+    \ \ \ \ (if (pair? x)
+
+    \ \ \ \ \ \ \ \ (let ((x (cdr x)))
+
+    \ \ \ \ \ \ \ \ \ \ (if (pair? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((x \ \ (cdr x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lag (cdr lag)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (not (eq? x lag)) (loop x lag)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (null? x))))
+
+    \ \ \ \ \ \ \ \ (not (null? x)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check-true (dotted-list? 1))
+
+    (check-true (dotted-list? '(1 . 2)))
+
+    (check-true (dotted-list? '(1 2 . 3)))
+
+    \;
+
+    (check-false (dotted-list? (circular-list 1 2 3)))
+
+    (check-false (dotted-list? '()))
+
+    (check-false (dotted-list? '(a)))
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <paragraph|null-list?><index|null-list?>
 
