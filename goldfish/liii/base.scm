@@ -41,8 +41,7 @@
   vector-copy vector-copy! vector-fill!
   ; R7RS 6.9 Bytevectors
   bytevector? make-bytevector bytevector bytevector-length
-  bytevector-u8-ref bytevector-u8-set!
-  bytevector-u8-ref bytevector-u8-set!
+  bytevector-u8-ref bytevector-u8-set! bytevector-append
   utf8->string string->utf8 u8-string-length u8-substring
   ; Input and Output
   call-with-port port? binary-port? textual-port?

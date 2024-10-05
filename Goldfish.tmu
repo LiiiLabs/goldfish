@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.3|1.2.9.2>>
+<TMU|<tuple|1.0.4|1.2.9.3-rc1>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
@@ -428,7 +428,7 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length
 
-    \ \ bytevector-u8-ref bytevector-u8-set!
+    \ \ bytevector-u8-ref bytevector-u8-set! bytevector-append
 
     \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
 
@@ -512,9 +512,7 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length
 
-    \ \ bytevector-u8-ref bytevector-u8-set!
-
-    \ \ bytevector-u8-ref bytevector-u8-set!
+    \ \ bytevector-u8-ref bytevector-u8-set! bytevector-append
 
     \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length u8-substring
 
@@ -1673,6 +1671,42 @@
 
   <section|字节向量>
 
+  字节向量是固定长度的单字节序列，每一个单字节的取值范围是<math|<around*|[|0,255|]>>。字节向量的每一个元素都是类型一致的单字节，其空间利用率会比向量高一些。
+
+  类型一致的向量在S7 Scheme中有<scm|int-vector>和<scm|byte-vector>等特殊形式，这是S7 Scheme里面扩展的功能。R7RS定义的<scm|bytevector>可以使用<scm|byte-vector>作为实现。
+
+  <value|r7rs><paragraph|bytevector><scm|(byte ...) =\<gtr\> bytevector><index|bytevector>
+
+  <\description>
+    <item*|byte>一个或多个介于 0 到 255 之间的整数（代表字节的值）。
+  </description>
+
+  <code*|bytevector>过程返回一个新分配的字节向量，其元素包含传递给过程的所有参数。每个参数都必须是一个介于 0 到 255 之间的整数，表示字节向量中的一个字节。如果没有提供任何参数，将创建一个空的字节向量。
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define bytevector byte-vector)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (bytevector 1) =\<gtr\> #u8(1))
+
+    (check (bytevector) =\<gtr\> #u8())
+
+    (check (bytevector 1 2 3) =\<gtr\> #u8(1 2 3))
+
+    \;
+
+    (check (bytevector 255) =\<gtr\> #u8(255))
+
+    (check-catch 'wrong-type-arg (bytevector 256))
+
+    (check-catch 'wrong-type-arg (bytevector -1))
+
+    \;
+  </scm-chunk>
+
   <value|r7rs><paragraph|bytevector?><index|bytevector?>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
@@ -1683,6 +1717,8 @@
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check-true (bytevector? #u8(0)))
+
+    (check-true (bytevector? #u8()))
 
     \;
   </scm-chunk>
@@ -1703,29 +1739,7 @@
     \;
   </scm-chunk>
 
-  <value|r7rs><paragraph|bytevector><index|bytevector>
-
-  <\scm-chunk|goldfish/scheme/base.scm|true|true>
-    (define bytevector byte-vector)
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (bytevector 1) =\<gtr\> #u8(1))
-
-    (check (bytevector) =\<gtr\> #u8())
-
-    (check (bytevector 1 2 3) =\<gtr\> #u8(1 2 3))
-
-    \;
-
-    (check-catch 'wrong-type-arg (bytevector 256))
-
-    \;
-  </scm-chunk>
-
-  <value|r7rs><paragraph|bytevector-length>
+  <value|r7rs><paragraph|bytevector-length><index|bytevector-length>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-length length)
@@ -1733,7 +1747,7 @@
     \;
   </scm-chunk>
 
-  <value|r7rs><paragraph|bytevector-u8-ref>
+  <value|r7rs><paragraph|bytevector-u8-ref><index|bytevector-u8-ref>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-u8-ref byte-vector-ref)
@@ -1743,10 +1757,32 @@
 
   \;
 
-  <value|r7rs><paragraph|bytevector-u8-set!>
+  <value|r7rs><paragraph|bytevector-u8-set!><index|bytevector-u8-set!>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-u8-set! byte-vector-set!)
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|bytevector-append><index|bytevector-append>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define bytevector-append append)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (bytevector-append #u8() #u8()) =\<gtr\> #u8())
+
+    (check (bytevector-append #u8() #u8(1)) =\<gtr\> #u8(1))
+
+    (check (bytevector-append #u8(1) #u8()) =\<gtr\> #u8(1))
 
     \;
   </scm-chunk>
@@ -1818,9 +1854,9 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ index \ ; Incomplete sequence
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bytevector-u8-ref bv (+ index 1)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((next-byte1 (bv (+ index 1)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bytevector-u8-ref bv (+ index 2))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (next-byte2 (bv (+ index 2))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (not (= (logand next-byte1 #xc0) #x80))
 
