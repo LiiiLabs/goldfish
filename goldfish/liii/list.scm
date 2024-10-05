@@ -21,7 +21,7 @@
   ; SRFI 1: Constructors
   circular-list iota list-copy
   ; SRFI 1: Predicates
-  null-list? circular-list?
+  null-list? circular-list? proper-list? dotted-list?
   ; SRFI 1: Selectors
   first second third fourth fifth sixth seventh eighth ninth tenth
   take drop take-right drop-right

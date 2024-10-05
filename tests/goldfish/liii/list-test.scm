@@ -51,8 +51,6 @@
   (set-car! obj1 3)
   (check-false (eq? obj1 obj2)))
 
-; (check (circular-list? (circular-list 1 2)) => #t)
-
 (check (null-list? '()) => #t)
 
 (check (null-list? '(1 . 2)) => #f)
@@ -273,6 +271,14 @@
       (check (delete-duplicates (list 1 1 2 3) 'not-pred) => 1))
     (lambda args #t))
   => #t)
+
+(let1 cl (circular-list 1 2 3)
+  (check (cl 3) => 1)
+  (check (cl 4) => 2)
+  (check (cl 5) => 3)
+  (check (cl 6) => 1))
+
+; (check (circular-list? (circular-list 1 2)) => #t)
 
 (check-true (length=? 3 (list 1 2 3)))
 (check-false (length=? 2 (list 1 2 3)))

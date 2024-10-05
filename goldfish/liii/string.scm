@@ -20,8 +20,6 @@
   string? string-ref string-length
   ; from (scheme base)
   string-copy string-for-each string-map
-    ;R7RS 6.5 Symbols
-    string->symbol
   ; from (srfi srfi-13)
   string-null? string-join
   string-every string-any

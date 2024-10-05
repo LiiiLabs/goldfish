@@ -6436,7 +6436,7 @@
 
     \ \ ; SRFI 1: Predicates
 
-    \ \ null-list? circular-list?
+    \ \ null-list? circular-list? proper-list? dotted-list?
 
     \ \ ; SRFI 1: Selectors
 
@@ -6494,7 +6494,11 @@
 
     \ \ circular-list iota list-copy\ 
 
-    \ \ circular-list? null-list?
+    \ \ ; SRFI 1: Predicates
+
+    \ \ circular-list? null-list? proper-list? dotted-list?
+
+    \ \ ; SRFI 1: Selectors
 
     \ \ first second third fourth fifth
 
@@ -6559,22 +6563,6 @@
     \;
 
     (check (make-list 0) =\<gtr\> (list ))
-
-    \;
-  </scm-chunk>
-
-  <paragraph|circular-list><index|circular-list>
-
-  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
-    ; 0 clause BSD, from S7 repo stuff.scm
-
-    (define circular-list
-
-    \ \ (lambda objs
-
-    \ \ \ \ (let ((lst (copy objs)))
-
-    \ \ \ \ \ \ (set-cdr! (list-tail lst (- (length lst) 1)) lst))))
 
     \;
   </scm-chunk>
@@ -6777,28 +6765,38 @@
     \;
   </scm-chunk>
 
-  <paragraph|circular-list?><index|circular-list?>
+  <paragraph|proper-list?>
+
+  正规列表（proper list）是指满足以下条件的列表：
+
+  <\enumerate>
+    <item><strong|空列表>：也写作 <code*|()>，它是唯一的一个既是正规列表也是空列表的数据结构。空列表在 Scheme 中被认为是正规列表。
+
+    <item><strong|非空列表>：如果一个列表的每个元素都是通过<code*|cons>过程构造的，并且每个列表元素的<code*|cdr>部分（除了最后一个元素）都是正规列表，那么这个列表就是正规列表。
+  </enumerate>
+
+  \;
 
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
-    ; 0 clause BSD, from S7 repo stuff.scm
+    (define (proper-list? x)
 
-    (define circular-list?
+    \ \ (let loop ((x x) (lag x))
 
-    \ \ (lambda (obj)
+    \ \ \ \ (if (pair? x)
 
-    \ \ \ \ (catch #t
+    \ \ \ \ \ \ \ \ (let ((x (cdr x)))
 
-    \ \ \ \ \ \ (lambda () (infinite? (length obj)))
+    \ \ \ \ \ \ \ \ \ \ (if (pair? x)
 
-    \ \ \ \ \ \ (lambda args #f))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((x \ \ (cdr x))
 
-    \;
-  </scm-chunk>
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lag (cdr lag)))
 
-  <todo|在Windows上CI的结果是#f，需要修复这个问题>
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (not (eq? x lag)) (loop x lag)))
 
-  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
-    ; (check (circular-list? (circular-list 1 2)) =\<gtr\> #t)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (null? x)))
+
+    \ \ \ \ \ \ \ \ (null? x))))
 
     \;
   </scm-chunk>
@@ -7270,7 +7268,9 @@
 
     \ \ (if (pair? (cdr l))
 
-    \ \ \ \ \ \ (last-pair (cdr l)) l))
+    \ \ \ \ \ \ (last-pair (cdr l))
+
+    \ \ \ \ \ \ l))
 
     \;
   </scm-chunk>
@@ -8331,6 +8331,62 @@
     \ \ \ \ (lambda args #t))
 
     \ \ =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  <subsection|循环列表>
+
+  <paragraph|circular-list><index|circular-list>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (circular-list val1 . vals)
+
+    \ \ (let ((ans (cons val1 vals)))
+
+    \ \ \ \ (set-cdr! (last-pair ans) ans)
+
+    \ \ \ \ ans))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|false>
+    (let1 cl (circular-list 1 2 3)
+
+    \ \ (check (cl 3) =\<gtr\> 1)
+
+    \ \ (check (cl 4) =\<gtr\> 2)
+
+    \ \ (check (cl 5) =\<gtr\> 3)
+
+    \ \ (check (cl 6) =\<gtr\> 1))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|circular-list?><index|circular-list?>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    ; 0 clause BSD, from S7 repo stuff.scm
+
+    (define circular-list?
+
+    \ \ (lambda (obj)
+
+    \ \ \ \ (catch #t
+
+    \ \ \ \ \ \ (lambda () (infinite? (length obj)))
+
+    \ \ \ \ \ \ (lambda args #f))))
+
+    \;
+  </scm-chunk>
+
+  <todo|在Windows上CI的结果是#f，需要修复这个问题>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    ; (check (circular-list? (circular-list 1 2)) =\<gtr\> #t)
 
     \;
   </scm-chunk>
