@@ -13632,19 +13632,27 @@
 
     \ \ \ \ \ \ (when (\<less\> i input-N)
 
-    \ \ \ \ \ \ \ \ (let* ((b1 (base64-table (bv i)))
+    \ \ \ \ \ \ \ \ (let* ((c1 (bv i))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (base64-table (bv (+ i 1))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (bv (+ i 1)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (base64-table (bv (+ i 2))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (bv (+ i 2)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b4 (base64-table (bv (+ i 3)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (bv (+ i 3)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b1 (base64-table c1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (base64-table c2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (base64-table c3))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b4 (base64-table c4)))
 
     \ \ \ \ \ \ \ \ \ \ (if (or (negative? b1) (negative? b2)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (negative? b3) (not (equal? (bv (+ i 2)) BASE64_PAD_BYTE)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (negative? b3) (!= c3 BASE64_PAD_BYTE))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (negative? b4) (not (equal? (bv (+ i 3)) BASE64_PAD_BYTE))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (negative? b4) (!= c4 BASE64_PAD_BYTE)))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error "Invalid base64 input")
 
@@ -13652,7 +13660,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output j
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (logior (ash b1 2) (ash b2 -4)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (logior (ash b1 2) (ash b2 -4)))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (when (and (not (negative? b3)) (\<less\> j (- output-N 1)))
 
