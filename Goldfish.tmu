@@ -13431,7 +13431,11 @@
 
   <section|实现>
 
-  <paragraph|base64-encode>
+  <paragraph|bytevector-base64-encode><index|bytevector-base64-encode>
+
+  <paragraph|string-base64-encode><index|string-base64-encode>
+
+  <paragraph|base64-encode><index|base64-encode>
 
   Base64编码的规则如下：
 
@@ -13519,12 +13523,32 @@
     \ \ \ \ \ \ output)))
 
     \;
+  </scm-chunk>
 
+  <\scm-chunk|goldfish/liii/base64.scm|true|false>
     (define string-base64-encode
 
     \ \ (typed-lambda ((str string?))
 
     \ \ \ \ (utf8-\<gtr\>string (bytevector-base64-encode (string-\<gtr\>utf8 str)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/base64.scm|true|true>
+    (define (base64-encode x)
+
+    \ \ (cond ((string? x)
+
+    \ \ \ \ \ \ \ \ \ (string-base64-encode x))
+
+    \ \ \ \ \ \ \ \ ((bytevector? x)
+
+    \ \ \ \ \ \ \ \ \ (bytevector-base64-encode x))
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ (type-error "input must be string or bytevector"))))
 
     \;
   </scm-chunk>
@@ -13552,6 +13576,12 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|bytevector-base64-decode><index|bytevector-base64-decode>
+
+  <paragraph|string-base64-decode><index|string-base64-decode>
+
+  \;
 
   <section|结尾>
 

@@ -54,6 +54,14 @@
   (typed-lambda ((str string?))
     (utf8->string (bytevector-base64-encode (string->utf8 str)))))
 
+(define (base64-encode x)
+  (cond ((string? x)
+         (string-base64-encode x))
+        ((bytevector? x)
+         (bytevector-base64-encode x))
+        (else
+         (type-error "input must be string or bytevector"))))
+
 ) ; end of begin
 ) ; end of define-library
 
