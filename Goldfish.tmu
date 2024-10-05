@@ -6939,7 +6939,7 @@
 
   <section|接口>
 
-  <\scm-chunk|goldfish/liii/string.scm|true|false>
+  <\scm-chunk|goldfish/liii/string.scm|true|true>
     (define-library (liii string)
 
     (export
@@ -8484,6 +8484,8 @@
 
     (check-true (string-prefix? "MathAgape" "MathAgape"))
 
+    \;
+
     (check-false (string-prefix? "a" "MathAgape"))
 
     \;
@@ -8523,6 +8525,8 @@
     (check-true (string-suffix? "" "MathAgape"))
 
     (check-true (string-suffix? "MathAgape" "MathAgape"))
+
+    \;
 
     (check-false (string-suffix? "p" "MathAgape"))
 
@@ -8961,7 +8965,7 @@
 
   在编程实践中，移除字符串的前缀是非常常用的功能。
 
-  <\scm-chunk|goldfish/liii/string.scm|true|false>
+  <\scm-chunk|goldfish/liii/string.scm|true|true>
     (define string-remove-prefix
 
     \ \ (typed-lambda ((str string?) (prefix string?))
@@ -8975,7 +8979,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-remove-prefix "浙江省杭州市西湖区" "浙江省") =\<gtr\> "杭州市西湖区")
 
     (check (string-remove-prefix "aaa" "a") =\<gtr\> "aa")
@@ -8983,6 +8987,32 @@
     (check (string-remove-prefix "abc" "bc") =\<gtr\> "abc")
 
     (check (string-remove-prefix "abc" "") =\<gtr\> "abc")
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-remove-suffix><index|string-remove-suffix>
+
+  <\scm-chunk|goldfish/liii/string.scm|true|true>
+    (define string-remove-suffix
+
+    \ \ (typed-lambda ((str string?) (suffix string?))
+
+    \ \ \ \ (if (string-suffix? suffix str)
+
+    \ \ \ \ \ \ \ \ (substring str 0 (- (string-length str) (string-length suffix)))
+
+    \ \ \ \ \ \ \ \ (string-copy str))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-remove-suffix "aaa" "a") =\<gtr\> "aa")
+
+    (check (string-remove-suffix "aaa" "") =\<gtr\> "aaa")
+
+    (check (string-remove-suffix "Goldfish.tmu" ".tmu") =\<gtr\> "Goldfish")
 
     \;
   </scm-chunk>

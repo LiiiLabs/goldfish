@@ -45,6 +45,12 @@
         (substring str (string-length prefix))
         str)))
 
+(define string-remove-suffix
+  (typed-lambda ((str string?) (suffix string?))
+    (if (string-suffix? suffix str)
+        (substring str 0 (- (string-length str) (string-length suffix)))
+        (string-copy str))))
+
 ) ; end of begin
 ) ; end of define-library
 

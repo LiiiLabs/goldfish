@@ -387,11 +387,13 @@
 (check-true (string-prefix? "Ma" "MathAgape"))
 (check-true (string-prefix? "" "MathAgape"))
 (check-true (string-prefix? "MathAgape" "MathAgape"))
+
 (check-false (string-prefix? "a" "MathAgape"))
 
 (check-true (string-suffix? "e" "MathAgape"))
 (check-true (string-suffix? "" "MathAgape"))
 (check-true (string-suffix? "MathAgape" "MathAgape"))
+
 (check-false (string-suffix? "p" "MathAgape"))
 
 (check (string-index "0123456789" #\2) => 2)
@@ -479,6 +481,10 @@
 (check (string-remove-prefix "aaa" "a") => "aa")
 (check (string-remove-prefix "abc" "bc") => "abc")
 (check (string-remove-prefix "abc" "") => "abc")
+
+(check (string-remove-suffix "aaa" "a") => "aa")
+(check (string-remove-suffix "aaa" "") => "aaa")
+(check (string-remove-suffix "Goldfish.tmu" ".tmu") => "Goldfish")
 
 (check-report)
 
