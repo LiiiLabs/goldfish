@@ -390,6 +390,11 @@
 (check-true ((compose not zero?) 1))
 (check-false ((compose not zero?) 0))
 
+(let1 add1/add (lambda* (x (y 1)) (+ x y))
+  (check (add1/add 1) => 2)
+  (check (add1/add 0) => 1)
+  (check (add1/add 1 2)=> 3))
+
 (define add3
   (typed-lambda
     ((i integer?) (x real?) z)

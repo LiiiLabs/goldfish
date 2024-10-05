@@ -585,6 +585,22 @@
 
   <subsection|原语表达式>
 
+  原语表达式可以分为：变量、字面量、函数的应用、匿名函数、分支表达式、赋值表达式、文件包含表达式。
+
+  <paragraph|lambda>
+
+  <paragraph|quote>
+
+  <paragraph|if>
+
+  <paragraph|set!>
+
+  <paragraph|include>
+
+  <paragraph|include-ci>
+
+  \;
+
   <subsection|派生表达式>
 
   <paragraph|cond>
@@ -711,13 +727,13 @@
 
   <value|r7rs><paragraph|or><index|or>
 
-  <value|r7rs><paragraph|when>
+  <value|r7rs><paragraph|when><index|when>
 
-  <value|r7rs><paragraph|unless>
+  <value|r7rs><paragraph|unless><index|unless>
 
   <value|r7rs><paragraph|let><index|let>
 
-  <value|r7rs><paragraph|let*>
+  <value|r7rs><paragraph|let*><index|let*>
 
   <value|r7rs><paragraph|letrec>
 
@@ -888,6 +904,14 @@
 
     \;
   </scm-chunk>
+
+  <subsection|宏>
+
+  金鱼Scheme基于S7 Scheme，不支持<scm|let-syntax>, <scm|letrec-syntax>, <scm|syntax-rules>和<scm|syntax-error>等R7RS定义的宏的基础设施。
+
+  <paragraph|define-macro>
+
+  金鱼Scheme支持<scm|define-macro>来定义宏。宏采用正则序求值。
 
   <section|程序结构>
 
@@ -2645,7 +2669,7 @@
 
   <section|系统接口>
 
-  <section|三鲤扩展库>
+  <section|三鲤扩展函数>
 
   <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
 
@@ -2825,6 +2849,20 @@
     (check-true ((compose not zero?) 1))
 
     (check-false ((compose not zero?) 0))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|lambda*><index|lambda*>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (let1 add1/add (lambda* (x (y 1)) (+ x y))
+
+    \ \ (check (add1/add 1) =\<gtr\> 2)
+
+    \ \ (check (add1/add 0) =\<gtr\> 1)
+
+    \ \ (check (add1/add 1 2)=\<gtr\> 3))
 
     \;
   </scm-chunk>
