@@ -13412,7 +13412,7 @@
 
     (export
 
-    \ \ string-base64-encode bytevector-base64-encode
+    \ \ string-base64-encode bytevector-base64-encode base64-encode
 
     )
 
@@ -13525,7 +13525,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/liii/base64.scm|true|false>
+  <\scm-chunk|goldfish/liii/base64.scm|true|true>
     (define string-base64-encode
 
     \ \ (typed-lambda ((str string?))
@@ -13555,24 +13555,24 @@
 
   <subparagraph|测试>
 
-  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|false>
-    (check (string-base64-encode "") =\<gtr\> "")
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|true>
+    (check (base64-encode "") =\<gtr\> "")
 
-    (check (string-base64-encode "a") =\<gtr\> "YQ==")
+    (check (base64-encode "a") =\<gtr\> "YQ==")
 
-    (check (string-base64-encode "z") =\<gtr\> "eg==")
+    (check (base64-encode "z") =\<gtr\> "eg==")
 
-    (check (string-base64-encode "f") =\<gtr\> "Zg==")
+    (check (base64-encode "f") =\<gtr\> "Zg==")
 
-    (check (string-base64-encode "fo") =\<gtr\> "Zm8=")
+    (check (base64-encode "fo") =\<gtr\> "Zm8=")
 
-    (check (string-base64-encode "foo") =\<gtr\> "Zm9v")
+    (check (base64-encode "foo") =\<gtr\> "Zm9v")
 
-    (check (string-base64-encode "foob") =\<gtr\> "Zm9vYg==")
+    (check (base64-encode "foob") =\<gtr\> "Zm9vYg==")
 
-    (check (string-base64-encode "fooba") =\<gtr\> "Zm9vYmE=")
+    (check (base64-encode "fooba") =\<gtr\> "Zm9vYmE=")
 
-    (check (string-base64-encode "foobar") =\<gtr\> "Zm9vYmFy")
+    (check (base64-encode "foobar") =\<gtr\> "Zm9vYmFy")
 
     \;
   </scm-chunk>

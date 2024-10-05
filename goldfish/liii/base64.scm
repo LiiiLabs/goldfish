@@ -17,7 +17,7 @@
 (define-library (liii base64)
 (import (liii base))
 (export
-  string-base64-encode bytevector-base64-encode
+  string-base64-encode bytevector-base64-encode base64-encode
 )
 (begin
 (define-constant BYTE2BASE64_BV
