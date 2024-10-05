@@ -16,7 +16,7 @@
 
     <assign|r7rs|<flag|r7rs|dark cyan>>
 
-    <assign|goldfish-version|17.10.7>
+    <assign|goldfish-version|17.10.6>
   </hide-preamble>
 
   文档许可证暂时没有确定！
@@ -931,7 +931,7 @@
 
   <value|r7rs><paragraph|define-values><index|define-values>
 
-  <\scm-chunk|goldfish/scheme/base.scm|true|false>
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
     ; 0-clause BSD by Bill Schottstaedt from S7 source repo: s7test.scm
 
     (define-macro (define-values vars expression)
@@ -1753,7 +1753,7 @@
 
   <\session|goldfish|default>
     <\output>
-      Goldfish Scheme 17.10.7 Community Edition by LiiiLabs
+      Goldfish Scheme 17.10.6 Community Edition by LiiiLabs
 
       implemented on S7 Scheme (10.12, 16-Aug-2024)
     </output>
@@ -13324,6 +13324,142 @@
   <section|结尾>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <chapter|(liii base64)>
+
+  <section|协议>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/base64.scm|false|true>
+    (define-library (liii base64)
+
+    (import (liii base))
+
+    (export base64-encode)
+
+    (begin
+  </scm-chunk>
+
+  <section|测试>
+
+  <section|实现>
+
+  <paragraph|base64-encode>
+
+  Base64编码的规则如下：
+
+  <\enumerate>
+    <item><strong|字符集>：Base64编码使用一个包含64个字符的字符集，这些字符包括大小写字母、数字和两个特殊符号（通常是<code*|+>和<code*|/>）。还有一个等号<code*|=>用于填充。
+
+    <item><strong|分组>：原始数据被分为3个字节的组。每组3个字节表示为24位。
+
+    <item><strong|索引映射>：每组24位被分成4个6位的块。每个6位块映射到Base64字符集的一个字符上。
+
+    <item><strong|编码>：
+
+    <\itemize>
+      <item>将24位的二进制数分成4个6位的块。
+
+      <item>每个6位块在Base64字符集中查找对应的字符。
+    </itemize>
+
+    <item><strong|填充>：
+
+    <\itemize>
+      <item>如果原始数据的长度不是3的倍数，最后一组将不足3个字节。这种情况下，不足的部分用0填充到3个字节。
+
+      <item>编码后，如果最后一组6位块不足6位，使用<code*|=>进行填充。
+    </itemize>
+  </enumerate>
+
+  \;
+
+  <\scm-chunk|goldfish/liii/base64.scm|true|true>
+    (define-constant BYTE2BASE64_BV
+
+    \ \ (string-\<gtr\>utf8 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"))
+
+    \;
+
+    (define-constant BASE64_PAD_INT
+
+    \ \ (char-\<gtr\>integer #\\=))
+
+    \;
+
+    (define (base64-encode bv)
+
+    \ \ (let* ((input-N (bytevector-length bv))
+
+    \ \ \ \ \ \ \ \ \ (output-N (* 4 (ceiling (/ input-N 3))))
+
+    \ \ \ \ \ \ \ \ \ (output (make-bytevector output-N)))
+
+    \ \ \ \ (let loop ((i 0) (j 0))
+
+    \ \ \ \ \ \ (when (\<less\> i input-N)
+
+    \ \ \ \ \ \ \ \ (let* ((b1 (bv i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (if (\<less\> (+ i 1) input-N) (bv (+ i 1)) 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (if (\<less\> (+ i 2) input-N) (bv (+ i 2)) 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (combined (logior (ash b1 16) (ash b2 8) b3))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c1 (logand (ash combined -18) #x3F))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (logand (ash combined -12) #x3F))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (logand (ash combined -6) #x3F))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (logand combined #x3F)))
+
+    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output j (BYTE2BASE64_BV c1))
+
+    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 1) (BYTE2BASE64_BV c2))
+
+    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 2)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 1) input-N) (BYTE2BASE64_BV c3) BASE64_PAD_INT))
+
+    \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! output (+ j 3)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (if (\<less\> (+ i 2) input-N) (BYTE2BASE64_BV c4) BASE64_PAD_INT))
+
+    \ \ \ \ \ \ \ \ \ \ (loop (+ i 3) (+ j 4)))))
+
+    \ \ \ \ output))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|false|false>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii base64))
+
+    \;
+
+    (check (utf8-\<gtr\>string (base64-encode (string-\<gtr\>utf8 "a"))) =\<gtr\> "YQ==")
+
+    \;
+
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/liii/base64.scm|true|false>
     ) ; end of begin
 
     ) ; end of define-library
