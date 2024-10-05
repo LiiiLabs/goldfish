@@ -20,7 +20,7 @@ option_end()
 local S7_VERSION = "20240816"
 add_requires("s7 "..S7_VERSION, {system=false})
 
-local TBOX_VERSION = "1.7.5"
+local TBOX_VERSION = "1.7.6"
 if has_config("tbox") then
     add_requires("apt::libtbox-dev", {alias="tbox"})
 else
