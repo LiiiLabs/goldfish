@@ -97,9 +97,9 @@
 
 (define (drop-right l k)
   (let loop ((lag l) (lead (drop l k)))
-    (if (null? lead)
-        '()
-        (cons (car lag) (loop (cdr lag) (cdr lead))))))
+    (if (pair? lead)
+        (cons (car lag) (loop (cdr lag) (cdr lead)))
+        '())))
 
 (define (last-pair l)
   (if (pair? (cdr l))

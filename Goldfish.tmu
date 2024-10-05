@@ -7286,11 +7286,11 @@
 
     \ \ (let loop ((lag l) (lead (drop l k)))
 
-    \ \ \ \ (if (null? lead)
+    \ \ \ \ (if (pair? lead)
 
-    \ \ \ \ \ \ \ \ '()
+    \ \ \ \ \ \ \ \ (cons (car lag) (loop (cdr lag) (cdr lead)))
 
-    \ \ \ \ \ \ \ \ (cons (car lag) (loop (cdr lag) (cdr lead))))))
+    \ \ \ \ \ \ \ \ '())))
 
     \;
   </scm-chunk>
