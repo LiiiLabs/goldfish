@@ -10307,7 +10307,7 @@
 
   返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
     (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
 
     (check (list-\<gtr\>vector '()) =\<gtr\> #())
@@ -13421,7 +13421,7 @@
 
   <section|测试>
 
-  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|true>
     (import (liii check)
 
     \ \ \ \ \ \ \ \ (liii base64))
@@ -13551,10 +13551,6 @@
     (check (string-base64-encode "foobar") =\<gtr\> "Zm9vYmFy")
 
     \;
-
-    (check-report)
-
-    \;
   </scm-chunk>
 
   <section|结尾>
@@ -13563,6 +13559,12 @@
     ) ; end of begin
 
     ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|false>
+    (check-report)
 
     \;
   </scm-chunk>
