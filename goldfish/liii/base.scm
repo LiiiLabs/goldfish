@@ -31,8 +31,7 @@
   ; R7RS 6.4: list
   list-copy
   ; R7RS 6.5: Symbol
-  symbol=?
-  string->symbol
+  symbol? symbol=? string->symbol symbol->string
   ; R7RS 6.6: Characters
   digit-value
   ; R7RS 6.7: String
