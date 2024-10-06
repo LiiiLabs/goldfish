@@ -19,9 +19,9 @@
         (liii error))
 (export
   ; from (srfi srfi-151)
-  bitwise-and bitwise-ior
+  bitwise-not bitwise-and bitwise-ior
   ; S7 built-in
-  logand logior
+  lognot logand logior
 )
 (begin
 ) ; end of begin

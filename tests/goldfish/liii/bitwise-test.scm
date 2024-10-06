@@ -19,6 +19,11 @@
 
 (check-set-mode! 'report-failed)
 
+(check (bitwise-not 0) => -1)
+(check (bitwise-not 1) => -2)
+(check (bitwise-not #b1000) => -9)
+(check (bitwise-not -1) => 0)
+
 (check (bitwise-and 5 3) => 1)  ; 5 (101) AND 3 (011) = 1 (001)
 (check (bitwise-and 8 4) => 0)  ; 8 (1000) AND 4 (0100) = 0 (0000)
 (check (bitwise-and #b101 #b011) => 1)  ; 5 (101) AND 3 (011) = 1 (001)  
