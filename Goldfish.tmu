@@ -9181,7 +9181,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|string-downcase><index|string-downcase>
+  <value|srfi><paragraph|string-downcase><index|string-downcase>
 
   S7内置的<scm|string-downcase>是符合R7RS标准的，这里实现的是SRFI 13定义的<scm|string-downcase>，需要额外实现<scm|start>和<scm|end>这两个可选参数。
 
