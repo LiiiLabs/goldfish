@@ -58,9 +58,6 @@
   and-let*
   ; SRFI-8
   receive
-  ; SRFI-151
-  bitwise-or
-  bitwise-and
   ; Extra routines for (liii base)
   == != display* in? let1 compose identity typed-lambda
 )

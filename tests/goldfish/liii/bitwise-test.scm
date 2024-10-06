@@ -21,9 +21,13 @@
 
 (check (bitwise-and 5 3) => 1)  ; 5 (101) AND 3 (011) = 1 (001)
 (check (bitwise-and 8 4) => 0)  ; 8 (1000) AND 4 (0100) = 0 (0000)
+(check (bitwise-and #b101 #b011) => 1)  ; 5 (101) AND 3 (011) = 1 (001)  
+(check (bitwise-and #b1000 #b0100) => 0) ; 8 (1000) AND 4 (0100) = 0 (0000)
 
 (check (bitwise-or 5 3) => 7)  ; 5 (101) OR 3 (011) = 7 (111)
 (check (bitwise-or 8 4) => 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
+(check (bitwise-and #b101 #b011) => 7)  ; 5 (101) AND 3 (011) = 1 (001)  
+(check (bitwise-and #b1000 #b0100) => 12) ; 8 (1000) AND 4 (0100) = 0 (0000)
 
 (check-report)
 

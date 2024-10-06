@@ -546,12 +546,6 @@
 
     \ \ receive
 
-    \ \ ; SRFI-151
-
-    \ \ bitwise-or
-
-    \ \ bitwise-and
-
     \ \ ; Extra routines for (liii base)
 
     \ \ == != display* in? let1 compose identity typed-lambda
@@ -1508,10 +1502,6 @@
   <paragraph|expt>
 
   <subsection|数的转换>
-
-  <section|位运算 (Bitwise Operations)>
-
-  见章 <reference|chapter:liii_bitwise>.
 
   <section|布尔值>
 
@@ -4106,6 +4096,10 @@
 
     (check (bitwise-and 8 4) =\<gtr\> 0) \ ; 8 (1000) AND 4 (0100) = 0 (0000)
 
+    (check (bitwise-and #b101 #b011) =\<gtr\> 1) \ ; 5 (101) AND 3 (011) = 1 (001) \ 
+
+    (check (bitwise-and #b1000 #b0100) =\<gtr\> 0) ; 8 (1000) AND 4 (0100) = 0 (0000)
+
     \;
   </scm-chunk>
 
@@ -4127,6 +4121,10 @@
     (check (bitwise-or 5 3) =\<gtr\> 7) \ ; 5 (101) OR 3 (011) = 7 (111)
 
     (check (bitwise-or 8 4) =\<gtr\> 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
+
+    (check (bitwise-and #b101 #b011) =\<gtr\> 7) \ ; 5 (101) AND 3 (011) = 1 (001) \ 
+
+    (check (bitwise-and #b1000 #b0100) =\<gtr\> 12) ; 8 (1000) AND 4 (0100) = 0 (0000)
 
     \;
   </scm-chunk>
