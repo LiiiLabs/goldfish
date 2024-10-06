@@ -33,12 +33,19 @@
   string-reverse
   string-tokenize
   ; Liii extras
+  string-starts? string-ends?
   string-remove-prefix string-remove-suffix
 )
 (import (srfi srfi-13)
         (liii base)
         (liii error))
 (begin
+
+(define (string-starts? str prefix)
+  (string-prefix? prefix str))
+
+(define (string-ends? str suffix)
+  (string-suffix? suffix str))
 
 (define string-remove-prefix
   (typed-lambda ((str string?) (prefix string?))

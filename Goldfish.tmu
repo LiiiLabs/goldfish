@@ -7498,6 +7498,8 @@
 
     \ \ ; Liii extras
 
+    \ \ string-starts? string-ends?
+
     \ \ string-remove-prefix string-remove-suffix
 
     )
@@ -9556,6 +9558,38 @@
   </scm-chunk>
 
   <section|三鲤扩展函数>
+
+  <paragraph|string-starts?><index|string-starts?>
+
+  <\scm-chunk|goldfish/liii/string.scm|true|false>
+    (define (string-starts? str prefix)
+
+    \ \ (string-prefix? prefix str))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+    (check-true (string-starts? "MathAgape" "Math"))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-ends?><index|string-ends?>
+
+  <\scm-chunk|goldfish/liii/string.scm|true|false>
+    (define (string-ends? str suffix)
+
+    \ \ (string-suffix? suffix str))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+    (check-true (string-ends? "MathAgape" "Agape"))
+
+    \;
+  </scm-chunk>
 
   <paragraph|string-remove-prefix><index|string-remove-prefix>
 
