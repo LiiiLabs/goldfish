@@ -7221,6 +7221,8 @@
 
   <value|srfi><paragraph|arithmetic-shift><index|arithmetic-shift>
 
+  log开头的S7内置函数不推荐使用，原因是log不符合位运算的语义，<scm|ash>是<scm|arithmetic-shift>的简写，能够有效避免<scm|arithmetic>这个单词拼写错误的可能性，仍旧是推荐使用的。从代码可读性上考虑，还是使用<scm|arithmetic-shift>更加合适。
+
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define arithmetic-shift ash)
 
