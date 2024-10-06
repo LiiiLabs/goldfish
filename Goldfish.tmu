@@ -14,7 +14,9 @@
 
     <assign|subparagraph|<macro|title|<assign|subparagraph-numbered|<compound|subparagraph-display-numbers>><assign|subparagraph-prefix|<macro|<compound|the-subparagraph>.>><compound|next-subparagraph><compound|subparagraph-clean><compound|subparagraph-header|<arg|title>><compound|subparagraph-toc|<arg|title>><small|<if|<value|subparagraph-numbered>|<compound|subparagraph-numbered-title|<arg|title>>|<compound|subparagraph-unnumbered-title|<arg|title>>>>>>
 
-    <assign|r7rs|<flag|r7rs|dark cyan>>
+    <assign|r7rs|<flag|R7RS|dark cyan>>
+
+    <assign|srfi|<flag|SRFI|dark red>>
 
     <assign|goldfish-version|17.10.7>
   </hide-preamble>
@@ -6913,6 +6915,16 @@
 
   <chapter|(liii bitwise)><label|chapter:liii_bitwise>
 
+  <section|概述>
+
+  位运算的基本规则如下表所示：
+
+  <\big-table|<math|<tabular|<tformat|<cwith|2|-1|2|-1|cell-halign|r>|<cwith|2|2|1|-1|cell-tborder|1ln>|<cwith|1|1|1|-1|cell-bborder|1ln>|<cwith|2|2|1|-1|cell-bborder|0ln>|<cwith|3|3|1|-1|cell-tborder|0ln>|<cwith|2|2|1|1|cell-lborder|0ln>|<cwith|2|2|5|5|cell-rborder|0ln>|<cwith|1|1|2|2|cell-tborder|0ln>|<cwith|4|4|2|2|cell-bborder|0ln>|<cwith|1|-1|2|2|cell-lborder|1ln>|<cwith|1|-1|1|1|cell-rborder|1ln>|<cwith|1|-1|2|2|cell-rborder|0ln>|<cwith|1|-1|3|3|cell-lborder|0ln>|<table|<row|<cell|>|<cell|1 op 1>|<cell|1 op 0>|<cell|0 op 1>|<cell|0 op 0>>|<row|<cell|and>|<cell|1>|<cell|0>|<cell|0>|<cell|0>>|<row|<cell|or>|<cell|1>|<cell|1>|<cell|1>|<cell|0>>|<row|<cell|xor>|<cell|0>|<cell|1>|<cell|1>|<cell|0>>>>>>>
+    二进制1位位运算表
+  </big-table>
+
+  在金鱼Scheme中，整数类型是64位的有符号整数，上述运算规则执行64次，就是金鱼Scheme中整数的位运算具体规则。
+
   <section|许可证>
 
   <\scm-chunk|goldfish/liii/bitwise.scm|false|true>
@@ -7030,11 +7042,11 @@
 
     \ \ ; from (srfi srfi-151)
 
-    \ \ bitwise-not bitwise-and bitwise-ior
+    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor
 
     \ \ ; S7 built-in
 
-    \ \ lognot logand logior
+    \ \ lognot logand logior logxor
 
     )
 
@@ -7052,7 +7064,7 @@
 
     (export
 
-    \ \ bitwise-not bitwise-and bitwise-ior
+    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor
 
     )
 
@@ -7105,7 +7117,7 @@
 
   <paragraph|logand><index|logand>
 
-  <label|srfi><paragraph|bitwise-and><index|bitwise-and>
+  <value|srfi><paragraph|bitwise-and><index|bitwise-and>
 
   使用S7内置的<with|font-family|tt|logand>实现，不推荐使用<scm|logand>。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
 
@@ -7135,7 +7147,7 @@
 
   <paragraph|logior><index|logior>
 
-  <label|srfi><paragraph|bitwise-or><index|bitwise-or>
+  <value|srfi><paragraph|bitwise-or><index|bitwise-or>
 
   使用S7内置的<with|font-family|tt|logior>实现，不推荐使用<scm|logior>。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
 
@@ -7157,6 +7169,38 @@
     (check (bitwise-ior #b1000 #b0100) =\<gtr\> 12) ; 8 (1000) AND 4 (0100) = 0 (0000)
 
     (check (bitwise-ior #b1100 #b0001) =\<gtr\> 13)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|logxor><index|logxor>
+
+  <value|srfi><paragraph|bitwise-xor><index|bitwise-xor>
+
+  使用S7内置的<scm|logxor>实现，不推荐使用<scm|logxor>，推荐使用<scm|bitwise-xor>。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define bitwise-xor logxor)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bitwise-xor 1 1) =\<gtr\> 0)
+
+    (check (bitwise-xor #b10 #b11) =\<gtr\> #b01) ; 2 xor 3 = 1
+
+    (check (bitwise-xor #b101010 #b110100) =\<gtr\> #b011110) ; 42 xor 20 = 34
+
+    (check (bitwise-xor #b0 #b0) =\<gtr\> #b0) ; 0 xor 0 = 0
+
+    (check (bitwise-xor #b1 #b1) =\<gtr\> #b0) ; 1 xor 1 = 0
+
+    (check (bitwise-xor #b101 #b111) =\<gtr\> #b010) ; 5 xor 7 = 2
+
+    (check (bitwise-xor #b1000 #b1001) =\<gtr\> #b0001) ; 8 xor 9 = 1
+
+    (check (bitwise-xor #b10010101 #b01111001) =\<gtr\> #b11101100)
 
     \;
   </scm-chunk>
