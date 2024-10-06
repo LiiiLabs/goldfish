@@ -6223,6 +6223,54 @@
     \;
   </scm-chunk>
 
+  <subsection|关联列表>
+
+  关联列表（association list）的每一个元素都是序对。
+
+  <value|r7rs><paragraph|assoc>
+
+  <value|r7rs><paragraph|assq>
+
+  <value|r7rs><paragraph|assv>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (let1 l '((a 1) (b 2) (c . 3))
+
+    \ \ (check (assq 'a l) =\<gtr\> ‘(a 1))
+
+    \ \ (check-true (eq? (assq 'a l) (l 0)))
+
+    \ \ (check (assq 'b l) =\<gtr\> ‘(b 2))
+
+    \ \ (check (assq 'c l) =\<gtr\> ‘(c . 3))
+
+    \ \ (check (assq 'd l) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (let1 l '((2 3) (5 7) (11 . 13))
+
+    \ \ (check (assv 5 l) =\<gtr\> '(5 7))
+
+    \ \ (check (assv 11 l) =\<gtr\> '(11 . 13)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|false>
+    (let1 l '(((a)) ((b)) ((c)))
+
+    \ \ (check (assoc '(a) l) =\<gtr\> '((a)))
+
+    \ \ (check (assq '(a) l) =\<gtr\> #f)
+
+    \ \ (check (assv '(a) l) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
   <subsection|循环列表>
 
   <paragraph|circular-list><index|circular-list>

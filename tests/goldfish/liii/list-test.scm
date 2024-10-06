@@ -288,6 +288,22 @@
     (lambda args #t))
   => #t)
 
+(let1 l '((a 1) (b 2) (c . 3))
+  (check (assq 'a l) => `(a 1))
+  (check-true (eq? (assq 'a l) (l 0)))
+  (check (assq 'b l) => `(b 2))
+  (check (assq 'c l) => `(c . 3))
+  (check (assq 'd l) => #f))
+
+(let1 l '((2 3) (5 7) (11 . 13))
+  (check (assv 5 l) => '(5 7))
+  (check (assv 11 l) => '(11 . 13)))
+
+(let1 l '(((a)) ((b)) ((c)))
+  (check (assoc '(a) l) => '((a)))
+  (check (assq '(a) l) => #f)
+  (check (assv '(a) l) => #f))
+
 (let1 cl (circular-list 1 2 3)
   (check (cl 3) => 1)
   (check (cl 4) => 2)
