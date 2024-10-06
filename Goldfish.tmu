@@ -7484,8 +7484,6 @@
 
     \ \ string-trim string-trim-right string-trim-both
 
-    \ \ string-prefix? string-suffix?
-
     \ \ string-index string-index-right
 
     \ \ string-contains string-count

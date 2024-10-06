@@ -26,7 +26,6 @@
   string-take string-take-right string-drop string-drop-right
   string-pad string-pad-right
   string-trim string-trim-right string-trim-both
-  string-prefix? string-suffix?
   string-index string-index-right
   string-contains string-count
   string-upcase string-downcase
