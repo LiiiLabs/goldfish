@@ -16,7 +16,7 @@
 
 (define-library (srfi srfi-151)
 (export
-  bitwise-not bitwise-and bitwise-ior
+  bitwise-not bitwise-and bitwise-ior bitwise-xor
 )
 (begin
 
@@ -25,6 +25,8 @@
 (define bitwise-and logand)
 
 (define bitwise-ior logior)
+
+(define bitwise-xor logxor)
 
 ) ; end of begin
 ) ; end of define-library

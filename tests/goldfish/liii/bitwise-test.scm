@@ -36,5 +36,14 @@
 (check (bitwise-ior #b1000 #b0100) => 12) ; 8 (1000) AND 4 (0100) = 0 (0000)
 (check (bitwise-ior #b1100 #b0001) => 13)
 
+(check (bitwise-xor 1 1) => 0)
+(check (bitwise-xor #b10 #b11) => #b01) ; 2 xor 3 = 1
+(check (bitwise-xor #b101010 #b110100) => #b011110) ; 42 xor 20 = 34
+(check (bitwise-xor #b0 #b0) => #b0) ; 0 xor 0 = 0
+(check (bitwise-xor #b1 #b1) => #b0) ; 1 xor 1 = 0
+(check (bitwise-xor #b101 #b111) => #b010) ; 5 xor 7 = 2
+(check (bitwise-xor #b1000 #b1001) => #b0001) ; 8 xor 9 = 1
+(check (bitwise-xor #b10010101 #b01111001) => #b11101100)
+
 (check-report)
 
