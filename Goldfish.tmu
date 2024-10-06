@@ -7030,7 +7030,7 @@
 
     \ \ ; from (srfi srfi-151)
 
-    \ \ bitwise-and bitwise-ior
+    \ \ bitwise-not bitwise-and bitwise-ior
 
     \ \ ; S7 built-in
 
@@ -7052,7 +7052,7 @@
 
     (export
 
-    \ \ bitwise-and bitwise-ior
+    \ \ bitwise-not bitwise-and bitwise-ior
 
     )
 
@@ -7077,11 +7077,37 @@
 
   <section|位逻辑运算>
 
-  \;
+  <paragraph|lognot><index|lognot>
+
+  <paragraph|bitwise-not><index|bitwise-not>
+
+  使用S7内置的lognot实现，不推荐使用<scm|lognot>。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define bitwise-not lognot)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bitwise-not 0) =\<gtr\> -1)
+
+    (check (bitwise-not 1) =\<gtr\> -2)
+
+    (check (bitwise-not #b1000) =\<gtr\> -9)
+
+    (check (bitwise-not -1) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|logand><index|logand>
 
   <label|srfi><paragraph|bitwise-and><index|bitwise-and>
 
-  使用S7内置的<with|font-family|tt|logand>实现。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
+  使用S7内置的<with|font-family|tt|logand>实现，不推荐使用<scm|logand>。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define bitwise-and logand)
@@ -7107,9 +7133,11 @@
 
   \;
 
+  <paragraph|logior><index|logior>
+
   <label|srfi><paragraph|bitwise-or><index|bitwise-or>
 
-  使用S7内置的<with|font-family|tt|logior>实现。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
+  使用S7内置的<with|font-family|tt|logior>实现，不推荐使用<scm|logior>。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define bitwise-ior logior)
