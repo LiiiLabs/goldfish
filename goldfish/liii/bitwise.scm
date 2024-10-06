@@ -18,13 +18,10 @@
 (import (srfi srfi-151)
         (liii error))
 (export
-  ; S7 built-in
- 
-  ; from (scheme base)
- 
   ; from (srfi srfi-151)
-  bitwise-and 
-  bitwise-or
+  bitwise-and bitwise-ior
+  ; S7 built-in
+  logand logior
 )
 (begin
 ) ; end of begin

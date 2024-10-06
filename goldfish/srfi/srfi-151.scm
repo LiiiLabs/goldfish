@@ -15,12 +15,14 @@
 ;
 
 (define-library (srfi srfi-151)
-(export bitwise-and bitwise-or)
+(export
+  bitwise-and bitwise-ior
+)
 (begin
 
 (define bitwise-and logand)
 
-(define bitwise-or logior)
+(define bitwise-ior logior)
 
 ) ; end of begin
 ) ; end of define-library
