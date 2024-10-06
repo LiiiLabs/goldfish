@@ -1,4 +1,4 @@
-# 金鱼Scheme
+# 金鱼Scheme / [Goldfish Scheme](README.md)
 > 让Scheme和Python一样易用且实用！
 
 金鱼Scheme 是一个 Scheme 解释器，具有以下特性：
@@ -18,13 +18,15 @@
 | 库 | 描述 | 示例函数 |
 | --- | --- | --- |
 | [(liii base)](goldfish/liii/base.scm) | 基础库 | `==`, `!=`, `display*` |
-| [(liii case)](goldfish/liii/case.scm) | 模式匹配 | `case*` |
-| [(liii string)](goldfish/liii/string.scm) | 字符串函数库 | `string-join` |
-| [(liii list)](goldfish/liii/list.scm) | 列表函数库 | `list-view`, `fold` |
-| [(liii stack)](goldfish/liii/stack.scm) | 栈 | `stack-pop!`, `stack-push!` |
-| [(liii hash-table)](goldfish/liii/hash-table.scm) | 哈希表 | `hash-table-empty?`, `hash-table-contains?` | 
 | [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `os-error`函数抛出`'os-error`，类似Python的OSError |
 | [(liii check)](goldfish/liii/check.scm) | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch` |
+| [(liii case)](goldfish/liii/case.scm) | 模式匹配 | `case*` |
+| [(liii list)](goldfish/liii/list.scm) | 列表函数库 | `list-view`, `fold` |
+| [(liii bitwise)](goldfish/liii/bitwise.scm) | 位运算函数库 | `bitwise-and`, `bitwise-or` |
+| [(liii string)](goldfish/liii/string.scm) | 字符串函数库 | `string-join` |
+| [(liii vector)](goldfish/liii/vector.scm) | 向量函数库 | `vector-index` |
+| [(liii stack)](goldfish/liii/stack.scm) | 栈 | `stack-pop!`, `stack-push!` |
+| [(liii hash-table)](goldfish/liii/hash-table.scm) | 哈希表 | `hash-table-empty?`, `hash-table-contains?` | 
 | [(liii sys)](goldfish/liii/sys.scm) | 库类似于 Python 的 `sys` 模块 | `argv` |
 | [(liii os)](goldfish/liii/os.scm) | 库类似于 Python 的 `os` 模块 | `getenv`, `mkdir` |
 | [(liii path)](goldfish/liii/path.scm) | 路径函数库 | `path-dir?`, `path-file?` |
@@ -53,6 +55,7 @@
 | --- | --- |
 | `(scheme base)` | 基础库 |
 | `(scheme case-lambda)` | 提供 `case-lambda` |
+| `(scheme char)` | 字符函数库 |
 | `(scheme file)` | 文件操作 |
 | `(scheme time)` | 时间库 |
 

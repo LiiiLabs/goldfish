@@ -1,4 +1,4 @@
-# Goldfish Scheme
+# Goldfish Scheme / [金鱼 Scheme](README_ZH.md)
 > Make Scheme as easy to use and practical as Python!
 
 Goldfish Scheme is a Scheme interpreter with the following features:
@@ -18,11 +18,13 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 | Library | Description | Example functions |
 |---|---|---|
 | [(liii base)](goldfish/liii/base.scm) | Basic routines | `==`, `!=`, `display*` |
-| [(liii case)](goldfish/liii/case.scm) | Pattern matching | `case*` |
 | [(liii error)](goldfish/liii/error.scm) | Python like Errors  |  `os-error` to raise `'os-error` just like OSError in Python |
-| [(liii string)](goldfish/liii/string.scm) | String Library | `string-join` |
 | [(liii check)](goldfish/liii/check.scm) | Test framework based on SRFI-78 | `check`, `check-catch` |
+| [(liii case)](goldfish/liii/case.scm) | Pattern matching | `case*` |
 | [(liii list)](goldfish/liii/list.scm) | List Library | `list-view`, `fold` |
+| [(liii bitwise)](goldfish/liii/bitwise.scm) | Bitwise Library | `bitwise-and`, `bitwise-or` |
+| [(liii string)](goldfish/liii/string.scm) | String Library | `string-join` |
+| [(liii vector)](goldfish/liii/vector.scm) | Vector Library | `vector-index` |
 | [(liii stack)](goldfish/liii/stack.scm) | Stack Library | `stack-pop!`, `stack-push!` |
 | [(liii hash-table)](goldfish/liii/hash-table.scm) | Hash Table Library | `hash-table-empty?`, `hash-table-contains?` | 
 | [(liii sys)](goldfish/liii/sys.scm) | Library looks like Python sys module | `argv` |
@@ -40,7 +42,7 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 | `(srfi srfi-9)`   | Complete | Provide `define-record-type` |
 | `(srfi srfi-13)`  | Complete | String Library | 
 | `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
-| `(srfi srfi-39)`  | Complete | Parameter objects |
+| `(srfi srfi-39)`  | Complete | Parameter Objects |
 | `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
 | `(srfi srfi-125)` | Part | Hash Table |
 | `(srfi srfi-133)` | Part | Vector |
@@ -52,6 +54,7 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 |-----|-------|
 | `(scheme base)` | Base library |
 | `(scheme case-lambda)` | Provide `case-lambda` |
+| `(scheme char)` | Character Library |
 | `(scheme file)` | File operations |
 | `(scheme time)` | Time library |
 
