@@ -613,8 +613,12 @@
 (check (vector-length #(1 2 3)) => 3)
 (check (vector-length #()) => 0)
 
-(check (vector-ref #(1 2 3) 0) => 1)
-(check (vector-ref #(1 2 3) 2) => 3)
+(let1 v #(1 2 3)
+  (check (vector-ref v 0) => 1)
+  (check (v 0) => 1)
+  
+  (check (vector-ref v 2) => 3)
+  (check (v 2) => 3))
 
 (check-catch 'out-of-range (vector-ref #(1 2 3) 3))
 (check-catch 'out-of-range (vector-ref #() 0))

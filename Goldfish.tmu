@@ -9748,7 +9748,7 @@
   <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
     (define-library (srfi srfi-133)
 
-    \;
+    (import (liii base))
 
     (export
 
@@ -9762,8 +9762,6 @@
 
     \ \ vector-swap!)
 
-    (import (scheme base))
-
     (begin
 
     \;
@@ -9772,7 +9770,9 @@
   <\scm-chunk|goldfish/liii/vector.scm|true|true>
     (define-library (liii vector)
 
-    \;
+    (import (srfi srfi-133)
+
+    \ \ \ \ \ \ \ \ (liii base))
 
     (export
 
@@ -9797,10 +9797,6 @@
     \ \ vector-index vector-index-right vector-partition
 
     \ \ vector-swap!)
-
-    (import (srfi srfi-133)
-
-    \ \ \ \ \ \ \ \ (scheme base))
 
     (begin
 
@@ -10051,6 +10047,8 @@
 
   <paragraph|vector=>
 
+  <todo|TODO>
+
   <subsection|选择器>
 
   <r7rs><paragraph|vector-length><scm|(v) =\<gtr\> integer><index|vector-length>
@@ -10065,14 +10063,22 @@
     \;
   </scm-chunk>
 
-  <r7rs><paragraph|vector-ref><scm|(vector-ref v k )><index|vector-ref>
+  <r7rs><paragraph|vector-ref><scm|((v vector?) (k integer?))><index|vector-ref>
 
   返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (vector-ref #(1 2 3) 0) =\<gtr\> 1)
+    (let1 v #(1 2 3)
 
-    (check (vector-ref #(1 2 3) 2) =\<gtr\> 3)
+    \ \ (check (vector-ref v 0) =\<gtr\> 1)
+
+    \ \ (check (v 0) =\<gtr\> 1)
+
+    \ \ 
+
+    \ \ (check (vector-ref v 2) =\<gtr\> 3)
+
+    \ \ (check (v 2) =\<gtr\> 3))
 
     \;
 
@@ -10217,6 +10223,10 @@
     \;
   </scm-chunk>
 
+  <paragraph|vector-cumulate><index|vector-cumulate>
+
+  <todo|TODO>
+
   <subsection|搜索>
 
   <paragraph|vector-any><index|vector-any>
@@ -10336,6 +10346,10 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|vector-skip><index|vector-skip>
+
+  <paragraph|vector-skip-right><index|vector-skip-right>
 
   <paragraph|vector-partition><index|vector-partition>
 
