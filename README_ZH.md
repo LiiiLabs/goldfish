@@ -43,6 +43,7 @@
 | `(srfi srfi-78)` | 部分 | 轻量级测试框架 |
 | `(srfi srfi-125)` | 部分 | 哈希表 |
 | `(srfi srfi-133)` | 部分 | 向量 |
+| `(srfi srfi-151)` | 部分 | 位运算 |
 | `(srfi srfi-216)` | 部分 | SICP |
 
 

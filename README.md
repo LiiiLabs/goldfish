@@ -44,6 +44,7 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 | `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
 | `(srfi srfi-125)` | Part | Hash Table |
 | `(srfi srfi-133)` | Part | Vector |
+| `(srfi srfi-151)` | Part | Bitwise Operations |
 | `(srfi srfi-216)` | Part | SICP |
 
 ### R7RS Standard Libraries
