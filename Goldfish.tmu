@@ -7416,6 +7416,8 @@
 
     \ \ string-contains string-count
 
+    \ \ string-upcase string-downcase
+
     \ \ string-reverse
 
     \ \ string-tokenize
@@ -7442,7 +7444,7 @@
 
     \ \ (import
 
-    \ \ \ \ (scheme base)
+    \ \ \ \ (liii base)
 
     \ \ \ \ (srfi srfi-1))
 
@@ -7463,6 +7465,8 @@
     \ \ \ \ string-index string-index-right
 
     \ \ \ \ string-contains string-count
+
+    \ \ \ \ string-upcase string-downcase
 
     \ \ \ \ string-reverse
 
@@ -9139,6 +9143,78 @@
     \;
   </scm-chunk>
 
+  <subsection|大写小写转换>
+
+  <paragraph|string-titlecase>
+
+  <value|srfi><paragraph|string-upcase><index|string-upcase>
+
+  S7内置的<scm|string-upcase>是符合R7RS标准的，这里实现的是SRFI 13定义的<scm|string-upcase>，需要额外实现<scm|start>和<scm|end>这两个可选参数。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define s7-string-upcase string-upcase)
+
+    \;
+
+    (define* (string-upcase str (start 0) (end (string-length str)))
+
+    \ \ (let* ((left (substring str 0 start))
+
+    \ \ \ \ \ \ \ \ \ (middle (substring str start end))
+
+    \ \ \ \ \ \ \ \ \ (right (substring str end)))
+
+    \ \ \ \ (string-append left (s7-string-upcase middle) right)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-upcase "abc") =\<gtr\> "ABC")
+
+    (check (string-upcase "abc" 0 1) =\<gtr\> "Abc")
+
+    \;
+
+    (check-catch 'out-of-range (string-upcase "abc" 0 4))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-downcase><index|string-downcase>
+
+  S7内置的<scm|string-downcase>是符合R7RS标准的，这里实现的是SRFI 13定义的<scm|string-downcase>，需要额外实现<scm|start>和<scm|end>这两个可选参数。
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define s7-string-downcase string-downcase)
+
+    \;
+
+    (define* (string-downcase str (start 0) (end (string-length str)))
+
+    \ \ (let* ((left (substring str 0 start))
+
+    \ \ \ \ \ \ \ \ \ (middle (substring str start end))
+
+    \ \ \ \ \ \ \ \ \ (right (substring str end)))
+
+    \ \ \ \ (string-append left (s7-string-downcase middle) right)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-downcase "ABC") =\<gtr\> "abc")
+
+    (check (string-downcase "ABC" 0 1) =\<gtr\> "aBC")
+
+    \;
+
+    (check-catch 'out-of-range (string-downcase "ABC" 0 4))
+
+    \;
+  </scm-chunk>
+
   <subsection|翻转和追加>
 
   <paragraph|string-reverse><index|string-reverse>
@@ -9231,7 +9307,7 @@
     \;
   </scm-chunk>
 
-  <subsection|Fold, unfold & map>
+  <subsection|高阶函数>
 
   <r7rs><paragraph|string-map><index|string-map>
 

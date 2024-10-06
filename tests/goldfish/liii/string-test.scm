@@ -416,6 +416,16 @@
 (check (string-count "xyz" #\x 0 3) => 1)
 (check (string-count "xyz" (lambda (x) (char=? x #\x))) => 1)
 
+(check (string-upcase "abc") => "ABC")
+(check (string-upcase "abc" 0 1) => "Abc")
+
+(check-catch 'out-of-range (string-upcase "abc" 0 4))
+
+(check (string-downcase "ABC") => "abc")
+(check (string-downcase "ABC" 0 1) => "aBC")
+
+(check-catch 'out-of-range (string-downcase "ABC" 0 4))
+
 (check (string-reverse "01234") => "43210")
 
 (check-catch 'out-of-range (string-reverse "01234" -1))
