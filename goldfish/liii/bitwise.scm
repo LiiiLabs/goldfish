@@ -20,8 +20,10 @@
 (export
   ; from (srfi srfi-151)
   bitwise-not bitwise-and bitwise-ior bitwise-xor
+  arithmetic-shift
   ; S7 built-in
   lognot logand logior logxor
+  ash
 )
 (begin
 ) ; end of begin

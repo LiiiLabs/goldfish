@@ -17,6 +17,7 @@
 (define-library (srfi srfi-151)
 (export
   bitwise-not bitwise-and bitwise-ior bitwise-xor
+  arithmetic-shift
 )
 (begin
 
@@ -27,6 +28,8 @@
 (define bitwise-ior logior)
 
 (define bitwise-xor logxor)
+
+(define arithmetic-shift ash)
 
 ) ; end of begin
 ) ; end of define-library

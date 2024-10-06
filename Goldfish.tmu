@@ -7044,9 +7044,13 @@
 
     \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor
 
+    \ \ arithmetic-shift
+
     \ \ ; S7 built-in
 
     \ \ lognot logand logior logxor
+
+    \ \ ash
 
     )
 
@@ -7065,6 +7069,8 @@
     (export
 
     \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor
+
+    \ \ arithmetic-shift
 
     )
 
@@ -7087,11 +7093,13 @@
     \;
   </scm-chunk>
 
-  <section|位逻辑运算>
+  <section|实现>
+
+  <subsection|基础运算>
 
   <paragraph|lognot><index|lognot>
 
-  <paragraph|bitwise-not><index|bitwise-not>
+  <value|srfi><paragraph|bitwise-not><index|bitwise-not>
 
   使用S7内置的lognot实现，不推荐使用<scm|lognot>。
 
@@ -7185,6 +7193,8 @@
     \;
   </scm-chunk>
 
+  <subparagraph|测试>
+
   <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
     (check (bitwise-xor 1 1) =\<gtr\> 0)
 
@@ -7204,6 +7214,46 @@
 
     \;
   </scm-chunk>
+
+  <subsection|整数运算>
+
+  <paragraph|ash><index|ash>
+
+  <value|srfi><paragraph|arithmetic-shift><index|arithmetic-shift>
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define arithmetic-shift ash)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (arithmetic-shift #b10 -1) =\<gtr\> #b1) ; 2 \<gtr\>\<gtr\> 1 = 1
+
+    (check (arithmetic-shift #b10 1) =\<gtr\> #b100) ; 2 \<less\>\<less\> 1 = 4
+
+    (check (arithmetic-shift #b1000 -2) =\<gtr\> #b10) ; 8 \<gtr\>\<gtr\> 2 = 2
+
+    (check (arithmetic-shift #b1000 2) =\<gtr\> #b100000)
+
+    (check (arithmetic-shift #b10000000000000000 -3) =\<gtr\> #b10000000000000)
+
+    (check (arithmetic-shift #b1000000000000000 3) =\<gtr\> #b1000000000000000000)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <subsection|单位运算>
+
+  <subsection|按位运算>
+
+  <subsection|按位转换>
+
+  <subsection|高阶函数>
 
   <section|结束>
 
