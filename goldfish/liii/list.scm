@@ -32,8 +32,10 @@
   ; SRFI 1: Searching
   find any every list-index
   take-while drop-while
-  ; SRFI 1: deleting
+  ; SRFI 1: Deleting
   delete
+  ; SRFI 1: Association List
+  assoc assq assv alist-cons
   ; Liii List extensions
   list-view flatmap
   list-null? list-not-null? not-null-list?
