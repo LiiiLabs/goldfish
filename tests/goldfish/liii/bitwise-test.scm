@@ -25,11 +25,11 @@
 (check (bitwise-and #b1000 #b0100) => 0) ; 8 (1000) AND 4 (0100) = 0 (0000)
 (check (bitwise-and #b1100 #b1010) => 8) 
 
-(check (bitwise-or 5 3) => 7)  ; 5 (101) OR 3 (011) = 7 (111)
-(check (bitwise-or 8 4) => 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
-(check (bitwise-or #b101 #b011) => 7)  ; 5 (101) AND 3 (011) = 1 (001)  
-(check (bitwise-or #b1000 #b0100) => 12) ; 8 (1000) AND 4 (0100) = 0 (0000)
-(check (bitwise-or #b1100 #b0001) => 13)
+(check (bitwise-ior 5 3) => 7)  ; 5 (101) OR 3 (011) = 7 (111)
+(check (bitwise-ior 8 4) => 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
+(check (bitwise-ior #b101 #b011) => 7)  ; 5 (101) AND 3 (011) = 1 (001)  
+(check (bitwise-ior #b1000 #b0100) => 12) ; 8 (1000) AND 4 (0100) = 0 (0000)
+(check (bitwise-ior #b1100 #b0001) => 13)
 
 (check-report)
 
