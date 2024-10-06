@@ -7034,7 +7034,7 @@
 
     \ \ ; S7 built-in
 
-    \ \ logand logior
+    \ \ lognot logand logior
 
     )
 

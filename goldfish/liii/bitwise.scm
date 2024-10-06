@@ -21,7 +21,7 @@
   ; from (srfi srfi-151)
   bitwise-not bitwise-and bitwise-ior
   ; S7 built-in
-  logand logior
+  lognot logand logior
 )
 (begin
 ) ; end of begin
