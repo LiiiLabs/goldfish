@@ -384,18 +384,6 @@
 (check (string-trim-both "  2 4  ") => "2 4")
 (check (string-trim-both "--2 4--" #\-) => "2 4")
 
-(check-true (string-prefix? "Ma" "MathAgape"))
-(check-true (string-prefix? "" "MathAgape"))
-(check-true (string-prefix? "MathAgape" "MathAgape"))
-
-(check-false (string-prefix? "a" "MathAgape"))
-
-(check-true (string-suffix? "e" "MathAgape"))
-(check-true (string-suffix? "" "MathAgape"))
-(check-true (string-suffix? "MathAgape" "MathAgape"))
-
-(check-false (string-suffix? "p" "MathAgape"))
-
 (check (string-index "0123456789" #\2) => 2)
 (check (string-index "0123456789" #\2 2) => 2)
 (check (string-index "0123456789" #\2 3) => #f)
@@ -486,6 +474,18 @@
 (check (string-tokenize "1 22 333") => '("1" "22" "333"))
 (check (string-tokenize "1 22 333" #\2) => '("1 " " 333"))
 (check (string-tokenize "1 22 333" #\  2) => `("22" "333"))
+
+(check-true (string-starts? "MathAgape" "Ma"))
+(check-true (string-starts? "MathAgape" ""))
+(check-true (string-starts? "MathAgape" "MathAgape"))
+
+(check-false (string-starts? "MathAgape" "a"))
+
+(check-true (string-ends? "MathAgape" "e"))
+(check-true (string-ends? "MathAgape" ""))
+(check-true (string-ends? "MathAgape" "MathAgape"))
+
+(check-false (string-ends? "MathAgape" "p"))
 
 (check (string-remove-prefix "浙江省杭州市西湖区" "浙江省") => "杭州市西湖区")
 (check (string-remove-prefix "aaa" "a") => "aa")

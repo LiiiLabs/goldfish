@@ -29,7 +29,7 @@
     filter path-dir?
     flatmap listdir2
     filter (lambda (x) (path-file? x))
-    filter (lambda (x) (not (string-suffix? "srfi-78-test.scm" x))))))
+    filter (lambda (x) (not (string-ends? x "srfi-78-test.scm"))))))
 
 (define (goldfish-cmd)
   (if (os-windows?)

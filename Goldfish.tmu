@@ -7484,8 +7484,6 @@
 
     \ \ string-trim string-trim-right string-trim-both
 
-    \ \ string-prefix? string-suffix?
-
     \ \ string-index string-index-right
 
     \ \ string-contains string-count
@@ -7497,6 +7495,8 @@
     \ \ string-tokenize
 
     \ \ ; Liii extras
+
+    \ \ string-starts? string-ends?
 
     \ \ string-remove-prefix string-remove-suffix
 
@@ -9001,20 +9001,6 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check-true (string-prefix? "Ma" "MathAgape"))
-
-    (check-true (string-prefix? "" "MathAgape"))
-
-    (check-true (string-prefix? "MathAgape" "MathAgape"))
-
-    \;
-
-    (check-false (string-prefix? "a" "MathAgape"))
-
-    \;
-  </scm-chunk>
-
   <paragraph|string-suffix?><index|string-suffix?>
 
   <scm|string-suffix?>是一个谓词函数，用于检查一个字符串是否是另一个字符串的后缀。若第一个字符串是第二个字符串的后缀，则函数返回<scm|#t>；否则返回<scm|#f>。特别地，空字符串是任意字符串的后缀；两个内容相同的字符串互为后缀。
@@ -9039,20 +9025,6 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-ref str j))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) (+ j 1))))))))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check-true (string-suffix? "e" "MathAgape"))
-
-    (check-true (string-suffix? "" "MathAgape"))
-
-    (check-true (string-suffix? "MathAgape" "MathAgape"))
-
-    \;
-
-    (check-false (string-suffix? "p" "MathAgape"))
 
     \;
   </scm-chunk>
@@ -9556,6 +9528,60 @@
   </scm-chunk>
 
   <section|三鲤扩展函数>
+
+  <paragraph|string-starts?><index|string-starts?>
+
+  SRFI 13定义的<scm|string-prefix?>的顺序容易弄错，故而定义<scm|string-starts?>将字符串放在前面，前缀放在后面。
+
+  <\scm-chunk|goldfish/liii/string.scm|true|true>
+    (define (string-starts? str prefix)
+
+    \ \ (string-prefix? prefix str))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-true (string-starts? "MathAgape" "Ma"))
+
+    (check-true (string-starts? "MathAgape" ""))
+
+    (check-true (string-starts? "MathAgape" "MathAgape"))
+
+    \;
+
+    (check-false (string-starts? "MathAgape" "a"))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-ends?><index|string-ends?>
+
+  SRFI 13定义的<scm|string-suffix?>的顺序容易弄错，故而定义<scm|string-end?>将字符串放在前面，前缀放在后面。
+
+  <\scm-chunk|goldfish/liii/string.scm|true|true>
+    (define (string-ends? str suffix)
+
+    \ \ (string-suffix? suffix str))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-true (string-ends? "MathAgape" "e"))
+
+    (check-true (string-ends? "MathAgape" ""))
+
+    (check-true (string-ends? "MathAgape" "MathAgape"))
+
+    \;
+
+    (check-false (string-ends? "MathAgape" "p"))
+
+    \;
+  </scm-chunk>
 
   <paragraph|string-remove-prefix><index|string-remove-prefix>
 
