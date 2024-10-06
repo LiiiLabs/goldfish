@@ -16,7 +16,7 @@
 
 (define-library (srfi srfi-13)
   (import
-    (scheme base)
+    (liii base)
     (srfi srfi-1))
   (export
     string-null? string-copy string-join
@@ -27,6 +27,7 @@
     string-prefix? string-suffix? 
     string-index string-index-right
     string-contains string-count
+    string-upcase string-downcase
     string-reverse
     string-tokenize)
 (begin
@@ -279,6 +280,22 @@
   (let ((str-sub (%string-from-range str start+end))
         (criterion (%make-criterion char/pred?)))
     (count criterion (string->list str-sub))))
+
+(define s7-string-upcase string-upcase)
+
+(define* (string-upcase str (start 0) (end (string-length str)))
+  (let* ((left (substring str 0 start))
+         (middle (substring str start end))
+         (right (substring str end)))
+    (string-append left (s7-string-upcase middle) right)))
+
+(define s7-string-downcase string-downcase)
+
+(define* (string-downcase str (start 0) (end (string-length str)))
+  (let* ((left (substring str 0 start))
+         (middle (substring str start end))
+         (right (substring str end)))
+    (string-append left (s7-string-downcase middle) right)))
 
 (define (string-reverse str . start+end)
   (cond ((null-list? start+end)

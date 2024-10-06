@@ -29,6 +29,7 @@
   string-prefix? string-suffix?
   string-index string-index-right
   string-contains string-count
+  string-upcase string-downcase
   string-reverse
   string-tokenize
   ; Liii extras
