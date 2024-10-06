@@ -9561,7 +9561,9 @@
 
   <paragraph|string-starts?><index|string-starts?>
 
-  <\scm-chunk|goldfish/liii/string.scm|true|false>
+  SRFI 13定义的<scm|string-prefix?>的顺序容易弄错，故而定义<scm|string-starts?>将字符串放在前面，前缀放在后面。
+
+  <\scm-chunk|goldfish/liii/string.scm|true|true>
     (define (string-starts? str prefix)
 
     \ \ (string-prefix? prefix str))
@@ -9569,7 +9571,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check-true (string-starts? "MathAgape" "Math"))
 
     \;
@@ -9577,7 +9579,9 @@
 
   <paragraph|string-ends?><index|string-ends?>
 
-  <\scm-chunk|goldfish/liii/string.scm|true|false>
+  SRFI 13定义的<scm|string-suffix?>的顺序容易弄错，故而定义<scm|string-end?>将字符串放在前面，前缀放在后面。
+
+  <\scm-chunk|goldfish/liii/string.scm|true|true>
     (define (string-ends? str suffix)
 
     \ \ (string-suffix? suffix str))
@@ -9585,7 +9589,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check-true (string-ends? "MathAgape" "Agape"))
 
     \;
