@@ -25,6 +25,8 @@
   take drop take-right drop-right count fold fold-right
   reduce reduce-right append-map filter partition remove find
   delete delete-duplicates
+  ; SRFI 1: Association List
+  assoc assq assv alist-cons
   take-while drop-while list-index any every
   last-pair last)
 (begin
@@ -253,6 +255,9 @@
             (if (eq? tail new-tail)
                 lis
                 (cons x new-tail)))))))
+
+(define (alist-cons key value alist)
+  (cons (cons key value) alist))
 
 (define (circular-list val1 . vals)
   (let ((ans (cons val1 vals)))

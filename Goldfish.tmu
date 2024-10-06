@@ -4274,9 +4274,13 @@
 
     \ \ take-while drop-while
 
-    \ \ ; SRFI 1: deleting
+    \ \ ; SRFI 1: Deleting
 
     \ \ delete
+
+    \ \ ; SRFI 1: Association List
+
+    \ \ assoc assq assv alist-cons
 
     \ \ ; Liii List extensions
 
@@ -4325,6 +4329,10 @@
     \ \ reduce reduce-right append-map filter partition remove find
 
     \ \ delete delete-duplicates
+
+    \ \ ; SRFI 1: Association List
+
+    \ \ assoc assq assv alist-cons
 
     \ \ take-while drop-while list-index any every
 
@@ -6227,11 +6235,11 @@
 
   关联列表（association list）的每一个元素都是序对。
 
-  <value|r7rs><paragraph|assoc>
+  <value|r7rs><paragraph|assoc><index|assoc>
 
-  <value|r7rs><paragraph|assq>
+  <value|r7rs><paragraph|assq><index|assq>
 
-  <value|r7rs><paragraph|assv>
+  <value|r7rs><paragraph|assv><index|assv>
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (let1 l '((a 1) (b 2) (c . 3))
@@ -6259,7 +6267,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (let1 l '(((a)) ((b)) ((c)))
 
     \ \ (check (assoc '(a) l) =\<gtr\> '((a)))
@@ -6267,6 +6275,24 @@
     \ \ (check (assq '(a) l) =\<gtr\> #f)
 
     \ \ (check (assv '(a) l) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|alist-cons><index|alist-cons>
+
+  <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
+    (define (alist-cons key value alist)
+
+    \ \ (cons (cons key value) alist))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (alist-cons 'a 1 '()) =\<gtr\> '((a . 1)))
+
+    (check (alist-cons 'a 1 '((b . 2))) =\<gtr\> '((a . 1) (b . 2)))
 
     \;
   </scm-chunk>

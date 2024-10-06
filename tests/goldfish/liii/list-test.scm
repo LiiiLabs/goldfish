@@ -304,6 +304,9 @@
   (check (assq '(a) l) => #f)
   (check (assv '(a) l) => #f))
 
+(check (alist-cons 'a 1 '()) => '((a . 1)))
+(check (alist-cons 'a 1 '((b . 2))) => '((a . 1) (b . 2)))
+
 (let1 cl (circular-list 1 2 3)
   (check (cl 3) => 1)
   (check (cl 4) => 2)
