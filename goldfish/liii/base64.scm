@@ -15,7 +15,8 @@
 ;
 
 (define-library (liii base64)
-(import (liii base))
+(import (liii base)
+        (liii bitwise))
 (export
   string-base64-encode bytevector-base64-encode base64-encode
   string-base64-decode bytevector-base64-decode base64-decode
@@ -33,11 +34,11 @@
       (let* ((p1 b1)
              (p2 (if b2 b2 0))
              (p3 (if b3 b3 0))
-             (combined (logior (ash p1 16) (ash p2 8) p3))
-             (c1 (logand (ash combined -18) #x3F))
-             (c2 (logand (ash combined -12) #x3F))
-             (c3 (logand (ash combined -6) #x3F))
-             (c4 (logand combined #x3F)))
+             (combined (bitwise-ior (ash p1 16) (ash p2 8) p3))
+             (c1 (bitwise-and (ash combined -18) #x3F))
+             (c2 (bitwise-and (ash combined -12) #x3F))
+             (c3 (bitwise-and (ash combined -6) #x3F))
+             (c4 (bitwise-and combined #x3F)))
         (values
           (BYTE2BASE64_BV c1)
           (BYTE2BASE64_BV c2)
@@ -92,9 +93,9 @@
               (and (negative? b4) (!= c4 BASE64_PAD_BYTE)))
           (value-error "Invalid base64 input")
           (values
-            (logior (ash b1 2) (ash b2 -4))
-            (logand (logior (ash b2 4) (ash b3 -2)) #xFF)
-            (logand (logior (ash b3 6) b4) #xFF)
+            (bitwise-ior (ash b1 2) (ash b2 -4))
+            (bitwise-and (bitwise-ior (ash b2 4) (ash b3 -2)) #xFF)
+            (bitwise-and (bitwise-ior (ash b3 6) b4) #xFF)
             (if (negative? b3) 1 (if (negative? b4) 2 3))))))
   
   (let* ((input-N (bytevector-length bv))

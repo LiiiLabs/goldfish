@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.4|1.2.9.3-rc1>>
+<TMU|<tuple|1.0.4|1.2.9.3-rc2>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -13966,7 +13966,9 @@
   <\scm-chunk|goldfish/liii/base64.scm|true|true>
     (define-library (liii base64)
 
-    (import (liii base))
+    (import (liii base)
+
+    \ \ \ \ \ \ \ \ (liii bitwise))
 
     (export
 
@@ -14046,15 +14048,15 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (p3 (if b3 b3 0))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (combined (logior (ash p1 16) (ash p2 8) p3))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (combined (bitwise-ior (ash p1 16) (ash p2 8) p3))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (c1 (logand (ash combined -18) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c1 (bitwise-and (ash combined -18) #x3F))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (logand (ash combined -12) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c2 (bitwise-and (ash combined -12) #x3F))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (logand (ash combined -6) #x3F))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c3 (bitwise-and (ash combined -6) #x3F))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (logand combined #x3F)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (c4 (bitwise-and combined #x3F)))
 
     \ \ \ \ \ \ \ \ (values
 
@@ -14204,11 +14206,11 @@
 
     \ \ \ \ \ \ \ \ \ \ (values
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (logior (ash b1 2) (ash b2 -4))
+    \ \ \ \ \ \ \ \ \ \ \ \ (bitwise-ior (ash b1 2) (ash b2 -4))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (logand (logior (ash b2 4) (ash b3 -2)) #xFF)
+    \ \ \ \ \ \ \ \ \ \ \ \ (bitwise-and (bitwise-ior (ash b2 4) (ash b3 -2)) #xFF)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (logand (logior (ash b3 6) b4) #xFF)
+    \ \ \ \ \ \ \ \ \ \ \ \ (bitwise-and (bitwise-ior (ash b3 6) b4) #xFF)
 
     \ \ \ \ \ \ \ \ \ \ \ \ (if (negative? b3) 1 (if (negative? b4) 2 3))))))
 
