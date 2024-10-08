@@ -62,9 +62,7 @@
 
 (define (os-temp-dir)
   (let1 temp-dir (g_os-temp-dir)
-    (if (os-windows?)
-      (string-remove-suffix temp-dir "\\")
-      (string-remove-suffix temp-dir "/"))))
+    (string-remove-suffix temp-dir (string (os-sep)))))
 
 (define (access path mode)
   (cond ((eq? mode 'F_OK) (g_access path 0))
