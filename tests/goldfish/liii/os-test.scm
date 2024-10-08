@@ -38,7 +38,7 @@
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
 (when (os-windows?)
-  (check (string-prefix? "C:" (os-temp-dir)) => #t))
+  (check (string-starts? (os-temp-dir) "C:") => #t))
 
 (when (os-linux?)
   (check (os-temp-dir) => "/tmp"))

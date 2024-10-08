@@ -14434,7 +14434,7 @@
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (os-windows?)
 
-    \ \ (check (string-prefix? "C:" (os-temp-dir)) =\<gtr\> #t))
+    \ \ (check (string-starts? (os-temp-dir) "C:") =\<gtr\> #t))
 
     \;
 
