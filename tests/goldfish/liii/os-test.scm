@@ -15,8 +15,9 @@
 ;
 
 (import (liii check)
-        (srfi srfi-13)
+        (liii string)
         (liii os)
+        (liii uuid)
         (scheme time))
 
 (check-set-mode! 'report-failed)

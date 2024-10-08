@@ -14372,9 +14372,11 @@
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (import (liii check)
 
-    \ \ \ \ \ \ \ \ (srfi srfi-13)
+    \ \ \ \ \ \ \ \ (liii string)
 
     \ \ \ \ \ \ \ \ (liii os)
+
+    \ \ \ \ \ \ \ \ (liii uuid)
 
     \ \ \ \ \ \ \ \ (scheme time))
 
