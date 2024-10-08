@@ -21,7 +21,6 @@
 
 (check-set-mode! 'report-failed)
 
-
 (when (os-linux?)
   (check (os-type) => "Linux"))
 
@@ -53,10 +52,25 @@
              (mkdir "/tmp/test_124")))
     => #t))
 
-(check (string-null? (getcwd)) => #f)
+(check-false (string-null? (getcwd)))
 
 (when (not (os-windows?))
   (check (> (vector-length (listdir "/usr")) 0) => #t))
+
+(let* ((test-dir (string-append (os-temp-dir) "/test"))
+       (test-dir2 (string-append test-dir "/")))
+  (mkdir test-dir)
+  (mkdir (string-append test-dir "/a"))
+  (mkdir (string-append test-dir "/b"))
+  (mkdir (string-append test-dir "/c"))
+  (let1 r (listdir test-dir)
+    (check-true (in? "a" r))
+    (check-true (in? "b" r))
+    (check-true (in? "c" r)))
+  (let1 r2 (listdir test-dir2)
+    (check-true (in? "a" r2))
+    (check-true (in? "b" r2))
+    (check-true (in? "c" r2))))
 
 (when (os-windows?)
   (check (> (vector-length (listdir "C:")) 0) => #t))
@@ -66,3 +80,4 @@
 (check (getenv "PATH") => #f)
 
 (check-report)
+
