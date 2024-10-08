@@ -14484,17 +14484,23 @@
 
     \;
 
-    (let* ((test-dir (string-append (os-temp-dir) "/test"))
+    (let* ((test-dir (string-append (os-temp-dir) "/" (uuid4)))
 
-    \ \ \ \ \ \ \ (test-dir2 (string-append test-dir "/")))
+    \ \ \ \ \ \ \ (test-dir2 (string-append test-dir "/"))
+
+    \ \ \ \ \ \ \ (dir-a (string-append test-dir2 "a"))
+
+    \ \ \ \ \ \ \ (dir-b (string-append test-dir2 "b"))
+
+    \ \ \ \ \ \ \ (dir-c (string-append test-dir2 "c")))
 
     \ \ (mkdir test-dir)
 
-    \ \ (mkdir (string-append test-dir "/a"))
+    \ \ (mkdir dir-a)
 
-    \ \ (mkdir (string-append test-dir "/b"))
+    \ \ (mkdir dir-b)
 
-    \ \ (mkdir (string-append test-dir "/c"))
+    \ \ (mkdir dir-c)
 
     \ \ (let1 r (listdir test-dir)
 
@@ -14510,7 +14516,15 @@
 
     \ \ \ \ (check-true (in? "b" r2))
 
-    \ \ \ \ (check-true (in? "c" r2))))
+    \ \ \ \ (check-true (in? "c" r2)))
+
+    \ \ (rmdir dir-a)
+
+    \ \ (rmdir dir-b)
+
+    \ \ (rmdir dir-c)
+
+    \ \ (rmdir test-dir))
 
     \;
 
