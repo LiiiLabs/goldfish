@@ -311,7 +311,7 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
   int path_slash_N= path_N;
   char last_ch= path_s[path_N-1];
 #if defined(TB_CONFIG_OS_WINDOWS)
-  if (last_ch != '/' || last_ch != '\\') {
+  if (last_ch != '/' && last_ch != '\\') {
     path_slash_N= path_slash_N + 1;
   }
 #else
