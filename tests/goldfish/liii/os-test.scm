@@ -15,12 +15,12 @@
 ;
 
 (import (liii check)
-        (srfi srfi-13)
+        (liii string)
         (liii os)
+        (liii uuid)
         (scheme time))
 
 (check-set-mode! 'report-failed)
-
 
 (when (os-linux?)
   (check (os-type) => "Linux"))
@@ -38,7 +38,7 @@
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
 (when (os-windows?)
-  (check (string-prefix? "C:" (os-temp-dir)) => #t))
+  (check (string-starts? (os-temp-dir) "C:") => #t))
 
 (when (os-linux?)
   (check (os-temp-dir) => "/tmp"))
@@ -53,10 +53,32 @@
              (mkdir "/tmp/test_124")))
     => #t))
 
-(check (string-null? (getcwd)) => #f)
+(check-false (string-null? (getcwd)))
 
 (when (not (os-windows?))
   (check (> (vector-length (listdir "/usr")) 0) => #t))
+
+(let* ((test-dir (string-append (os-temp-dir) (string (os-sep)) (uuid4)))
+       (test-dir2 (string-append test-dir (string (os-sep))))
+       (dir-a (string-append test-dir2 "a"))
+       (dir-b (string-append test-dir2 "b"))
+       (dir-c (string-append test-dir2 "c")))
+  (mkdir test-dir)
+  (mkdir dir-a)
+  (mkdir dir-b)
+  (mkdir dir-c)
+  (let1 r (listdir test-dir)
+    (check-true (in? "a" r))
+    (check-true (in? "b" r))
+    (check-true (in? "c" r)))
+  (let1 r2 (listdir test-dir2)
+    (check-true (in? "a" r2))
+    (check-true (in? "b" r2))
+    (check-true (in? "c" r2)))
+  (rmdir dir-a)
+  (rmdir dir-b)
+  (rmdir dir-c)
+  (rmdir test-dir))
 
 (when (os-windows?)
   (check (> (vector-length (listdir "C:")) 0) => #t))
@@ -66,3 +88,4 @@
 (check (getenv "PATH") => #f)
 
 (check-report)
+

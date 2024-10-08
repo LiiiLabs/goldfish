@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.4|1.2.9.3-rc2>>
+<TMU|<tuple|1.0.4|1.2.9.3>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -14322,6 +14322,236 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/base64-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <chapter|(liii os)>
+
+  <section|协议>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii string)
+
+    \ \ \ \ \ \ \ \ (liii os)
+
+    \ \ \ \ \ \ \ \ (liii uuid)
+
+    \ \ \ \ \ \ \ \ (scheme time))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <paragraph|os-linux?><goldfish-lang|() =\<gtr\> boolean>
+
+  <paragraph|os-macos?><goldfish-lang|() =\<gtr\> boolean>
+
+  <paragraph|os-windows?><goldfish-lang|() =\<gtr\> boolean>
+
+  <paragraph|os-type><goldfish-lang|() =\<gtr\> boolean>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (os-linux?)
+
+    \ \ (check (os-type) =\<gtr\> "Linux"))
+
+    \;
+
+    (when (os-macos?)
+
+    \ \ (check (os-type) =\<gtr\> "Darwin"))
+
+    \;
+
+    (when (os-windows?)
+
+    \ \ (check (os-type) =\<gtr\> "Windows"))
+
+    \;
+
+    (when (not (os-windows?))
+
+    \ \ (let ((t1 (current-second)))
+
+    \ \ \ \ (os-call "sleep 1")
+
+    \ \ \ \ (let ((t2 (current-second)))
+
+    \ \ \ \ \ \ (check (\<gtr\>= (ceiling (- t2 t1)) 1) =\<gtr\> #t))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|os-temp-dir>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (os-windows?)
+
+    \ \ (check (string-starts? (os-temp-dir) "C:") =\<gtr\> #t))
+
+    \;
+
+    (when (os-linux?)
+
+    \ \ (check (os-temp-dir) =\<gtr\> "/tmp"))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|mkdir>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (not (os-windows?))
+
+    \ \ (check-catch 'file-exists-error
+
+    \ \ \ \ (mkdir "/tmp"))
+
+    \ \ (check (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ (let ((test_dir "/tmp/test_124"))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (when (file-exists? test_dir)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rmdir "/tmp/test_124"))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (mkdir "/tmp/test_124")))
+
+    \ \ \ \ =\<gtr\> #t))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|getcwd>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (check-false (string-null? (getcwd)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|listdir>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (not (os-windows?))
+
+    \ \ (check (\<gtr\> (vector-length (listdir "/usr")) 0) =\<gtr\> #t))
+
+    \;
+
+    (let* ((test-dir (string-append (os-temp-dir) (string (os-sep)) (uuid4)))
+
+    \ \ \ \ \ \ \ (test-dir2 (string-append test-dir (string (os-sep))))
+
+    \ \ \ \ \ \ \ (dir-a (string-append test-dir2 "a"))
+
+    \ \ \ \ \ \ \ (dir-b (string-append test-dir2 "b"))
+
+    \ \ \ \ \ \ \ (dir-c (string-append test-dir2 "c")))
+
+    \ \ (mkdir test-dir)
+
+    \ \ (mkdir dir-a)
+
+    \ \ (mkdir dir-b)
+
+    \ \ (mkdir dir-c)
+
+    \ \ (let1 r (listdir test-dir)
+
+    \ \ \ \ (check-true (in? "a" r))
+
+    \ \ \ \ (check-true (in? "b" r))
+
+    \ \ \ \ (check-true (in? "c" r)))
+
+    \ \ (let1 r2 (listdir test-dir2)
+
+    \ \ \ \ (check-true (in? "a" r2))
+
+    \ \ \ \ (check-true (in? "b" r2))
+
+    \ \ \ \ (check-true (in? "c" r2)))
+
+    \ \ (rmdir dir-a)
+
+    \ \ (rmdir dir-b)
+
+    \ \ (rmdir dir-c)
+
+    \ \ (rmdir test-dir))
+
+    \;
+
+    (when (os-windows?)
+
+    \ \ (check (\<gtr\> (vector-length (listdir "C:")) 0) =\<gtr\> #t))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|getenv>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (check (string-null? (getenv "PATH")) =\<gtr\> #f)
+
+    (unsetenv "PATH")
+
+    (check (getenv "PATH") =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|false>
     (check-report)
 
     \;
