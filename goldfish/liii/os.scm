@@ -17,6 +17,7 @@
 (define-library (liii os)
 (export
   os-arch os-type os-windows? os-linux? os-macos? os-temp-dir
+  os-sep os-path-sep
   os-call system
   mkdir chdir rmdir getenv unsetenv getcwd listdir access getlogin getpid)
 (import (scheme process-context)
@@ -48,6 +49,16 @@
 (define (os-macos?)
   (let ((name (os-type)))
     (and name (string=? name "Darwin"))))
+
+(define (os-sep)
+  (if (os-windows?)
+    #\\
+    #\/))
+
+(define (os-path-sep)
+  (if (os-windows?)
+    #\;
+    #\:))
 
 (define (os-temp-dir)
   (let1 temp-dir (g_os-temp-dir)
