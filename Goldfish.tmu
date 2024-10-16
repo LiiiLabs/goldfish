@@ -14037,11 +14037,11 @@
 
   假设输入为"Man"，其ASCII值为<math|77,97,110>，其二进制表示为：
 
-  <equation*|77=01001101,<with|mode|text|<nbsp>>97=01100001,<with|mode|text|<nbsp>>110=01101110>
+  <equation*|77=01001101,97=01100001,110=01101110>
 
   将24位二进制分为4组，每组6位：
 
-  <equation*|010011,<with|mode|text|<nbsp>>010110,<with|mode|text|<nbsp>>000101,<with|mode|text|<nbsp>>101110>
+  <equation*|010011,010110,000101,<with|mode|text|>101110>
 
   转换为Base64字符，分别对应<code*|T>, <code*|W>, <code*|F>, <code*|u>。因此，"Man"的Base64编码为<code*|TWFu>。
 
