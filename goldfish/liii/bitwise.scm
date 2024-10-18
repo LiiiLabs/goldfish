@@ -19,7 +19,7 @@
         (liii error))
 (export
   ; from (srfi srfi-151)
-  bitwise-not bitwise-and bitwise-ior bitwise-xor
+  bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand
   arithmetic-shift
   ; S7 built-in
   lognot logand logior logxor
