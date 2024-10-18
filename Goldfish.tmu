@@ -14063,6 +14063,60 @@
     \;
   </scm-chunk>
 
+  <section|Base64编解码介绍>
+
+  Base64编码是一种将任意字节序列编码为可打印字符的方式，其编码和解码的过程如下：
+
+  <paragraph*|编码的长度计算：>
+
+  Base64的编码长度与输入数据的长度相关，长度计算公式为：
+
+  <equation*|<with|mode|text|length(output)>=<around*|\<lceil\>|<frac|<with|mode|text|length(input)>|3>|\<rceil\>>\<times\>4>
+
+  其中，输入的每3个字节被转换为4个Base64字符。如果输入的字节数不是3的倍数，会在编码后用<code*|=>符号填充，保证输出长度始终是4的倍数。
+
+  <paragraph*|输入数据的分组与填充：>
+
+  <\big-table|<scm|<tabular|<tformat|<table|<row|<cell|b1>|<cell|b2>|<cell|b3>>|<row|<cell|0-255>|<cell|0-255>|<cell|0-255>>|<row|<cell|0-255>|<cell|0-255>|<cell|#f>>|<row|<cell|0-255>|<cell|#f>|<cell|#f>>>>>>>
+    最后一组不足的元素需要设置为<scm|#f>
+  </big-table>
+
+  输入的字节流被分为每组3个字节进行编码。对于不足3个字节的最后一组，根据不同情况补充<code*|#f>（表示填充字节）。表格16.1展示了3种情况：
+
+  <\itemize>
+    <item>如果有3个字节，则正常处理。
+
+    <item>如果有2个字节，则第三个字节补充为<code*|#f>。
+
+    <item>如果只有1个字节，则后两个字节补充为<code*|#f>。
+  </itemize>
+
+  <paragraph*|映射规则：>
+
+  每组3个字节 <math|<around*|[|b<rsub|1>,b<rsub|2>,b<rsub|3>|]>> 将映射为4个Base64字符 <math|<around*|[|c<rsub|1>,c<rsub|2>,c<rsub|3>,c<rsub|4>|]>>，其中，Base64字符的取值范围是字母、数字、<code*|+>、<code*|/>，以及可能的填充符号<code*|=>。映射的具体规则如下：
+
+  <\itemize>
+    <item>将3个字节（24位）按6位一组，分成4个部分，每个部分对应一个Base64字符。
+
+    <item>如果不足3个字节（即有填充的情况），则最后一个或两个Base64字符会用<code*|=>替代。
+  </itemize>
+
+  <paragraph*|例子：>
+
+  假设输入为"Man"，其ASCII值为<math|77,97,110>，其二进制表示为：
+
+  <equation*|77=01001101,97=01100001,110=01101110>
+
+  将24位二进制分为4组，每组6位：
+
+  <equation*|010011,010110,000101,<with|mode|text|>101110>
+
+  转换为Base64字符，分别对应<code*|T>, <code*|W>, <code*|F>, <code*|u>。因此，"Man"的Base64编码为<code*|TWFu>。
+
+  解码时，过程反过来：将Base64字符转换为6位二进制，再拼接回原始的字节序列。
+
+  Base64编码的特点是保持输入的可读性并使其适合传输，但相较于原始数据，会增加大约33%的大小。
+
   <section|实现>
 
   <paragraph|bytevector-base64-encode><index|bytevector-base64-encode>
@@ -14070,26 +14124,6 @@
   <paragraph|string-base64-encode><index|string-base64-encode>
 
   <paragraph|base64-encode><index|base64-encode>
-
-  <\enumerate>
-    <item>计算base64编码的长度
-
-    <\equation*>
-      length<around*|(|output|)>=<around*|\<lceil\>|length<around*|(|input|)>/3|\<rceil\>>\<times\>4
-    </equation*>
-
-    <item>将输入的字节向量分组，每组三个元素，最后一组存在三种情况：
-
-    <\big-table|<scm|<tabular|<tformat|<table|<row|<cell|b1>|<cell|b2>|<cell|b3>>|<row|<cell|0-255>|<cell|0-255>|<cell|0-255>>|<row|<cell|0-255>|<cell|0-255>|<cell|#f>>|<row|<cell|0-255>|<cell|#f>|<cell|#f>>>>>>>
-      最后一组不足的元素需要设置为<scm|#f>
-    </big-table>
-
-    <item>对每一组的<math|<around*|[|b<rsub|1>,b<rsub|2>,b<rsub|3>|]>>映射为<math|<around*|[|c<rsub|1>,c<rsub|2>,c<rsub|3>,c<rsub|4>|]>>，其中<math|c<rsub|n>>必须是字母、数字、<scm|+>、<scm|/>或者<scm|=>。
-
-    <todo|描述一下base64的映射规则>
-
-    \;
-  </enumerate>
 
   <\scm-chunk|goldfish/liii/base64.scm|true|true>
     (define-constant BYTE2BASE64_BV
