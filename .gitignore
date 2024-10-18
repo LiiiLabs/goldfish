@@ -1,3 +1,8 @@
+# Ignore .DS_Store (common on macOS)
+.DS_Store
+
+# Ignore the .gitignore file itself
+/.gitignore
 .xmake/
 build/
 bin/goldfish
@@ -6,5 +11,3 @@ goldfish/**/*-test.scm
 compile_commands.json
 .cache/
 *~
-.DS_Store
-

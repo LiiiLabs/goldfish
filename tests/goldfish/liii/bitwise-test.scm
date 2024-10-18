@@ -45,6 +45,18 @@
 (check (bitwise-xor #b1000 #b1001) => #b0001) ; 8 xor 9 = 1
 (check (bitwise-xor #b10010101 #b01111001) => #b11101100)
 
+(check (bitwise-nor 2 4) => -7)  
+(check (bitwise-nor 3 1) => -4)  
+(check (bitwise-nor #b111 #b011) => -8)  
+(check (bitwise-nor #b1101 #b1011) => -16) 
+(check (bitwise-nor #b1100 #b0000) => -13) 
+
+(check (bitwise-nand 1 1) => -2)  
+(check (bitwise-nand 3 1) => -2)  
+(check (bitwise-nand #b110 #b001) => -1)    
+(check (bitwise-nand #b1001 #b0111) => -2) 
+(check (bitwise-nand #b1011 #b0101) => -2) 
+
 (check (arithmetic-shift #b10 -1) => #b1) ; 2 >> 1 = 1
 (check (arithmetic-shift #b10 1) => #b100) ; 2 << 1 = 4
 (check (arithmetic-shift #b1000 -2) => #b10) ; 8 >> 2 = 2
