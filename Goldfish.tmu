@@ -14056,10 +14056,10 @@
   <paragraph*|输入数据的分组与填充：>
 
   <\big-table|<scm|<tabular|<tformat|<table|<row|<cell|b1>|<cell|b2>|<cell|b3>>|<row|<cell|0-255>|<cell|0-255>|<cell|0-255>>|<row|<cell|0-255>|<cell|0-255>|<cell|#f>>|<row|<cell|0-255>|<cell|#f>|<cell|#f>>>>>>>
-    最后一组不足的元素需要设置为<scm|#f>
+    最后一组不足的元素需要设置为<scm|#f><label|table:16.1>
   </big-table>
 
-  输入的字节流被分为每组3个字节进行编码。对于不足3个字节的最后一组，根据不同情况补充<code*|#f>（表示填充字节）。表格16.1展示了3种情况：
+  输入的字节流被分为每组3个字节进行编码。对于不足3个字节的最后一组，根据不同情况补充<code*|#f>（表示填充字节）。<smart-ref|table:16.1>展示了3种情况：
 
   <\itemize>
     <item>如果有3个字节，则正常处理。
