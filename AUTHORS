@@ -1,10 +1,11 @@
 # The original authors of the SRFI reference IMPL are kept in indivisual files
-# This AUTHORS file is for Goldfish Scheme authors.
+# This AUTHORS file is for The Goldfish Scheme Authors.
 #
 # Names should be added to this file like so:
 # Name or Organization <email address>
 
-Liii Network Inc.
+浙江三鲤网络科技有限公司 <*@liii.pro>
 
 沈达 <da@liii.pro>
 刘念 <nian@liii.pro>
+

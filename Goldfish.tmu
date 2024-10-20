@@ -21,13 +21,47 @@
     <assign|goldfish-version|17.10.6>
   </hide-preamble>
 
-  文档许可证暂时没有确定！
-
-  \;
-
   金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。目前专注于Scheme语言的标准库。本文档是金鱼Scheme V<value|goldfish-version>的文学编程实现，目前金鱼Scheme中几乎所有的Scheme代码实现和测试都包含在本文档中。
 
-  本文档的用户是人类和大模型服务。基于本文档，用户可以获得金鱼Scheme的实现方法，也可以改进金鱼Scheme的既有实现。本文档的内容越翔实，用户使用金鱼Scheme的体验越好。<chapter|boot.scm>
+  本文档的用户是人类和大模型服务。基于本文档，用户可以获得金鱼Scheme的实现方法，也可以改进金鱼Scheme的既有实现。本文档的内容越翔实，用户使用金鱼Scheme的体验越好。
+
+  <chapter|许可证>
+
+  本文档采用文学编程方式编写，金鱼Scheme相关的所有代码几乎都包含在本文档中。本文档的许可证分为代码和文档两部分，其中代码部分采用Apache许可证，相关信息在每一个源代码文件的头部都会显式声明，未显式声明的源代码默认采用Apache许可证；其中文档部分采用<with|font-series|bold|知识共享署名-相同方式共享4.0国际许可协议>授权。您可以自由地分享、修改本作品，只要您遵循以下条件：
+
+  <\description>
+    <item*|署名>您必须给出适当的署名，提供作品的链接，并指明是否有任何变更。您可以以任何合理的方式做这些事，但不得以任何方式暗示许可人赞同您或您的使用。
+
+    <item*|相同方式共享>如果您再混合、转换或基于本作品创作，您必须以相同的许可协议发布其成果。
+  </description>
+
+  金鱼Scheme是浙江三鲤网络科技有限公司发起的开源项目，我们在分发源代码时，版权信息统一采用The Goldfish Scheme Authors作为金鱼Scheme的作者。那么谁是The Goldfish Scheme Authors呢？这些信息我们会在金鱼Scheme的仓库的根目录下的<shell|AUTHORS>文件中维护：
+
+  <\verbatim-chunk|AUTHORS|false|false>
+    # The original authors of the SRFI reference IMPL are kept in indivisual files
+
+    # This AUTHORS file is for The Goldfish Scheme Authors.
+
+    #
+
+    # Names should be added to this file like so:
+
+    # Name or Organization \<less\>email address\<gtr\>
+
+    \;
+
+    浙江三鲤网络科技有限公司 \<less\>*@liii.pro\<gtr\>
+
+    \;
+
+    沈达 \<less\>da@liii.pro\<gtr\>
+
+    刘念 \<less\>nian@liii.pro\<gtr\>
+
+    \;
+  </verbatim-chunk>
+
+  <chapter|boot.scm>
 
   S7 Scheme默认并不遵循R7RS，在启动S7 Scheme之后，我们需要做的第一件事就是加载<scm|boot.scm>，实现R7RS的<scm|define-library>和<scm|import>。
 
