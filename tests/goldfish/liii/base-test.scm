@@ -623,19 +623,8 @@
 (check-catch 'out-of-range (vector-ref #(1 2 3) 3))
 (check-catch 'out-of-range (vector-ref #() 0))
   
-(check
-  (catch 'wrong-type-arg
-    (lambda () (vector-ref #(1 2 3) 2.0))
-    (lambda args #t))
-  =>
-  #t)
-  
-(check
-  (catch 'wrong-type-arg
-    (lambda () (vector-ref #(1 2 3) "2"))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (vector-ref #(1 2 3) 2.0))
+(check-catch 'wrong-type-arg (vector-ref #(1 2 3) "2"))
 
 (define my-vector #(0 1 2 3))
 (check my-vector => #(0 1 2 3))
