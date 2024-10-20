@@ -7298,11 +7298,9 @@
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-ior>实现。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
-    (define (bitwise-nor a b)
- \ 
+    (define (bitwise-nor a b) \ 
 
     \ \ \ \ \ \ \ \ (lognot (bitwise-ior a b)))
-
 
     \;
   </scm-chunk>
@@ -7332,11 +7330,9 @@
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-and>实现。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
-    (define (bitwise-nand a b)
- \ 
+    (define (bitwise-nand a b) \ 
 
     \ \ \ \ \ \ \ \ (lognot (bitwise-and a b)))
-
 
     \;
   </scm-chunk>
@@ -10157,9 +10153,13 @@
     \;
   </scm-chunk>
 
-  <r7rs><paragraph|vector-ref><scm|((v vector?) (k integer?))><index|vector-ref>
+  <r7rs><paragraph|vector-ref><scm|((v vector?) (k integer?)) =\<gtr\> object><index|vector-ref>
 
   返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
+
+  <\remark>
+    在金鱼Scheme中，我们推荐使用<scm|(v 0)>而不是<scm|(vector-ref v 0)>，因为前者更加简洁。在使用前者访问向量中的元素时，注意变量的命名需要能够标明变量的类型，比如在<scm|(x 0)>中，我们无法有效分辨<scm|x>是什么类型的变量，而<scm|(vector-ref x 0)>能够有效地标明<scm|x>是向量。故而，在使用前者这种简洁的语法时，建议使用<scm|v->前缀或者<scm|-v>后缀来标明<scm|x>的类型，比如<scm|(v-x 0)>或者<scm|(x-v 0)>。
+  </remark>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (let1 v #(1 2 3)
@@ -10182,31 +10182,9 @@
 
     \ \ 
 
-    (check
+    (check-catch 'wrong-type-arg (vector-ref #(1 2 3) 2.0))
 
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (vector-ref #(1 2 3) 2.0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \ \ 
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (vector-ref #(1 2 3) "2"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'wrong-type-arg (vector-ref #(1 2 3) "2"))
 
     \;
   </scm-chunk>

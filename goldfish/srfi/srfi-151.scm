@@ -29,15 +29,11 @@
 
 (define bitwise-xor logxor)
 
-(define (bitwise-nor a b)
-  
+(define (bitwise-nor a b)  
         (lognot (bitwise-ior a b)))
 
-
-(define (bitwise-nand a b)
-  
+(define (bitwise-nand a b)  
         (lognot (bitwise-and a b)))
-
 
 (define arithmetic-shift ash)
 
