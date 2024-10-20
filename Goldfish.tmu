@@ -7298,11 +7298,9 @@
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-ior>实现。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
-    (define (bitwise-nor a b)
- \ 
+    (define (bitwise-nor a b) \ 
 
     \ \ \ \ \ \ \ \ (lognot (bitwise-ior a b)))
-
 
     \;
   </scm-chunk>
@@ -7332,11 +7330,9 @@
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-and>实现。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
-    (define (bitwise-nand a b)
- \ 
+    (define (bitwise-nand a b) \ 
 
     \ \ \ \ \ \ \ \ (lognot (bitwise-and a b)))
-
 
     \;
   </scm-chunk>
@@ -10319,7 +10315,43 @@
 
   <paragraph|vector-cumulate><index|vector-cumulate>
 
-  <todo|TODO>
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    (define (vector-cumulate fn knil vec)
+
+    \ \ (typed-lambda ((fn procedure?) knil (vec vector?)))
+
+    \ \ (let* ((len (vector-length vec))
+
+    \ \ \ \ \ \ \ \ \ (rst (make-vector len)))
+
+    \ \ \ \ (let loop ((i 0) (lhs knil))
+
+    \ \ \ \ \ \ \ \ \ (if (\< i len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (let* ((vi (vector-ref vec i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (out (fn lhs vi)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! rst i out)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ 1 i) out)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ rst))))
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-133-test.scm|false|false>
+    (check (vector-cumulate + 0 #()) =\<gtr\> #())
+
+    (check (vector-cumulate + 0 #(1 2 3)) =\<gtr\> #(1 3 6))
+
+    (check (vector-cumulate - 0 #(1 2 3)) =\<gtr\> #(-1 -3 -6))
+  </scm-chunk>
 
   <subsection|搜索>
 

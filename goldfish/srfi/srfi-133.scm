@@ -37,6 +37,18 @@
               (loop (+ i 1) (+ count 1)))
              (else (loop (+ i 1) count)))))
 
+(define (vector-cumulate fn knil vec)
+  (typed-lambda ((fn procedure?) knil (vec vector?)))
+  (let* ((len (vector-length vec))
+         (rst (make-vector len)))
+    (let loop ((i 0) (lhs knil))
+         (if (< i len)
+             (let* ((vi (vector-ref vec i))
+                   (out (fn lhs vi)))
+               (begin
+                 (vector-set! rst i out)
+                 (loop (+ 1 i) out)))
+             rst))))
 ; TODO optional parameters
 (define (vector-any pred v)
   (let loop ((i 0))
