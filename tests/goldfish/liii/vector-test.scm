@@ -147,9 +147,8 @@
 (vector-swap! my-vector 0 (- (vector-length my-vector) 1))
 (check my-vector => #(3 1 2 0))
 
-(check-catch
- 'out-of-range
- (vector-swap! my-vector 1 (vector-length my-vector)))
+(check-catch 'out-of-range
+  (vector-swap! my-vector 1 (vector-length my-vector)))
 
 (define my-vector (vector 0 1 2 3 4))
 (fill! my-vector #f)
@@ -163,59 +162,24 @@
 (define b (vector "b0" "b1" "b2" "b3" "b4"))
 
 ;(< at 0)
-(check
-  (catch 'out-of-range
-    (lambda () (vector-copy! b -1 a))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-copy! b -1 a))
 
 ;(< start 0)
-(check
-  (catch 'out-of-range
-    (lambda () (vector-copy! b 0 a -1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-copy! b 0 a -1))
 
 ;(> start (vector-length from))
-(check
-  (catch 'out-of-range
-    (lambda () (vector-copy! b 0 a 6))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-copy! b 0 a 6))
 
 ;(> end (vector-length from))
-(check
-  (catch 'out-of-range
-    (lambda () (vector-copy! b 0 a 0 6))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-copy! b 0 a 0 6))
 
 ;(> start end)
-(check
-  (catch 'out-of-range
-    (lambda () (vector-copy! b 0 a 2 1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-copy! b 0 a 2 1))
 
 ;(> (+ at (- end start)) (vector-length to))
-(check
-  (catch 'out-of-range
-    (lambda () (vector-copy! b 6 a))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-copy! b 6 a))
 
-(check
-  (catch 'out-of-range
-    (lambda () (vector-copy! b 1 a))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-copy! b 1 a))
 
 (define a (vector "a0" "a1" "a2" "a3" "a4"))
 (define b (vector "b0" "b1" "b2" "b3" "b4"))
@@ -236,21 +200,11 @@
 (check (vector->string (vector #\0 #\1 #\2 #\3) 1 3) => "12")
 (check (vector->string (vector #\0 #\1 #\2 #\3) 1 2) => "1")
 
-(check
-  (catch 'out-of-range
-    (lambda () (vector->string (vector #\0 #\1 #\2 #\3) 2 10))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector->string (vector #\0 #\1 #\2 #\3) 2 10))
 
 (check (vector->string (vector 0 1 #\2 3 4) 2 3) => "2")
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () (vector->string (vector 0 1 #\2 3 4) 1 3))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (vector->string (vector 0 1 #\2 3 4) 1 3))
 
 (check (string->vector "0123") => (vector #\0 #\1 #\2 #\3))
 (check (string->vector "abc") => (vector #\a #\b #\c))

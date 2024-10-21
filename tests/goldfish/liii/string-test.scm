@@ -49,26 +49,8 @@
 (check-false (string-every char-numeric? "012d45"))
 
 (check-catch 'wrong-type-arg (string-every 1 "012345"))
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-every
-         #\012345
-         "012345"))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-every
-         "012345"
-         "012345"))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (string-every #\012345 "012345"))
+(check-catch 'wrong-type-arg (string-every "012345" "012345"))
 
 (check-true (string-every char-numeric? "012345"))
 (check-false (string-every number? "012345"))
@@ -90,75 +72,16 @@
 (check-true (string-any char-numeric? "xxx0xx"))
 (check-false (string-any char-numeric? "xxxxxx"))
 
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-every
-         0
-         "xxx0xx"))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-any
-         (lambda (n) (= n 0))
-         "xxx0xx"))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'wrong-type-arg
-    (lambda () 
-      (string-every
-         "0"
-         "xxx0xx"))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'wrong-type-arg (string-every 0 "xxx0xx"))
+(check-catch 'wrong-type-arg (string-any (lambda (n) (= n 0)) "xxx0xx"))
+(check-catch 'wrong-type-arg (string-every "0" "xxx0xx"))
 
 (check-true (string-any char-alphabetic? "01c345" 2))
-
 (check-false (string-any char-alphabetic? "01c345" 3))
-
-(check
-  (string-any 
-    char-alphabetic?
-    "01c345"
-    2
-    4)
-  =>
-  #t)
-
-(check
-  (string-any 
-    char-alphabetic?
-    "01c345"
-    2
-    2)
-  =>
-  #f)
-
-(check
-  (string-any 
-    char-alphabetic?
-    "01c345"
-    3
-    4)
-  =>
-  #f)
-
-(check
-  (string-any 
-    char-alphabetic?
-    "01c345"
-    2
-    6)
-  =>
-  #t)
+(check-true (string-any char-alphabetic? "01c345" 2 4))
+(check-false (string-any char-alphabetic? "01c345" 2 2))
+(check-false (string-any char-alphabetic? "01c345" 3 4))
+(check-true (string-any char-alphabetic? "01c345" 2 6))
 
 (check
   (catch 'out-of-range
@@ -230,42 +153,14 @@
 (check-catch 'out-of-range (string-drop-right "MathAgape" -1))
 (check-catch 'out-of-range (string-drop-right "MathAgape" 20))
 
-(check
-  (string-pad "MathAgape" 15)
-  =>
-  "      MathAgape")
+(check (string-pad "MathAgape" 15) => "      MathAgape")
+(check (string-pad "MathAgape" 12 #\1) => "111MathAgape")
+(check (string-pad "MathAgape" 6 #\1 0 4) => "11Math")
+(check (string-pad "MathAgape" 9) => "MathAgape")
+(check (string-pad "MathAgape" 5) => "Agape")
+(check (string-pad "MathAgape" 2 #\1 0 4) => "th")
 
-(check
-  (string-pad "MathAgape" 12 #\1)
-  =>
-  "111MathAgape")
-
-(check
-  (string-pad "MathAgape" 6 #\1 0 4)
-  =>
-  "11Math")
-
-(check
-  (string-pad "MathAgape" 9)
-  =>
-  "MathAgape")
-
-(check
-  (string-pad "MathAgape" 5)
-  =>
-  "Agape")
-
-(check
-  (string-pad "MathAgape" 2 #\1 0 4)
-  =>
-  "th")
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-pad "MathAgape" -1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-pad "MathAgape" -1))
 
 (check (string-pad-right "MathAgape" 15) => "MathAgape      ")
 (check (string-pad-right "MathAgape" 12 #\1) => "MathAgape111")
@@ -285,96 +180,31 @@
 
 (check-catch 'out-of-range (string-trim "  2 4  " 8))
 
-(check
-  (string-trim "  2 4  " 0 4)
-  =>
-  "2 ")
+(check (string-trim "  2 4  " 0 4) => "2 ")
+(check (string-trim "  2 4  " 0 7) => "2 4  ")
 
-(check
-  (string-trim "  2 4  " 0 7)
-  =>
-  "2 4  ")
+(check-catch 'out-of-range (string-trim "  2 4  " 0 8))
 
-(check
-  (catch 'out-of-range
-    (lambda () (string-trim "  2 4  " 0 8))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (string-trim "  2 4  " #\ )
-  =>
-  "2 4  ")
-
-(check
-  (string-trim "-- 2 4 --" #\-)
-  =>
-  " 2 4 --")
-
-(check
-  (string-trim " - 345" #\- 1)
-  =>
-  " 345")
-
-(check
-  (string-trim " - 345" #\- 1 4)
-  =>
-  " 3")
+(check (string-trim "  2 4  " #\ ) => "2 4  ")
+(check (string-trim "-- 2 4 --" #\-) => " 2 4 --")
+(check (string-trim " - 345" #\- 1) => " 345")
+(check (string-trim " - 345" #\- 1 4) => " 3")
 
 (check (string-trim-right "  2 4  ") => "  2 4")
+(check (string-trim-right "  2 4  " 1) => " 2 4")
+(check (string-trim-right "  2 4  " 2) => "2 4")
+(check (string-trim-right "  2 4  " 3) => " 4")
+(check (string-trim-right "  2 4  " 4) => "4")
+(check (string-trim-right "  2 4  " 5) => "")
+(check (string-trim-right "  2 4  " 6) => "")
+(check (string-trim-right "  2 4  " 7) => "")
 
-(check
-  (string-trim-right "  2 4  " 1)
-  =>
-  " 2 4")
-
-(check
-  (string-trim-right "  2 4  " 2)
-  =>
-  "2 4")
-
-(check
-  (string-trim-right "  2 4  " 3)
-  =>
-  " 4")
-
-(check
-  (string-trim-right "  2 4  " 4)
-  =>
-  "4")
-
-(check
-  (string-trim-right "  2 4  " 5)
-  =>
-  "")
-
-(check
-  (string-trim-right "  2 4  " 6)
-  =>
-  "")
-
-(check
-  (string-trim-right "  2 4  " 7)
-  =>
-  "")
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-trim-right "  2 4  " 8))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-trim-right "  2 4  " 8))
 
 (check (string-trim-right "  2 4  " 0 4) => "  2")
 (check (string-trim-right "  2 4  " 0 7) => "  2 4")
 
-(check
-  (catch 'out-of-range
-    (lambda () (string-trim-right "  2 4  " 0 8))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-trim-right "  2 4  " 0 8))
 
 (check (string-trim-right "  2 4  " #\ ) => "  2 4")
 (check (string-trim-right "-- 2 4 --" #\-) => "-- 2 4 ")
