@@ -21,7 +21,7 @@
   vector-count
   vector-any vector-every vector-copy vector-copy!
   vector-index vector-index-right vector-partition
-  vector-swap!)
+  vector-swap! vector-cumulate)
 (begin
 
 (define (vector-empty? v)
@@ -37,18 +37,18 @@
               (loop (+ i 1) (+ count 1)))
              (else (loop (+ i 1) count)))))
 
-(define (vector-cumulate fn knil vec)
-  (typed-lambda ((fn procedure?) knil (vec vector?)))
-  (let* ((len (vector-length vec))
-         (rst (make-vector len)))
-    (let loop ((i 0) (lhs knil))
-         (if (< i len)
-             (let* ((vi (vector-ref vec i))
-                   (out (fn lhs vi)))
-               (begin
-                 (vector-set! rst i out)
-                 (loop (+ 1 i) out)))
-             rst))))
+(define vector-cumulate
+  (typed-lambda ((fn procedure?) knil (vec vector?))
+    (let* ((len (vector-length vec))
+           (v-rst (make-vector len)))
+      (let loop ((i 0) (lhs knil))
+           (if (= i len)
+               v-rst
+               (let1 cumu-i (fn lhs (vec i))
+                 (begin
+                   (vector-set! v-rst i cumu-i)
+                   (loop (+ 1 i) cumu-i))))))))
+
 ; TODO optional parameters
 (define (vector-any pred v)
   (let loop ((i 0))
