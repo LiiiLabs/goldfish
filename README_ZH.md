@@ -192,6 +192,5 @@ tests/demo_argv.scm => #\newline
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},
-    url={}, 
 }
 ```

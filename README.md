@@ -177,7 +177,7 @@ Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which ar
 
 ## Citation
 
-A pdf version of the documentation is available at TBD, and can be cited with the following bibtex entry:
+The reader can cite our work with the following bibtex entry:
 
 ```
 @book{goldfish,
@@ -185,6 +185,5 @@ A pdf version of the documentation is available at TBD, and can be cited with th
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},
-    url={}, 
 }
 ```
