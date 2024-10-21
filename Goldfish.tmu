@@ -434,17 +434,9 @@
 
     \ \ ; R7RS 6.2: Numbers
 
-    \ \ square
+    \ \ square exact inexact floor s7-floor ceiling s7-ceiling truncate s7-truncate
 
-    \ \ exact inexact
-
-    \ \ floor s7-floor ceiling s7-ceiling truncate s7-truncate round s7-round
-
-    \ \ floor-quotient
-
-    \ \ gcd lcm s7-lcm
-
-    \ \ boolean=?
+    \ \ round s7-round floor-quotient gcd lcm s7-lcm boolean=?
 
     \ \ ; R7RS 6.4: list
 
@@ -468,29 +460,19 @@
 
     \ \ ; R7RS 6.8: Vector
 
-    \ \ vector-\<gtr\>string string-\<gtr\>vector
-
-    \ \ vector-copy vector-copy! vector-fill!
+    \ \ vector-\<gtr\>string string-\<gtr\>vector vector-copy vector-copy! vector-fill!
 
     \ \ ; R7RS 6.9: Bytevectors
 
-    \ \ bytevector? make-bytevector bytevector bytevector-length
+    \ \ bytevector? make-bytevector bytevector bytevector-length bytevector-u8-ref
 
-    \ \ bytevector-u8-ref bytevector-u8-set! bytevector-append
-
-    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
+    \ \ bytevector-u8-set! bytevector-append utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
 
     \ \ ; Input and Output
 
-    \ \ call-with-port port? binary-port? textual-port?
+    \ \ call-with-port port? binary-port? textual-port? input-port-open? output-port-open?
 
-    \ \ input-port-open? output-port-open?
-
-    \ \ open-binary-input-file open-binary-output-file
-
-    \ \ close-port
-
-    \ \ eof-object
+    \ \ open-binary-input-file open-binary-output-file close-port eof-object
 
     \ \ ; Control flow
 
@@ -526,15 +508,9 @@
 
     \ \ ; R7RS 6.2: Numbers
 
-    \ \ square
+    \ \ square exact inexact floor s7-floor ceiling s7-ceiling truncate s7-truncate
 
-    \ \ exact inexact
-
-    \ \ floor s7-floor ceiling s7-ceiling truncate s7-truncate round s7-round
-
-    \ \ floor-quotient
-
-    \ \ gcd lcm s7-lcm
+    \ \ round s7-round floor-quotient gcd lcm s7-lcm
 
     \ \ ; R7RS 6.3: Booleans
 
@@ -562,29 +538,21 @@
 
     \ \ ; R7RS 6.8 Vector
 
-    \ \ vector-\<gtr\>string string-\<gtr\>vector
-
-    \ \ vector-copy vector-copy! vector-fill!
+    \ \ vector-\<gtr\>string string-\<gtr\>vector vector-copy vector-copy! vector-fill!
 
     \ \ ; R7RS 6.9 Bytevectors
 
-    \ \ bytevector? make-bytevector bytevector bytevector-length
+    \ \ bytevector? make-bytevector bytevector bytevector-length bytevector-u8-ref
 
-    \ \ bytevector-u8-ref bytevector-u8-set! bytevector-append
+    \ \ bytevector-u8-set! bytevector-append utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
 
-    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length u8-substring
+    \ \ u8-substring
 
     \ \ ; Input and Output
 
-    \ \ call-with-port port? binary-port? textual-port?
+    \ \ call-with-port port? binary-port? textual-port? input-port-open? output-port-open?
 
-    \ \ input-port-open? output-port-open?
-
-    \ \ open-binary-input-file open-binary-output-file
-
-    \ \ close-port
-
-    \ \ eof-object
+    \ \ open-binary-input-file open-binary-output-file close-port eof-object
 
     \ \ ; Control flow
 
@@ -2322,8 +2290,6 @@
 
     \;
   </scm-chunk>
-
-  \;
 
   <section|控制流>
 
@@ -4844,13 +4810,13 @@
   注意<scm|(cons '(1 2) '(3 4))>其实是一个列表，但这个列表的元素不都是整数。这个例子容易理解成结果是一个序对且不是列表。
 
   <\session|goldfish|default>
-    <\unfolded-io>
+    <\folded-io>
       \<gtr\>\ 
-    <|unfolded-io>
+    <|folded-io>
       (cons '(1 2) '(3 4))
-    <|unfolded-io>
+    <|folded-io>
       ((1 2) 3 4)
-    </unfolded-io>
+    </folded-io>
 
     <\input>
       \<gtr\>\ 
@@ -6938,7 +6904,15 @@
 
     \ \ \ \ \ \ \ \ (else
 
-    \ \ \ \ \ \ \ \ \ (error 'type-error "flatten: the second argument depth should be symbol ‘deepest' or a integer, which will be uesd as depth, but got a ~A" depth)))
+    \ \ \ \ \ \ \ \ \ (type-error
+
+    \ \ \ \ \ \ \ \ \ \ (string-append
+
+    \ \ \ \ \ \ \ \ \ \ \ \ "flatten: the second argument depth should be symbol "
+
+    \ \ \ \ \ \ \ \ \ \ \ \ "‘deepest' or a integer, which will be uesd as depth,"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ " but got a ~A") depth)))
 
     \ \ ) ; end of (define* (flatten))
 
@@ -7966,45 +7940,9 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check-catch 'wrong-type-arg (string-every 1 "012345"))
 
-    \;
+    (check-catch 'wrong-type-arg (string-every #\\012345 "012345"))
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every
-
-    \ \ \ \ \ \ \ \ \ #\\012345
-
-    \ \ \ \ \ \ \ \ \ "012345"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every
-
-    \ \ \ \ \ \ \ \ \ "012345"
-
-    \ \ \ \ \ \ \ \ \ "012345"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'wrong-type-arg (string-every "012345" "012345"))
 
     \;
   </scm-chunk>
@@ -8092,63 +8030,11 @@
   注意，评估规则<scm|criterion>必须是谓词或字符，否则报错。
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check
+    (check-catch 'wrong-type-arg (string-every 0 "xxx0xx"))
 
-    \ \ (catch 'wrong-type-arg
+    (check-catch 'wrong-type-arg (string-any (lambda (n) (= n 0)) "xxx0xx"))
 
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every
-
-    \ \ \ \ \ \ \ \ \ 0
-
-    \ \ \ \ \ \ \ \ \ "xxx0xx"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-any
-
-    \ \ \ \ \ \ \ \ \ (lambda (n) (= n 0))
-
-    \ \ \ \ \ \ \ \ \ "xxx0xx"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda ()\ 
-
-    \ \ \ \ \ \ (string-every
-
-    \ \ \ \ \ \ \ \ \ "0"
-
-    \ \ \ \ \ \ \ \ \ "xxx0xx"))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'wrong-type-arg (string-every "0" "xxx0xx"))
 
     \;
   </scm-chunk>
@@ -8158,81 +8044,15 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check-true (string-any char-alphabetic? "01c345" 2))
 
-    \;
-
     (check-false (string-any char-alphabetic? "01c345" 3))
 
-    \;
+    (check-true (string-any <code*|char-alphabetic?> "01c345" 2 4))
 
-    (check
+    (check-false (string-any char-alphabetic? "01c345" 2 2))
 
-    \ \ (string-any\ 
+    (check-false (string-any char-alphabetic? "01c345" 3 4))
 
-    \ \ \ \ <code*|char-alphabetic?>
-
-    \ \ \ \ "01c345"
-
-    \ \ \ \ 2
-
-    \ \ \ \ 4)
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (string-any\ 
-
-    \ \ \ \ <code*|char-alphabetic?>
-
-    \ \ \ \ "01c345"
-
-    \ \ \ \ 2
-
-    \ \ \ \ 2)
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
-
-    \;
-
-    (check
-
-    \ \ (string-any\ 
-
-    \ \ \ \ <code*|char-alphabetic?>
-
-    \ \ \ \ "01c345"
-
-    \ \ \ \ 3
-
-    \ \ \ \ 4)
-
-    \ \ =\<gtr\>
-
-    \ \ #f)
-
-    \;
-
-    (check
-
-    \ \ (string-any\ 
-
-    \ \ \ \ char-alphabetic?
-
-    \ \ \ \ "01c345"
-
-    \ \ \ \ 2
-
-    \ \ \ \ 6)
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-true (string-any char-alphabetic? "01c345" 2 6))
 
     \;
 
@@ -8324,45 +8144,11 @@
 
     \;
 
-    (check
+    (check-catch 'out-of-range (string-ref "MathAgape" -1))
 
-    \ \ (catch 'out-of-range
+    (check-catch 'out-of-range (string-ref "MathAgape" 9))
 
-    \ \ \ \ (lambda () (string-ref "MathAgape" -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "MathAgape" 9))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-ref "" 0))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-ref "" 0))
 
     \;
   </scm-chunk>
@@ -8616,77 +8402,21 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check
+    (check (string-pad "MathAgape" 15) =\<gtr\> " \ \ \ \ \ MathAgape")
 
-    \ \ (string-pad "MathAgape" 15)
+    (check (string-pad "MathAgape" 12 #\\1) =\<gtr\> "111MathAgape")
 
-    \ \ =\<gtr\>
+    (check (string-pad "MathAgape" 6 #\\1 0 4) =\<gtr\> "11Math")
 
-    \ \ " \ \ \ \ \ MathAgape")
+    (check (string-pad "MathAgape" 9) =\<gtr\> "MathAgape")
 
-    \;
+    (check (string-pad "MathAgape" 5) =\<gtr\> "Agape")
 
-    (check
-
-    \ \ (string-pad "MathAgape" 12 #\\1)
-
-    \ \ =\<gtr\>
-
-    \ \ "111MathAgape")
+    (check (string-pad "MathAgape" 2 #\\1 0 4) =\<gtr\> "th")
 
     \;
 
-    (check
-
-    \ \ (string-pad "MathAgape" 6 #\\1 0 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "11Math")
-
-    \;
-
-    (check
-
-    \ \ (string-pad "MathAgape" 9)
-
-    \ \ =\<gtr\>
-
-    \ \ "MathAgape")
-
-    \;
-
-    (check
-
-    \ \ (string-pad "MathAgape" 5)
-
-    \ \ =\<gtr\>
-
-    \ \ "Agape")
-
-    \;
-
-    (check
-
-    \ \ (string-pad "MathAgape" 2 #\\1 0 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "th")
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-pad "MathAgape" -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-pad "MathAgape" -1))
 
     \;
   </scm-chunk>
@@ -8820,77 +8550,23 @@
 
     \;
 
-    (check
+    (check (string-trim " \ 2 4 \ " 0 4) =\<gtr\> "2 ")
 
-    \ \ (string-trim " \ 2 4 \ " 0 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "2 ")
+    (check (string-trim " \ 2 4 \ " 0 7) =\<gtr\> "2 4 \ ")
 
     \;
 
-    (check
-
-    \ \ (string-trim " \ 2 4 \ " 0 7)
-
-    \ \ =\<gtr\>
-
-    \ \ "2 4 \ ")
+    (check-catch 'out-of-range (string-trim " \ 2 4 \ " 0 8))
 
     \;
 
-    (check
+    (check (string-trim " \ 2 4 \ " #\\ ) =\<gtr\> "2 4 \ ")
 
-    \ \ (catch 'out-of-range
+    (check (string-trim "-- 2 4 --" #\\-) =\<gtr\> " 2 4 --")
 
-    \ \ \ \ (lambda () (string-trim " \ 2 4 \ " 0 8))
+    (check (string-trim " - 345" #\\- 1) =\<gtr\> " 345")
 
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
-
-    \;
-
-    (check
-
-    \ \ (string-trim " \ 2 4 \ " #\\ )
-
-    \ \ =\<gtr\>
-
-    \ \ "2 4 \ ")
-
-    \;
-
-    (check
-
-    \ \ (string-trim "-- 2 4 --" #\\-)
-
-    \ \ =\<gtr\>
-
-    \ \ " 2 4 --")
-
-    \;
-
-    (check
-
-    \ \ (string-trim " - 345" #\\- 1)
-
-    \ \ =\<gtr\>
-
-    \ \ " 345")
-
-    \;
-
-    (check
-
-    \ \ (string-trim " - 345" #\\- 1 4)
-
-    \ \ =\<gtr\>
-
-    \ \ " 3")
+    (check (string-trim " - 345" #\\- 1 4) =\<gtr\> " 3")
 
     \;
   </scm-chunk>
@@ -8920,89 +8596,23 @@
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-trim-right " \ 2 4 \ ") =\<gtr\> " \ 2 4")
 
-    \;
+    (check (string-trim-right " \ 2 4 \ " 1) =\<gtr\> " 2 4")
 
-    (check
+    (check (string-trim-right " \ 2 4 \ " 2) =\<gtr\> "2 4")
 
-    \ \ (string-trim-right " \ 2 4 \ " 1)
+    (check (string-trim-right " \ 2 4 \ " 3) =\<gtr\> " 4")
 
-    \ \ =\<gtr\>
+    (check (string-trim-right " \ 2 4 \ " 4) =\<gtr\> "4")
 
-    \ \ " 2 4")
+    (check (string-trim-right " \ 2 4 \ " 5) =\<gtr\> "")
 
-    \;
+    (check (string-trim-right " \ 2 4 \ " 6) =\<gtr\> "")
 
-    (check
-
-    \ \ (string-trim-right " \ 2 4 \ " 2)
-
-    \ \ =\<gtr\>
-
-    \ \ "2 4")
+    (check (string-trim-right " \ 2 4 \ " 7) =\<gtr\> "")
 
     \;
 
-    (check
-
-    \ \ (string-trim-right " \ 2 4 \ " 3)
-
-    \ \ =\<gtr\>
-
-    \ \ " 4")
-
-    \;
-
-    (check
-
-    \ \ (string-trim-right " \ 2 4 \ " 4)
-
-    \ \ =\<gtr\>
-
-    \ \ "4")
-
-    \;
-
-    (check
-
-    \ \ (string-trim-right " \ 2 4 \ " 5)
-
-    \ \ =\<gtr\>
-
-    \ \ "")
-
-    \;
-
-    (check
-
-    \ \ (string-trim-right " \ 2 4 \ " 6)
-
-    \ \ =\<gtr\>
-
-    \ \ "")
-
-    \;
-
-    (check
-
-    \ \ (string-trim-right " \ 2 4 \ " 7)
-
-    \ \ =\<gtr\>
-
-    \ \ "")
-
-    \;
-
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-trim-right " \ 2 4 \ " 8))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-trim-right " \ 2 4 \ " 8))
 
     \;
 
@@ -9012,17 +8622,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (string-trim-right " \ 2 4 \ " 0 8))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (string-trim-right " \ 2 4 \ " 0 8))
 
     \;
 
@@ -10630,17 +10230,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-set! my-vector 4 10))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-set! my-vector 4 10))
 
     \;
   </scm-chunk>
@@ -10688,11 +10278,9 @@
 
     \;
 
-    (check-catch
+    (check-catch 'out-of-range
 
-    \ 'out-of-range
-
-    \ (vector-swap! my-vector 1 (vector-length my-vector)))
+    \ \ (vector-swap! my-vector 1 (vector-length my-vector)))
 
     \;
   </scm-chunk>
@@ -10810,13 +10398,13 @@
       (vector-copy! b 0 a 1)
     </input>
 
-    <\unfolded-io>
+    <\folded-io>
       \<gtr\>\ 
-    <|unfolded-io>
+    <|folded-io>
       b
-    <|unfolded-io>
+    <|folded-io>
       <guile-result|#("a1" "a2" "a3" "a4" "b4")>
-    </unfolded-io>
+    </folded-io>
 
     <\folded-io>
       \<gtr\>\ 
@@ -10874,111 +10462,41 @@
 
     ;(\<less\> at 0)
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b -1 a))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-copy! b -1 a))
 
     \;
 
     ;(\<less\> start 0)
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a -1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-copy! b 0 a -1))
 
     \;
 
     ;(\<gtr\> start (vector-length from))
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a 6))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-copy! b 0 a 6))
 
     \;
 
     ;(\<gtr\> end (vector-length from))
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a 0 6))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-copy! b 0 a 0 6))
 
     \;
 
     ;(\<gtr\> start end)
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 0 a 2 1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-copy! b 0 a 2 1))
 
     \;
 
     ;(\<gtr\> (+ at (- end start)) (vector-length to))
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 6 a))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-copy! b 6 a))
 
     \;
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-copy! b 1 a))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-copy! b 1 a))
 
     \;
 
@@ -11016,17 +10534,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-\<gtr\>list #() 1))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-\<gtr\>list #() 1))
 
     \;
 
@@ -11096,17 +10604,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'out-of-range
-
-    \ \ \ \ (lambda () (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 2 10))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'out-of-range (vector-\<gtr\>string (vector #\\0 #\\1 #\\2 #\\3) 2 10))
 
     \;
 
@@ -11114,17 +10612,7 @@
 
     \;
 
-    (check
-
-    \ \ (catch 'wrong-type-arg
-
-    \ \ \ \ (lambda () (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 1 3))
-
-    \ \ \ \ (lambda args #t))
-
-    \ \ =\<gtr\>
-
-    \ \ #t)
+    (check-catch 'wrong-type-arg (vector-\<gtr\>string (vector 0 1 #\\2 3 4) 1 3))
 
     \;
   </scm-chunk>
@@ -15468,8 +14956,11 @@
   <\collection>
     <associate|font-base-size|8>
     <associate|info-flag|paper>
+    <associate|page-border|attached>
     <associate|page-height|auto>
-    <associate|page-medium|papyrus>
+    <associate|page-medium|paper>
+    <associate|page-offset|1>
+    <associate|page-packet|2>
     <associate|page-screen-margin|false>
     <associate|page-type|a5>
     <associate|page-width|auto>

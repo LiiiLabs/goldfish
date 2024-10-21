@@ -570,26 +570,9 @@
 (check (string-ref "MathAgape" 0) => #\M)
 (check (string-ref "MathAgape" 2) => #\t)
 
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "MathAgape" -1))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "MathAgape" 9))
-    (lambda args #t))
-  =>
-  #t)
-
-(check
-  (catch 'out-of-range
-    (lambda () (string-ref "" 0))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (string-ref "MathAgape" -1))
+(check-catch 'out-of-range (string-ref "MathAgape" 9))
+(check-catch 'out-of-range (string-ref "" 0))
 
 (check (string-append "Math" "Agape") => "MathAgape")
 
@@ -632,22 +615,12 @@
 (check (vector-set! my-vector 2 10) => 10)
 (check my-vector => #(0 1 10 3))
 
-(check
-  (catch 'out-of-range
-    (lambda () (vector-set! my-vector 4 10))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector-set! my-vector 4 10))
 
 (check (vector->list #()) => '())
 (check (vector->list #() 0) => '())
 
-(check
-  (catch 'out-of-range
-    (lambda () (vector->list #() 1))
-    (lambda args #t))
-  =>
-  #t)
+(check-catch 'out-of-range (vector->list #() 1))
 
 (check (vector->list #(0 1 2 3)) => '(0 1 2 3))
 (check (vector->list #(0 1 2 3) 1) => '(1 2 3))
