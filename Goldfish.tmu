@@ -9850,7 +9850,7 @@
 
     \ \ vector-index vector-index-right vector-partition
 
-    \ \ vector-swap!)
+    \ \ vector-swap! vector-cumulate)
 
     (begin
 
@@ -9886,7 +9886,7 @@
 
     \ \ vector-index vector-index-right vector-partition
 
-    \ \ vector-swap!)
+    \ \ vector-swap! vector-cumulate)
 
     (begin
 
@@ -9922,7 +9922,7 @@
 
     \ \ \ vector-index vector-index-right vector-partition
 
-    \ \ \ vector-swap!))
+    \ \ \ vector-swap! vector-cumulate))
 
     \;
   </scm-chunk>
