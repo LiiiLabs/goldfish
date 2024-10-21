@@ -10318,34 +10318,32 @@
   <subparagraph|实现>
 
   <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
-    (define (vector-cumulate fn knil vec)
+    (define vector-cumulate
 
-    \ \ (typed-lambda ((fn procedure?) knil (vec vector?)))
+    \ \ (typed-lambda ((fn procedure?) knil (vec vector?))
 
-    \ \ (let* ((len (vector-length vec))
+    \ \ \ \ (let* ((len (vector-length vec))
 
-    \ \ \ \ \ \ \ \ \ (rst (make-vector len)))
+    \ \ \ \ \ \ \ \ \ \ \ (v-rst (make-vector len)))
 
-    \ \ \ \ (let loop ((i 0) (lhs knil))
+    \ \ \ \ \ \ (let loop ((i 0) (lhs knil))
 
-    \ \ \ \ \ \ \ \ \ (if (\< i len)
+    \ \ \ \ \ \ \ \ \ \ \ (if (= i len)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (let* ((vi (vector-ref vec i))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v-rst
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (out (fn lhs vi)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let1 cumu-i (fn lhs (vec i))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! rst i out)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! v-rst i cumu-i)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ 1 i) out)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ rst))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ 1 i) cumu-i))))))))
   </scm-chunk>
 
   <subparagraph|测试>
 
-  <\scm-chunk|tests/goldfish/srfi/srfi-133-test.scm|false|false>
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
     (check (vector-cumulate + 0 #()) =\<gtr\> #())
 
     (check (vector-cumulate + 0 #(1 2 3)) =\<gtr\> #(1 3 6))

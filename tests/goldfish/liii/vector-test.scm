@@ -27,7 +27,7 @@
    vector-count
    vector-any vector-every vector-copy vector-copy!
    vector-index vector-index-right vector-partition
-   vector-swap!))
+   vector-swap! vector-cumulate))
 
 (check-true (vector? (int-vector 1 2 3)))
 (check-catch 'wrong-type-arg (int-vector 1 2 'a))
@@ -89,6 +89,10 @@
 (check (vector-count even? #()) => 0)
 (check (vector-count even? #(1 3 5 7 9)) => 0)
 (check (vector-count even? #(1 3 4 7 8)) => 2)
+
+(check (vector-cumulate + 0 #()) => #())
+(check (vector-cumulate + 0 #(1 2 3)) => #(1 3 6))
+(check (vector-cumulate - 0 #(1 2 3)) => #(-1 -3 -6))
 
 (check (vector-any even? #()) => #f)
 (check (vector-any even? #(1 3 5 7 9)) => #f)
