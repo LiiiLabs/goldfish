@@ -21,7 +21,7 @@
     <assign|goldfish-version|17.10.6>
   </hide-preamble>
 
-  金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。目前专注于Scheme语言的标准库。本文档是金鱼Scheme V<value|goldfish-version>的文学编程实现，目前金鱼Scheme中几乎所有的Scheme代码实现和测试都包含在本文档中。
+  bit金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。目前专注于Scheme语言的标准库。本文档是金鱼Scheme V<value|goldfish-version>的文学编程实现，目前金鱼Scheme中几乎所有的Scheme代码实现和测试都包含在本文档中。
 
   本文档的用户是人类和大模型服务。基于本文档，用户可以获得金鱼Scheme的实现方法，也可以改进金鱼Scheme的既有实现。本文档的内容越翔实，用户使用金鱼Scheme的体验越好。
 
@@ -7130,6 +7130,8 @@
 
     \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-or bitwise-nor bitwise-nand
 
+    \ \ bit-count
+
     \ \ arithmetic-shift
 
     \ \ ; S7 built-in
@@ -7145,12 +7147,16 @@
     \;
   </scm-chunk>
 
+  \;
+
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define-library (srfi srfi-151)
 
     (export
 
-    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand
+    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor biwtise-or bitwise-nor bitwise-nand
+
+    \ \ bit-count
 
     \ \ arithmetic-shift
 
@@ -7258,7 +7264,7 @@
   <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
     (check (bitwise-ior 5 3) =\<gtr\> 7) \ ; 5 (101) OR 3 (011) = 7 (111)
 
-    (check (bitwise-or 5 3) =\<gtr\> 7)
+    (check (bitwise-ior 5 3) =\<gtr\> 7)
 
     (check (bitwise-ior 8 4) =\<gtr\> 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
 
@@ -7365,6 +7371,59 @@
     (check (bitwise-nand #b1001 #b0111) =\<gtr\> -2)\ 
 
     (check (bitwise-nand #b1011 #b0101) =\<gtr\> -2)\ 
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|bit-count><index|lognot>
+
+  <value|srfi><paragraph|bit-count><index|bitwise-nand>
+
+  使用(logand n (- n 1)) 有利于统计1的数量。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define (bit-count i)
+
+    \ \ (if (\>= i 0)
+
+    \ \ \ \ \ \ (let loop ((n i) (count 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ (if (= n 0)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (logand n (- n 1)) (+ count 1))))
+
+    \ \ \ \ \ \ (let loop ((n (lognot i)) (count 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ (if (= n 0)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ count
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (logand n (- n 1)) (+ count 1))))))
+
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bit-count 0) =\> \ 0)
+
+    (check (bit-count -1) =\> \ 0)
+
+    (check (bit-count 7) =\> \ 3)
+
+    (check (bit-count \ 13) =\> \ 3) ;Two's-complement binary: …0001101
+
+    (check (bit-count -13) =\> \ 2) ;Two's-complement binary: …1110011
+
+    (check (bit-count \ 30) =\> \ 4) ;Two's-complement binary: …0011110
+
+    (check (bit-count -30) =\> \ 4) ;Two's-complement binary: …1100010
 
     \;
   </scm-chunk>

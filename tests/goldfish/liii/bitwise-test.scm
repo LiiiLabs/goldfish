@@ -31,7 +31,7 @@
 (check (bitwise-and #b1100 #b1010) => 8) 
 
 (check (bitwise-ior 5 3) => 7)  ; 5 (101) OR 3 (011) = 7 (111)
-(check (bitwise-or 5 3) => 7)
+(check (bitwise-ior 5 3) => 7)
 (check (bitwise-ior 8 4) => 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
 (check (bitwise-ior #b101 #b011) => 7)  ; 5 (101) AND 3 (011) = 1 (001)  
 (check (bitwise-ior #b1000 #b0100) => 12) ; 8 (1000) AND 4 (0100) = 0 (0000)
@@ -57,6 +57,14 @@
 (check (bitwise-nand #b110 #b001) => -1)    
 (check (bitwise-nand #b1001 #b0111) => -2) 
 (check (bitwise-nand #b1011 #b0101) => -2) 
+
+(check (bit-count 0) =>  0)
+(check (bit-count -1) =>  0)
+(check (bit-count 7) =>  3)
+(check (bit-count  13) =>  3) ;Two's-complement binary: …0001101
+(check (bit-count -13) =>  2) ;Two's-complement binary: …1110011
+(check (bit-count  30) =>  4) ;Two's-complement binary: …0011110
+(check (bit-count -30) =>  4) ;Two's-complement binary: …1100010
 
 (check (arithmetic-shift #b10 -1) => #b1) ; 2 >> 1 = 1
 (check (arithmetic-shift #b10 1) => #b100) ; 2 << 1 = 4
