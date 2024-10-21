@@ -7117,7 +7117,7 @@
 
   <section|接口>
 
-  <\scm-chunk|goldfish/liii/bitwise.scm|true|true>
+  <\scm-chunk|goldfish/liii/bitwise.scm|true|false>
     (define-library (liii bitwise)
 
     (import (srfi srfi-151)
@@ -7128,7 +7128,7 @@
 
     \ \ ; from (srfi srfi-151)
 
-    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-or bitwise-nor bitwise-nand
+    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand
 
     \ \ arithmetic-shift
 
@@ -7141,6 +7141,10 @@
     )
 
     (begin
+
+    ) ; end of begin
+
+    ) ; end of library
 
     \;
   </scm-chunk>
@@ -7247,18 +7251,10 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/liii/bitwise.scm|true|true>
-    (define bitwise-or bitwise-ior)
-
-    \;
-  </scm-chunk>
-
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
     (check (bitwise-ior 5 3) =\<gtr\> 7) \ ; 5 (101) OR 3 (011) = 7 (111)
-
-    (check (bitwise-or 5 3) =\<gtr\> 7)
 
     (check (bitwise-ior 8 4) =\<gtr\> 12) ; 8 (1000) OR 4 (0100) = 12 (1100)
 
@@ -7419,14 +7415,6 @@
     ) ; end of begin
 
     ) ; end of define-library
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|goldfish/liii/bitwise.scm|true|false>
-    ) ; end of begin
-
-    ) ; end of library
 
     \;
   </scm-chunk>
