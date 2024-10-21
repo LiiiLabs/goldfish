@@ -181,3 +181,17 @@ tests/demo_argv.scm => #\newline
 
 ## 许可证
 金鱼Scheme 根据 Apache 2.0 许可证授权，一些源自 S7 Scheme 存储库和 SRFI 的代码片段已在相关源文件中明确声明。
+
+## 引用
+
+读者可以用以下的bibtex代码来引用我们的工作.
+
+```
+@book{goldfish,
+    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He},
+    title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
+    publisher = {LIII NETWORK},
+    year = {2024},
+    url={}, 
+}
+```
