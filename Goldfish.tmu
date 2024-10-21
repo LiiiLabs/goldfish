@@ -9888,7 +9888,7 @@
 
     \ \ vector-index vector-index-right vector-partition
 
-    \ \ vector-swap!)
+    \ \ vector-swap! vector-cumulate)
 
     (begin
 
@@ -9924,7 +9924,7 @@
 
     \ \ vector-index vector-index-right vector-partition
 
-    \ \ vector-swap!)
+    \ \ vector-swap! vector-cumulate)
 
     (begin
 
@@ -9960,7 +9960,7 @@
 
     \ \ \ vector-index vector-index-right vector-partition
 
-    \ \ \ vector-swap!))
+    \ \ \ vector-swap! vector-cumulate))
 
     \;
   </scm-chunk>
@@ -10335,7 +10335,105 @@
 
   <paragraph|vector-cumulate><index|vector-cumulate>
 
-  <todo|TODO>
+  <subparagraph|实现>
+
+  使用函数 fn 和初始值 knil 在向量 vector 上迭代，迭代结果将在一个等长的新向量中返回。
+
+  每次迭代中，fn 被传入上次迭代的结果 lhs 和向量中的元素 vec i，产生的结果 cumu-i 将存储在结果向量 v-rst 中。
+
+  一般而言，knil, cumu-i 的类型未必与 vector 中的元素相同，只需要保证 fn cumu-i (vec i) 能够得到 cumu-i 同类型的结果即可。
+
+  迭代过程可以形式地表示为：
+
+  vector-cumulate fn knil vec =\<gtr\> #(fn knil (vec 0), fn cumu-0 (vec 1), fn cumu-1 (vec 2), <text-dots>)
+
+  \;
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    ; Return a new vector v-rst with same length of input vector vec.
+
+    ; Every element of the result is the result the i-th iteration of fn cumu_i vec_i.
+
+    ; \ \ Where fn should be a procedure with 2 args.
+
+    ; \ \ The type of knil and vector could be different.
+
+    ; In the i-th iteration, cumu_i = fn cumu_(i-1) vec_i, with cumu_0 = fn knil vec_0.
+
+    \;
+
+    (define vector-cumulate
+
+    \ \ (typed-lambda ((fn procedure?) knil (vec vector?))
+
+    \ \ \ \ (let* ((len (vector-length vec))
+
+    \ \ \ \ \ \ \ \ \ \ \ (v-rst (make-vector len)))
+
+    \ \ \ \ \ \ (let loop ((i 0) (lhs knil))
+
+    \ \ \ \ \ \ \ \ \ \ \ (if (= i len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ v-rst
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let1 cumu-i (fn lhs (vec i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! v-rst i cumu-i)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ 1 i) cumu-i))))))))
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    ; Trivial cases.
+
+    (check (vector-cumulate + 0 '#(1 2 3 4)) =\> #(1 3 6 10))
+
+    (check (vector-cumulate - 0 '#(1 2 3 4)) =\> #(-1 -3 -6 -10))
+
+    (check (vector-cumulate * 1 '#(-1 -2 -3 -4)) =\> #(-1 2 -6 24))
+
+    \;
+
+    ;;; Test cases of vec.
+
+    ; Not a vec input.
+
+    (check-catch 'type-error (vector-cumulate + 0 'a))
+
+    ; Empty vec test.
+
+    (check (vector-cumulate + 0 '#()) =\> #())
+
+    \;
+
+    ;; Test cases of fn.
+
+    ; A case with consant fn.
+
+    (check (vector-cumulate (lambda (x y) 'a) 0 '#(1 2 3)) =\> #(a a a))
+
+    ; A wrong-number-of-args case with 1-arg fn.
+
+    (check-catch 'wrong-number-of-args (vector-cumulate (lambda (x) 'a) 0 '#(1 2 3)))
+
+    ; A wrong-type-arg case with args can't be mapped by fn.
+
+    (check-catch 'wrong-type-arg (vector-cumulate + '(1) '#(1 2 3)))
+
+    \;
+
+    ;;; Test cases of knil.
+
+    ; A case of different type of knil/cumu and vec-i.
+
+    (check (vector-cumulate (lambda (x y) (+ x 2)) 0 '#('a 'b 'c)) =\> #(2 4 6))
+  </scm-chunk>
 
   <subsection|搜索>
 

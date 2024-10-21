@@ -27,7 +27,7 @@
    vector-count
    vector-any vector-every vector-copy vector-copy!
    vector-index vector-index-right vector-partition
-   vector-swap!))
+   vector-swap! vector-cumulate))
 
 (check-true (vector? (int-vector 1 2 3)))
 (check-catch 'wrong-type-arg (int-vector 1 2 'a))
@@ -90,6 +90,28 @@
 (check (vector-count even? #(1 3 5 7 9)) => 0)
 (check (vector-count even? #(1 3 4 7 8)) => 2)
 
+; Trivial cases.
+(check (vector-cumulate + 0 '#(1 2 3 4)) => #(1 3 6 10))
+(check (vector-cumulate - 0 '#(1 2 3 4)) => #(-1 -3 -6 -10))
+(check (vector-cumulate * 1 '#(-1 -2 -3 -4)) => #(-1 2 -6 24))
+
+;;; Test cases of vec.
+; Not a vec input.
+(check-catch 'type-error (vector-cumulate + 0 'a))
+; Empty vec test.
+(check (vector-cumulate + 0 '#()) => #())
+
+;; Test cases of fn.
+; A case with consant fn.
+(check (vector-cumulate (lambda (x y) 'a) 0 '#(1 2 3)) => #(a a a))
+; A wrong-number-of-args case with 1-arg fn.
+(check-catch 'wrong-number-of-args (vector-cumulate (lambda (x) 'a) 0 '#(1 2 3)))
+; A wrong-type-arg case with args can't be mapped by fn.
+(check-catch 'wrong-type-arg (vector-cumulate + '(1) '#(1 2 3)))
+
+;;; Test cases of knil.
+; A case of different type of knil/cumu and vec-i.
+(check (vector-cumulate (lambda (x y) (+ x 2)) 0 '#('a 'b 'c)) => #(2 4 6))
 (check (vector-any even? #()) => #f)
 (check (vector-any even? #(1 3 5 7 9)) => #f)
 (check (vector-any even? #(1 3 4 7 8)) => #t)
