@@ -175,3 +175,15 @@ Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://cc
 Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicited claimed in the related source files.
 
 
+## Citation
+
+The reader can cite our work with the following bibtex entry:
+
+```
+@book{goldfish,
+    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He},
+    title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
+    publisher = {LIII NETWORK},
+    year = {2024},
+}
+```
