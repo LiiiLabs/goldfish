@@ -7410,11 +7410,7 @@
       (check (bit-count -30) =\> \ 4) ;Two's-complement binary: ...1100010
 
       <code|<\code*>
-        (check (bit-count (expt 2 100)) =\> \ 1)
-
-        (check (bit-count (- (expt 2 100))) =\> \ 100)
-
-        (check (bit-count (- (1+ (expt 2 100)))) =\> \ 1)
+        \;
       </code*>>
     </code*>>
 

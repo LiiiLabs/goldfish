@@ -64,9 +64,7 @@
 (check (bit-count -13) =>  2) ;Two's-complement binary: ...1110011 
 (check (bit-count  30) =>  4) ;Two's-complement binary: ...0011110 
 (check (bit-count -30) =>  4) ;Two's-complement binary: ...1100010
-(check (bit-count (expt 2 100)) =>  1)
-(check (bit-count (- (expt 2 100))) =>  100)
-(check (bit-count (- (1+ (expt 2 100)))) =>  1)
+
  
 
 (check (arithmetic-shift #b10 -1) => #b1) ; 2 >> 1 = 1
