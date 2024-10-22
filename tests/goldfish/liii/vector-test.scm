@@ -27,7 +27,7 @@
    vector-count
    vector-any vector-every vector-copy vector-copy!
    vector-index vector-index-right vector-partition
-   vector-swap! vector-cumulate))
+   vector-swap! vector-cumulate reverse-list->vector))
 
 (check-true (vector? (int-vector 1 2 3)))
 (check-catch 'wrong-type-arg (int-vector 1 2 'a))
@@ -191,6 +191,13 @@
 (vector-copy! b 0 a 0 5)
 (check b => #("a0" "a1" "a2" "a3" "a4")) 
 
+; Trivial cases.
+(check (reverse-list->vector '()) => '#())
+(check (reverse-list->vector '(1 2 3)) => '#(3 2 1))
+; Dotted-list is not a proper list.
+(check-catch 'type-error (reverse-list->vector '(1 2 . 3)))
+; Circular-list is not a proper list.
+(check-catch 'type-error (reverse-list->vector (circular-list 1 2 3)))
 (check (vector->string (vector #\0 #\1 #\2 #\3)) => "0123")
 (check (vector->string (vector #\a #\b #\c)) => "abc")
 
