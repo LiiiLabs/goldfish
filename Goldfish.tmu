@@ -9538,7 +9538,9 @@
 
     \ \ vector-index vector-index-right vector-partition
 
-    \ \ vector-swap! vector-cumulate)
+    \ \ vector-swap! vector-cumulate
+
+    \ \ reverse-list-\<gtr\>vector)
 
     (begin
 
@@ -9574,7 +9576,7 @@
 
     \ \ \ vector-index vector-index-right vector-partition
 
-    \ \ \ vector-swap! vector-cumulate))
+    \ \ \ vector-swap! vector-cumulate reverse-list-\<gtr\>vector))
 
     \;
   </scm-chunk>
@@ -10569,12 +10571,62 @@
 
   返回一个新创建的向量，其元素初始化为列表 <code*|list> 中的元素。注意，<item*|list-\<gtr\>vector>不像<item*|vector-\<gtr\>list>那样可用接收索引参数。
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (list-\<gtr\>vector '(0 1 2 3)) =\<gtr\> #(0 1 2 3))
 
     (check (list-\<gtr\>vector '()) =\<gtr\> #())
 
     \;
+  </scm-chunk>
+
+  \;
+
+  <r7rs><paragraph|reverse-list-\<gtr\>vector><scm|(reverse-list-\<gtr\>vector l)><index|list-\<gtr\>vector>
+
+  返回一个新创建的向量，其元素初始化为反转后的列表 <code*|list> 中的元素。
+
+  传入的列表应当是一个 proper-list。
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    ; Input a proper-list, return a vector with inversed order elements.
+
+    (define reverse-list-\>vector
+
+    \ \ (typed-lambda ((lst proper-list?))
+
+    \ \ \ \ (let* ((len (length lst)) (v-rst (make-vector len)))
+
+    \ \ \ \ \ \ (let loop ((l lst) (i (- len 1)))
+
+    \ \ \ \ \ \ \ \ (cond ((null? l) v-rst)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((length=? 1 l) (begin (vector-set! v-rst i (car l)) v-rst))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! v-rst i (car l))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr l) (- i 1)))))))))
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|false>
+    ; Trivial cases.
+
+    (check (reverse-list-\>vector '()) =\> '#())
+
+    (check (reverse-list-\>vector '(1 2 3)) =\> '#(3 2 1))
+
+    ; Dotted-list is not a proper list.
+
+    (check-catch 'type-error (reverse-list-\>vector '(1 2 . 3)))
+
+    ; Circular-list is not a proper list.
+
+    (check-catch 'type-error (reverse-list-\>vector (circular-list 1 2 3)))
   </scm-chunk>
 
   \;
