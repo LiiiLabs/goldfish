@@ -21,7 +21,7 @@
   vector-count
   vector-any vector-every vector-copy vector-copy!
   vector-index vector-index-right vector-partition
-  vector-swap! vector-cumulate)
+  vector-swap! vector-cumulate reverse-list->vector)
 (begin
 
 (define (vector-empty? v)
