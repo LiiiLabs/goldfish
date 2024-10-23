@@ -36,7 +36,8 @@
 (define (bitwise-nand a b)  
         (lognot (bitwise-and a b)))
 
-(define (bit-count i)
+(define bit-count 
+  (typed-lambda ((i integer?))
   (if (>= i 0)
       (let loop ((n i) (count 0))
            (if (= n 0)
@@ -45,8 +46,7 @@
       (let loop ((n (lognot i)) (count 0))
            (if (= n 0)
                count
-               (loop (logand n (- n 1)) (+ count 1))))))
-
+               (loop (logand n (- n 1)) (+ count 1)))))))
 
 (define arithmetic-shift ash)
 
