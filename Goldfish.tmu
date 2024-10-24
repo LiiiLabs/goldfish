@@ -7132,6 +7132,8 @@
 
     \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-or bitwise-nor bitwise-nand
 
+    \ \ bit-count
+
     \ \ arithmetic-shift
 
     \ \ ; S7 built-in
@@ -7152,7 +7154,7 @@
 
     (export
 
-    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand
+    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand bit-count
 
     \ \ arithmetic-shift
 
@@ -7367,6 +7369,60 @@
     (check (bitwise-nand #b1001 #b0111) =\<gtr\> -2)\ 
 
     (check (bitwise-nand #b1011 #b0101) =\<gtr\> -2)\ 
+
+    \;
+  </scm-chunk>
+
+  <paragraph|bit-count><index|lognot>
+
+  <value|srfi><paragraph|bit-count><index|bitwise-nand>
+
+  使用(logand n (- n 1)) 有利于统计1的数量。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define bit-count\ 
+
+    \ (typed-lambda ((i integer?))
+
+    \ \ \ \ \ \ (define (bit-count-positive i)
+
+    \ \ \ \ \ \ \ \ (let loop ((n i) (cnt 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (if (= n 0)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ cnt
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (logand n (- n 1)) (+ cnt 1)))))
+
+    \;
+
+    \ \ (cond ((zero? i) 0)
+
+    \ \ \ \ \ \ \ \ ((positive? i) (bit-count-positive i))
+
+    \ \ \ \ \ \ \ \ (else (bit-count-positive (lognot i))))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bit-count 0) =\> \ 0)
+
+    (check (bit-count -1) =\> \ 0)
+
+    (check (bit-count 7) =\> \ 3)
+
+    (check (bit-count \ 13) =\> \ 3) ;Two's-complement binary: …0001101
+
+    (check (bit-count -13) =\> \ 2) ;Two's-complement binary: …1110011
+
+    (check (bit-count \ 30) =\> \ 4) ;Two's-complement binary: …0011110
+
+    (check (bit-count -30) =\> \ 4) ;Two's-complement binary: …1100010
+
+    (check (bit-count (arithmetic-shift #b10 61)) =\> \ 1)
 
     \;
   </scm-chunk>
