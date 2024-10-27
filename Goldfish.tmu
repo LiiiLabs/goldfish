@@ -10062,11 +10062,11 @@
   <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
     ; Trivial cases.
 
-    (check (vector-cumulate + 0 '#(1 2 3 4)) =\> #(1 3 6 10))
+    (check (vector-cumulate + 0 '#(1 2 3 4)) =\<gtr\> #(1 3 6 10))
 
-    (check (vector-cumulate - 0 '#(1 2 3 4)) =\> #(-1 -3 -6 -10))
+    (check (vector-cumulate - 0 '#(1 2 3 4)) =\<gtr\> #(-1 -3 -6 -10))
 
-    (check (vector-cumulate * 1 '#(-1 -2 -3 -4)) =\> #(-1 2 -6 24))
+    (check (vector-cumulate * 1 '#(-1 -2 -3 -4)) =\<gtr\> #(-1 2 -6 24))
 
     \;
 
@@ -10078,7 +10078,7 @@
 
     ; Empty vec test.
 
-    (check (vector-cumulate + 0 '#()) =\> #())
+    (check (vector-cumulate + 0 '#()) =\<gtr\> #())
 
     \;
 
@@ -10086,7 +10086,7 @@
 
     ; A case with consant fn.
 
-    (check (vector-cumulate (lambda (x y) 'a) 0 '#(1 2 3)) =\> #(a a a))
+    (check (vector-cumulate (lambda (x y) 'a) 0 '#(1 2 3)) =\<gtr\> #(a a a))
 
     ; A wrong-number-of-args case with 1-arg fn.
 
@@ -10102,7 +10102,7 @@
 
     ; A case of different type of knil/cumu and vec-i.
 
-    (check (vector-cumulate (lambda (x y) (+ x 2)) 0 '#('a 'b 'c)) =\> #(2 4 6))
+    (check (vector-cumulate (lambda (x y) (+ x 2)) 0 '#('a 'b 'c)) =\<gtr\> #(2 4 6))
   </scm-chunk>
 
   <subsection|搜索>
@@ -10646,7 +10646,7 @@
   <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
     ; Input a proper-list, return a vector with inversed order elements.
 
-    (define reverse-list-\>vector
+    (define reverse-list-\<gtr\>vector
 
     \ \ (typed-lambda ((lst proper-list?))
 
@@ -10663,26 +10663,38 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! v-rst i (car l))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr l) (- i 1)))))))))
+
+    \;
   </scm-chunk>
 
   \;
 
   <subparagraph|测试>
 
+  常见情况：
+
   <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
-    ; Trivial cases.
+    (check (reverse-list-\<gtr\>vector '()) =\<gtr\> '#())
 
-    (check (reverse-list-\>vector '()) =\> '#())
+    (check (reverse-list-\<gtr\>vector '(1 2 3)) =\<gtr\> '#(3 2 1))
 
-    (check (reverse-list-\>vector '(1 2 3)) =\> '#(3 2 1))
+    \;
+  </scm-chunk>
 
-    ; Dotted-list is not a proper list.
+  点状列表不是正规列表，故而会直接抛出<goldfish-lang|type-error>：
 
-    (check-catch 'type-error (reverse-list-\>vector '(1 2 . 3)))
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check-catch 'type-error (reverse-list-\<gtr\>vector '(1 2 . 3)))
 
-    ; Circular-list is not a proper list.
+    \;
+  </scm-chunk>
 
-    (check-catch 'type-error (reverse-list-\>vector (circular-list 1 2 3)))
+  循环列表不是正规列表，故而会直接抛出<scm|type-error>：
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check-catch 'type-error (reverse-list-\<gtr\>vector (circular-list 1 2 3)))
+
+    \;
   </scm-chunk>
 
   \;

@@ -116,6 +116,7 @@
               (else (begin
                      (vector-set! v-rst i (car l))
                      (loop (cdr l) (- i 1)))))))))
+
 ) ; end of begin
 ) ; end of define-library
 
