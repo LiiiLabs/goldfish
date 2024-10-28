@@ -61,11 +61,11 @@
 (check (bit-count 0) =>  0)
 (check (bit-count -1) =>  0)
 (check (bit-count 7) =>  3)
-(check (bit-count  13) =>  3) ;Two's-complement binary: …0001101
-(check (bit-count -13) =>  2) ;Two's-complement binary: …1110011
-(check (bit-count  30) =>  4) ;Two's-complement binary: …0011110
-(check (bit-count -30) =>  4) ;Two's-complement binary: …1100010
-(check (bit-count (arithmetic-shift #b10 61)) =>  1)
+(check (bit-count  13) =>  3)
+(check (bit-count -13) =>  2)
+(check (bit-count  30) =>  4)
+(check (bit-count -30) =>  4)
+(check (bit-count (arithmetic-shift #b10 61)) => 1)
 
 (check (arithmetic-shift #b10 -1) => #b1) ; 2 >> 1 = 1
 (check (arithmetic-shift #b10 1) => #b100) ; 2 << 1 = 4
