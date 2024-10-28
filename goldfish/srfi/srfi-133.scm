@@ -111,11 +111,10 @@
   (typed-lambda ((lst proper-list?))
     (let* ((len (length lst)) (v-rst (make-vector len)))
       (let loop ((l lst) (i (- len 1)))
-        (cond ((null? l) v-rst)
-              ((length=? 1 l) (begin (vector-set! v-rst i (car l)) v-rst))
-              (else (begin
-                     (vector-set! v-rst i (car l))
-                     (loop (cdr l) (- i 1)))))))))
+        (if (null? l) v-rst
+            (begin
+              (vector-set! v-rst i (car l))
+              (loop (cdr l) (- i 1))))))))
 
 ) ; end of begin
 ) ; end of define-library
