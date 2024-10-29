@@ -1197,7 +1197,57 @@
 
   <subsection|数的运算>
 
-  <paragraph|zero?>
+  <value|r7rs><paragraph|zero?><index|zero?><scm|(x) =\<gtr\> boolean?>
+
+  判断一个数是否为0，注意该判断为真的情况有两种，其一是整数的0，其二是浮点数的0.0。如有需要，可以使用<scm|exact?>和<scm|inexact?>准确区分两者。
+
+  <subparagraph|真>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (let1 zero-int 0
+
+    \ \ (check-true (and (integer? zero-int) (zero? zero-int))))
+
+    (let1 zero-exact (- 1/2 1/2)
+
+    \ \ (check-true (and (exact? zero-exact) (zero? zero-exact))))
+
+    (let1 zero-inexact 0.0
+
+    \ \ (check-true (and (inexact? zero-inexact) (zero? zero-inexact))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|假>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-false (zero? 1+1i))
+
+    (check-false (zero? #b11))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|类型错误>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (zero? #\\A))
+
+    (check-catch 'wrong-type-arg (zero? #t))
+
+    (check-catch 'wrong-type-arg (zero? #f))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|positive?><index|positive?>
+
+  <value|r7rs><paragraph|negative?><index|negative?>
+
+  <value|r7rs><paragraph|odd?><index|odd?>
+
+  <value|r7rs><paragraph|even?><index|even?>
 
   <value|r7rs><paragraph|floor><index|floor><scm|(x) =\<gtr\> integer>
 
@@ -7373,7 +7423,7 @@
     \;
   </scm-chunk>
 
-  <value|srfi><paragraph|bit-count><index|bitwise-nand><scm|((i integer?)) =\<gtr\> integer?>
+  <value|srfi><paragraph|bit-count><index|bit-count><scm|((i integer?)) =\<gtr\> integer?>
 
   如果i是正数，统计i的二进制表示中的1的数量。如果i是负数，统计i的二进制表示中的0的数量。
 

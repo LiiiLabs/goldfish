@@ -135,6 +135,20 @@
 (check-false (exact? 0.3))
 ; (check-true (exact? #e3.0))
 
+(let1 zero-int 0
+  (check-true (and (integer? zero-int) (zero? zero-int))))
+(let1 zero-exact (- 1/2 1/2)
+  (check-true (and (exact? zero-exact) (zero? zero-exact))))
+(let1 zero-inexact 0.0
+  (check-true (and (inexact? zero-inexact) (zero? zero-inexact))))
+
+(check-false (zero? 1+1i))
+(check-false (zero? #b11))
+
+(check-catch 'wrong-type-arg (zero? #\A))
+(check-catch 'wrong-type-arg (zero? #t))
+(check-catch 'wrong-type-arg (zero? #f))
+
 (check (floor 1.1) => 1.0)
 (check (floor 1) => 1)
 (check (floor 1/2) => 0)
