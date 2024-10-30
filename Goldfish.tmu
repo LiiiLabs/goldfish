@@ -9899,6 +9899,8 @@
 
   <paragraph|vector=>
 
+  使用给定的元素比较器 (elt) 在传入的待比较向量参数列表上进行比较。如果参数列表实际上不足两个，默认返回 true。如果在给定的元素比较器上，参数列表中有任意向量的某个元素不相等，返回 false。
+
   <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
     ; (vector= elt=? vec ...) -\> boolean, srfi-133 support.\ 
 
@@ -9967,6 +9969,10 @@
     (check-false (vector= = '#(1 2 3 4 5) '#(1 2 3 4)))
 
     (check-true (vector= = '#(1 2 3 4) '#(1 2 3 4)))
+
+    (check-true (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3)))
+
+    (check-false (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3 4)))
 
     ; error cases
 

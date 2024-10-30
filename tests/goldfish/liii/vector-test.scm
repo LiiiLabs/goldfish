@@ -71,6 +71,8 @@
 (check-false (vector= eq? '#(a b c d) '#(a b d c)))
 (check-false (vector= = '#(1 2 3 4 5) '#(1 2 3 4)))
 (check-true (vector= = '#(1 2 3 4) '#(1 2 3 4)))
+(check-true (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3)))
+(check-false (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3 4)))
 ; error cases
 (check-catch 'type-error (vector= 1 (vector (vector 'a)) (vector (vector 'a))))
 ; complex cases in srfi-133
