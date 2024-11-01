@@ -48,7 +48,7 @@
   ; SRFI-8
   receive
   ; Extra routines for (liii base)
-  == != display* in? let1 compose identity typed-lambda
+  == != display* in? let1 compose identity typed-lambda atom?
 )
 (begin
 
@@ -104,6 +104,9 @@
                         (values)))
                   args)
            ,@body))))
+
+(define (atom? x)
+  (not (list? x)))
 
 ) ; end of begin
 ) ; end of define-library

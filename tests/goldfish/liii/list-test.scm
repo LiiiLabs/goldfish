@@ -280,12 +280,12 @@
     (lambda args #t))
   => #t)
 
-(check-true (length=? 3 (list 1 2 3)))
-(check-false (length=? 2 (list 1 2 3)))
-(check-false (length=? 4 (list 1 2 3)))
+(check-true (length=? (list 1 2 3) 3))
+(check-false (length=? (list 1 2 3) 2))
+(check-false (length=? (list 1 2 3) 4))
 
-(check-true (length=? 0 (list )))
-(check-catch 'value-error (length=? -1 (list )))
+(check-true (length=? (list ) 0))
+(check-catch 'value-error (length=? (list ) -1))
 
 (check-true (length>? '(1 2 3 4 5) 3))
 (check-false (length>? '(1 2) 3))
@@ -306,6 +306,44 @@
 
 (check-false (length>=? '(1 2 . 3) 3))
 (check-true (length>=? '(1 2 . 3) 2))
+
+(check-true (length<? '(1 2 3) 4))
+(check-false (length<? '(1 2 3 4) 4))
+(check-true (length<? '() 1))
+
+(check-false (length<? '(1 2 . 3) 2))
+(check-true (length<? '(1 2 . 3) 3))
+
+(check-catch 'value-error (length<? '(1) 0))
+(check-catch 'value-error (length<? '() 0))
+(check-catch 'value-error (length<? '(1 2 3) -1))
+(check-true (length<=? '(1 2 3) 3))
+(check-false (length<=? '(1 2 3 4) 3))
+(check-true (length<=? '() 0))
+
+(check-false (length<=? '(1 2 . 3) 1))
+(check-true (length<=? '(1 2 . 3) 2))
+
+(check-catch 'value-error (length<=? '(1) -1))
+(check-catch 'value-error (length<=? '() -1))
+(check-catch 'value-error (length<=? '(1 2 3) -1))
+;; 测试将列表在指定位置分割
+(check (split-at '(1 2 3 4 5) 3) => '((1 2 3) . (4 5)))
+(check (split-at '(1 2 3) 0) => '(() . (1 2 3)))
+(check (split-at '(1 2 3 4 5) 0) => '(() . (1 2 3 4 5)))
+(check (split-at '() 3) => '(() . ()))
+(check (split-at '(1) 1) => '((1) . ()))
+
+;; 测试列表末尾不是null的情况
+(check (split-at '(1 2 . 3) 0) => '(() . (1 2 . 3)))
+(check (split-at '(1 2 . 3) 1) => '((1) . (2 . 3)))
+(check (split-at '(1 2 . 3) 2) => '((1 2) . 3))
+(check (split-at '(1 2 . 3) 3) => '((1 2) . 3))
+
+;; 测试n大于列表长度的情况
+(check (split-at '(1 2 3) 5) => '((1 2 3) . ()))
+(check (split-at '(1) 5) => '((1)))
+(check (split-at '(1 2 3) -1)=> '((1 2 3)))
 
 (check ((list-view (list 1 2 3))) => (list 1 2 3))
 
@@ -352,6 +390,52 @@
 (check-catch 'type-error (not-null-list? 1))
 (check (list-not-null? 1) => #f)
 (check (list-null? 1) => #f)
+
+;;; ensure-length>=
+;; 测试列表长度已经大于等于指定长度，应该原封不动返回列表
+(check (ensure-length>= '(1 2 3) 2 (lambda (x) '())) => '(1 2 3))
+(check (ensure-length>= '(1 2 3 4 5) 3 (lambda (x) '())) => '(1 2 3 4 5))
+;; 测试列表长度小于指定长度，需要追加默认值
+(check (ensure-length>= '(1 2) 4 (lambda (x) '())) => '(1 2 () ()))
+(check (ensure-length>= '(1) 3 (lambda (x) '())) => '(1 () ()))
+;; 测试空列表，需要追加多个默认值
+(check (ensure-length>= '() 5 (lambda (x) '())) => '(() () () () ()))
+(check (ensure-length>= '() 3 (lambda (x) '())) => '(() () ()))
+;; 测试列表长度正好等于指定长度
+(check (ensure-length>= '(1 2 3) 3 (lambda (x) '())) => '(1 2 3))
+;; 测试default参数不是函数时，预期抛出错误
+(check-catch 'value-error (ensure-length>= '(1 2 3) 4 'not-a-function))
+;; 测试指定长度为负数，预期抛出错误
+(check-catch 'value-error (ensure-length>= '(1 2 3) -1 (lambda (x) '())))
+
+;;; ensure-length<=
+;; 测试列表长度小于等于指定长度
+(check (ensure-length<= '(1 2 3) 4) => '(1 2 3))
+(check (ensure-length<= '(1 2 3 4 5) 3) => '(1 2 3))
+;; 测试列表长度大于指定长度
+(check (ensure-length<= '(1 2 3 4 5) 2) => '(1 2))
+;; 测试空列表
+(check (ensure-length<= '() 5) => '())
+;; 测试指定长度为0
+(check (ensure-length<= '(1 2 3) 0) => '())
+;; 测试指定长度为负数，预期抛出错误
+(check-catch 'value-error (ensure-length<= '(1 2 3) -1))
+
+;;; ensure-length=
+;; 测试列表长度等于指定长度
+(check (ensure-length= '(1 2 3) 3 (lambda (x) '())) => '(1 2 3))
+;; 测试列表长度小于指定长度，需要追加默认值
+(check (ensure-length= '(1 2) 4 (lambda (x) '())) => '(1 2 () ()))
+;; 测试列表长度大于指定长度
+(check (ensure-length= '(1 2 3 4 5) 3 (lambda (x) '())) => '(1 2 3))
+;; 测试空列表，需要追加多个默认值
+(check (ensure-length= '() 5 (lambda (x) '())) => '(() () () () ()))
+;; 测试指定长度为0
+(check (ensure-length= '(1 2 3) 0 (lambda (x) '())) => '())
+;; 测试指定长度为负数，预期抛出错误
+(check-catch 'value-error (ensure-length= '(1 2 3) -1 (lambda (x) '())))
+;; 测试default参数不是函数，预期抛出错误
+(check-catch 'value-error (ensure-length= '(1 2 3) 4 'not-a-function))
 
 ; deepest flatten
 (check (flatten '((a) () (b ()) () (c)) 'deepest) => '(a b c))

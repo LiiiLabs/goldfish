@@ -37,18 +37,19 @@
   ; Liii List extensions
   list-view flatmap
   list-null? list-not-null? not-null-list?
-  length=? length>? length>=? flatten
+  length=? length>? length>=? length<? length<=?
+  split-at ensure-length>= ensure-length<= ensure-length= flatten
 )
 (import (srfi srfi-1)
         (liii error))
 (begin
 
-(define (length=? x scheme-list)
+(define (length=? scheme-list x)
   (when (< x 0)
     (value-error "length=?: expected non-negative integer x but received ~d" x))
   (cond ((and (= x 0) (null? scheme-list)) #t)
         ((or (= x 0) (null? scheme-list)) #f)
-        (else (length=? (- x 1) (cdr scheme-list)))))
+        (else (length=? (cdr scheme-list) (- x 1)))))
 
 (define (length>? lst len)
   (let loop ((lst lst)
@@ -64,6 +65,26 @@
           ((pair? lst) (loop (cdr lst) (+ cnt 1)))
           (else (<= len cnt)))))
 
+(define (length<? lst len)
+  (when (< len 1)
+    (value-error "specific length is smaller than 0 -- length<?"))
+  (do ((i 0 (+ 1 i))
+       (rest lst (cdr rest)))
+      ((or (not (pair? rest)) (= i len))
+       (< i len))))
+
+(define (length<=? lst len)  (length<? lst (+ 1 len)))
+
+(define (split-at lst n)
+  (let loop ((n n)
+             (lst lst))
+   (if (or (zero? n) (not (pair? lst)))
+       (cons '() lst)
+       (let ((result-pair (loop (- n 1) (cdr lst))))
+         (cons (cons (car lst)
+                     (car result-pair))
+               (cdr result-pair))))))
+
 (define (list-view scheme-list)
   (define (f-inner-reducer scheme-list filter filter-func rest-funcs)
     (cond ((null? rest-funcs) (list-view (filter filter-func scheme-list)))
@@ -74,7 +95,7 @@
                             (cddr rest-funcs)))))
   (define (f-inner . funcs)
     (cond ((null? funcs) scheme-list)
-          ((length=? 2 funcs)
+          ((length=? funcs 2)
            (list-view ((car funcs) (cadr funcs) scheme-list)))
           ((even? (length funcs))
            (f-inner-reducer scheme-list
@@ -100,6 +121,50 @@
 (define (list-not-null? l)
   (and (pair? l)
        (or (null? (cdr l)) (pair? (cdr l)))))
+
+;; unsafe local function, don't export this!
+(define (make-list-length>= rest n default)
+  (let loop ((rest rest)
+             (n n))
+    (cond ((= 0 n) '())
+          ((null? rest)
+           (cons (default n)
+                 (loop '()
+                       (- n 1))))
+          (else
+           (cons (car rest)
+                 (loop (cdr rest)
+                       (- n 1)))))))
+
+(define (ensure-length>= lst n default)
+  (when (not (procedure? default))
+    (value-error "default should be a function but got ~A -- ensure-length>=" default))
+  (when (> 0 n)
+    (value-error "specific length too small, which is ~A -- ensure-length>=" n))
+  (if (length>=? lst n)
+      lst
+      (make-list-length>= lst n default)))
+
+(define (ensure-length<= lst n)
+  (when (> 0 n)
+    (value-error "specific length too small, which is ~A -- ensure-length<=" n))
+  (if (length<=? lst n)
+      lst
+      (take lst n)))
+
+(define (ensure-length= lst n default)
+  (when (not (procedure? default))
+    (value-error "default should be a function but got ~A -- ensure-length=" default))
+  (when (> 0 n)
+    (value-error "specific length too small, which is ~A -- ensure-length=" n))
+  (let ((len (length lst)))
+    (cond ((= n len)
+           lst)
+          ((< n len)
+           (take lst n))
+          ((> n len)
+           (make-list-length>= lst n default)))))
+
 
 (define* (flatten lst (depth 1))
   (define (flatten-depth-iter rest depth res-node)

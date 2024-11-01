@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.3|1.2.9>>
+<TMU|<tuple|1.0.5|1.2.9.5>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref>>
 
@@ -506,7 +506,7 @@
 
     \ \ ; Extra routines for (liii base)
 
-    \ \ == != display* in? let1 compose identity typed-lambda
+    \ \ == != display* in? let1 compose identity typed-lambda atom?
 
     )
 
@@ -2220,6 +2220,38 @@
   </scm-chunk>
 
   \;
+
+  <paragraph|atom?><index|atom?>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (atom? x)
+
+    \ \ (not (list? x)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (atom? 1))
+
+    (check-true (atom? 'sym-123))
+
+    (check-true (atom? "123"))
+
+    (check-true (atom? #(1 2 3)))
+
+    \;
+
+    (check-false (atom? '()))
+
+    (check-false (atom? '(1 2 3)))
+
+    \;
+  </scm-chunk>
 
   <section|结尾>
 
@@ -5844,7 +5876,9 @@
 
     \ \ list-null? list-not-null? not-null-list?
 
-    \ \ length=? length\<gtr\>? length\<gtr\>=? flatten
+    \ \ length=? length\<gtr\>? length\<gtr\>=? length\<less\>? length\<less\>=?
+
+    \ \ split-at ensure-length\<gtr\>= ensure-length\<less\>= ensure-length= flatten
 
     )
 
@@ -7691,34 +7725,18 @@
 
   <section|三鲤扩展库>
 
-  <paragraph|length=?><index|length=?><scm|(x l) =\<gtr\> boolean>
+  <paragraph|length=?><index|length=?><scm|(l x) =\<gtr\> boolean>
 
   <\description>
-    <item*|x>期望的列表长度，如果长度为负数，该函数会抛出<scm|value-error>
-
     <item*|l>列表
+
+    <item*|x>期望的列表长度，如果长度为负数，该函数会抛出<scm|value-error>
   </description>
 
   快速判断一个列表<scm|l>的长度是否为<scm|x>。由于<scm|(= x (length l))>这种判断方式的复杂度是<math|O<around*|(|n|)>>，故而需要<scm|length=?>这种快速的判断方式。
 
-  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
-    (check-true (length=? 3 (list 1 2 3)))
-
-    (check-false (length=? 2 (list 1 2 3)))
-
-    (check-false (length=? 4 (list 1 2 3)))
-
-    \;
-
-    (check-true (length=? 0 (list )))
-
-    (check-catch 'value-error (length=? -1 (list )))
-
-    \;
-  </scm-chunk>
-
   <\scm-chunk|goldfish/liii/list.scm|true|true>
-    (define (length=? x scheme-list)
+    (define (length=? scheme-list x)
 
     \ \ (when (\<less\> x 0)
 
@@ -7728,7 +7746,23 @@
 
     \ \ \ \ \ \ \ \ ((or (= x 0) (null? scheme-list)) #f)
 
-    \ \ \ \ \ \ \ \ (else (length=? (- x 1) (cdr scheme-list)))))
+    \ \ \ \ \ \ \ \ (else (length=? (cdr scheme-list) (- x 1)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check-true (length=? (list 1 2 3) 3))
+
+    (check-false (length=? (list 1 2 3) 2))
+
+    (check-false (length=? (list 1 2 3) 4))
+
+    \;
+
+    (check-true (length=? (list ) 0))
+
+    (check-catch 'value-error (length=? (list ) -1))
 
     \;
   </scm-chunk>
@@ -7813,6 +7847,170 @@
     (check-false (length\<gtr\>=? '(1 2 . 3) 3))
 
     (check-true (length\<gtr\>=? '(1 2 . 3) 2))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|length\<less\>?><scm|(lst len) =\<gtr\> bool> <index|length\<less\>?>
+
+  <\description>
+    <item*|lst>列表
+
+    <item*|len>期望的列表长度，如果长度小于1，该函数会抛出<scm|value-error>
+  </description>
+
+  <code*|检查列表的长度是否小于给定的数字。>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (length\<less\>? lst len)
+
+    \ \ (when (\< len 1)
+
+    \ \ \ \ (value-error "specific length is smaller than 0 -- length\<?"))
+
+    \ \ (do ((i 0 (+ 1 i))
+
+    \ \ \ \ \ \ \ (rest lst (cdr rest)))
+
+    \ \ \ \ \ \ ((or (not (pair? rest)) (= i len))
+
+    \ \ \ \ \ \ \ (\< i len))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check-true (length\<less\>? '(1 2 3) 4))
+
+    (check-false (length\<less\>? '(1 2 3 4) 4))
+
+    (check-true (length\<less\>? '() 1))
+
+    \;
+
+    (check-false (length\<less\>? '(1 2 . 3) 2))
+
+    (check-true (length\<less\>? '(1 2 . 3) 3))
+
+    \;
+
+    (check-catch 'value-error (length\<? '(1) 0))
+
+    (check-catch 'value-error (length\<? '() 0))
+
+    (check-catch 'value-error (length\<less\>? '(1 2 3) -1))
+  </scm-chunk>
+
+  <paragraph|length\<less\>=?><scm|(lst len) =\<gtr\> bool> <index|length\<less\>=?>
+
+  <\description>
+    <item*|lst>列表
+
+    <item*|len>期望的列表长度，如果长度小于0，该函数会抛出<scm|value-error>
+  </description>
+
+  <code*|检查列表的长度是否小于给定的数字。>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (length\<less\>=? lst len) \ (length\<less\>? lst (+ 1 len)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check-true (length\<less\>=? '(1 2 3) 3))
+
+    (check-false (length\<less\>=? '(1 2 3 4) 3))
+
+    (check-true (length\<less\>=? '() 0))
+
+    \;
+
+    (check-false (length\<less\>=? '(1 2 . 3) 1))
+
+    (check-true (length\<less\>=? '(1 2 . 3) 2))
+
+    \;
+
+    (check-catch 'value-error (length\<less\>=? '(1) -1))
+
+    (check-catch 'value-error (length\<less\>=? '() -1))
+
+    (check-catch 'value-error (length\<less\>=? '(1 2 3) -1))
+  </scm-chunk>
+
+  <paragraph|split-at><scm|(lst n) =\<gtr\> (taked . droped)> <index|split-at>
+
+  <\description>
+    <item*|lst><code|<code*|列表，需要被分割的列表。>>
+
+    <item*|n><code|<code*|整数，指定分割的位置。>>
+
+    <item*|(taked . droped)>一个 pair，car 是前 n 项，包含第 n 项，cdr 是从第 n + 1 项开始到末尾的所有项。
+  </description>
+
+  <\code*>
+    将一个列表在指定位置分割成两个列表，返回一个包含两个列表的 pair。
+
+    实现方式：该函数通过递归方式工作。它从列表的头部开始，每次递归调用时减少n的值，直到n为零。当n为零时，递归结束，返回一个包含空列表和原始列表的 pair 单元。在递归返回的过程中，函数构建一个新的 pair 单元，将当前元素与递归返回的第一个列表组合，形成新的头部列表，并将递归返回的第二个列表作为尾部列表。
+  </code*>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (split-at lst n)
+
+    \ \ (let loop ((n n)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (lst lst))
+
+    \ \ \ (if (or (zero? n) (not (pair? lst)))
+
+    \ \ \ \ \ \ \ (cons '() lst)
+
+    \ \ \ \ \ \ \ (let ((result-pair (loop (- n 1) (cdr lst))))
+
+    \ \ \ \ \ \ \ \ \ (cons (cons (car lst)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car result-pair))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr result-pair))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    ;; 测试将列表在指定位置分割
+
+    (check (split-at '(1 2 3 4 5) 3) =\<gtr\> '((1 2 3) . (4 5)))
+
+    (check (split-at '(1 2 3) 0) =\<gtr\> '(() . (1 2 3)))
+
+    (check (split-at '(1 2 3 4 5) 0) =\<gtr\> '(() . (1 2 3 4 5)))
+
+    (check (split-at '() 3) =\<gtr\> '(() . ()))
+
+    (check (split-at '(1) 1) =\<gtr\> '((1) . ()))
+
+    \;
+
+    ;; 测试列表末尾不是null的情况
+
+    (check (split-at '(1 2 . 3) 0) =\<gtr\> '(() . (1 2 . 3)))
+
+    (check (split-at '(1 2 . 3) 1) =\<gtr\> '((1) . (2 . 3)))
+
+    (check (split-at '(1 2 . 3) 2) =\<gtr\> '((1 2) . 3))
+
+    (check (split-at '(1 2 . 3) 3) =\<gtr\> '((1 2) . 3))
+
+    \;
+
+    ;; 测试n大于列表长度的情况
+
+    (check (split-at '(1 2 3) 5) =\<gtr\> '((1 2 3) . ()))
+
+    (check (split-at '(1) 5) =\<gtr\> '((1)))
+
+    (check (split-at '(1 2 3) -1)=\<gtr\> '((1 2 3)))
 
     \;
   </scm-chunk>
@@ -7928,7 +8126,7 @@
 
     \ \ \ \ (cond ((null? funcs) scheme-list)
 
-    \ \ \ \ \ \ \ \ \ \ ((length=? 2 funcs)
+    \ \ \ \ \ \ \ \ \ \ ((length=? funcs 2)
 
     \ \ \ \ \ \ \ \ \ \ \ (list-view ((car funcs) (cadr funcs) scheme-list)))
 
@@ -8086,6 +8284,238 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|ensure-length\<gtr\>=><scm|(lst len default) =\<gtr\> new-lst><index|ensure-length\<gtr\>=>
+
+  <paragraph|ensure-length\<less\>=><scm|(lst len default) =\<gtr\> new-lst><index|ensure-length\<gtr\>=>
+
+  <paragraph|ensure-length=><scm|(lst len default) =\<gtr\> new-lst><index|ensure-length\<gtr\>=>
+
+  <\description>
+    <item*|lst>列表，需要确保长度的列表。
+
+    <item*|len>整数，指定的最小长度。
+
+    <item*|default>函数，输入是列表变长时，扩展的下标，输出默认值的函数。
+
+    <item*|new-lst> 列表，返回一个新列表，其长度至少等于n。如果原列表长度已经满足或超过n，则返回原列表。
+  </description>
+
+  \;
+
+  ensure-length\<gtr\>=：确保一个列表的长度至少等于指定的数值。如果列表长度小于指定数值，则在列表末尾追加默认值，直到长度满足要求。
+
+  ensure-length\<less\>=：确保一个列表的长度不超过指定的数值。如果列表长度超过指定数值，则截取列表的前n个元素。
+
+  ensure-length=：确保一个列表的长度等于指定的数值。如果列表长度小于指定数值，会在列表末尾追加默认值；如果列表长度超过指定数值，则截取列表的前n个元素。
+
+  \;
+
+  ensure-length\<gtr\>= \ 实现：该函数首先使用 <scm|length\>=?> 函数检查输入列表 <scm|lst> 的长度是否已经大于或等于 <scm|n>。如果是，则直接返回原列表。如果不满足长度要求，则调用 <scm|make-list-length\>=> 函数来创建一个新的列表，该列表在原列表的基础上，追加足够数量的由 <scm|default> 函数生成的默认值，直到新列表的长度至少为 <scm|n>。
+
+  注意：该函数和下面的 <goldfish-lang|ensure-length=> 函数一起使用辅助函数 <scm|make-list-length\<gtr\>=>，不应该被导出！
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    ;; unsafe local function, don't export this!
+
+    (define (make-list-length\<gtr\>= rest n default)
+
+    \ \ (let loop ((rest rest)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (n n))
+
+    \ \ \ \ (cond ((= 0 n) '())
+
+    \ \ \ \ \ \ \ \ \ \ ((null? rest)
+
+    \ \ \ \ \ \ \ \ \ \ \ (cons (default n)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (- n 1))))
+
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ (cons (car rest)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr rest)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (- n 1)))))))
+
+    \;
+
+    (define (ensure-length\<gtr\>= lst n default)
+
+    \ \ (when (not (procedure? default))
+
+    \ \ \ \ (value-error "default should be a function but got ~A -- ensure-length\<gtr\>=" default))
+
+    \ \ (when (\<gtr\> 0 n)
+
+    \ \ \ \ (value-error "specific length too small, which is ~A -- ensure-length\<gtr\>=" n))
+
+    \ \ (if (length\<gtr\>=? lst n)
+
+    \ \ \ \ \ \ lst
+
+    \ \ \ \ \ \ (make-list-length\<gtr\>= lst n default)))
+
+    \;
+  </scm-chunk>
+
+  ensure-length\<less\>= 实现：该函数首先检查指定的最大长度<scm| n >是否大于0，如果是，则抛出一个值错误。接着，使用 <scm|length\<less\>=?> 函数检查输入列表 <goldfish-lang|lst> \ 的长度是否已经小于或等于 <goldfish-lang|n>。如果是，则直接返回原列表。如果不满足长度要求，即列表长度大于 <scm|n>，则调用 <scm|take> \ 函数来截取列表的前 <goldfish-lang|n> 个元素，并返回这个截取后的列表。
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (ensure-length\<less\>= lst n)
+
+    \ \ (when (\<gtr\> 0 n)
+
+    \ \ \ \ (value-error "specific length too small, which is ~A -- ensure-length\<less\>=" n))
+
+    \ \ (if (length\<less\>=? lst n)
+
+    \ \ \ \ \ \ lst
+
+    \ \ \ \ \ \ (take lst n)))
+
+    \;
+  </scm-chunk>
+
+  ensure-length= 实现：该函数首先检查默认值提供者 <scm|default> 是否为一个函数，如果不是，则抛出一个值错误。接着，检查指定的目标长度 <goldfish-lang|n> 是否大于0，如果不是，则抛出一个值错误。然后，使用<goldfish-lang|length> 函数获取列表 <scm|lst> 的当前长度 <goldfish-lang|len>。
+
+  <\description>
+    <item*|n = len>直接返回原列表。
+
+    <item*|n \<less\> len>使用 <scm|take> 函数截取列表的前 <scm|n> 个元素，并返回这个截取后的列表。
+
+    <item*|n \<gtr\> len>调用 <goldfish-lang|make-list-length\<gtr\>=> 函数在列表末尾追加由 <scm|default> 函数生成的默认值，直到新列表的长度恰好为 <goldfish-lang|n> 。
+  </description>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    (define (ensure-length= lst n default)
+
+    \ \ (when (not (procedure? default))
+
+    \ \ \ \ (value-error "default should be a function but got ~A -- ensure-length=" default))
+
+    \ \ (when (\<gtr\> 0 n)
+
+    \ \ \ \ (value-error "specific length too small, which is ~A -- ensure-length=" n))
+
+    \ \ (let ((len (length lst)))
+
+    \ \ \ \ (cond ((= n len)
+
+    \ \ \ \ \ \ \ \ \ \ \ lst)
+
+    \ \ \ \ \ \ \ \ \ \ ((\<less\> n len)
+
+    \ \ \ \ \ \ \ \ \ \ \ (take lst n))
+
+    \ \ \ \ \ \ \ \ \ \ ((\<gtr\> n len)
+
+    \ \ \ \ \ \ \ \ \ \ \ (make-list-length\<gtr\>= lst n default)))))
+
+    \;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    ;;; ensure-length\<gtr\>=
+
+    ;; 测试列表长度已经大于等于指定长度，应该原封不动返回列表
+
+    (check (ensure-length\<gtr\>= '(1 2 3) 2 (lambda (x) '())) =\<gtr\> '(1 2 3))
+
+    (check (ensure-length\<gtr\>= '(1 2 3 4 5) 3 (lambda (x) '())) =\<gtr\> '(1 2 3 4 5))
+
+    ;; 测试列表长度小于指定长度，需要追加默认值
+
+    (check (ensure-length\<gtr\>= '(1 2) 4 (lambda (x) '())) =\<gtr\> '(1 2 () ()))
+
+    (check (ensure-length\<gtr\>= '(1) 3 (lambda (x) '())) =\<gtr\> '(1 () ()))
+
+    ;; 测试空列表，需要追加多个默认值
+
+    (check (ensure-length\<gtr\>= '() 5 (lambda (x) '())) =\<gtr\> '(() () () () ()))
+
+    (check (ensure-length\<gtr\>= '() 3 (lambda (x) '())) =\<gtr\> '(() () ()))
+
+    ;; 测试列表长度正好等于指定长度
+
+    (check (ensure-length\<gtr\>= '(1 2 3) 3 (lambda (x) '())) =\<gtr\> '(1 2 3))
+
+    ;; 测试default参数不是函数时，预期抛出错误
+
+    (check-catch 'value-error (ensure-length\<gtr\>= '(1 2 3) 4 'not-a-function))
+
+    ;; 测试指定长度为负数，预期抛出错误
+
+    (check-catch 'value-error (ensure-length\<gtr\>= '(1 2 3) -1 (lambda (x) '())))
+
+    \;
+
+    ;;; ensure-length\<less\>=
+
+    ;; 测试列表长度小于等于指定长度
+
+    (check (ensure-length\<less\>= '(1 2 3) 4) =\<gtr\> '(1 2 3))
+
+    (check (ensure-length\<less\>= '(1 2 3 4 5) 3) =\<gtr\> '(1 2 3))
+
+    ;; 测试列表长度大于指定长度
+
+    (check (ensure-length\<less\>= '(1 2 3 4 5) 2) =\<gtr\> '(1 2))
+
+    ;; 测试空列表
+
+    (check (ensure-length\<less\>= '() 5) =\<gtr\> '())
+
+    ;; 测试指定长度为0
+
+    (check (ensure-length\<less\>= '(1 2 3) 0) =\<gtr\> '())
+
+    ;; 测试指定长度为负数，预期抛出错误
+
+    (check-catch 'value-error (ensure-length\<less\>= '(1 2 3) -1))
+
+    \;
+
+    ;;; ensure-length=
+
+    ;; 测试列表长度等于指定长度
+
+    (check (ensure-length= '(1 2 3) 3 (lambda (x) '())) =\<gtr\> '(1 2 3))
+
+    ;; 测试列表长度小于指定长度，需要追加默认值
+
+    (check (ensure-length= '(1 2) 4 (lambda (x) '())) =\<gtr\> '(1 2 () ()))
+
+    ;; 测试列表长度大于指定长度
+
+    (check (ensure-length= '(1 2 3 4 5) 3 (lambda (x) '())) =\<gtr\> '(1 2 3))
+
+    ;; 测试空列表，需要追加多个默认值
+
+    (check (ensure-length= '() 5 (lambda (x) '())) =\<gtr\> '(() () () () ()))
+
+    ;; 测试指定长度为0
+
+    (check (ensure-length= '(1 2 3) 0 (lambda (x) '())) =\<gtr\> '())
+
+    ;; 测试指定长度为负数，预期抛出错误
+
+    (check-catch 'value-error (ensure-length= '(1 2 3) -1 (lambda (x) '())))
+
+    ;; 测试default参数不是函数，预期抛出错误
+
+    (check-catch 'value-error (ensure-length= '(1 2 3) 4 'not-a-function))
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <paragraph|flatten><index|flatten><scm|(lst [depth]) =\<gtr\> lst>
 

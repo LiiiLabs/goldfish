@@ -308,6 +308,14 @@
 (check (add3 1 2 3) => 6)
 (check-catch 'type-error (add3 1.2 2 3))
 
+(check-true (atom? 1))
+(check-true (atom? 'sym-123))
+(check-true (atom? "123"))
+(check-true (atom? #(1 2 3)))
+
+(check-false (atom? '()))
+(check-false (atom? '(1 2 3)))
+
 (check-report)
 
 (check (string? "MathAgape") => #t)
