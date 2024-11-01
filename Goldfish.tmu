@@ -18,7 +18,7 @@
 
     <assign|srfi|<flag|SRFI|dark red>>
 
-    <assign|goldfish-version|17.10.6>
+    <assign|goldfish-version|17.10.8>
   </hide-preamble>
 
   金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。目前专注于Scheme语言的标准库。本文档是金鱼Scheme V<value|goldfish-version>的文学编程实现，目前金鱼Scheme中几乎所有的Scheme代码实现和测试都包含在本文档中。
