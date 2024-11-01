@@ -1865,7 +1865,7 @@
 
   <section|字符>
 
-  <paragraph|char?><index|char?>
+  <value|r7rs><paragraph|char?><index|char?>
 
   判断一个对象x是否是字符类型。
 
@@ -1877,7 +1877,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|char=?><index|char=?>
+  <value|r7rs><paragraph|char=?><index|char=?>
 
   判断两个及以上字符对象是否相等。
 
