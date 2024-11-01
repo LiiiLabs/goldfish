@@ -22,7 +22,7 @@
   ; SRFI 1: Selectors
   first second third fourth fifth
   sixth seventh eighth ninth tenth
-  take drop take-right drop-right count fold fold-right
+  take drop take-right drop-right count fold fold-right split-at
   reduce reduce-right append-map filter partition remove find
   delete delete-duplicates
   ; SRFI 1: Association List
@@ -113,6 +113,15 @@
     (if (pair? lead)
         (cons (car lag) (loop (cdr lag) (cdr lead)))
         '())))
+
+(define (split-at lst n)
+  (let ((result (cons #f '())))
+    (do ((n n (- n 1))
+         (rest lst (cdr rest))
+         (node result (cdr node)))
+        ((or (zero? n) (not (pair? rest)))
+         (values (cdr result) rest))
+      (set-cdr! node (cons (car rest) '())))))
 
 (define (last-pair l)
   (if (pair? (cdr l))
