@@ -27,7 +27,8 @@
    vector-count
    vector-any vector-every vector-copy vector-copy!
    vector-index vector-index-right vector-partition
-   vector-swap! vector-cumulate reverse-list->vector))
+   vector-swap! vector-cumulate reverse-list->vector
+   vector=))
 
 (check-true (vector? (int-vector 1 2 3)))
 (check-catch 'wrong-type-arg (int-vector 1 2 'a))
@@ -62,6 +63,21 @@
 (check-false (vector-empty? (vector 1)))
 (check-catch 'type-error (vector-empty? 1))
 
+; trivial cases
+(check-true (vector= eq?))
+(check-true (vector= eq? '#(a)))
+; basic cases
+(check-true (vector= eq? '#(a b c d) '#(a b c d)))
+(check-false (vector= eq? '#(a b c d) '#(a b d c)))
+(check-false (vector= = '#(1 2 3 4 5) '#(1 2 3 4)))
+(check-true (vector= = '#(1 2 3 4) '#(1 2 3 4)))
+(check-true (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3)))
+(check-false (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3 4)))
+; error cases
+(check-catch 'type-error (vector= 1 (vector (vector 'a)) (vector (vector 'a))))
+; complex cases in srfi-133
+(check-true (vector= equal? (vector (vector 'a)) (vector (vector 'a))))
+(check-false (vector= eq? (vector (vector 'a)) (vector (vector 'a))))
 (check
   (let ((lst (make-list 5)))
     (vector-for-each

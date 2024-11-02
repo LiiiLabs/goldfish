@@ -9606,7 +9606,9 @@
 
     \ \ vector-index vector-index-right vector-partition
 
-    \ \ vector-swap! vector-cumulate reverse-list-\<gtr\>vector)
+    \ \ vector-swap! vector-cumulate reverse-list-\<gtr\>vector
+
+    \ \ vector=)
 
     (begin
 
@@ -9642,7 +9644,9 @@
 
     \ \ vector-index vector-index-right vector-partition
 
-    \ \ vector-swap! vector-cumulate reverse-list-\<gtr\>vector)
+    \ \ vector-swap! vector-cumulate reverse-list-\<gtr\>vector
+
+    \ \ vector=)
 
     (begin
 
@@ -9678,7 +9682,9 @@
 
     \ \ \ vector-index vector-index-right vector-partition
 
-    \ \ \ vector-swap! vector-cumulate reverse-list-\<gtr\>vector))
+    \ \ \ vector-swap! vector-cumulate reverse-list-\<gtr\>vector
+
+    \ \ \ vector=))
 
     \;
   </scm-chunk>
@@ -9893,7 +9899,83 @@
 
   <paragraph|vector=>
 
-  <todo|TODO>
+  使用一个元素比较器 (elt=?) 来比较传入的一组向量是否相等。当传入的向量不足两个的时候默认返回相等。元素比较器 elt=? 以及内置的比较器运算的结果都是 boolean，否则都会抛出类型错误。
+
+  因为比较一组向量是否全部相等，可以通过不断比较相邻两个来实现。所以这里的具体实现中，定义了一个名为 compare2vecs 的 内部 procedure ，它可以使用 elt=? 进行向量的两两比较。
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    (define (vector= elt=? . rest)
+
+    \ \ (define compare2vecs
+
+    \ \ \ \ (typed-lambda ((cmp procedure?) (vec1 vector?) (vec2 vector?))
+
+    \ \ \ \ \ \ \ (let* \ ((len1 (vector-length vec1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (len2 (vector-length vec2)))
+
+    \ \ \ \ \ \ \ \ \ (if (not (= len1 len2)) #f
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (let loop ((ilhs 0) (irhs 0) (len len1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (= ilhs len) #t
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (not (cmp (vec1 ilhs) (vec2 irhs))) #f\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ 1 ilhs) (+ 1 irhs) len))))))))
+
+    \ \ (when (not (procedure? elt=?)) (error 'type-error "elt=? should be a procedure"))
+
+    \ \ (if (or(null? rest) (= 1 (length rest))) #t
+
+    \ \ \ \ \ \ (let loop ((vec1 (car rest)) (vec2 (car (cdr rest))) (vrest (cdr (cdr rest))))
+
+    \ \ \ \ \ \ \ \ (let1 rst (compare2vecs elt=? vec1 vec2)
+
+    \ \ \ \ \ \ \ \ \ \ \ (when (not (boolean? rst)) (error 'type-error "elt=\<gtr\> should return bool"))
+
+    \ \ \ \ \ \ \ \ \ \ \ (if (compare2vecs elt=? vec1 vec2)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? vrest) #t
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop vec2 (car vrest) (cdr vrest)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #f)))))
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    ; trivial cases
+
+    (check-true (vector= eq?))
+
+    (check-true (vector= eq? '#(a)))
+
+    ; basic cases
+
+    (check-true (vector= eq? '#(a b c d) '#(a b c d)))
+
+    (check-false (vector= eq? '#(a b c d) '#(a b d c)))
+
+    (check-false (vector= = '#(1 2 3 4 5) '#(1 2 3 4)))
+
+    (check-true (vector= = '#(1 2 3 4) '#(1 2 3 4)))
+
+    (check-true (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3)))
+
+    (check-false (vector= equal? '#(1 2 3) '#(1 2 3) '#(1 2 3 4)))
+
+    ; error cases
+
+    (check-catch 'type-error (vector= 1 (vector (vector 'a)) (vector (vector 'a))))
+
+    ; complex cases in srfi-133
+
+    (check-true (vector= equal? (vector (vector 'a)) (vector (vector 'a))))
+
+    (check-false (vector= eq? (vector (vector 'a)) (vector (vector 'a))))
+  </scm-chunk>
+
+  \;
 
   <subsection|选择器>
 
