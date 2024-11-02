@@ -114,14 +114,19 @@
         (cons (car lag) (loop (cdr lag) (cdr lead)))
         '())))
 
-(define (split-at lst n)
+(define (split-at lst i)
+  (when (< i 0)
+    (value-error "require a index greater than 0, but got ~A -- split-at" i))
   (let ((result (cons #f '())))
-    (do ((n n (- n 1))
+    (do ((j i (- j 1))
          (rest lst (cdr rest))
          (node result (cdr node)))
-        ((or (zero? n) (not (pair? rest)))
+        ((zero? j)
          (values (cdr result) rest))
+      (when (not (pair? rest))
+        (value-error "lst length cannot be greater than i, where lst is ~A, but i is ~A-- split-at" lst i))
       (set-cdr! node (cons (car rest) '())))))
+
 
 (define (last-pair l)
   (if (pair? (cdr l))

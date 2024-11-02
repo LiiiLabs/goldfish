@@ -1,6 +1,6 @@
 <TMU|<tuple|1.0.5|1.2.9.5>>
 
-<style|<tuple|article|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
+<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
 <\body>
   <\hide-preamble>
@@ -5211,36 +5211,46 @@
     \;
   </scm-chunk>
 
-  <paragraph|split-at><scm|(lst n) =\<gtr\> (values taked droped)> \ <index|split-at>
+  <paragraph|split-at><scm|(lst i) =\<gtr\> (values taked droped)> \ <index|split-at>
 
   <\description>
     <item*|lst><code|<code*|列表，需要被分割的列表。>>
 
-    <item*|n><code|<code*|整数，指定分割的位置。>>
+    <item*|i><code|<code*|整数，指定分割的位置。>>
 
-    <item*|(values taked droped)>两个值，第一个是包含原列表前 <scm|n> 个元素的列表，第二个是原列表剩余元素的列表。
+    <item*|(values taked droped)>两个值，第一个是包含原列表前 <scm|i> 个元素的列表，第二个是原列表剩余元素的列表。
   </description>
 
-  将一个列表分割成两部分，返回两个值。第一个值是包含原列表前 <goldfish-lang|n> 个元素的列表，第二个值是原列表剩余元素的列表。
+  将一个列表分割成两部分，返回两个值。第一个值是包含原列表前 <goldfish-lang|i> 个元素的列表，第二个值是原列表剩余元素的列表。
 
-  实现细节：该函数通过迭代方式工作。它遍历列表 <scm|lst>，每次迭代将当前元素添加到结果列表中，直到达到指定的分割位置 <goldfish-lang|n> 或列表结束。如果 <goldfish-lang|n> 为 0，函数返回空列表和原始列表。如果 <scm|n> 大于列表长度，函数返回整个列表和空列表。函数使用 <scm|values> 返回两个值，这样可以同时返回两个列表。
+  实现细节：该函数通过迭代方式工作。它遍历列表 <scm|lst>，每次迭代将当前元素添加到结果列表中，直到达到指定的分割位置 <goldfish-lang|i>。如果 <goldfish-lang|i> 为 0，函数返回空列表和原始列表。如果 <scm|i> 大于列表长度或小于〇，函数报错。函数使用 <scm|values> 返回两个值，这样可以同时返回两个列表。
 
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
-    (define (split-at lst n)
+    (define (split-at lst i)
+
+    \ \ (when (\<less\> i 0)
+
+    \ \ \ \ (value-error "require a index greater than 0, but got ~A -- split-at" i))
 
     \ \ (let ((result (cons #f '())))
 
-    \ \ \ \ (do ((n n (- n 1))
+    \ \ \ \ (do ((j i (- j 1))
 
     \ \ \ \ \ \ \ \ \ (rest lst (cdr rest))
 
     \ \ \ \ \ \ \ \ \ (node result (cdr node)))
 
-    \ \ \ \ \ \ \ \ ((or (zero? n) (not (pair? rest)))
+    \ \ \ \ \ \ \ \ ((zero? j)
 
     \ \ \ \ \ \ \ \ \ (values (cdr result) rest))
 
+    \ \ \ \ \ \ (when (not (pair? rest))
+
+    \ \ \ \ \ \ \ \ (value-error "lst length cannot be greater than i, where lst is ~A, but i is ~A-- split-at" lst i))
+
     \ \ \ \ \ \ (set-cdr! node (cons (car rest) '())))))
+
+    \;
 
     \;
   </scm-chunk>
@@ -5250,9 +5260,11 @@
 
     (check (list (split-at '(1 2 3 4 5) 0)) =\<gtr\> '(() (1 2 3 4 5)))
 
-    (check (list (split-at '(1 2 3 4 5) 10)) =\<gtr\> '((1 2 3 4 5) ()))
+    \;
 
-    (check (list (split-at '(1 2 3 4 5) -1)) =\<gtr\> '((1 2 3 4 5) ()))
+    (check-catch 'value-error (split-at '(1 2 3 4 5) 10))
+
+    (check-catch 'value-error (split-at '(1 2 3 4 5) -1))
 
     \;
 
@@ -5260,19 +5272,21 @@
 
     (check (list (split-at '(1 2 3 4 . 5) 3)) =\<gtr\> '((1 2 3) (4 . 5)))
 
-    (check (list (split-at '(1 2 3 4 . 5) 10)) =\<gtr\> '((1 2 3 4) 5))
-
     (check (list (split-at '(1 2 3 4 . 5) 4)) =\<gtr\> '((1 2 3 4) 5))
 
-    (check (list (split-at '(1 2 3 4 . 5) -1)) =\<gtr\> '((1 2 3 4) 5))
+    \;
+
+    (check-catch 'value-error (split-at '(1 2 3 4 . 5) 10))
+
+    (check-catch 'value-error (split-at '(1 2 3 4 . 5) -1))
 
     \;
 
     (check (list (split-at '() 0)) =\<gtr\> '(() ()))
 
-    (check (list (split-at '() 10)) =\<gtr\> '(() ()))
+    (check-catch 'value-error (split-at '() 10))
 
-    (check (list (split-at '() -1)) =\<gtr\> '(() ()))
+    (check-catch 'value-error (split-at '() -1))
 
     \;
   </scm-chunk>
