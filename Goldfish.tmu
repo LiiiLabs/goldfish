@@ -1865,7 +1865,7 @@
 
   <section|字符>
 
-  <paragraph|char?><index|char?>
+  <value|r7rs><paragraph|char?><index|char?>
 
   判断一个对象x是否是字符类型。
 
@@ -1877,7 +1877,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|char=?><index|char=?>
+  <value|r7rs><paragraph|char=?><index|char=?>
 
   判断两个及以上字符对象是否相等。
 
@@ -1887,6 +1887,24 @@
     (check (char=? #\\A #\\A #\\A) =\<gtr\> #t)
 
     (check (char=? #\\A #\\a) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|char-\<gtr\>integer><index|char-\<gtr\>integer>
+
+  将字符转换为其对应的Unicode标量值。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (char-\<gtr\>integer #\\A) =\<gtr\> 65)
+
+    (check (char-\<gtr\>integer #\\a) =\<gtr\> 97)
+
+    (check (char-\<gtr\>integer #\\newline) =\<gtr\> 10)
+
+    (check (char-\<gtr\>integer #\\space) =\<gtr\> 32)
+
+    (check (char-\<gtr\>integer #\\tab) =\<gtr\> 9)
 
     \;
   </scm-chunk>
