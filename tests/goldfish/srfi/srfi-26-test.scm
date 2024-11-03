@@ -14,12 +14,16 @@
 ; under the License.
 ;
 
-(import (srfi srfi-26)
-        (liii check))
+(import (liii check)
+        (srfi srfi-26))
 
 (check-set-mode! 'report-failed)
+(check ((cut + <> 2) 1) => 3)
+(check ((cut <> 1 2) +) => 3)
+(check ((cut + 1 2)) => 3)
+(check ((cut <> <> <>) + 2 3) => 5)
 
-(check-catch 'wrong-number-of-args ((cut + 1 <> 2) 2 4))
-(check ((cut + 1 <> 2) 3) => 6)
+(check ((cut <> '(1 2 3)) car) => 1)
 
+(check-catch 'wrong-number-of-args ((cut + <> 2) 1 2))
 (check-report)

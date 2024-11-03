@@ -14471,6 +14471,196 @@
     \;
   </scm-chunk>
 
+  <chapter|(srfi 26)>
+
+  <section|协议>
+
+  <\scm-chunk|goldfish/srfi/srfi-26.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-26-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/srfi/srfi-26.scm|true|true>
+    (define-library (srfi srfi-26)
+
+    \ \ (import (scheme base))
+
+    \ \ (export cut)
+
+    (begin
+
+    \ \ 
+  </scm-chunk>
+
+  \;
+
+  \;
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-26-test.scm|true|true>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (srfi srfi-26))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+  </scm-chunk>
+
+  <section|srfi-26 简介>
+
+  TODO
+
+  <section|实现>
+
+  <paragraph|cut . formal-args =\<gtr\> procedure><index|bytevector-base64-encode>
+
+  cut 是一个宏，通过 define-macro 定义。
+
+  cut 接受一个参数列表，这个参数列表中可能包含若干个占位符（\<less\>\<gtr\>），然后构造出来一个 lambda 表达式。构造出的表达式能够接受占位符数量的参数，详情请阅读 srfi-26。
+
+  常见情况如下：
+
+  占位符是 proc 本身：(cut \<less\>\<gtr\> args) proc) =\<gtr\> (proc args)
+
+  参数占位符：((cut proc arg1 \<less\>\<gtr\> arg2 <text-dots>) input1) =\<gtr\> (proc arg1 input1 arg2 <text-dots>)
+
+  实现中，由于参数中可能压根没有占位符，可能出现比如 "cut + 1 2" 的正常表达式，这种情况下 args 必须是空列表。所以在 quasiquote 的代码中不应该对 args 做任何除了参数数量之外的任何类型检查。
+
+  \;
+
+  <\scm-chunk|goldfish/srfi/srfi-26.scm|true|true>
+    (define-macro (cut . formal-args)
+
+    \ \ (let* ((cnt-holes 0)
+
+    \ \ \ \ \ \ \ \ \ (slotted-args (map (lambda (x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (eq? '\<\> x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin (set! cnt-holes (+ 1 cnt-holes)) 'slot) x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ formal-args)))
+
+    \ \ \ `(lambda args
+
+    \ \ \ \ (when (not (= (length args) ,cnt-holes))
+
+    \ \ \ \ \ \ (error 'wrong-number-of-args
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ "The number of args should be same with the holes."))
+
+    \ \ \ \ (let1 formal-call (map (lambda (x) (if (not (eq? x 'slot)) x
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let1 subst-arg (car args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! args (cdr args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ subst-arg)))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ',slotted-args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (eval formal-call)))))
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-26-test.scm|true|true>
+    (check ((cut + \<less\>\<gtr\> 2) 1) =\<gtr\> 3)
+
+    (check ((cut \<less\>\<gtr\> 1 2) +) =\<gtr\> 3)
+
+    (check ((cut + 1 2)) =\<gtr\> 3)
+
+    (check ((cut \<\> \<\> \<\>) + 2 3) =\> 5)
+
+    \;
+
+    (check ((cut \<less\>\<gtr\> '(1 2 3)) car) =\<gtr\> 1)
+
+    \;
+
+    (check-catch 'wrong-number-of-args ((cut + \<less\>\<gtr\> 2) 1 2))
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/srfi/srfi-26.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/srfi/srfi-26-test.scm|true|false>
+    (check-report)
+  </scm-chunk>
+
   <chapter|(liii os)>
 
   <section|协议>
