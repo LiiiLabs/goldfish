@@ -132,6 +132,23 @@
 (check-catch 'out-of-range (drop-right '(1 2 3 4) -1))
 (check-catch 'out-of-range (drop-right '(1 2 3 . 4) 4))
 
+(check (list (split-at '(1 2 3 4 5) 3)) => '((1 2 3) (4 5)))
+(check (list (split-at '(1 2 3 4 5) 0)) => '(() (1 2 3 4 5)))
+
+(check-catch 'value-error (split-at '(1 2 3 4 5) 10))
+(check-catch 'value-error (split-at '(1 2 3 4 5) -1))
+
+(check (list (split-at '(1 2 3 4 . 5) 0)) => '(() (1 2 3 4 . 5)))
+(check (list (split-at '(1 2 3 4 . 5) 3)) => '((1 2 3) (4 . 5)))
+(check (list (split-at '(1 2 3 4 . 5) 4)) => '((1 2 3 4) 5))
+
+(check-catch 'value-error (split-at '(1 2 3 4 . 5) 10))
+(check-catch 'value-error (split-at '(1 2 3 4 . 5) -1))
+
+(check (list (split-at '() 0)) => '(() ()))
+(check-catch 'value-error (split-at '() 10))
+(check-catch 'value-error (split-at '() -1))
+
 (check (last-pair '(a b c)) => '(c))
 (check (last-pair '(c)) => '(c))
 
