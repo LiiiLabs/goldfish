@@ -29,6 +29,10 @@
 (begin
 
 (define bitwise-or bitwise-ior)
+(define (bitwise-andc1 i j)  (bitwise-and (bitwise-not i) j))   
+(define (bitwise-andc2 i j)  (bitwise-and i (bitwise-not j)))   
+(define (bitwise-orc1  i j)  (bitwise-ior (bitwise-not i) j))
+(define (bitwise-orc2  i j)  (bitwise-ior i (bitwise-not j)))
 
 ) ; end of begin
 ) ; end of library
