@@ -1891,6 +1891,24 @@
     \;
   </scm-chunk>
 
+  <value|r7rs><paragraph|char-\<gtr\>integer><index|char-\<gtr\>integer>
+
+  将字符转换为其对应的Unicode标量值。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (char-\<gtr\>integer #\\A) =\<gtr\> 65)
+
+    (check (char-\<gtr\>integer #\\a) =\<gtr\> 97)
+
+    (check (char-\<gtr\>integer #\\newline) =\<gtr\> 10)
+
+    (check (char-\<gtr\>integer #\\space) =\<gtr\> 32)
+
+    (check (char-\<gtr\>integer #\\tab) =\<gtr\> 9)
+
+    \;
+  </scm-chunk>
+
   <section|字符串>
 
   见<smart-ref|chapter:liii_string>
