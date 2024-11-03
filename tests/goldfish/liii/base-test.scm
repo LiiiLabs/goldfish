@@ -149,6 +149,32 @@
 (check-catch 'wrong-type-arg (zero? #t))
 (check-catch 'wrong-type-arg (zero? #f))
 
+(check-true (positive? 1))
+(check-true (positive? 0.1))
+(check-true (positive? 1/2))
+
+(check-false (positive? 0))
+(check-false (positive? -1))
+(check-false (positive? -1.1))
+(check-false (positive? -1/2))
+
+(check-catch 'wrong-type-arg (positive? #\A))
+(check-catch 'wrong-type-arg (positive? #t))
+(check-catch 'wrong-type-arg (positive? #f))
+
+(check-true (negative? -1))
+(check-true (negative? -0.1))
+(check-true (negative? -1/2))
+
+(check-false (negative? 0))
+(check-false (negative? 1))
+(check-false (negative? 1.1))
+(check-false (negative? 1/2))
+
+(check-catch 'wrong-type-arg (negative? #\A))
+(check-catch 'wrong-type-arg (negative? #t))
+(check-catch 'wrong-type-arg (negative? #f))
+
 (check (floor 1.1) => 1.0)
 (check (floor 1) => 1)
 (check (floor 1/2) => 0)

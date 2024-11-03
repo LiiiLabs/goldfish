@@ -1241,9 +1241,89 @@
     \;
   </scm-chunk>
 
-  <value|r7rs><paragraph|positive?><index|positive?>
+  <value|r7rs><paragraph|positive?><index|positive?><scm|(x) =\<gtr\> boolean?>
 
-  <value|r7rs><paragraph|negative?><index|negative?>
+  判断一个数是否为正数。
+
+  <subparagraph|真>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (positive? 1))
+
+    (check-true (positive? 0.1))
+
+    (check-true (positive? 1/2))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|假>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-false (positive? 0))
+
+    (check-false (positive? -1))
+
+    (check-false (positive? -1.1))
+
+    (check-false (positive? -1/2))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|类型错误>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (positive? #\\A))
+
+    (check-catch 'wrong-type-arg (positive? #t))
+
+    (check-catch 'wrong-type-arg (positive? #f))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|negative?><index|negative?><scm|(x) =\<gtr\> boolean?>
+
+  判断一个数是否为负数。
+
+  <subparagraph|真>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (negative? -1))
+
+    (check-true (negative? -0.1))
+
+    (check-true (negative? -1/2))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|假>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-false (negative? 0))
+
+    (check-false (negative? 1))
+
+    (check-false (negative? 1.1))
+
+    (check-false (negative? 1/2))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|类型错误>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (negative? #\\A))
+
+    (check-catch 'wrong-type-arg (negative? #t))
+
+    (check-catch 'wrong-type-arg (negative? #f))
+
+    \;
+  </scm-chunk>
 
   <value|r7rs><paragraph|odd?><index|odd?>
 
