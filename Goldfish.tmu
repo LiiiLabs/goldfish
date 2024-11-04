@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.4|1.2.9.3>>
+<TMU|<tuple|1.0.5|1.2.9.5>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -7360,7 +7360,7 @@
 
     \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-or bitwise-nor bitwise-nand
 
-    \ \ bit-count bitwise-orc1 bitwise-orc2
+    \ \ bit-count bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
 
     \ \ arithmetic-shift
 
@@ -7384,7 +7384,7 @@
 
     \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand bit-count\ 
 
-    \ \ bitwise-orc1 bitwise-orc2
+    \ \ bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
 
     \ \ arithmetic-shift
 
@@ -7713,6 +7713,70 @@
     (check (bitwise-orc2 #b1001 #b0111) =\> -7)
 
     (check (bitwise-orc2 #b1011 #b0101) =\> -5)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <value|srfi><paragraph|bitwise-andc1><index|bitwise-andc1>
+
+  使用S7内置的<with|font-family|tt|bitwise-and>和<scm|bitwise-not>实现。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define (bitwise-andc1 i j) \ 
+
+    \ \ (bitwise-and (bitwise-not i) j))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bitwise-andc1 11 26) =\> 16)
+
+    (check (bitwise-andc1 5 3) =\> 2)
+
+    (check (bitwise-andc1 #b1100 #b1010) =\> 2)
+
+    (check (bitwise-andc1 0 15) =\> 15)
+
+    (check (bitwise-andc1 15 0) =\> 0)
+
+    (check (bitwise-andc1 7 1) =\> 0)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <value|srfi><paragraph|bitwise-andc2><index|bitwise-andc2>
+
+  使用S7内置的<with|font-family|tt|bitwise-and>和<scm|bitwise-not>实现。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define (bitwise-andc2 i j)\ 
+
+    \ \ (bitwise-and i (bitwise-not j)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bitwise-andc2 11 26) =\> 1)
+
+    (check (bitwise-andc2 5 3) =\> 4)
+
+    (check (bitwise-andc2 #b1100 #b1010) =\> 4)
+
+    (check (bitwise-andc2 0 15) =\> 0)
+
+    (check (bitwise-andc2 15 0) =\> 15)
+
+    (check (bitwise-andc2 7 1) =\> 6)
 
     \;
   </scm-chunk>
