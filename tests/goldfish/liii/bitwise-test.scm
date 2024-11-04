@@ -67,6 +67,19 @@
 (check (bit-count -30) =>  4)
 (check (bit-count (arithmetic-shift #b10 61)) => 1)
 
+(check (bitwise-orc1 1 1) => -1)
+(check (bitwise-orc1 3 1) => -3)
+(check (bitwise-orc1 11 26) => -2)
+(check (bitwise-orc1 #b110 #b001) => -7)
+(check (bitwise-orc1 #b1001 #b0111) => -9)
+(check (bitwise-orc1 #b1011 #b0101) => -11)
+
+(check (bitwise-orc2 11 26) => -17)
+(check (bitwise-orc2 3 1) => -1)
+(check (bitwise-orc2 #b110 #b001) => -2)
+(check (bitwise-orc2 #b1001 #b0111) => -7)
+(check (bitwise-orc2 #b1011 #b0101) => -5)
+
 (check (arithmetic-shift #b10 -1) => #b1) ; 2 >> 1 = 1
 (check (arithmetic-shift #b10 1) => #b100) ; 2 << 1 = 4
 (check (arithmetic-shift #b1000 -2) => #b10) ; 8 >> 2 = 2

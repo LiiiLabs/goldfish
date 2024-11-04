@@ -323,9 +323,8 @@
 
 (check (char->integer #\A) => 65)
 (check (char->integer #\a) => 97)
-
 (check (char->integer #\newline) => 10)
-(check (char->integer #\space) => 32) 
+(check (char->integer #\space) => 32)
 (check (char->integer #\tab) => 9)
 
 (check (bytevector 1) => #u8(1))
