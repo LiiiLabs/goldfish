@@ -15524,6 +15524,120 @@
 
     \;
   </scm-chunk>
+
+  <chapter|基础设施>
+
+  <section|持续集成>
+
+  <subsection|Github平台macOS系统>
+
+  <\verbatim-chunk|.github/workflows/ci-macos.yml|false|false>
+    name: Build and Test on macOS
+
+    \;
+
+    on:
+
+    \ \ push:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ pull_request:
+
+    \ \ \ \ branches: [ main ]
+
+    \;
+  </verbatim-chunk>
+
+  \;
+
+  <\verbatim-chunk|.github/workflows/ci-macos.yml|false|false>
+    jobs:
+
+    \ \ macosbuild:
+
+    \ \ \ \ runs-on: macos-13
+
+    \ \ \ \ steps:
+
+    \ \ \ \ \ \ - uses: actions/checkout@v2
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ fetch-depth: 1
+
+    \;
+
+    \ \ \ \ \ \ - name: cache xmake
+
+    \ \ \ \ \ \ \ \ uses: actions/cache@v2
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ path: \|
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{github.workspace}}/build/.build_cache
+
+    \ \ \ \ \ \ \ \ \ \ \ \ /Users/runner/.xmake
+
+    \ \ \ \ \ \ \ \ \ \ key: ${{ runner.os }}-xmake-${{ hashFiles('**/xmake.lua') }}
+
+    \;
+
+    \ \ \ \ \ \ - name: set XMAKE_GLOBALDIR
+
+    \ \ \ \ \ \ \ \ run: echo "XMAKE_GLOBALDIR=${{ runner.workspace }}/xmake-global" \<gtr\>\<gtr\> $GITHUB_ENV
+
+    \;
+
+    \ \ \ \ \ \ - uses: xmake-io/github-action-setup-xmake@v1
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ xmake-version: v2.8.7
+
+    \ \ \ \ \ \ \ \ \ \ actions-cache-folder: '.xmake-cache'
+
+    \;
+
+    \ \ \ \ \ \ - name: xmake repo --update
+
+    \ \ \ \ \ \ \ \ run: xmake repo --update
+
+    \;
+
+    \ \ \ \ \ \ - name: cache packages from xrepo
+
+    \ \ \ \ \ \ \ \ uses: actions/cache@v3
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ path: \|
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+
+    \ \ \ \ \ \ \ \ \ \ key: ${{ runner.os }}-xrepo-${{ hashFiles('**/xmake.lua') }}
+
+    \;
+
+    \ \ \ \ \ \ - name: config
+
+    \ \ \ \ \ \ \ \ run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
+
+    \;
+
+    \ \ \ \ \ \ - name: build
+
+    \ \ \ \ \ \ \ \ run: xmake build --yes -vD goldfish
+
+    \;
+
+    \ \ \ \ \ \ - name: run tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \;
+  </verbatim-chunk>
 </body>
 
 <\initial>
