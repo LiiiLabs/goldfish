@@ -7674,17 +7674,17 @@
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
-    (check (bitwise-orc1 1 1) =\> -1)
+    (check (bitwise-orc1 1 1) =\<gtr\> -1)
 
-    (check (bitwise-orc1 3 1) =\> -3)
+    (check (bitwise-orc1 3 1) =\<gtr\> -3)
 
-    (check (bitwise-orc1 11 26) =\> -2)
+    (check (bitwise-orc1 11 26) =\<gtr\> -2)
 
-    (check (bitwise-orc1 #b110 #b001) =\> -7)
+    (check (bitwise-orc1 #b110 #b001) =\<gtr\> -7)
 
-    (check (bitwise-orc1 #b1001 #b0111) =\> -9)
+    (check (bitwise-orc1 #b1001 #b0111) =\<gtr\> -9)
 
-    (check (bitwise-orc1 #b1011 #b0101) =\> -11)
+    (check (bitwise-orc1 #b1011 #b0101) =\<gtr\> -11)
 
     \;
   </scm-chunk>
@@ -7706,15 +7706,15 @@
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
-    (check (bitwise-orc2 11 26) =\> -17)
+    (check (bitwise-orc2 11 26) =\<gtr\> -17)
 
-    (check (bitwise-orc2 3 1) =\> -1)
+    (check (bitwise-orc2 3 1) =\<gtr\> -1)
 
-    (check (bitwise-orc2 #b110 #b001) =\> -2)
+    (check (bitwise-orc2 #b110 #b001) =\<gtr\> -2)
 
-    (check (bitwise-orc2 #b1001 #b0111) =\> -7)
+    (check (bitwise-orc2 #b1001 #b0111) =\<gtr\> -7)
 
-    (check (bitwise-orc2 #b1011 #b0101) =\> -5)
+    (check (bitwise-orc2 #b1011 #b0101) =\<gtr\> -5)
 
     \;
   </scm-chunk>
@@ -7736,17 +7736,17 @@
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
-    (check (bitwise-andc1 11 26) =\> 16)
+    (check (bitwise-andc1 11 26) =\<gtr\> 16)
 
-    (check (bitwise-andc1 5 3) =\> 2)
+    (check (bitwise-andc1 5 3) =\<gtr\> 2)
 
-    (check (bitwise-andc1 #b1100 #b1010) =\> 2)
+    (check (bitwise-andc1 #b1100 #b1010) =\<gtr\> 2)
 
-    (check (bitwise-andc1 0 15) =\> 15)
+    (check (bitwise-andc1 0 15) =\<gtr\> 15)
 
-    (check (bitwise-andc1 15 0) =\> 0)
+    (check (bitwise-andc1 15 0) =\<gtr\> 0)
 
-    (check (bitwise-andc1 7 1) =\> 0)
+    (check (bitwise-andc1 7 1) =\<gtr\> 0)
 
     \;
   </scm-chunk>
@@ -7768,17 +7768,17 @@
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
-    (check (bitwise-andc2 11 26) =\> 1)
+    (check (bitwise-andc2 11 26) =\<gtr\> 1)
 
-    (check (bitwise-andc2 5 3) =\> 4)
+    (check (bitwise-andc2 5 3) =\<gtr\> 4)
 
-    (check (bitwise-andc2 #b1100 #b1010) =\> 4)
+    (check (bitwise-andc2 #b1100 #b1010) =\<gtr\> 4)
 
-    (check (bitwise-andc2 0 15) =\> 0)
+    (check (bitwise-andc2 0 15) =\<gtr\> 0)
 
-    (check (bitwise-andc2 15 0) =\> 15)
+    (check (bitwise-andc2 15 0) =\<gtr\> 15)
 
-    (check (bitwise-andc2 7 1) =\> 6)
+    (check (bitwise-andc2 7 1) =\<gtr\> 6)
 
     \;
   </scm-chunk>
