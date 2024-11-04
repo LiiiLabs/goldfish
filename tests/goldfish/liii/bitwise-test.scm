@@ -80,6 +80,20 @@
 (check (bitwise-orc2 #b1001 #b0111) => -7)
 (check (bitwise-orc2 #b1011 #b0101) => -5)
 
+(check (bitwise-andc1 11 26) => 16)
+(check (bitwise-andc1 5 3) => 2)
+(check (bitwise-andc1 #b1100 #b1010) => 2)
+(check (bitwise-andc1 0 15) => 15)
+(check (bitwise-andc1 15 0) => 0)
+(check (bitwise-andc1 7 1) => 0)
+
+(check (bitwise-andc2 11 26) => 1)
+(check (bitwise-andc2 5 3) => 4)
+(check (bitwise-andc2 #b1100 #b1010) => 4)
+(check (bitwise-andc2 0 15) => 0)
+(check (bitwise-andc2 15 0) => 15)
+(check (bitwise-andc2 7 1) => 6)
+
 (check (arithmetic-shift #b10 -1) => #b1) ; 2 >> 1 = 1
 (check (arithmetic-shift #b10 1) => #b100) ; 2 << 1 = 4
 (check (arithmetic-shift #b1000 -2) => #b10) ; 8 >> 2 = 2
