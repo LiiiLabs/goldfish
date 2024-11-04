@@ -20,7 +20,7 @@
 
     <assign|goldfish-version|17.10.8>
 
-    <assign|type-hint|<macro|body|<goldfish-lang|<arg|body>>>>
+    <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
   </hide-preamble>
 
   金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。目前专注于Scheme语言的标准库。本文档是金鱼Scheme V<value|goldfish-version>的文学编程实现，目前金鱼Scheme中几乎所有的Scheme代码实现和测试都包含在本文档中。
@@ -7417,7 +7417,7 @@
 
   <paragraph|lognot><index|lognot>
 
-  <value|srfi><paragraph|bitwise-not><index|bitwise-not><type-hint|((x integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-not><index|bitwise-not><typehint|((x integer?)) =\<gtr\> boolean?>
 
   使用S7内置的lognot实现，不推荐使用<scm|lognot>。
 
@@ -7443,7 +7443,7 @@
 
   <paragraph|logand><index|logand>
 
-  <value|srfi><paragraph|bitwise-and><index|bitwise-and><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-and><index|bitwise-and><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|logand>实现，不推荐使用<scm|logand>。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
 
@@ -7473,7 +7473,7 @@
 
   <paragraph|logior><index|logior>
 
-  <value|srfi><paragraph|bitwise-or><index|bitwise-or><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-or><index|bitwise-or><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|logior>实现，不推荐使用<scm|logior>。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
 
@@ -7509,7 +7509,7 @@
 
   <paragraph|logxor><index|logxor>
 
-  <value|srfi><paragraph|bitwise-xor><index|bitwise-xor><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-xor><index|bitwise-xor><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<scm|logxor>实现，不推荐使用<scm|logxor>，推荐使用<scm|bitwise-xor>。
 
@@ -7545,7 +7545,7 @@
 
   <paragraph|lognot><index|lognot>
 
-  <value|srfi><paragraph|bitwise-nor><index|bitwise-nor><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-nor><index|bitwise-nor><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-ior>实现。
 
@@ -7577,7 +7577,7 @@
 
   <paragraph|lognot><index|lognot>
 
-  <value|srfi><paragraph|bitwise-nand><index|bitwise-nand><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-nand><index|bitwise-nand><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-and>实现。
 
@@ -7659,7 +7659,7 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-orc1><index|bitwise-orc1><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-orc1><index|bitwise-orc1><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|bitwise-ior>和<scm|bitwise-not>实现。
 
@@ -7691,7 +7691,7 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-orc2><index|bitwise-orc2><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-orc2><index|bitwise-orc2><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|bitwise-ior>和<scm|bitwise-not>实现。
 
@@ -7721,7 +7721,7 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-andc1><index|bitwise-andc1><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-andc1><index|bitwise-andc1><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<scm|bitwise-and>和<scm|bitwise-not>实现。
 
@@ -7753,7 +7753,7 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-andc2><index|bitwise-andc2><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-andc2><index|bitwise-andc2><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<scm|bitwise-and>和<scm|bitwise-not>实现。
 
@@ -7787,7 +7787,7 @@
 
   <paragraph|ash><index|ash>
 
-  <value|srfi><paragraph|arithmetic-shift><index|arithmetic-shift><type-hint|((i integer?) (shift integer?)) =\<gtr\> integer?>
+  <value|srfi><paragraph|arithmetic-shift><index|arithmetic-shift><typehint|((i integer?) (shift integer?)) =\<gtr\> integer?>
 
   log开头的S7内置函数不推荐使用，原因是log不符合位运算的语义，<scm|ash>是<scm|arithmetic-shift>的简写，能够有效避免<scm|arithmetic>这个单词拼写错误的可能性，仍旧是推荐使用的。从代码可读性上考虑，还是使用<scm|arithmetic-shift>更加合适。
 
@@ -13195,7 +13195,7 @@
 
   <subsection|构造器>
 
-  <paragraph|make-hash-table><index|make-hash-table>
+  <paragraph|make-hash-table><index|make-hash-table><todo|>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
     (define (make-hash-table . args)
@@ -13245,9 +13245,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table>
+  <paragraph|hash-table><todo|>
 
-  <paragraph|alist-\<gtr\>hash-table><index|alist-\<gtr\>hash-table>
+  <paragraph|alist-\<gtr\>hash-table><index|alist-\<gtr\>hash-table><todo|>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
     (define alist-\<gtr\>hash-table
@@ -13277,11 +13277,11 @@
 
   <subsection|谓词>
 
-  <paragraph|hash-table?><index|hash-table?>
+  <paragraph|hash-table?><index|hash-table?><typehint|(obj) =\<gtr\> boolean?>
 
   S7内置函数。判断一个对象是不是哈希表。
 
-  <paragraph|hash-table-contains?><index|hash-table-contains?><scm|((ht hash-table?) key) =\<gtr\> bool>
+  <paragraph|hash-table-contains?><index|hash-table-contains?><typehint|((ht hash-table?) key) =\<gtr\> boolean?>
 
   <subparagraph|实现>
 
@@ -13309,7 +13309,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-empty?><index|hash-table-empty?>
+  <paragraph|hash-table-empty?><index|hash-table-empty?><typehint|((ht hash-table?)) =\<gtr\> boolean?>
 
   <subparagraph|实现>
 
@@ -13337,7 +13337,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table=?><index|hash-table=?><scm|(ht1 ht2) =\<gtr\> boolean>
+  <paragraph|hash-table=?><index|hash-table=?><typehint|((ht1 hash-table?) (ht2 hash-table?)) =\<gtr\> boolean?>
+
+  <todo|改进实现，需要使用typed-lambda保证ht1和ht2都是哈希表>
 
   <subparagraph|实现>
 
@@ -13379,7 +13381,7 @@
 
   <subsection|选择器>
 
-  <paragraph|hash-table-ref><index|hash-table-ref><scm|(hash-table-ref ht key) =\<gtr\> value>
+  <paragraph|hash-table-ref><index|hash-table-ref><typehint|((ht hash-table?) key) =\<gtr\> value>
 
   <\description>
     <item*|ht>哈希表
@@ -13409,7 +13411,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-ref/default><index|hash-table-ref/default><scm|(hash-table-ref/default ht key default) =\<gtr\> value>
+  <paragraph|hash-table-ref/default><index|hash-table-ref/default><typehint|((ht hash-table?) key default) =\<gtr\> value>
+
+  <todo|需要设计一种合理的方式，标注default参数实际上是惰性求值的>
 
   <\description>
     <item*|ht>哈希表
@@ -13463,7 +13467,7 @@
 
   <subsection|修改器>
 
-  <paragraph|hash-table-set!><index|hash-table-set!>
+  <paragraph|hash-table-set!><index|hash-table-set!><todo|typehint>
 
   <subparagraph|测试>
 
@@ -13505,7 +13509,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-delete!><index|hash-table-delete!>
+  <paragraph|hash-table-delete!><index|hash-table-delete!><todo|typehints>
 
   <subparagraph|测试>
 
@@ -13565,7 +13569,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-update!><index|hash-table-update!>
+  <paragraph|hash-table-update!><index|hash-table-update!><todo|typehint>
 
   <subparagraph|实现>
 
@@ -13597,7 +13601,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-clear!><index|hash-table-clear!>
+  <paragraph|hash-table-clear!><index|hash-table-clear!><todo|typehint>
 
   <subparagraph|实现>
 
@@ -13637,7 +13641,7 @@
 
   <subsection|哈希表整体>
 
-  <paragraph|hash-table-size><index|hash-table-size>
+  <paragraph|hash-table-size><index|hash-table-size><typehint|((ht hash-table?)) =\<gtr\> integer?>
 
   <subparagraph|实现>
 
@@ -13667,7 +13671,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-keys><index|hash-table-keys>
+  <paragraph|hash-table-keys><index|hash-table-keys><typehint|((ht hash-table?)) =\<gtr\> list?>
 
   <subparagraph|实现>
 
@@ -13695,7 +13699,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-values><index|hash-table-values>
+  <paragraph|hash-table-values><index|hash-table-values><todo|typehint>
 
   <subparagraph|实现>
 
@@ -13723,7 +13727,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-entries><index|hash-table-entries>
+  <paragraph|hash-table-entries><index|hash-table-entries><todo|typehint>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
     (define hash-table-entries
@@ -13761,7 +13765,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-find><index|hash-table-find><scm|(proc (ht hash-table?) failure) =\<gtr\> obj>
+  <paragraph|hash-table-find><index|hash-table-find><typehint|(proc (ht hash-table?) failure) =\<gtr\> obj>
 
   对于哈希表中的每个关联项，调用proc函数处理它的键和值。如果proc返回真（true），那么hash-table-find函数将返回proc返回的结果。如果所有对proc的调用都返回假（#f），则返回调用thunk failure函数的结果。
 
@@ -13775,7 +13779,7 @@
 
   \;
 
-  <paragraph|hash-table-count><index|hash-table-count>
+  <paragraph|hash-table-count><index|hash-table-count><typehint|((pred? procedure?) (ht hash-table?)) =\<gtr\> integer?>
 
   <subparagraph|实现>
 
@@ -13853,7 +13857,7 @@
 
   <subsection|映射和折叠>
 
-  <paragraph|hash-table-foreach><index|hash-table-foreach><scm|((proc procedure?) (ht hash-table?)) =\<gtr\> #\<less\>unspeficied\<gtr\>>
+  <paragraph|hash-table-foreach><index|hash-table-foreach><typehint|((proc procedure?) (ht hash-table?)) =\<gtr\> #\<less\>unspeficied\<gtr\>>
 
   对哈希表中的每个关联调用 proc，传递两个参数：关联的键和关联的值。proc 返回的值被丢弃。返回一个未指定的值。
 
@@ -13885,7 +13889,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|hash-table-map-\<gtr\>list><index|hash-table-map-\<gtr\>list><scm|((proc procedure?) (ht hash-table?)) =\<gtr\> list>
+  <paragraph|hash-table-map-\<gtr\>list><index|hash-table-map-\<gtr\>list><typehint|((proc procedure?) (ht hash-table?)) =\<gtr\> list?>
 
   对哈希表中的每个关联调用 proc，传递两个参数：关联的键和关联的值。每次调用 proc 返回的值会被累积到一个列表中，并最终返回该列表。
 
@@ -13927,7 +13931,7 @@
 
   <subsection|复制和转换>
 
-  <paragraph|hash-table-\<gtr\>alist><index|hash-table-\<gtr\>alist>
+  <paragraph|hash-table-\<gtr\>alist><index|hash-table-\<gtr\>alist><todo|typehint>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
     (define hash-table-\<gtr\>alist
