@@ -15531,7 +15531,7 @@
 
   <subsection|Github平台macOS系统>
 
-  <\verbatim-chunk|.github/workflows/ci-macos.yml|false|false>
+  <\verbatim-chunk|.github/workflows/ci-macos.yml|false|true>
     name: Build and Test on macOS
 
     \;
@@ -15551,7 +15551,7 @@
 
   \;
 
-  <\verbatim-chunk|.github/workflows/ci-macos.yml|false|false>
+  <\verbatim-chunk|.github/workflows/ci-macos.yml|true|false>
     jobs:
 
     \ \ macosbuild:
