@@ -19,6 +19,8 @@
     <assign|srfi|<flag|SRFI|dark red>>
 
     <assign|goldfish-version|17.10.8>
+
+    <assign|type-hint|<macro|body|<goldfish-lang|<arg|body>>>>
   </hide-preamble>
 
   金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。目前专注于Scheme语言的标准库。本文档是金鱼Scheme V<value|goldfish-version>的文学编程实现，目前金鱼Scheme中几乎所有的Scheme代码实现和测试都包含在本文档中。
@@ -7415,7 +7417,7 @@
 
   <paragraph|lognot><index|lognot>
 
-  <value|srfi><paragraph|bitwise-not><index|bitwise-not>
+  <value|srfi><paragraph|bitwise-not><index|bitwise-not><type-hint|((x integer?)) =\<gtr\> boolean?>
 
   使用S7内置的lognot实现，不推荐使用<scm|lognot>。
 
@@ -7441,7 +7443,7 @@
 
   <paragraph|logand><index|logand>
 
-  <value|srfi><paragraph|bitwise-and><index|bitwise-and>
+  <value|srfi><paragraph|bitwise-and><index|bitwise-and><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|logand>实现，不推荐使用<scm|logand>。此函数应用<with|font-family|tt|and>运算在整数的二进制表示上。
 
@@ -7471,7 +7473,7 @@
 
   <paragraph|logior><index|logior>
 
-  <value|srfi><paragraph|bitwise-or><index|bitwise-or>
+  <value|srfi><paragraph|bitwise-or><index|bitwise-or><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|logior>实现，不推荐使用<scm|logior>。此函数应用<with|font-family|tt|or>运算在整数的二进制表示上。
 
@@ -7507,7 +7509,7 @@
 
   <paragraph|logxor><index|logxor>
 
-  <value|srfi><paragraph|bitwise-xor><index|bitwise-xor>
+  <value|srfi><paragraph|bitwise-xor><index|bitwise-xor><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<scm|logxor>实现，不推荐使用<scm|logxor>，推荐使用<scm|bitwise-xor>。
 
@@ -7543,7 +7545,7 @@
 
   <paragraph|lognot><index|lognot>
 
-  <value|srfi><paragraph|bitwise-nor><index|bitwise-nor>
+  <value|srfi><paragraph|bitwise-nor><index|bitwise-nor><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-ior>实现。
 
@@ -7575,7 +7577,7 @@
 
   <paragraph|lognot><index|lognot>
 
-  <value|srfi><paragraph|bitwise-nand><index|bitwise-nand>
+  <value|srfi><paragraph|bitwise-nand><index|bitwise-nand><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|lognot>和<scm|bitwise-and>实现。
 
@@ -7657,7 +7659,7 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-orc1><index|bitwise-orc1>
+  <value|srfi><paragraph|bitwise-orc1><index|bitwise-orc1><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|bitwise-ior>和<scm|bitwise-not>实现。
 
@@ -7689,7 +7691,7 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-orc2><index|bitwise-orc2>
+  <value|srfi><paragraph|bitwise-orc2><index|bitwise-orc2><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用S7内置的<with|font-family|tt|bitwise-ior>和<scm|bitwise-not>实现。
 
@@ -7719,9 +7721,9 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-andc1><index|bitwise-andc1>
+  <value|srfi><paragraph|bitwise-andc1><index|bitwise-andc1><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
-  使用S7内置的<with|font-family|tt|bitwise-and>和<scm|bitwise-not>实现。
+  使用S7内置的<scm|bitwise-and>和<scm|bitwise-not>实现。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define (bitwise-andc1 i j) \ 
@@ -7751,9 +7753,9 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-andc2><index|bitwise-andc2>
+  <value|srfi><paragraph|bitwise-andc2><index|bitwise-andc2><type-hint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
-  使用S7内置的<with|font-family|tt|bitwise-and>和<scm|bitwise-not>实现。
+  使用S7内置的<scm|bitwise-and>和<scm|bitwise-not>实现。
 
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define (bitwise-andc2 i j)\ 
@@ -7785,7 +7787,7 @@
 
   <paragraph|ash><index|ash>
 
-  <value|srfi><paragraph|arithmetic-shift><index|arithmetic-shift>
+  <value|srfi><paragraph|arithmetic-shift><index|arithmetic-shift><type-hint|((i integer?) (shift integer?)) =\<gtr\> integer?>
 
   log开头的S7内置函数不推荐使用，原因是log不符合位运算的语义，<scm|ash>是<scm|arithmetic-shift>的简写，能够有效避免<scm|arithmetic>这个单词拼写错误的可能性，仍旧是推荐使用的。从代码可读性上考虑，还是使用<scm|arithmetic-shift>更加合适。
 
