@@ -7657,8 +7657,6 @@
 
   \;
 
-  <paragraph|logorc><index|logorc>
-
   <value|srfi><paragraph|bitwise-orc1><index|bitwise-orc1>
 
   使用S7内置的<with|font-family|tt|bitwise-ior>和<scm|bitwise-not>实现。
@@ -7690,8 +7688,6 @@
   </scm-chunk>
 
   \;
-
-  <paragraph|logorc><index|logorc>
 
   <value|srfi><paragraph|bitwise-orc2><index|bitwise-orc2>
 
