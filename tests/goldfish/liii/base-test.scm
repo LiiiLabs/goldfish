@@ -385,7 +385,7 @@
 
 (check (+ (values 1 2 3) 4) => 10)
 
-(check ((lambda () (values "abcd" 2)) string-ref) => #\c)
+(check (string-ref ((lambda () (values "abcd" 2)))) => #\c)
 
 (check (+ (call/cc (lambda (ret) (ret 1 2 3))) 4) => 10)
 

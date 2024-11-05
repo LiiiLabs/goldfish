@@ -2543,7 +2543,7 @@
     <item*|与<scm|lambda>配合使用>当使用 <code*|lambda> 表达式时，<code*|values> 也可以直接将多个值插入到参数列表中：
 
     <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-      (check ((lambda () (values "abcd" 2)) string-ref) =\<gtr\> #\\c)
+      (check (string-ref ((lambda () (values "abcd" 2)))) =\<gtr\> #\\c)
 
       \;
     </scm-chunk>
