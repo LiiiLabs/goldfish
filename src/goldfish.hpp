@@ -38,7 +38,7 @@
 #include <wordexp.h>
 #endif
 
-#define GOLDFISH_VERSION "17.10.8"
+#define GOLDFISH_VERSION "17.10.9"
 
 #define GOLDFISH_PATH_MAXN TB_PATH_MAXN
 
