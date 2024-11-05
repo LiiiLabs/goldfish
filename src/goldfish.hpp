@@ -39,6 +39,7 @@
 #endif
 
 #define GOLDFISH_VERSION "17.10.8"
+
 #define GOLDFISH_PATH_MAXN TB_PATH_MAXN
 
 static std::vector<std::string> command_args= std::vector<std::string> ();
@@ -60,7 +61,6 @@ string_vector_to_s7_vector (s7_scheme* sc, vector<string> v) {
   return ret;
 }
 
-// Glues for Goldfish
 static s7_pointer
 f_version (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, GOLDFISH_VERSION);
@@ -90,7 +90,6 @@ glue_goldfish (s7_scheme* sc) {
                                      false, d_delete_file, NULL));
 }
 
-// Glues for (scheme time)
 static s7_pointer
 f_current_second (s7_scheme* sc, s7_pointer args) {
   // TODO: use std::chrono::tai_clock::now() when using C++ 20
@@ -112,7 +111,6 @@ glue_scheme_time (s7_scheme* sc) {
                                      0, false, d_current_second, NULL));
 }
 
-// Glues for (scheme process-context)
 static s7_pointer
 f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
 #ifdef _MSC_VER
@@ -142,12 +140,6 @@ f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
-f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
-  const char* env_name= s7_string (s7_car (args));
-  return s7_make_boolean (sc, tb_environment_remove (env_name));
-}
-
-static s7_pointer
 f_command_line (s7_scheme* sc, s7_pointer args) {
   s7_pointer ret = s7_nil (sc);
   int        size= command_args.size ();
@@ -155,6 +147,12 @@ f_command_line (s7_scheme* sc, s7_pointer args) {
     ret= s7_cons (sc, s7_make_string (sc, command_args[i].c_str ()), ret);
   }
   return ret;
+}
+
+static s7_pointer
+f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
+  const char* env_name= s7_string (s7_car (args));
+  return s7_make_boolean (sc, tb_environment_remove (env_name));
 }
 
 inline void
@@ -176,7 +174,6 @@ glue_scheme_process_context (s7_scheme* sc) {
                                      false, d_command_line, NULL));
 }
 
-// Glue for (liii os)
 static s7_pointer
 f_os_type (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_LINUX
@@ -305,11 +302,11 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
   s7_pointer     ret= s7_make_vector (sc, 0);
   tb_directory_walk (path_c, 0, tb_false, tb_directory_walk_func, &entries);
 
-  int entries_N= entries.size ();
-  string path_s= string (path_c);
-  int path_N= path_s.size();
-  int path_slash_N= path_N;
-  char last_ch= path_s[path_N-1];
+  int    entries_N   = entries.size ();
+  string path_s      = string (path_c);
+  int    path_N      = path_s.size ();
+  int    path_slash_N= path_N;
+  char   last_ch     = path_s[path_N - 1];
 #if defined(TB_CONFIG_OS_WINDOWS)
   if (last_ch != '/' && last_ch != '\\') {
     path_slash_N= path_slash_N + 1;

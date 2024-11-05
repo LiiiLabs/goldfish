@@ -15671,6 +15671,8 @@
     \ \ return goldfish::repl_for_community_edition (argc, argv);
 
     }
+
+    \;
   </cpp-chunk>
 
   <section|实现>
@@ -15733,6 +15735,8 @@
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     #define GOLDFISH_VERSION "17.10.8"
+
+    \;
   </cpp-chunk>
 
   <paragraph|GOLDFISH_PATH_MAXN>
@@ -15743,13 +15747,17 @@
     \;
   </cpp-chunk>
 
-  \;
+  <paragraph|全局变量>
 
-  <\cpp-chunk|src/goldfish.hpp|true|false>
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static std::vector\<less\>std::string\<gtr\> command_args= std::vector\<less\>std::string\<gtr\> ();
 
     \;
+  </cpp-chunk>
 
+  <paragraph|goldfish命名空间的开始>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     namespace goldfish {
 
     using std::cerr;
@@ -15763,7 +15771,17 @@
     using std::vector;
 
     \;
+  </cpp-chunk>
 
+  <subsection|胶水代码>
+
+  <subsubsection|公共辅助函数>
+
+  <subparagraph|string_vector_to_s7_vector>
+
+  将<cpp|std::vector>复制为S7的<scm|vector>。
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     inline s7_pointer
 
     string_vector_to_s7_vector (s7_scheme* sc, vector\<less\>string\<gtr\> v) {
@@ -15783,9 +15801,13 @@
     }
 
     \;
+  </cpp-chunk>
 
-    // Glues for Goldfish
+  <subsubsection|Goldfish基础胶水代码>
 
+  <paragraph|g_version><index|g_version><typehint|=\<gtr\> string?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_version (s7_scheme* sc, s7_pointer args) {
@@ -15795,7 +15817,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_delete-file><index|g_delete-file><typehint|((file-name string?)) =\<gtr\> boolean?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_delete_file (s7_scheme* sc, s7_pointer args) {
@@ -15807,7 +15833,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|glue_goldfish>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     inline void
 
     glue_goldfish (s7_scheme* sc) {
@@ -15843,9 +15873,13 @@
     }
 
     \;
+  </cpp-chunk>
 
-    // Glues for (scheme time)
+  <subsubsection|(scheme time)的胶水代码>
 
+  <paragraph|g_current-second><index|g_current-second><typehint|=\<gtr\> inexact?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_current_second (s7_scheme* sc, s7_pointer args) {
@@ -15863,7 +15897,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|glue_scheme_time>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     inline void
 
     glue_scheme_time (s7_scheme* sc) {
@@ -15887,9 +15925,13 @@
     }
 
     \;
+  </cpp-chunk>
 
-    // Glues for (scheme process-context)
+  <subsubsection|(scheme process-context)的胶水代码>
 
+  <paragraph|g_get-environment-variable><index|g_get-environment-variable>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
@@ -15945,19 +15987,11 @@
     }
 
     \;
+  </cpp-chunk>
 
-    static s7_pointer
+  <paragraph|g_command-line><index|g_command-line>
 
-    f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* env_name= s7_string (s7_car (args));
-
-    \ \ return s7_make_boolean (sc, tb_environment_remove (env_name));
-
-    }
-
-    \;
-
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_command_line (s7_scheme* sc, s7_pointer args) {
@@ -15973,6 +16007,22 @@
     \ \ }
 
     \ \ return ret;
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_scheme_process_context>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* env_name= s7_string (s7_car (args));
+
+    \ \ return s7_make_boolean (sc, tb_environment_remove (env_name));
 
     }
 
@@ -16015,9 +16065,13 @@
     }
 
     \;
+  </cpp-chunk>
 
-    // Glue for (liii os)
+  <subsubsection|(liii os)的胶水代码>
 
+  <paragraph|g_os-type><index|g_os-type>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_os_type (s7_scheme* sc, s7_pointer args) {
@@ -16045,7 +16099,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_os-arch><index|g_os-arch>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_os_arch (s7_scheme* sc, s7_pointer args) {
@@ -16055,7 +16113,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_os-call><index|g_os-call>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_os_call (s7_scheme* sc, s7_pointer args) {
@@ -16111,7 +16173,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_system><index|g_system>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_system (s7_scheme* sc, s7_pointer args) {
@@ -16125,7 +16191,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_os-temp-dir><index|g_os-temp-dir>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
@@ -16139,7 +16209,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_isdir><index|g_isdir>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_isdir (s7_scheme* sc, s7_pointer args) {
@@ -16171,7 +16245,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_isfile><index|g_isfile>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_isfile (s7_scheme* sc, s7_pointer args) {
@@ -16199,7 +16277,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_mkdir><index|g_mkdir>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_mkdir (s7_scheme* sc, s7_pointer args) {
@@ -16211,7 +16293,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_chdir><index|g_chdir>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_chdir (s7_scheme* sc, s7_pointer args) {
@@ -16223,7 +16309,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_getcwd><index|g_getcwd>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_getcwd (s7_scheme* sc, s7_pointer args) {
@@ -16237,7 +16327,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_listdir><index|g_listdir>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static tb_long_t
 
     tb_directory_walk_func (tb_char_t const* path, tb_file_info_t const* info,
@@ -16274,15 +16368,15 @@
 
     \;
 
-    \ \ int entries_N= entries.size ();
+    \ \ int \ \ \ entries_N \ \ = entries.size ();
 
-    \ \ string path_s= string (path_c);
+    \ \ string path_s \ \ \ \ \ = string (path_c);
 
-    \ \ int path_N= path_s.size();
+    \ \ int \ \ \ path_N \ \ \ \ \ = path_s.size ();
 
-    \ \ int path_slash_N= path_N;
+    \ \ int \ \ \ path_slash_N= path_N;
 
-    \ \ char last_ch= path_s[path_N-1];
+    \ \ char \ \ last_ch \ \ \ \ = path_s[path_N - 1];
 
     #if defined(TB_CONFIG_OS_WINDOWS)
 
@@ -16313,7 +16407,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_access><index|g_access>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_access (s7_scheme* sc, s7_pointer args) {
@@ -16337,7 +16435,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_getlogin><index|g_getlogin>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_getlogin (s7_scheme* sc, s7_pointer args) {
@@ -16359,7 +16461,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|g_getpid><index|g_getpid>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_getpid (s7_scheme* sc, s7_pointer args) {
@@ -16377,7 +16483,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|glue_liii_os>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     inline void
 
     glue_liii_os (s7_scheme* sc) {
@@ -16543,7 +16653,15 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <subsubsection|(liii uuid)的胶水代码>
+
+  <scm|(liii uuid)>是通过C++实现的，本节是相关的胶水代码。
+
+  <paragraph|g_uuid4><index|g_uuid4><typehint|=\<gtr\> string?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_uuid4 (s7_scheme* sc, s7_pointer args) {
@@ -16557,7 +16675,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|glue_liii_uuid>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     inline void
 
     glue_liii_uuid (s7_scheme* sc) {
@@ -16577,7 +16699,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <subsubsection|胶水代码汇总接口>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     inline void
 
     glue_for_community_edition (s7_scheme* sc) {
@@ -16595,7 +16721,13 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <subsection|命令行>
+
+  <paragraph|显示帮助>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static void
 
     display_help () {
@@ -16627,7 +16759,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|显示版本>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static void
 
     display_version () {
@@ -16639,7 +16775,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|错误的命令行选项>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static void
 
     display_for_invalid_options () {
@@ -16651,7 +16791,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|执行文件中的代码>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static void
 
     goldfish_eval_file (s7_scheme* sc, string path, bool quiet) {
@@ -16675,7 +16819,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|执行命令行中以字符串形式传入的代码>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static void
 
     goldfish_eval_code (s7_scheme* sc, string code) {
@@ -16687,7 +16835,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|REPL>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     int
 
     repl_for_community_edition (int argc, char** argv) {
@@ -16953,7 +17105,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|goldfish命名空间的结束>
+
+  <\cpp-chunk|src/goldfish.hpp|true|false>
     } // namespace goldfish
   </cpp-chunk>
 
