@@ -181,7 +181,7 @@ The reader can cite our work with the following bibtex entry:
 
 ```
 @book{goldfish,
-    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He},
+    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He and Yingyao Zhou},
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},
