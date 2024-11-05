@@ -380,6 +380,11 @@
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
+(check (values 4) 
+       => 4) ; single value case
+(check (values) 
+       => #<unspecified>) ; no values case
+
 (check (call-with-values (lambda () (values 4 5))
                          (lambda (x y) x))
        => 4)

@@ -2471,7 +2471,23 @@
 
   <paragraph|call/cc>
 
-  <paragraph|values>
+  <paragraph|values><index|values>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (values 4)\ 
+
+    \ \ \ \ \ \ \ =\> 4) ; single value case
+
+    (check (values)\ 
+
+    \ \ \ \ \ \ \ =\> #\<unspecified\>) ; no values case
+
+    \;
+  </scm-chunk>
+
+  当我们只传一个值给values时（比如 <code*|(values 4)>），它就简单地返回这个值，这时values的行为就像一个恒等函数。这是最简单的使用场景。
+
+  如果调用values时不带任何参数（即 <code*|(values)>），它会返回一个空值。这种情况在实践中比较少见，但在某些特殊场合可能会用到。
 
   <value|r7rs><paragraph|call-with-values><scm|(producer consumer)>
 
