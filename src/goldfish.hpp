@@ -140,12 +140,6 @@ f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
-f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
-  const char* env_name= s7_string (s7_car (args));
-  return s7_make_boolean (sc, tb_environment_remove (env_name));
-}
-
-static s7_pointer
 f_command_line (s7_scheme* sc, s7_pointer args) {
   s7_pointer ret = s7_nil (sc);
   int        size= command_args.size ();
@@ -153,6 +147,12 @@ f_command_line (s7_scheme* sc, s7_pointer args) {
     ret= s7_cons (sc, s7_make_string (sc, command_args[i].c_str ()), ret);
   }
   return ret;
+}
+
+static s7_pointer
+f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
+  const char* env_name= s7_string (s7_car (args));
+  return s7_make_boolean (sc, tb_environment_remove (env_name));
 }
 
 inline void
@@ -174,24 +174,6 @@ glue_scheme_process_context (s7_scheme* sc) {
                                      false, d_command_line, NULL));
 }
 
-static s7_pointer
-f_uuid4 (s7_scheme* sc, s7_pointer args) {
-  tb_char_t        uuid[37];
-  const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
-  return s7_make_string (sc, ret);
-}
-
-inline void
-glue_liii_uuid (s7_scheme* sc) {
-  s7_pointer  cur_env= s7_curlet (sc);
-  const char* s_uuid4= "g_uuid4";
-  const char* d_uuid4= "(g_uuid4) => string";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
-             s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
-                                     NULL));
-}
-
-// Glue for (liii os)
 static s7_pointer
 f_os_type (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_LINUX
@@ -453,6 +435,23 @@ glue_liii_os (s7_scheme* sc) {
              s7_make_typed_function (sc, s_unsetenv,
                                      f_unset_environment_variable, 1, 0, false,
                                      d_unsetenv, NULL));
+}
+
+static s7_pointer
+f_uuid4 (s7_scheme* sc, s7_pointer args) {
+  tb_char_t        uuid[37];
+  const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
+  return s7_make_string (sc, ret);
+}
+
+inline void
+glue_liii_uuid (s7_scheme* sc) {
+  s7_pointer  cur_env= s7_curlet (sc);
+  const char* s_uuid4= "g_uuid4";
+  const char* d_uuid4= "(g_uuid4) => string";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
+             s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
+                                     NULL));
 }
 
 inline void
