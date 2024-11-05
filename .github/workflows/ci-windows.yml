@@ -3,8 +3,22 @@ name: Build on windows
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'goldfish/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'xmake/**'
+      - 'xmake.lua'
+      - '.github/workflows/ci-windows.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'goldfish/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'xmake/**'
+      - 'xmake.lua'
+      - '.github/workflows/ci-windows.yml'
   workflow_dispatch:
 
 jobs:
@@ -37,3 +51,4 @@ jobs:
         run: xmake build --yes -vD goldfish
       - name: test
         run: bin/goldfish -l tests/test_all.scm
+
