@@ -380,10 +380,14 @@
 (check (apply + (list 3 4)) => 7)
 (check (apply + (list 2 3 4)) => 9)
 
-(check (values 4) 
-       => 4) ; single value case
-(check (values) 
-       => #<unspecified>) ; no values case
+(check (values 4) => 4)
+(check (values) => #<unspecified>)
+
+(check (+ (values 1 2 3) 4) => 10)
+
+(check ((lambda () (values "abcd" 2)) string-ref) => #\c)
+
+(check (+ (call/cc (lambda (ret) (ret 1 2 3))) 4) => 10)
 
 (check (call-with-values (lambda () (values 4 5))
                          (lambda (x y) x))
