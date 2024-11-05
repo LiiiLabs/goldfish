@@ -23,11 +23,39 @@
     <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
   </hide-preamble>
 
-  金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。目前专注于Scheme语言的标准库。本文档是金鱼Scheme V<value|goldfish-version>的文学编程实现，目前金鱼Scheme中几乎所有的Scheme代码实现和测试都包含在本文档中。
+  <chapter|金鱼Scheme简介>
 
-  本文档的用户是人类和大模型服务。基于本文档，用户可以获得金鱼Scheme的实现方法，也可以改进金鱼Scheme的既有实现。本文档的内容越翔实，用户使用金鱼Scheme的体验越好。
+  \;
 
-  <chapter|许可证>
+  金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。
+
+  金鱼Scheme解释器具有以下特性：
+
+  <\itemize>
+    <item>兼容R7RS small标准
+
+    <item>提供类似Python的标准库
+
+    <item>小巧且快速
+  </itemize>
+
+  <section|背景>
+
+  金鱼Scheme创建之初的目的是为了服务墨干理工套件及其商业版Liii STEM。
+
+  墨干一开始使用的是S7 Scheme，然而S7 Scheme并不严格遵循R7RS small标准，也没有提供常见的SRFI实现。故而我们决定在S7 Scheme的基础上，发布金鱼Scheme，更加严格地遵循R7RS small标准，并提供常见的SRFI实现作为金鱼Scheme的内置标准库。另外，无论是R7RS small还是SRFI都没有提供同时兼容macOS, GNU/Linux和Windows的类似于Python的os模块的标准库，故而我们模仿了Python的os模块，实现金鱼的内置标准库<scm|(liii os)>，以提供<scm|listdir>、<scm|mkdir>等常见功能。
+
+  <section|文学编程>
+
+  金鱼Scheme最初的三位作者是沈达、刘念和Yansong Li，项目立项时就是采用文学编程的方式实现金鱼Scheme的Scheme部分。
+
+  一开始，我们的文学编程文档<shell|Goldfish.tmu>是不开源的，我们只开源了金鱼Scheme的代码，其中代码是几乎没有任何注释的，因为我们在文学编程文档中的代码块之外会撰写注释。后来来自Emacs China社区的StarSugar开始向金鱼Scheme项目贡献代码，于是我们决定将金鱼Scheme的文学编程文档<shell|Goldfish.tmu>也开源出来，整个项目以开源的方式推进。
+
+  从金鱼Scheme V17.10.8开始，我们确定了金鱼Scheme的文学编程文档的许可证为<with|font-series|bold|知识共享署名-相同方式共享4.0国际许可协议>。
+
+  本文档是采用中文编写的。在2024年，开源软件项目的文档采用中文编写并不是主流。首先，金鱼Scheme项目的前三位作者的母语都是中文，采用母语作为文档的语言是自然而然的；其次，在大模型时代，计算机辅助翻译已经非常成熟且廉价，我们相信中文文档不会是金鱼Scheme走向世界的阻碍。
+
+  <section|许可证>
 
   本文档采用文学编程方式编写，金鱼Scheme相关的所有代码几乎都包含在本文档中。本文档的许可证分为代码和文档两部分，其中代码部分采用Apache许可证，相关信息在每一个源代码文件的头部都会显式声明，未显式声明的源代码默认采用Apache许可证；其中文档部分采用<with|font-series|bold|知识共享署名-相同方式共享4.0国际许可协议>授权。您可以自由地分享、修改本作品，只要您遵循以下条件：
 
@@ -70,6 +98,18 @@
 
     \;
   </verbatim-chunk>
+
+  我们会联系金鱼Scheme的贡献者，更新<shell|AUTHORS>文件。金鱼Scheme的贡献者并不一定在这个文件中，有可能我们没有及时更新，也有可能相关贡献者希望保持匿名。
+
+  <section|相关机构>
+
+  支持金鱼Scheme的相关机构如下所示：
+
+  <\itemize>
+    <item>浙江三鲤网络科技有限公司
+
+    <item>中国科学技术大学-德清阿尔法创新研究院
+  </itemize>
 
   <chapter|boot.scm>
 
