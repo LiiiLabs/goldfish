@@ -16704,7 +16704,7 @@
   <subsubsection|胶水代码汇总接口>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline void
+    void
 
     glue_for_community_edition (s7_scheme* sc) {
 
@@ -16844,8 +16844,6 @@
 
     <item>为S7 Scheme设置load path
 
-    <item>设置S7 Scheme的错误处理方式
-
     <item>初始化tbox
 
     <item>初始化胶水代码
@@ -16856,21 +16854,9 @@
 
     init_goldfish_scheme (const char* gf_lib) {
 
-    \ \ sc= s7_init ();
+    \ \ s7_scheme* sc= s7_init ();
 
     \ \ s7_add_to_load_path (sc, gf_lib);
-
-    \;
-
-    \ \ const char* errmsg= NULL;
-
-    \ \ s7_pointer \ old_port=
-
-    \ \ \ \ \ \ s7_set_current_error_port (sc, s7_open_output_string (sc));
-
-    \ \ int gc_loc= -1;
-
-    \ \ if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
 
     \;
 
@@ -16879,6 +16865,8 @@
     \;
 
     \ \ glue_for_community_edition (sc);
+
+    \ \ return sc;
 
     }
 
@@ -16902,11 +16890,13 @@
   <\cpp-chunk|src/goldfish.hpp|true|true>
     void
 
-    customize_goldfish_by_mode (string mode) {
+    customize_goldfish_by_mode (s7_scheme* sc, string mode,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const char* boot_file_path) {
 
     \ \ if (mode != "s7") {
 
-    \ \ \ \ s7_load (sc, gf_boot);
+    \ \ \ \ s7_load (sc, boot_file_path);
 
     \ \ }
 
@@ -17046,6 +17036,18 @@
 
     \;
 
+    \ \ const char* errmsg= NULL;
+
+    \ \ s7_pointer \ old_port=
+
+    \ \ \ \ \ \ s7_set_current_error_port (sc, s7_open_output_string (sc));
+
+    \ \ int gc_loc= -1;
+
+    \ \ if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
+
+    \;
+
     \ \ // -m: Load the standard library by mode
 
     \ \ string mode_flag= "-m";
@@ -17086,7 +17088,7 @@
 
     \;
 
-    \ \ customize_goldfish_by_mode (mode);
+    \ \ customize_goldfish_by_mode (sc, mode, gf_boot);
 
     \;
 

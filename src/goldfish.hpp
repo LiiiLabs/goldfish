@@ -454,7 +454,7 @@ glue_liii_uuid (s7_scheme* sc) {
                                      NULL));
 }
 
-inline void
+void
 glue_for_community_edition (s7_scheme* sc) {
   glue_goldfish (sc);
   glue_scheme_time (sc);
@@ -511,24 +511,20 @@ goldfish_eval_code (s7_scheme* sc, string code) {
 
 s7_scheme*
 init_goldfish_scheme (const char* gf_lib) {
-  sc= s7_init ();
+  s7_scheme* sc= s7_init ();
   s7_add_to_load_path (sc, gf_lib);
-
-  const char* errmsg= NULL;
-  s7_pointer  old_port=
-      s7_set_current_error_port (sc, s7_open_output_string (sc));
-  int gc_loc= -1;
-  if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
 
   if (!tb_init (tb_null, tb_null)) exit (-1);
 
   glue_for_community_edition (sc);
+  return sc;
 }
 
 void
-customize_goldfish_by_mode (string mode) {
+customize_goldfish_by_mode (s7_scheme* sc, string mode,
+                            const char* boot_file_path) {
   if (mode != "s7") {
-    s7_load (sc, gf_boot);
+    s7_load (sc, boot_file_path);
   }
 
   if (mode == "default" || mode == "liii") {
@@ -596,6 +592,12 @@ repl_for_community_edition (int argc, char** argv) {
   // Init the underlying S7 Scheme and add the load_path
   s7_scheme* sc= init_goldfish_scheme (gf_lib);
 
+  const char* errmsg= NULL;
+  s7_pointer  old_port=
+      s7_set_current_error_port (sc, s7_open_output_string (sc));
+  int gc_loc= -1;
+  if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
+
   // -m: Load the standard library by mode
   string mode_flag= "-m";
   string mode     = "default";
@@ -616,7 +618,7 @@ repl_for_community_edition (int argc, char** argv) {
     args.erase (args.begin () + i);
   }
 
-  customize_goldfish_by_mode (mode);
+  customize_goldfish_by_mode (sc, mode, gf_boot);
 
   // Command options
   if (args.size () == 1 && args[0].size () > 0 && args[0][0] == '-') {
