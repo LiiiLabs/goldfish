@@ -302,11 +302,11 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
   s7_pointer     ret= s7_make_vector (sc, 0);
   tb_directory_walk (path_c, 0, tb_false, tb_directory_walk_func, &entries);
 
-  int entries_N= entries.size ();
-  string path_s= string (path_c);
-  int path_N= path_s.size();
-  int path_slash_N= path_N;
-  char last_ch= path_s[path_N-1];
+  int    entries_N   = entries.size ();
+  string path_s      = string (path_c);
+  int    path_N      = path_s.size ();
+  int    path_slash_N= path_N;
+  char   last_ch     = path_s[path_N - 1];
 #if defined(TB_CONFIG_OS_WINDOWS)
   if (last_ch != '/' && last_ch != '\\') {
     path_slash_N= path_slash_N + 1;
@@ -643,4 +643,3 @@ repl_for_community_edition (int argc, char** argv) {
 }
 
 } // namespace goldfish
-
