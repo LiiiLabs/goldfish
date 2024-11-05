@@ -172,7 +172,7 @@ Goldfish Scheme is implemented to overcome the defects of [S7 Scheme](https://cc
 3. Try to provide the useful SRFI in R7RS library format
 
 ## License
-Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicited claimed in the related source files.
+Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which are derived from the S7 Scheme repo and SRFI have been explicitly claimed in the related source files.
 
 
 ## Citation
