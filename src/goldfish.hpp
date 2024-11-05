@@ -509,6 +509,45 @@ goldfish_eval_code (s7_scheme* sc, string code) {
   cout << s7_object_to_c_string (sc, x) << endl;
 }
 
+s7_scheme*
+init_goldfish_scheme (const char* gf_lib) {
+  sc= s7_init ();
+  s7_add_to_load_path (sc, gf_lib);
+
+  const char* errmsg= NULL;
+  s7_pointer  old_port=
+      s7_set_current_error_port (sc, s7_open_output_string (sc));
+  int gc_loc= -1;
+  if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
+
+  if (!tb_init (tb_null, tb_null)) exit (-1);
+
+  glue_for_community_edition (sc);
+}
+
+void
+customize_goldfish_by_mode (string mode) {
+  if (mode != "s7") {
+    s7_load (sc, gf_boot);
+  }
+
+  if (mode == "default" || mode == "liii") {
+    s7_eval_c_string (sc, "(import (liii base) (liii error))");
+  }
+  else if (mode == "sicp") {
+    s7_eval_c_string (sc, "(import (scheme base) (srfi sicp))");
+  }
+  else if (mode == "r7rs") {
+    s7_eval_c_string (sc, "(import (scheme base))");
+  }
+  else if (mode == "s7") {
+  }
+  else {
+    cerr << "No such mode: " << mode << endl;
+    exit (-1);
+  }
+}
+
 int
 repl_for_community_edition (int argc, char** argv) {
   // Check if the standard library and boot.scm exists
@@ -555,21 +594,7 @@ repl_for_community_edition (int argc, char** argv) {
   }
 
   // Init the underlying S7 Scheme and add the load_path
-  s7_scheme* sc;
-  sc= s7_init ();
-  s7_add_to_load_path (sc, gf_lib);
-
-  const char* errmsg= NULL;
-  s7_pointer  old_port=
-      s7_set_current_error_port (sc, s7_open_output_string (sc));
-  int gc_loc= -1;
-  if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
-
-  // Init tbox
-  if (!tb_init (tb_null, tb_null)) exit (-1);
-
-  // Glues
-  glue_for_community_edition (sc);
+  s7_scheme* sc= init_goldfish_scheme (gf_lib);
 
   // -m: Load the standard library by mode
   string mode_flag= "-m";
@@ -591,24 +616,7 @@ repl_for_community_edition (int argc, char** argv) {
     args.erase (args.begin () + i);
   }
 
-  // only when it is not s7 mode, we load `boot.scm`
-  if (mode != "s7") {
-    s7_load (sc, gf_boot);
-  }
-  // import the preload standard libraries
-  if (mode == "default" || mode == "liii") {
-    s7_eval_c_string (sc, "(import (liii base) (liii error))");
-  }
-  else if (mode == "sicp") {
-    s7_eval_c_string (sc, "(import (srfi sicp))");
-  }
-  else if (mode == "r7rs") {
-    s7_eval_c_string (sc, "(import (scheme base))");
-  }
-  else {
-    cerr << "No such mode: " << mode << endl;
-    exit (-1);
-  }
+  customize_goldfish_by_mode (mode);
 
   // Command options
   if (args.size () == 1 && args[0].size () > 0 && args[0][0] == '-') {

@@ -16837,6 +16837,104 @@
     \;
   </cpp-chunk>
 
+  <paragraph|金鱼Scheme的初始化>
+
+  <\enumerate>
+    <item>初始化S7 Scheme
+
+    <item>为S7 Scheme设置load path
+
+    <item>设置S7 Scheme的错误处理方式
+
+    <item>初始化tbox
+
+    <item>初始化胶水代码
+  </enumerate>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    s7_scheme*
+
+    init_goldfish_scheme (const char* gf_lib) {
+
+    \ \ sc= s7_init ();
+
+    \ \ s7_add_to_load_path (sc, gf_lib);
+
+    \;
+
+    \ \ const char* errmsg= NULL;
+
+    \ \ s7_pointer \ old_port=
+
+    \ \ \ \ \ \ s7_set_current_error_port (sc, s7_open_output_string (sc));
+
+    \ \ int gc_loc= -1;
+
+    \ \ if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
+
+    \;
+
+    \ \ if (!tb_init (tb_null, tb_null)) exit (-1);
+
+    \;
+
+    \ \ glue_for_community_edition (sc);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|金鱼Scheme的运行模式>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    void
+
+    customize_goldfish_by_mode (string mode) {
+
+    \ \ if (mode != "s7") {
+
+    \ \ \ \ s7_load (sc, gf_boot);
+
+    \ \ }
+
+    \;
+
+    \ \ if (mode == "default" \|\| mode == "liii") {
+
+    \ \ \ \ s7_eval_c_string (sc, "(import (liii base) (liii error))");
+
+    \ \ }
+
+    \ \ else if (mode == "sicp") {
+
+    \ \ \ \ s7_eval_c_string (sc, "(import (scheme base) (srfi sicp))");
+
+    \ \ }
+
+    \ \ else if (mode == "r7rs") {
+
+    \ \ \ \ s7_eval_c_string (sc, "(import (scheme base))");
+
+    \ \ }
+
+    \ \ else if (mode == "s7") {
+
+    \ \ }
+
+    \ \ else {
+
+    \ \ \ \ cerr \<less\>\<less\> "No such mode: " \<less\>\<less\> mode \<less\>\<less\> endl;
+
+    \ \ \ \ exit (-1);
+
+    \ \ }
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|REPL>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
@@ -16932,35 +17030,7 @@
 
     \ \ // Init the underlying S7 Scheme and add the load_path
 
-    \ \ s7_scheme* sc;
-
-    \ \ sc= s7_init ();
-
-    \ \ s7_add_to_load_path (sc, gf_lib);
-
-    \;
-
-    \ \ const char* errmsg= NULL;
-
-    \ \ s7_pointer \ old_port=
-
-    \ \ \ \ \ \ s7_set_current_error_port (sc, s7_open_output_string (sc));
-
-    \ \ int gc_loc= -1;
-
-    \ \ if (old_port != s7_nil (sc)) gc_loc= s7_gc_protect (sc, old_port);
-
-    \;
-
-    \ \ // Init tbox
-
-    \ \ if (!tb_init (tb_null, tb_null)) exit (-1);
-
-    \;
-
-    \ \ // Glues
-
-    \ \ glue_for_community_edition (sc);
+    \ \ s7_scheme* sc= init_goldfish_scheme (gf_lib);
 
     \;
 
@@ -17004,41 +17074,7 @@
 
     \;
 
-    \ \ // only when it is not s7 mode, we load ‘boot.scm‘
-
-    \ \ if (mode != "s7") {
-
-    \ \ \ \ s7_load (sc, gf_boot);
-
-    \ \ }
-
-    \ \ // import the preload standard libraries
-
-    \ \ if (mode == "default" \|\| mode == "liii") {
-
-    \ \ \ \ s7_eval_c_string (sc, "(import (liii base) (liii error))");
-
-    \ \ }
-
-    \ \ else if (mode == "sicp") {
-
-    \ \ \ \ s7_eval_c_string (sc, "(import (srfi sicp))");
-
-    \ \ }
-
-    \ \ else if (mode == "r7rs") {
-
-    \ \ \ \ s7_eval_c_string (sc, "(import (scheme base))");
-
-    \ \ }
-
-    \ \ else {
-
-    \ \ \ \ cerr \<less\>\<less\> "No such mode: " \<less\>\<less\> mode \<less\>\<less\> endl;
-
-    \ \ \ \ exit (-1);
-
-    \ \ }
+    \ \ customize_goldfish_by_mode (mode);
 
     \;
 
