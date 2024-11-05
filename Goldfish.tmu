@@ -16887,6 +16887,18 @@
 
   <paragraph|金鱼Scheme的运行模式>
 
+  <code*|-m>帮助您指定预加载的标准库。
+
+  <\description>
+    <item*|default><code*|-m default>等价于<code*|-m liii>
+
+    <item*|liii>预加载<code*|(liii base)>和<code*|(liii error)>的金鱼Scheme
+
+    <item*|r7rs>预加载<code*|(srfi sicp)>和<code*|(scheme base)>的S7 Scheme
+
+    <item*|s7>无任何无加载库的S7 Scheme
+  </description>
+
   <\cpp-chunk|src/goldfish.hpp|true|true>
     void
 
