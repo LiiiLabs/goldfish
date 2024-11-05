@@ -177,7 +177,7 @@ Goldfish Scheme is licensed under Apache 2.0, some of the code snippets which ar
 
 ## Citation
 
-The reader can cite our work with the following bibtex entry:
+The reader can cite our work with the following BibTeX entry:
 
 ```
 @book{goldfish,
@@ -185,5 +185,6 @@ The reader can cite our work with the following bibtex entry:
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},
+    url = {https://github.com/LiiiLabs/goldfish/releases/download/v17.10.9/Goldfish.pdf}
 }
 ```

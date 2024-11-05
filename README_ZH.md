@@ -184,7 +184,7 @@ tests/demo_argv.scm => #\newline
 
 ## 引用
 
-读者可以用以下的bibtex代码来引用我们的工作.
+读者可以用以下的BibTeX代码来引用我们的工作.
 
 ```
 @book{goldfish,
@@ -192,5 +192,6 @@ tests/demo_argv.scm => #\newline
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},
+    url = {https://gitee.com/LiiiLabs/goldfish/releases/download/v17.10.9/Goldfish.pdf}
 }
 ```
