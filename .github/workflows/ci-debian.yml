@@ -2,11 +2,26 @@ name: CI on Debian bookworm
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'goldfish/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'xmake/**'
+      - 'xmake.lua'
+      - '.github/workflows/ci-debian.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'goldfish/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'xmake/**'
+      - 'xmake.lua'
+      - '.github/workflows/ci-debian.yml'
 
 env:
   XMAKE_ROOT: y
+  DEBIAN_FRONTEND: noninteractive
 
 jobs:
   build:
@@ -17,8 +32,8 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          DEBIAN_FRONTEND=noninteractive apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y git 7zip unzip curl build-essential
+          apt-get update
+          apt-get install -y git 7zip unzip curl build-essential
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
@@ -55,3 +70,4 @@ jobs:
 
       - name: run tests
         run: bin/goldfish -l tests/test_all.scm
+

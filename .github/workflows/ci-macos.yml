@@ -3,8 +3,22 @@ name: Build and Test on macOS
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'goldfish/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'xmake/**'
+      - 'xmake.lua'
+      - '.github/workflows/ci-macos.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'goldfish/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'xmake/**'
+      - 'xmake.lua'
+      - '.github/workflows/ci-macos.yml'
 
 jobs:
   macosbuild:
