@@ -39,6 +39,7 @@
 #endif
 
 #define GOLDFISH_VERSION "17.10.8"
+
 #define GOLDFISH_PATH_MAXN TB_PATH_MAXN
 
 static std::vector<std::string> command_args= std::vector<std::string> ();
@@ -50,17 +51,6 @@ using std::endl;
 using std::string;
 using std::vector;
 
-inline s7_pointer
-string_vector_to_s7_vector (s7_scheme* sc, vector<string> v) {
-  int        N  = v.size ();
-  s7_pointer ret= s7_make_vector (sc, N);
-  for (int i= 0; i < N; i++) {
-    s7_vector_set (sc, ret, i, s7_make_string (sc, v[i].c_str ()));
-  }
-  return ret;
-}
-
-// Glues for Goldfish
 static s7_pointer
 f_version (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, GOLDFISH_VERSION);
@@ -88,6 +78,33 @@ glue_goldfish (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_delete_file),
              s7_make_typed_function (sc, s_delete_file, f_delete_file, 1, 0,
                                      false, d_delete_file, NULL));
+}
+
+static s7_pointer
+f_uuid4 (s7_scheme* sc, s7_pointer args) {
+  tb_char_t        uuid[37];
+  const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
+  return s7_make_string (sc, ret);
+}
+
+inline void
+glue_liii_uuid (s7_scheme* sc) {
+  s7_pointer  cur_env= s7_curlet (sc);
+  const char* s_uuid4= "g_uuid4";
+  const char* d_uuid4= "(g_uuid4) => string";
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
+             s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
+                                     NULL));
+}
+
+inline s7_pointer
+string_vector_to_s7_vector (s7_scheme* sc, vector<string> v) {
+  int        N  = v.size ();
+  s7_pointer ret= s7_make_vector (sc, N);
+  for (int i= 0; i < N; i++) {
+    s7_vector_set (sc, ret, i, s7_make_string (sc, v[i].c_str ()));
+  }
+  return ret;
 }
 
 // Glues for (scheme time)
@@ -440,23 +457,6 @@ glue_liii_os (s7_scheme* sc) {
                                      d_unsetenv, NULL));
 }
 
-static s7_pointer
-f_uuid4 (s7_scheme* sc, s7_pointer args) {
-  tb_char_t        uuid[37];
-  const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
-  return s7_make_string (sc, ret);
-}
-
-inline void
-glue_liii_uuid (s7_scheme* sc) {
-  s7_pointer  cur_env= s7_curlet (sc);
-  const char* s_uuid4= "g_uuid4";
-  const char* d_uuid4= "(g_uuid4) => string";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
-             s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
-                                     NULL));
-}
-
 inline void
 glue_for_community_edition (s7_scheme* sc) {
   glue_goldfish (sc);
@@ -646,3 +646,4 @@ repl_for_community_edition (int argc, char** argv) {
 }
 
 } // namespace goldfish
+

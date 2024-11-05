@@ -15733,6 +15733,8 @@
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     #define GOLDFISH_VERSION "17.10.8"
+
+    \;
   </cpp-chunk>
 
   <paragraph|GOLDFISH_PATH_MAXN>
@@ -15743,13 +15745,17 @@
     \;
   </cpp-chunk>
 
-  \;
+  <paragraph|全局变量>
 
-  <\cpp-chunk|src/goldfish.hpp|true|false>
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static std::vector\<less\>std::string\<gtr\> command_args= std::vector\<less\>std::string\<gtr\> ();
 
     \;
+  </cpp-chunk>
 
+  <paragraph|goldfish命名空间的开始>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     namespace goldfish {
 
     using std::cerr;
@@ -15763,29 +15769,13 @@
     using std::vector;
 
     \;
+  </cpp-chunk>
 
-    inline s7_pointer
+  <subsection|Goldfish基础胶水代码>
 
-    string_vector_to_s7_vector (s7_scheme* sc, vector\<less\>string\<gtr\> v) {
+  <subparagraph|g_version><index|g_version><typehint|=\<gtr\> string?>
 
-    \ \ int \ \ \ \ \ \ \ N \ = v.size ();
-
-    \ \ s7_pointer ret= s7_make_vector (sc, N);
-
-    \ \ for (int i= 0; i \<less\> N; i++) {
-
-    \ \ \ \ s7_vector_set (sc, ret, i, s7_make_string (sc, v[i].c_str ()));
-
-    \ \ }
-
-    \ \ return ret;
-
-    }
-
-    \;
-
-    // Glues for Goldfish
-
+  <\cpp-chunk|src/goldfish.hpp|true|false>
     static s7_pointer
 
     f_version (s7_scheme* sc, s7_pointer args) {
@@ -15795,7 +15785,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <subparagraph|g_delete-file><index|g_delete-file><typehint|((file-name string?)) =\<gtr\> boolean?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|false>
     static s7_pointer
 
     f_delete_file (s7_scheme* sc, s7_pointer args) {
@@ -15807,7 +15801,11 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <subparagraph|glue_goldfish>
+
+  <\cpp-chunk|src/goldfish.hpp|true|false>
     inline void
 
     glue_goldfish (s7_scheme* sc) {
@@ -15839,6 +15837,78 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_delete_file, f_delete_file, 1, 0,
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_delete_file, NULL));
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <subsection|(liii uuid)的胶水代码>
+
+  <scm|(liii uuid)>是通过C++实现的，本节是相关的胶水代码。
+
+  <subparagraph|g_uuid4><index|g_uuid4><typehint|=\<gtr\> string?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_uuid4 (s7_scheme* sc, s7_pointer args) {
+
+    \ \ tb_char_t \ \ \ \ \ \ \ uuid[37];
+
+    \ \ const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
+
+    \ \ return s7_make_string (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <subparagraph|glue_liii_uuid>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_liii_uuid (s7_scheme* sc) {
+
+    \ \ s7_pointer \ cur_env= s7_curlet (sc);
+
+    \ \ const char* s_uuid4= "g_uuid4";
+
+    \ \ const char* d_uuid4= "(g_uuid4) =\<gtr\> string";
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  \;
+
+  \;
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline s7_pointer
+
+    string_vector_to_s7_vector (s7_scheme* sc, vector\<less\>string\<gtr\> v) {
+
+    \ \ int \ \ \ \ \ \ \ N \ = v.size ();
+
+    \ \ s7_pointer ret= s7_make_vector (sc, N);
+
+    \ \ for (int i= 0; i \<less\> N; i++) {
+
+    \ \ \ \ s7_vector_set (sc, ret, i, s7_make_string (sc, v[i].c_str ()));
+
+    \ \ }
+
+    \ \ return ret;
 
     }
 
@@ -16544,40 +16614,6 @@
 
     \;
 
-    static s7_pointer
-
-    f_uuid4 (s7_scheme* sc, s7_pointer args) {
-
-    \ \ tb_char_t \ \ \ \ \ \ \ uuid[37];
-
-    \ \ const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
-
-    \ \ return s7_make_string (sc, ret);
-
-    }
-
-    \;
-
-    inline void
-
-    glue_liii_uuid (s7_scheme* sc) {
-
-    \ \ s7_pointer \ cur_env= s7_curlet (sc);
-
-    \ \ const char* s_uuid4= "g_uuid4";
-
-    \ \ const char* d_uuid4= "(g_uuid4) =\<gtr\> string";
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
-
-    }
-
-    \;
-
     inline void
 
     glue_for_community_edition (s7_scheme* sc) {
@@ -16953,8 +16989,14 @@
     }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|goldfish命名空间的结束>
+
+  <\cpp-chunk|src/goldfish.hpp|true|false>
     } // namespace goldfish
+
+    \;
   </cpp-chunk>
 
   <chapter|基础设施>
