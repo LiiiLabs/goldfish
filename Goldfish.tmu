@@ -16882,7 +16882,9 @@
 
     <item*|liii>预加载<code*|(liii base)>和<code*|(liii error)>的金鱼Scheme
 
-    <item*|r7rs>预加载<code*|(srfi sicp)>和<code*|(scheme base)>的S7 Scheme
+    <item*|sicp>预加载<code*|(srfi sicp)>和<code*|(scheme base)>的S7 Scheme
+
+    <item*|r7rs>预加载<code*|(scheme base)>的S7 Scheme
 
     <item*|s7>无任何无加载库的S7 Scheme
   </description>
