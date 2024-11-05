@@ -2513,21 +2513,57 @@
 
   <paragraph|values><index|values>
 
+  <scm|values>是一个过程（procedure），它用于返回多个值。在 Scheme 中，通常的过程只能返回一个值，但是<scm|values>允许你从一个过程返回多个值，这些值可以被另一个过程接收并处理。
+
+  当我们只传一个值给values时（比如 <code*|(values 4)>），它就简单地返回这个值，这时values的行为就像一个恒等函数。这是最简单的使用场景。
+
+  如果调用<scm|values>时不带任何参数（即<scm|(values)>），它会返回一个空值。这种情况在实践中比较少见，但在某些特殊场合可能会用到。
+
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (values 4)\ 
+    (check (values 4) =\<gtr\> 4)
 
-    \ \ \ \ \ \ \ =\> 4) ; single value case
-
-    (check (values)\ 
-
-    \ \ \ \ \ \ \ =\> #\<unspecified\>) ; no values case
+    (check (values) =\<gtr\> #\<less\>unspecified\<gtr\>)
 
     \;
   </scm-chunk>
 
-  当我们只传一个值给values时（比如 <code*|(values 4)>），它就简单地返回这个值，这时values的行为就像一个恒等函数。这是最简单的使用场景。
+  在金鱼Scheme中，<scm|values>的用法有一些特别之处，它允许将多个值直接插入到调用者的参数列表中。这种特性使得金鱼Scheme在处理多个返回值时非常灵活和强大。以下是<scm|values>在金鱼Scheme中的一些特殊用法（这些特殊用法源自于S7 Scheme）：
 
-  如果调用values时不带任何参数（即 <code*|(values)>），它会返回一个空值。这种情况在实践中比较少见，但在某些特殊场合可能会用到。
+  <\description>
+    <item*|直接插入到调用者参数列表>使用 <code*|values> 生成的多个值会被直接插入到调用者的参数列表中。这意味着，如果你有一个接受多个参数的函数，你可以直接从<scm|values>获得的多个值中解构这些参数。
+
+    <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+      (check (+ (values 1 2 3) 4) =\<gtr\> 10)
+
+      \;
+    </scm-chunk>
+
+    这里，<scm|values>生成的三个值<scm|(1 2 3)>被直接插入到 <code*|+> 函数的参数列表中，相当于<scm|(+ 1 2 3 4)>。
+
+    <item*|与<scm|lambda>配合使用>当使用 <code*|lambda> 表达式时，<code*|values> 也可以直接将多个值插入到参数列表中：
+
+    <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+      (check (string-ref ((lambda () (values "abcd" 2)))) =\<gtr\> #\\c)
+
+      \;
+    </scm-chunk>
+
+    这里，<code*|values> 生成的字符串 <code*|"abcd"> 和整数 <code*|2> 被直接插入到 <code*|string-ref> 函数的参数列表中，相当于<goldfish-lang|(string-ref "abcd" 2)>。
+
+    <item*|<scm|values>与<scm|call/cc>的隐式使用><code*|call/cc>（call with current continuation）是一个特殊的函数，它接受一个返回多个值的过程，并将其值作为参数传递给一个消费者。在金鱼Scheme中，<code*|call/cc> 有一个隐式的 <code*|values>，这意味着你可以直接返回多个值：
+
+    <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+      (check (+ (call/cc (lambda (ret) (ret 1 2 3))) 4) =\<gtr\> 10)
+
+      \;
+    </scm-chunk>
+
+    这里，<code*|ret> 宏生成的多个值 <code*|(1 2 3)> 被 <code*|+> 函数接收并求和。
+  </description>
+
+  这些特性使得金鱼Scheme在处理多个返回值时非常灵活，允许程序员以一种直观和高效的方式编写代码。
+
+  \;
 
   <value|r7rs><paragraph|call-with-values><scm|(producer consumer)>
 
