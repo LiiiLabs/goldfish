@@ -15927,7 +15927,7 @@
 
   <subparagraph|g_get-environment-variable><index|g_get-environment-variable>
 
-  <\cpp-chunk|src/goldfish.hpp|true|false>
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
@@ -15985,7 +15985,7 @@
     \;
   </cpp-chunk>
 
-  <\cpp-chunk|src/goldfish.hpp|true|false>
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
     f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
