@@ -23,7 +23,7 @@ on:
 
 jobs:
   windowsbuild:
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
         # Force xmake to a specific folder (for cache)
         XMAKE_GLOBALDIR: ${{ github.workspace }}/.xmake-global
