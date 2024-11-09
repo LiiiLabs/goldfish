@@ -149,6 +149,8 @@
 (check-catch 'wrong-type-arg (zero? #t))
 (check-catch 'wrong-type-arg (zero? #f))
 
+(check-set-mode! 'report)
+
 (check-true (positive? 1))
 (check-true (positive? 0.1))
 (check-true (positive? 1/2))
@@ -188,6 +190,8 @@
 (check-catch 'wrong-type-arg (negative? "not-a-number"))
 (check-catch 'wrong-type-arg (negative? 'symbol))
 (check-catch 'wrong-type-arg (negative? '(1 2 3)))
+
+(check-set-mode! 'report-failed)
 
 (check (floor 1.1) => 1.0)
 (check (floor 1) => 1)
