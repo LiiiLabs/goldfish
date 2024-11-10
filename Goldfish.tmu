@@ -2101,6 +2101,22 @@
     \;
   </scm-chunk>
 
+  <value|r7rs><paragraph|integer-\<gtr\>char><index|integer-\<gtr\>char>
+
+  将字符转换为其对应的Unicode标量值。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (integer-\<gtr\>char 65) =\<gtr\> #\\A) \ \ 
+
+    (check (integer-\<gtr\>char 97) =\<gtr\> #\\a) \ 
+
+    (check (integer-\<gtr\>char 48) =\<gtr\> #\\0)
+
+    (check (integer-\<gtr\>char 36) =\<gtr\> #\\$)
+
+    \;
+  </scm-chunk>
+
   <section|字符串>
 
   见<smart-ref|chapter:liii_string>

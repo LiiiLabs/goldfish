@@ -351,6 +351,11 @@
 (check (char->integer #\space) => 32)
 (check (char->integer #\tab) => 9)
 
+(check (integer->char 65) => #\A)   
+(check (integer->char 97) => #\a)  
+(check (integer->char 48) => #\0)
+(check (integer->char 36) => #\$)
+
 (check (bytevector 1) => #u8(1))
 (check (bytevector) => #u8())
 (check (bytevector 1 2 3) => #u8(1 2 3))
