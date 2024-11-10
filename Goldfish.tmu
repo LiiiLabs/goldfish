@@ -96,6 +96,8 @@
 
     Yingyao Zhou \<less\>yingyaozhou51@gmail.com\<gtr\>
 
+    赵淑婷 \<less\>shuting.zhao@outlook.com\<gtr\>
+
     \;
   </verbatim-chunk>
 
@@ -981,6 +983,7 @@
     \ \ \ \ \ \ ((= i 5) i))
 
     \ \ =\<gtr\> 5)
+
     \;
   </scm-chunk>
 
@@ -990,12 +993,13 @@
     (check
 
     \ \ (do ((i 0 (+ i 1))
-    
+
     \ \ \ \ \ \ \ (sum 0 (+ sum i)))
 
     \ \ \ \ \ \ ((= i 5) sum))
 
     \ \ =\<gtr\> 10)
+
     \;
   </scm-chunk>
 
@@ -1011,6 +1015,7 @@
     \ \ \ \ (set! i (+ i 1)))
 
     \ \ =\<gtr\> 5)
+
     \;
   </scm-chunk>
 
@@ -1025,9 +1030,10 @@
 
     \ \ \ \ \ \ \ \ ((= i 5) vec)
 
-    \ \ \ \ \ \ (vector-set! vec i i))
+    \ \ \ \ \ \ (vector-set! vec i i)))
 
     \ \ =\<gtr\> #(0 1 2 3 4))
+
     \;
   </scm-chunk>
 
