@@ -151,13 +151,14 @@
 
 (check-set-mode! 'report)
 
-(check-false (complex? +nan.0))
+(check-true (complex? +nan.0))
 (check-true (real? +nan.0))
 (check-false (rational? +nan.0))
-(check (+ 1 +nan.0) => 1)
-(check (+ 1 +nan.1) => 1)
-(check (+ 1 +nan.0+nan.0i) => 1)
-
+(check (+ 1 +nan.0) => 0.0)
+(check (+ 1 +nan.1) => 0.0)
+(check (+ 1 +nan.0+nan.0i) => 0.0)
+(check-false (> 1 +nan.0))
+(check-false (< 1 +nan.0))
 
 (check-true (positive? 1))
 (check-true (positive? 0.1))
