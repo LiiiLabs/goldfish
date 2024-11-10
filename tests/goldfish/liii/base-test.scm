@@ -93,6 +93,30 @@
 (check (and-let* ((hi 3) (ho #f)) (+ hi 1)) => #f)
 (check (and-let* ((hi 3) (ho #t)) (+ hi 1)) => 4)
 
+(check
+  (do ((i 0 (+ i 1)))
+      ((= i 5) i))
+  => 5)
+
+(check
+  (do ((i 0 (+ i 1))
+       (sum 0 (+ sum i)))
+      ((= i 5) sum))
+  => 10)
+
+(check
+  (do ((i 0))
+      ((= i 5) i)
+      (set! i (+ i 1)))
+  => 5)
+
+(define vec (make-vector 5))
+(check
+  (do ((i 0 (+ i 1)))
+      ((= i 5) vec)
+    (vector-set! vec i i))
+  => #(0 1 2 3 4))
+
 (let ()
   (define-values (value1 value2) (values 1 2))
   (check value1 => 1)

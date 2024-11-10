@@ -925,6 +925,68 @@
     \;
   </scm-chunk>
 
+  <value|r7rs><paragraph|do><index|do>
+
+  检查 <code*|do> 是否能够正确执行迭代并在结束时返回正确的值。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (do ((i 0 (+ i 1)))
+
+    \ \ \ \ ((= i 5) i))
+
+    \ \ =\<gtr\> 5)
+    \;
+  </scm-chunk>
+
+  检查 <code*|do> 是否能正确处理多个变量的绑定和更新。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (do ((i 0 (+ i 1))
+    
+    \ \ \ \ (sum 0 (+ sum i)))
+
+    \ \ \ \ ((= i 5) sum))
+
+    \ \ =\<gtr\> 10)
+    \;
+  </scm-chunk>
+
+  检查当步长被省略时，<code*|do> 是否正确处理变量默认更新。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (do ((i 0))
+
+    \ \ \ \ ((= i 5) i)
+
+    \ \ \ \ (set! i (+ i 1)))
+
+    \ \ =\<gtr\> 5)
+    \;
+  </scm-chunk>
+
+  检查 <code*|do> 表达式是否能正确执行副作用，例如修改向量。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define vec (make-vector 5))
+
+    (check
+
+    \ \ (do ((i 0 (+ i 1)))
+
+    \ \ \ \ ((= i 5) vec)
+
+    \ \ \ \ (vector-set! vec i i))
+
+    \ \ =\<gtr\> #(0 1 2 3 4))
+    \;
+  </scm-chunk>
+
   <subsection|宏>
 
   金鱼Scheme基于S7 Scheme，不支持<scm|let-syntax>, <scm|letrec-syntax>, <scm|syntax-rules>和<scm|syntax-error>等R7RS定义的宏的基础设施。
