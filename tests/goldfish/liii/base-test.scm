@@ -159,6 +159,11 @@
 (check (+ 1 +nan.0+nan.0i) => 0.0)
 (check-false (> 1 +nan.0))
 (check-false (< 1 +nan.0))
+(check-false (> 1.0 +nan.0))
+(check-false (< 1.0 +nan.0))
+(check-false (> 0.0 +nan.0))
+(check-false (< 0.0 +nan.0))
+(check-false (= 0.0 +nan.0))
 
 (check-true (positive? 1))
 (check-true (positive? 0.1))
