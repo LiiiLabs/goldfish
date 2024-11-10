@@ -164,6 +164,9 @@
 (check-false (> 0.0 +nan.0))
 (check-false (< 0.0 +nan.0))
 (check-false (= 0.0 +nan.0))
+(check-false (> 0.0 0.0))
+(check-false (< 0.0 0.0))
+(check-true (= 0.0 0.0))
 
 (check-true (positive? 1))
 (check-true (positive? 0.1))
