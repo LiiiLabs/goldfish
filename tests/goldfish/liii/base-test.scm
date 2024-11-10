@@ -107,14 +107,14 @@
 (check
   (do ((i 0))
       ((= i 5) i)
-      (set! i (+ i 1)))
+    (set! i (+ i 1)))
   => 5)
 
-(define vec (make-vector 5))
 (check
-  (do ((i 0 (+ i 1)))
-      ((= i 5) vec)
-    (vector-set! vec i i))
+  (let1 vec (make-vector 5)
+    (do ((i 0 (+ i 1)))
+        ((= i 5) vec)
+      (vector-set! vec i i)))
   => #(0 1 2 3 4))
 
 (let ()
