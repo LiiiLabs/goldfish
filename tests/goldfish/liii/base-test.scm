@@ -306,6 +306,26 @@
 
 (check (square 2) => 4)
 
+(check (number->string 123) => "123")
+(check (number->string -456) => "-456")
+
+(check (number->string 123 2) => "1111011")
+
+(check (number->string 123 8) => "173")
+
+(check (number->string 255 16) => "ff")
+
+(check-catch 'wrong-type-arg (number->string 123 'not-a-number))
+
+(check (number->string 1/2) => "1/2")
+(check (number->string 1/2 2) => "1/10")
+(check (number->string 3/4 2) => "11/100")
+
+(check (number->string 123.456) => "123.456")
+
+(check (number->string 1+2i) => "1.0+2.0i")
+(check (number->string 0+2i) => "0.0+2.0i")
+
 (check-true (boolean=? #t #t))
 (check-true (boolean=? #f #f))
 (check-true (boolean=? #t #t #t))

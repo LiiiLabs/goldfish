@@ -1851,6 +1851,66 @@
 
   <subsection|数的转换>
 
+  <paragraph|number-\<gtr\>string><typehint|((z number?) (radix 10)) =\<gtr\> string?>
+
+  将一个数<scm|z>转换为字符串，其中<scm|radix>是可选参数，默认值为10。
+
+  <subparagraph|整数>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (number-\<gtr\>string 123) =\<gtr\> "123")
+
+    (check (number-\<gtr\>string -456) =\<gtr\> "-456")
+
+    \;
+
+    (check (number-\<gtr\>string 123 2) =\<gtr\> "1111011")
+
+    \;
+
+    (check (number-\<gtr\>string 123 8) =\<gtr\> "173")
+
+    \;
+
+    (check (number-\<gtr\>string 255 16) =\<gtr\> "ff")
+
+    \;
+
+    (check-catch 'wrong-type-arg (number-\<gtr\>string 123 'not-a-number))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|有理数>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (number-\<gtr\>string 1/2) =\<gtr\> "1/2")
+
+    (check (number-\<gtr\>string 1/2 2) =\<gtr\> "1/10")
+
+    (check (number-\<gtr\>string 3/4 2) =\<gtr\> "11/100")
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|实数>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (number-\<gtr\>string 123.456) =\<gtr\> "123.456")
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|复数>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (number-\<gtr\>string 1+2i) =\<gtr\> "1.0+2.0i")
+
+    (check (number-\<gtr\>string 0+2i) =\<gtr\> "0.0+2.0i")
+
+    \;
+  </scm-chunk>
+
   <section|布尔值>
 
   <r7rs><paragraph|boolean=?><scm|(obj1 obj2 ...) =\<gtr\> boolean><index|boolean=?>
