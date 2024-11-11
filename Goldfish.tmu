@@ -1353,9 +1353,9 @@
     \;
   </scm-chunk>
 
-  <value|r7rs><paragraph|positive?><index|positive?><scm|(x) =\<gtr\> boolean?>
+  <value|r7rs><paragraph|positive?><index|positive?><scm|((x real?)) =\<gtr\> boolean?>
 
-  判断一个数是否为正数。
+  判断一个实数是否为正数。
 
   <subparagraph|真>
 
@@ -1365,6 +1365,10 @@
     (check-true (positive? 0.1))
 
     (check-true (positive? 1/2))
+
+    (check-true (positive? +inf.0))
+
+    (check-true (positive? 1+0i))
 
     \;
   </scm-chunk>
@@ -1380,24 +1384,34 @@
 
     (check-false (positive? -1/2))
 
+    (check-false (positive? -inf.0))
+
+    (check-false (positive? +nan.0))
+
     \;
   </scm-chunk>
 
   <subparagraph|类型错误>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (positive? 1+1i))
+
     (check-catch 'wrong-type-arg (positive? #\\A))
 
     (check-catch 'wrong-type-arg (positive? #t))
 
-    (check-catch 'wrong-type-arg (positive? #f))
+    (check-catch 'wrong-type-arg (positive? "not-a-number"))
+
+    (check-catch 'wrong-type-arg (positive? 'symbol))
+
+    (check-catch 'wrong-type-arg (positive? '(1 2 3)))
 
     \;
   </scm-chunk>
 
-  <value|r7rs><paragraph|negative?><index|negative?><scm|(x) =\<gtr\> boolean?>
+  <value|r7rs><paragraph|negative?><index|negative?><scm|((x real?)) =\<gtr\> boolean?>
 
-  判断一个数是否为负数。
+  判断一个实数是否为负数。
 
   <subparagraph|真>
 
@@ -1407,6 +1421,10 @@
     (check-true (negative? -0.1))
 
     (check-true (negative? -1/2))
+
+    (check-true (negative? -inf.0))
+
+    (check-true (negative? -1+0i))
 
     \;
   </scm-chunk>
@@ -1422,17 +1440,27 @@
 
     (check-false (negative? 1/2))
 
+    (check-false (negative? +inf.0))
+
+    (check-false (negative? -nan.0))
+
     \;
   </scm-chunk>
 
   <subparagraph|类型错误>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (negative? -1-1i))
+
     (check-catch 'wrong-type-arg (negative? #\\A))
 
     (check-catch 'wrong-type-arg (negative? #t))
 
-    (check-catch 'wrong-type-arg (negative? #f))
+    (check-catch 'wrong-type-arg (negative? "not-a-number"))
+
+    (check-catch 'wrong-type-arg (negative? 'symbol))
+
+    (check-catch 'wrong-type-arg (negative? '(1 2 3)))
 
     \;
   </scm-chunk>
