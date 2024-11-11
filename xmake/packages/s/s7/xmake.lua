@@ -41,10 +41,6 @@ package("s7")
         add_syslinks("pthread", "dl", "m")
     end
 
-    if is_plat("windows") then
-        add_cxxflags("/fp:precise")
-    end
-
     on_install("bsd", "cross", "cygwin", "linux", "macosx", "mingw", "msys", "wasm", "windows", function (package)
         os.cp(path.join(package:scriptdir(), "port", "xmake.lua"), "xmake.lua")
         local configs = {}
