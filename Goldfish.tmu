@@ -1851,7 +1851,7 @@
 
   <subsection|数的转换>
 
-  <paragraph|number-\<gtr\>string><typehint|((z number?) (radix 10)) =\<gtr\> string?>
+  <value|r7rs><paragraph|number-\<gtr\>string><index|number-\<gtr\>string><typehint|((z number?) (radix 10)) =\<gtr\> string?>
 
   将一个数<scm|z>转换为字符串，其中<scm|radix>是可选参数，默认值为10。
 
@@ -1910,6 +1910,8 @@
 
     \;
   </scm-chunk>
+
+  <value|r7rs><paragraph|string-\<gtr\>number><index|string-\<gtr\>number><typehint|((str string?) (radix 10)) =\<gtr\> number?>
 
   <section|布尔值>
 
