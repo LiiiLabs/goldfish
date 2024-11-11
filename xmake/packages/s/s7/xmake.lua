@@ -41,7 +41,7 @@ package("s7")
         add_syslinks("pthread", "dl", "m")
     end
 
-    if is_pla("windows") then
+    if is_plat("windows") then
         add_cxxflags("/fp:precise")
     end
 
