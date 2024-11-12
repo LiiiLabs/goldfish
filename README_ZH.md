@@ -188,7 +188,7 @@ tests/demo_argv.scm => #\newline
 
 ```
 @book{goldfish,
-    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He and Yingyao Zhou and Shuting Zhao},
+    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He and Yingyao Zhou and Shuting Zhao and Shen Wei},
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},
