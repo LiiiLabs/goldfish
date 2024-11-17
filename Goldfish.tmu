@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.5>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -21,6 +21,8 @@
     <assign|goldfish-version|17.10.9>
 
     <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
+
+    <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
   </hide-preamble>
 
   <chapter|金鱼Scheme简介>
@@ -168,7 +170,7 @@
 
     (define-macro (define-library libname . body) ; \|(lib name)\| -\<gtr\> environment
 
-    \ \ ‘(define ,(symbol (object-\<gtr\>string libname))
+    \ \ `(define ,(symbol (object-\<gtr\>string libname))
 
     \ \ \ \ \ (with-let (sublet (unlet)
 
@@ -178,7 +180,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons 'export (define-macro (,(gensym) . names)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(set! *export* (append ',names *export*)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(set! *export* (append ',names *export*)))))
 
     \ \ \ \ \ \ \ ,@body
 
@@ -240,7 +242,7 @@
   <\scm-chunk|goldfish/scheme/boot.scm|true|false>
     (define-macro (import . libs)
 
-    \ \ ‘(begin
+    \ \ `(begin
 
     \ \ \ \ \ (r7rs-import-library-filename ',libs)
 
@@ -252,7 +254,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((only)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((lambda (e names)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
 
@@ -268,7 +270,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((except)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((lambda (e names)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
 
@@ -288,7 +290,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((prefix)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((lambda (e prefx)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e prefx)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
 
@@ -310,7 +312,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((rename)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((lambda (e names)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
 
@@ -332,7 +334,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(let ((sym (symbol (object-\<gtr\>string ',lib))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(let ((sym (symbol (object-\<gtr\>string ',lib))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (not (defined? sym))
 
@@ -874,13 +876,13 @@
 
     \ \ \ \ \ \ \ \ \ \ \ (null? (cdar vars)))
 
-    \ \ \ \ \ \ ‘((lambda ,(caar vars)
+    \ \ \ \ \ \ `((lambda ,(caar vars)
 
     \ \ \ \ \ \ \ \ \ \ ,@body)
 
     \ \ \ \ \ \ \ \ ,(cadar vars))
 
-    \ \ \ \ \ \ ‘(with-let
+    \ \ \ \ \ \ `(with-let
 
     \ \ \ \ \ \ \ \ (apply sublet (curlet)
 
@@ -890,7 +892,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda (v)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((lambda ,(car v)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda ,(car v)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values ,@(map (lambda (name)
 
@@ -962,7 +964,7 @@
 
     (define-macro (and-let* vars . body)
 
-    \ \ ‘(let () (and ,@(map (lambda (v) ‘(define ,@v)) vars) (begin ,@body))))
+    \ \ `(let () (and ,@(map (lambda (v) `(define ,@v)) vars) (begin ,@body))))
 
     \;
 
@@ -1060,7 +1062,7 @@
 
     (define-macro (define-values vars expression)
 
-    \ \ ‘(if (not (null? ',vars))
+    \ \ `(if (not (null? ',vars))
 
     \ \ \ \ \ \ \ (varlet (curlet) ((lambda ,vars (curlet)) ,expression))))
 
@@ -1102,7 +1104,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)))
 
-    \ \ \ \ ‘(begin
+    \ \ \ \ `(begin
 
     \ \ \ \ \ \ \ (define (,? ,obj)
 
@@ -1130,11 +1132,11 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? (cddr field))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(define (,(cadr field) ,obj)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(define (,(cadr field) ,obj)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let-ref ,obj ',(car field)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(begin
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(begin
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (define (,(cadr field) ,obj)
 
@@ -2076,7 +2078,7 @@
   <subparagraph|测试>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (symbol-\<gtr\><with|font-series|bold|>string ‘MathAgape) =\<gtr\> "MathAgape")
+    (check (symbol-\<gtr\><with|font-series|bold|>string `MathAgape) =\<gtr\> "MathAgape")
 
     (check (symbol-\<gtr\>string 'goldfish-scheme) =\<gtr\> "goldfish-scheme")
 
@@ -2121,7 +2123,7 @@
     <\unfolded-io>
       \<gtr\>\ 
     <|unfolded-io>
-      ‘123
+      `123
     <|unfolded-io>
       <goldfish-result|123>
     </unfolded-io>
@@ -2134,7 +2136,7 @@
   </session>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (string-\<gtr\>symbol "MathAgape") =\<gtr\> ‘MathAgape)
+    (check (string-\<gtr\>symbol "MathAgape") =\<gtr\> `MathAgape)
 
     (check-false (equal? (string-\<gtr\>symbol "123") '123))
 
@@ -2142,7 +2144,7 @@
 
     \;
 
-    (check (string-\<gtr\>symbol (symbol-\<gtr\>string ‘MathAgape)) =\<gtr\> ‘MathAgape)
+    (check (string-\<gtr\>symbol (symbol-\<gtr\>string `MathAgape)) =\<gtr\> `MathAgape)
 
     \;
   </scm-chunk>
@@ -2773,7 +2775,7 @@
     <|unfolded-io>
       (define-macro (receive vars vals . body)
 
-      \ \ ‘((lambda ,vars ,@body) ,vals)) ; GPL
+      \ \ `((lambda ,vars ,@body) ,vals)) ; GPL
     <|unfolded-io>
       receive
     </unfolded-io>
@@ -2846,7 +2848,7 @@
 
     (define-macro (receive formals expression . body)
 
-    \ \ ‘(call-with-values
+    \ \ `(call-with-values
 
     \ \ \ \ (lambda () (values ,expression))
 
@@ -2886,7 +2888,7 @@
 
     (define-macro (guard results . body)
 
-    \ \ ‘(let ((,(car results)\ 
+    \ \ `(let ((,(car results)\ 
 
     \ \ \ \ \ \ \ \ \ \ (catch #t\ 
 
@@ -3256,7 +3258,7 @@
   <\scm-chunk|goldfish/liii/base.scm|true|true>
     (define-macro (let1 name1 value1 . body)
 
-    \ \ ‘(let ((,name1 ,value1))
+    \ \ `(let ((,name1 ,value1))
 
     \ \ \ \ \ ,@body))
 
@@ -3344,13 +3346,13 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-car! p (caar p))))
 
-    \ \ \ \ \ \ \ \ ‘(lambda ,new-args
+    \ \ \ \ \ \ \ \ `(lambda ,new-args
 
     \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (arg)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (pair? arg)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(unless (,(cadr arg) ,(car arg))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(unless (,(cadr arg) ,(car arg))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error 'type-error
 
@@ -3634,7 +3636,7 @@
   <\scm-chunk|goldfish/liii/error.scm|true|true>
     (define (type-error? err)
 
-    \ \ (in? err ‘(type-error wrong-type-arg)))
+    \ \ (in? err `(type-error wrong-type-arg)))
 
     \;
   </scm-chunk>
@@ -3768,7 +3770,7 @@
 
     ;\ 
 
-    ; THE SOFTWARE IS PROVIDED ‘‘AS IS'', WITHOUT WARRANTY OF ANY KIND,
+    ; THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND,
 
     ; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 
@@ -4282,7 +4284,7 @@
   <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
     (define-macro (check expr =\<gtr\> expected)
 
-    \ \ ‘(check:proc ',expr (lambda () ,expr) equal? ,expected))
+    \ \ `(check:proc ',expr (lambda () ,expr) equal? ,expected))
 
     \;
   </scm-chunk>
@@ -4292,7 +4294,7 @@
   <\scm-chunk|goldfish/liii/check.scm|true|true>
     (define-macro (check-true body)
 
-    \ \ ‘(check ,body =\<gtr\> #t))
+    \ \ `(check ,body =\<gtr\> #t))
 
     \;
   </scm-chunk>
@@ -4302,7 +4304,7 @@
   <\scm-chunk|goldfish/liii/check.scm|true|true>
     (define-macro (check-false body)
 
-    \ \ ‘(check ,body =\<gtr\> #f))
+    \ \ `(check ,body =\<gtr\> #f))
 
     \;
   </scm-chunk>
@@ -4312,7 +4314,7 @@
   <\scm-chunk|goldfish/liii/check.scm|true|true>
     (define-macro (check-catch error-id body)
 
-    \ \ ‘(check
+    \ \ `(check
 
     \ \ \ \ (catch ,error-id
 
@@ -4332,7 +4334,7 @@
   <\scm-chunk|goldfish/liii/check.scm|true|true>
     (define-macro (test left right)
 
-    \ \ ‘(check ,left =\<gtr\> ,right))
+    \ \ `(check ,left =\<gtr\> ,right))
 
     \;
   </scm-chunk>
@@ -6734,13 +6736,13 @@
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (let1 l '((a 1) (b 2) (c . 3))
 
-    \ \ (check (assq 'a l) =\<gtr\> ‘(a 1))
+    \ \ (check (assq 'a l) =\<gtr\> `(a 1))
 
     \ \ (check-true (eq? (assq 'a l) (l 0)))
 
-    \ \ (check (assq 'b l) =\<gtr\> ‘(b 2))
+    \ \ (check (assq 'b l) =\<gtr\> `(b 2))
 
-    \ \ (check (assq 'c l) =\<gtr\> ‘(c . 3))
+    \ \ (check (assq 'c l) =\<gtr\> `(c . 3))
 
     \ \ (check (assq 'd l) =\<gtr\> #f))
 
@@ -7396,7 +7398,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ "flatten: the second argument depth should be symbol "
 
-    \ \ \ \ \ \ \ \ \ \ \ \ "‘deepest' or a integer, which will be uesd as depth,"
+    \ \ \ \ \ \ \ \ \ \ \ \ "`deepest' or a integer, which will be uesd as depth,"
 
     \ \ \ \ \ \ \ \ \ \ \ \ " but got a ~A") depth)))
 
@@ -9904,7 +9906,7 @@
 
     (check (string-tokenize "1 22 333" #\\2) =\<gtr\> '("1 " " 333"))
 
-    (check (string-tokenize "1 22 333" #\\ \ 2) =\<gtr\> ‘("22" "333"))
+    (check (string-tokenize "1 22 333" #\\ \ 2) =\<gtr\> `("22" "333"))
 
     \;
   </scm-chunk>
@@ -13712,7 +13714,7 @@
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
     (define-macro (hash-table-ref/default ht key default)
 
-    \ \ ‘(or (hash-table-ref ,ht ,key)
+    \ \ `(or (hash-table-ref ,ht ,key)
 
     \ \ \ \ \ \ \ \ ,default))
 
@@ -15200,7 +15202,7 @@
 
     (define-macro (case-lambda . choices)
 
-    \ \ ‘(lambda args
+    \ \ `(lambda args
 
     \ \ \ \ \ (case (length args)
 
@@ -15210,9 +15212,9 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (negative? (length (car choice))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(else (apply (lambda ,(car choice) ,@(cdr choice)) args))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(else (apply (lambda ,(car choice) ,@(cdr choice)) args))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((,(length (car choice)))\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((,(length (car choice)))\ 
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply (lambda ,(car choice) ,@(cdr choice)) args))))
 
