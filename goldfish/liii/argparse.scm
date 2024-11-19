@@ -24,8 +24,6 @@
 (export make-argparser)
 (begin
 
-;; Internal argument record structure
-;; (name type short-name default current-value)
 (define (make-arg-record name type short-name default)
   (list name type short-name default default))
 

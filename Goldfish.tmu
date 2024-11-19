@@ -15450,7 +15450,7 @@
 
     \ \ (parser 'add-argument
 
-    \ \ \ \ '((name . "width") (type . number) (short . "width") (default . 80)))
+    \ \ \ \ '((name \ "width") (type . number) (short . "width") (default . 80)))
 
     \ \ (check (parser 'get-argument "width") =\<gtr\> 80)
 
@@ -15503,17 +15503,17 @@
 
   <section|实现>
 
-  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
-    ;; Internal argument record structure
+  <paragraph|make-arg-record>
 
-    ;; (name type short-name default current-value)
-
+  <\scm-chunk|goldfish/liii/argparse.scm|true|false>
     (define (make-arg-record name type short-name default)
 
     \ \ (list name type short-name default default))
 
     \;
+  </scm-chunk>
 
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     ;; Convert value based on type
 
     (define (convert-value value type)
@@ -15664,6 +15664,8 @@
 
     \;
   </scm-chunk>
+
+  \;
 
   <paragraph|make-argparser><index|make-argparser>
 
