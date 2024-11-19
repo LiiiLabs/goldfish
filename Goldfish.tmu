@@ -15748,7 +15748,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Unknown argument" name))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error (string-append "Unknown option: --" name)))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ 
 
@@ -15772,7 +15772,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Unknown argument" name))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error (string-append "Unknown option: -" name)))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ 
 

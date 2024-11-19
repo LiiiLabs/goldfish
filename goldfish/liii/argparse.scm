@@ -103,7 +103,7 @@
                          (let ((value (convert-value (cadr args) (cadr found))))
                            (set-car! (cddddr found) value))
                          (loop (cddr args))))
-                   (error "Unknown argument" name))))
+                   (value-error (string-append "Unknown option: --" name)))))
             
             ((short-form? arg)
              (let* ((name (substring arg 1))
@@ -115,7 +115,7 @@
                          (let ((value (convert-value (cadr args) (cadr found))))
                            (set-car! (cddddr found) value))
                          (loop (cddr args))))
-                   (error "Unknown argument" name))))
+                   (value-error (string-append "Unknown option: -" name)))))
             
             (else (loop (cdr args))))))))
 
