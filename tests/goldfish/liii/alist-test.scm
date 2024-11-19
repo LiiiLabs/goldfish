@@ -19,6 +19,7 @@
 
 (check-set-mode! 'report-failed)
 
+(check (alist-ref '((a 1)) 'a) => '(1))
 (check (alist-ref '((a . 1)) 'a) => 1)
 (check-catch 'key-error (alist-ref '((a . 1)) 'b))
 

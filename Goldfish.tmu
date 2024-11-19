@@ -7662,6 +7662,8 @@
   </goldfish-chunk>
 
   <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+    (check (alist-ref '((a 1)) 'a) =\<gtr\> '(1))
+
     (check (alist-ref '((a . 1)) 'a) =\<gtr\> 1)
 
     (check-catch 'key-error (alist-ref '((a . 1)) 'b))
@@ -15314,6 +15316,520 @@
   <section|结尾>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <chapter|(liii argparse)>
+
+  <section|协议>
+
+  <\scm-chunk|goldfish/liii/argparse.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define-library (liii argparse)
+
+    (import (liii base)
+
+    \ \ \ \ \ \ \ \ (liii error)
+
+    \ \ \ \ \ \ \ \ (liii list)
+
+    \ \ \ \ \ \ \ \ (liii string)
+
+    \ \ \ \ \ \ \ \ (liii hash-table)
+
+    \ \ \ \ \ \ \ \ (liii alist)
+
+    \ \ \ \ \ \ \ \ (liii sys))
+
+    (export make-argument-parser)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii argparse))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试命令行参数的类型>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
+    (let ((parser (make-argument-parser)))
+
+    \ \ (parser 'add-argument
+
+    \ \ \ \ '((name . "name") (type . string) (short . "n") (default . "anonymous")))
+
+    \ \ (check (parser 'name) =\<gtr\> "anonymous")
+
+    \ \ (parser 'parse-args '("--name" "john"))
+
+    \ \ (check (parser 'name) =\<gtr\> "john"))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试命令行参数的两种形式>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
+    (let ((parser (make-argument-parser)))
+
+    \ \ (parser 'add-argument
+
+    \ \ \ \ '((name . "width") (type . number) (short . "width") (default . 80)))
+
+    \;
+
+    \ \ (check (parser 'get-argument "width") =\<gtr\> 80)
+
+    \;
+
+    \ \ (parser 'parse-args '("--width" "100"))
+
+    \ \ (check (parser 'get-argument "width") =\<gtr\> 100)
+
+    \ \ (check (parser 'width) =\<gtr\> 100)
+
+    \;
+
+    \ \ (parser 'parse-args '("-width" "60"))
+
+    \ \ (check (parser 'width) =\<gtr\> 60))
+
+    \;
+
+    (let ((parser (make-argument-parser)))
+
+    \ \ (parser 'add-argument
+
+    \ \ \ \ '((name . "height") (type . number) (default . 60))) \ ; without short name
+
+    \ \ (parser 'parse-args '("--height" "120"))
+
+    \ \ (check (parser 'get-argument "height") =\<gtr\> 120))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试多个命令行参数多种类型>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
+    (let ((parser (make-argument-parser)))
+
+    \ \ (parser 'add-argument
+
+    \ \ \ \ '((name . "width") (type . number) (short . "w") (default . 80)))
+
+    \ \ (parser 'add-argument\ 
+
+    \ \ \ \ '((name . "title") (type . string) (default . "Untitled")))
+
+    \ \ (parser 'parse-args '("-w" "100" "--title" "My Document"))
+
+    \ \ (check (parser 'get-argument "width") =\<gtr\> 100)
+
+    \ \ (check (parser 'get-argument "title") =\<gtr\> "My Document"))
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <paragraph|make-arg-record>
+
+  <todo|使用define-record-type>
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (make-arg-record name type short-name default)
+
+    \ \ (list name type short-name default default))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|convert-value>
+
+  将给定值转化为给定类型。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (convert-value value type)
+
+    \ \ (case type
+
+    \ \ \ \ ((number)\ 
+
+    \ \ \ \ \ (if (number? value)
+
+    \ \ \ \ \ \ \ \ \ value
+
+    \ \ \ \ \ \ \ \ \ (let ((num (string-\<gtr\>number value)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (if num\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ num
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Invalid number format" value)))))
+
+    \ \ \ \ ((string)\ 
+
+    \ \ \ \ \ (if (string? value)
+
+    \ \ \ \ \ \ \ \ \ value
+
+    \ \ \ \ \ \ \ \ \ (error "Value is not a string")))
+
+    \ \ \ \ (else (error "Unsupported type" type))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|arg-type?>
+
+  命令行参数的类型必须是<scm|symbol>类型的Scheme字面量。目前命令行参数仅支持两种类型：
+
+  <\description>
+    <item*|string>如果没有指定，那么参数类型默认是字符串类型。
+
+    <item*|number>在传入参数时，参数的值是字符串，我们会调用<scm|number-\<gtr\>string>将字符串转化为Scheme的number类型。
+  </description>
+
+  \;
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (arg-type? type)
+
+    \ \ (unless (symbol? type)
+
+    \ \ \ \ (type-error "type of the argument must be symbol"))
+
+    \ \ (in? type '(string number)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|add-argument>
+
+  新增命令行参数。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (%add-argument args-ht args)
+
+    \ \ (let* ((options (car args))
+
+    \ \ \ \ \ \ \ \ \ (name (alist-ref options 'name
+
+    \ \ \ \ \ \ \ \ \ \ \ (lambda () (value-error "name is required for an option"))))
+
+    \ \ \ \ \ \ \ \ \ (type (alist-ref/default options 'type 'string))
+
+    \ \ \ \ \ \ \ \ \ (short-name (alist-ref/default options 'short #f))
+
+    \ \ \ \ \ \ \ \ \ (default (alist-ref/default options 'default #f))
+
+    \ \ \ \ \ \ \ \ \ (arg-record (make-arg-record name type short-name default)))
+
+    \ \ \ \ (unless (string? name)
+
+    \ \ \ \ \ \ (type-error "name of the argument must be string"))
+
+    \ \ \ \ (unless (arg-type? type)
+
+    \ \ \ \ \ \ (value-error "Invalid type of the argument" type))
+
+    \ \ \ \ (unless (or (not short-name) (string? short-name))
+
+    \ \ \ \ \ \ (type-error "short name of the argument must be string if given"))
+
+    \ \ \ \ (hash-table-set! args-ht name arg-record)
+
+    \ \ \ \ (when short-name
+
+    \ \ \ \ \ \ \ \ \ \ (hash-table-set! args-ht short-name arg-record))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
+    (let1 parser (make-argument-parser)
+
+    \ \ (check-catch 'type-error (parser 'add-argument '((name name))))
+
+    \ \ (check-catch 'value-error (parser 'add-argument '())))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|get-argument>
+
+  获得命令行参数对应的值。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (%get-argument args-ht args)
+
+    \ \ (let ((found (hash-table-ref/default args-ht (car args) #f)))
+
+    \ \ \ \ (if found
+
+    \ \ \ \ \ \ \ \ (fifth found)
+
+    \ \ \ \ \ \ \ \ (error "Argument not found" (car args)))))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  \;
+
+  <paragraph|parse-args>
+
+  解析命令行参数。
+
+  <subparagraph|long-form?>
+
+  判断是否形如<shell|--help>、<shell|--version>等形式。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (long-form? arg)
+
+    \ \ (and (string? arg)\ 
+
+    \ \ \ \ \ \ \ (\<gtr\>= (string-length arg) 3)
+
+    \ \ \ \ \ \ \ (string-starts? arg "--")))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|short-form?>
+
+  判断是否形如<shell|-w>、<shell|-help>等形式。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (short-form? arg)
+
+    \ \ (and (string? arg)
+
+    \ \ \ \ \ \ \ (\<gtr\>= (string-length arg) 2)
+
+    \ \ \ \ \ \ \ (char=? (string-ref arg 0) #\\-)))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|retrieve-args>
+
+  如果在代码中传入的参数是空列表，那么默认使用命令行参数。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (retrieve-args args)
+
+    \ \ (if (null? args)
+
+    \ \ \ \ \ \ (cddr (argv))
+
+    \ \ \ \ \ \ (car args)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (%parse-args args-ht prog-args)
+
+    \ \ (let loop ((args (retrieve-args prog-args)))
+
+    \ \ \ \ (if (null? args)
+
+    \ \ \ \ \ \ \ \ args-ht
+
+    \ \ \ \ \ \ \ \ (let ((arg (car args)))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((long-form? arg)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (let* ((name (substring arg 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (found (hash-table-ref args-ht name)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if found
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? (cdr args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Missing value for argument" name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((value (convert-value (cadr args) (cadr found))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-car! (cddddr found) value))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error (string-append "Unknown option: --" name)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((short-form? arg)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (let* ((name (substring arg 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (found (hash-table-ref args-ht name)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if found
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? (cdr args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Missing value for argument" name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((value (convert-value (cadr args) (cadr found))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-car! (cddddr found) value))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error (string-append "Unknown option: -" name)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (cdr args))))))))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <paragraph|make-argument-parser><index|make-argument-parser>
+
+  构造argparser，用于解析命令行参数。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (make-argument-parser)
+
+    \ \ (let ((args-ht (make-hash-table)))
+
+    \ \ \ \ (lambda (command . args)
+
+    \ \ \ \ \ \ (case command
+
+    \ \ \ \ \ \ \ \ ((add) (%add-argument args-ht args))
+
+    \ \ \ \ \ \ \ \ ((add-argument) (%add-argument args-ht args))
+
+    \ \ \ \ \ \ \ \ ((get) (%get-argument args-ht args))
+
+    \ \ \ \ \ \ \ \ ((get-argument) (%get-argument args-ht args))
+
+    \ \ \ \ \ \ \ \ ((parse) (%parse-args args-ht args))
+
+    \ \ \ \ \ \ \ \ ((parse-args) (%parse-args args-ht args))
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ (if (and (null? args) (symbol? command))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (%get-argument args-ht (list (symbol-\<gtr\>string command)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Unknown parser command" command)))))))
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
     (check-report)
 
     \;
