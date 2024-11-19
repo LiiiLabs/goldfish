@@ -24,25 +24,25 @@
   (parser 'parse-args '("--name" "john"))
   (check (parser 'name) => "john"))
 
-;; Test number type with long form
 (let ((parser (make-argparser)))
   (parser 'add-argument
     '((name . "width") (type . number) (short . "width") (default . 80)))
+
   (check (parser 'get-argument "width") => 80)
+
   (parser 'parse-args '("--width" "100"))
   (check (parser 'get-argument "width") => 100)
   (check (parser 'width) => 100)
-  (parser 'parse-args '("-width" "60"))
-  (check (parser 'get-argument "width") => 60))
 
-;; Test number type with short form
+  (parser 'parse-args '("-width" "60"))
+  (check (parser 'width) => 60))
+
 (let ((parser (make-argparser)))
   (parser 'add-argument
     '((name . "height") (type . number) (default . 60)))  ; without short name
   (parser 'parse-args '("--height" "120"))
   (check (parser 'get-argument "height") => 120))
 
-;; Test mixed types
 (let ((parser (make-argparser)))
   (parser 'add-argument
     '((name . "width") (type . number) (short . "w") (default . 80)))

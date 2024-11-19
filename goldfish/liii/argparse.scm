@@ -27,7 +27,6 @@
 (define (make-arg-record name type short-name default)
   (list name type short-name default default))
 
-;; Convert value based on type
 (define (convert-value value type)
   (case type
     ((number) 
@@ -60,7 +59,7 @@
 (define (%get-argument args-ht args)
   (let ((found (hash-table-ref/default args-ht (car args) #f)))
     (if found
-        (car (cddddr found))
+        (fifth found)
         (error "Argument not found" (car args)))))
 
 (define (%parse-args args-ht args)

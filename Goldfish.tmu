@@ -15443,16 +15443,20 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
-    ;; Test number type with long form
+  <subparagraph|测试命令行参数的两种形式>
 
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
     (let ((parser (make-argparser)))
 
     \ \ (parser 'add-argument
 
     \ \ \ \ '((name . "width") (type . number) (short . "width") (default . 80)))
 
+    \;
+
     \ \ (check (parser 'get-argument "width") =\<gtr\> 80)
+
+    \;
 
     \ \ (parser 'parse-args '("--width" "100"))
 
@@ -15460,13 +15464,13 @@
 
     \ \ (check (parser 'width) =\<gtr\> 100)
 
-    \ \ (parser 'parse-args '("-width" "60"))
-
-    \ \ (check (parser 'get-argument "width") =\<gtr\> 60))
-
     \;
 
-    ;; Test number type with short form
+    \ \ (parser 'parse-args '("-width" "60"))
+
+    \ \ (check (parser 'width) =\<gtr\> 60))
+
+    \;
 
     (let ((parser (make-argparser)))
 
@@ -15479,9 +15483,11 @@
     \ \ (check (parser 'get-argument "height") =\<gtr\> 120))
 
     \;
+  </scm-chunk>
 
-    ;; Test mixed types
+  <subparagraph|测试多个命令行参数多种类型>
 
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
     (let ((parser (make-argparser)))
 
     \ \ (parser 'add-argument
@@ -15513,9 +15519,11 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
-    ;; Convert value based on type
+  <paragraph|convert-value>
 
+  将给定值转化为给定类型。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (convert-value value type)
 
     \ \ (case type
@@ -15545,7 +15553,13 @@
     \ \ \ \ (else (error "Unsupported type" type))))
 
     \;
+  </scm-chunk>
 
+  <paragraph|add-argument>
+
+  新增命令行参数。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|false>
     (define (%add-argument args-ht args)
 
     \ \ (let* ((options (car args))
@@ -15573,19 +15587,31 @@
     \ \ \ \ \ \ \ \ \ \ (hash-table-set! args-ht short-name arg-record))))
 
     \;
+  </scm-chunk>
 
+  <paragraph|get-argument>
+
+  获得命令行参数对应的值。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (%get-argument args-ht args)
 
     \ \ (let ((found (hash-table-ref/default args-ht (car args) #f)))
 
     \ \ \ \ (if found
 
-    \ \ \ \ \ \ \ \ (car (cddddr found))
+    \ \ \ \ \ \ \ \ (fifth found)
 
     \ \ \ \ \ \ \ \ (error "Argument not found" (car args)))))
 
     \;
+  </scm-chunk>
 
+  <paragraph|parse-args>
+
+  解析命令行参数。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (%parse-args args-ht args)
 
     \ \ (let loop ((args (car args))
@@ -15668,6 +15694,8 @@
   \;
 
   <paragraph|make-argparser><index|make-argparser>
+
+  构造argparser，用于解析命令行参数。
 
   <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (make-argparser)
