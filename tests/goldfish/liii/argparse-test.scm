@@ -27,7 +27,7 @@
 ;; Test number type with long form
 (let ((parser (make-argparser)))
   (parser 'add-argument
-    '((name  "width") (type . number) (short . "width") (default . 80)))
+    '((name . "width") (type . number) (short . "width") (default . 80)))
   (check (parser 'get-argument "width") => 80)
   (parser 'parse-args '("--width" "100"))
   (check (parser 'get-argument "width") => 100)

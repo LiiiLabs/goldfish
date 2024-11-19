@@ -15450,7 +15450,7 @@
 
     \ \ (parser 'add-argument
 
-    \ \ \ \ '((name \ "width") (type . number) (short . "width") (default . 80)))
+    \ \ \ \ '((name . "width") (type . number) (short . "width") (default . 80)))
 
     \ \ (check (parser 'get-argument "width") =\<gtr\> 80)
 
@@ -15505,7 +15505,7 @@
 
   <paragraph|make-arg-record>
 
-  <\scm-chunk|goldfish/liii/argparse.scm|true|false>
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (make-arg-record name type short-name default)
 
     \ \ (list name type short-name default default))
