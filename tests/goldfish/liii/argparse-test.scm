@@ -19,14 +19,14 @@
 
 (check-set-mode! 'report-failed)
 
-(let ((parser (make-argparser)))
+(let ((parser (make-argument-parser)))
   (parser 'add-argument
     '((name . "name") (type . string) (short . "n") (default . "anonymous")))
   (check (parser 'name) => "anonymous")
   (parser 'parse-args '("--name" "john"))
   (check (parser 'name) => "john"))
 
-(let ((parser (make-argparser)))
+(let ((parser (make-argument-parser)))
   (parser 'add-argument
     '((name . "width") (type . number) (short . "width") (default . 80)))
 
@@ -39,13 +39,13 @@
   (parser 'parse-args '("-width" "60"))
   (check (parser 'width) => 60))
 
-(let ((parser (make-argparser)))
+(let ((parser (make-argument-parser)))
   (parser 'add-argument
     '((name . "height") (type . number) (default . 60)))  ; without short name
   (parser 'parse-args '("--height" "120"))
   (check (parser 'get-argument "height") => 120))
 
-(let ((parser (make-argparser)))
+(let ((parser (make-argument-parser)))
   (parser 'add-argument
     '((name . "width") (type . number) (short . "w") (default . 80)))
   (parser 'add-argument 
@@ -54,7 +54,7 @@
   (check (parser 'get-argument "width") => 100)
   (check (parser 'get-argument "title") => "My Document"))
 
-(let1 parser (make-argparser)
+(let1 parser (make-argument-parser)
   (check-catch 'type-error (parser 'add-argument '((name name))))
   (check-catch 'value-error (parser 'add-argument '())))
 

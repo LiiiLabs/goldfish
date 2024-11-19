@@ -21,7 +21,7 @@
         (liii string)
         (liii hash-table)
         (liii alist))
-(export make-argparser)
+(export make-argument-parser)
 (begin
 
 (define (make-arg-record name type short-name default)
@@ -84,10 +84,10 @@
 (define (retrieve-args args)
   (if (null? args)
       (vector->list (argv))
-      args))
+      (car args)))
 
 (define (%parse-args args-ht prog-args)
-  (let loop ((args (retrieve-args (car prog-args))))
+  (let loop ((args (retrieve-args prog-args)))
     (if (null? args)
         args-ht
         (let ((arg (car args)))
@@ -118,12 +118,15 @@
             
             (else (loop (cdr args))))))))
 
-(define (make-argparser)
+(define (make-argument-parser)
   (let ((args-ht (make-hash-table)))
     (lambda (command . args)
       (case command
+        ((add) (%add-argument args-ht args))
         ((add-argument) (%add-argument args-ht args))
+        ((get) (%get-argument args-ht args))
         ((get-argument) (%get-argument args-ht args))
+        ((parse) (%parse-args args-ht args))
         ((parse-args) (%parse-args args-ht args))
         (else
           (if (and (null? args) (symbol? command))
