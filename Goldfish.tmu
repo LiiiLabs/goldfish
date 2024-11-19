@@ -15340,7 +15340,9 @@
 
     \ \ \ \ \ \ \ \ (liii string)
 
-    \ \ \ \ \ \ \ \ (liii hash-table))
+    \ \ \ \ \ \ \ \ (liii hash-table)
+
+    \ \ \ \ \ \ \ \ (liii alist))
 
     (export make-argparser)
 
@@ -15444,14 +15446,6 @@
 
     \;
 
-    (define (get-option options key)
-
-    \ \ (let ((pair (assoc key options)))
-
-    \ \ \ \ (if pair (cdr pair) #f)))
-
-    \;
-
     ;; Convert value based on type
 
     (define (convert-value value type)
@@ -15492,9 +15486,9 @@
 
     \ \ \ \ \ \ \ \ \ (options (caddr args))
 
-    \ \ \ \ \ \ \ \ \ (short-name (get-option options 'short))
+    \ \ \ \ \ \ \ \ \ (short-name (alist-ref/default options 'short #f))
 
-    \ \ \ \ \ \ \ \ \ (default (get-option options 'default))
+    \ \ \ \ \ \ \ \ \ (default (alist-ref/default options 'default #f))
 
     \ \ \ \ \ \ \ \ \ (arg-record (make-arg-record name type short-name default)))
 
@@ -15601,7 +15595,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|make-argparser><inactive|<index|make-argparser>>
+  <paragraph|make-argparser><index|make-argparser>
 
   <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (make-argparser)

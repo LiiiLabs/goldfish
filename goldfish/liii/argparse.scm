@@ -4,7 +4,8 @@
         (liii error)
         (liii list)
         (liii string)
-        (liii hash-table))
+        (liii hash-table)
+        (liii alist))
 (export make-argparser)
 (begin
 
@@ -12,10 +13,6 @@
 ;; (name type short-name default current-value)
 (define (make-arg-record name type short-name default)
   (list name type short-name default default))
-
-(define (get-option options key)
-  (let ((pair (assoc key options)))
-    (if pair (cdr pair) #f)))
 
 ;; Convert value based on type
 (define (convert-value value type)
@@ -37,8 +34,8 @@
   (let* ((name (car args))
          (type (cadr args))
          (options (caddr args))
-         (short-name (get-option options 'short))
-         (default (get-option options 'default))
+         (short-name (alist-ref/default options 'short #f))
+         (default (alist-ref/default options 'default #f))
          (arg-record (make-arg-record name type short-name default)))
     (unless (memq type '(number string))
              (error "Type must be either 'number or 'string" type))
