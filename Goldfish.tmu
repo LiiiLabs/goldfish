@@ -15324,6 +15324,70 @@
   <section|协议>
 
   <\scm-chunk|goldfish/liii/argparse.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
     \;
   </scm-chunk>
 
@@ -15353,36 +15417,40 @@
 
   <section|测试>
 
-  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|false|false>
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
     (import (liii check)
 
     \ \ \ \ \ \ \ \ (liii argparse))
 
     \;
+  </scm-chunk>
 
-    ;; Test string type with required type
+  <subparagraph|测试命令行参数的类型>
 
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
     (let ((parser (make-argparser)))
 
-    \ \ (parser 'add-argument "name" 'string
+    \ \ (parser 'add-argument
 
-    \ \ \ \ \ \ \ \ \ \ '((short . "n") (default . "anonymous")))
+    \ \ \ \ '((name . "name") (type . 'string) (short . "n") (default . "anonymous")))
 
-    \ \ (check (parser 'get-argument "name") =\<gtr\> "anonymous")
+    \ \ (check (parser 'name) =\<gtr\> "anonymous")
 
     \ \ (parser 'parse-args '("--name" "john"))
 
-    \ \ (check (parser 'get-argument "name") =\<gtr\> "john"))
+    \ \ (check (parser 'name) =\<gtr\> "john"))
 
     \;
+  </scm-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
     ;; Test number type with long form
 
     (let ((parser (make-argparser)))
 
-    \ \ (parser 'add-argument "width" 'number
+    \ \ (parser 'add-argument
 
-    \ \ \ \ \ \ \ \ \ \ '((short . "width") (default . 80)))
+    \ \ \ \ '((name . "width") (type . 'number) (short . "width") (default . 80)))
 
     \ \ (check (parser 'get-argument "width") =\<gtr\> 80)
 
@@ -15402,9 +15470,9 @@
 
     (let ((parser (make-argparser)))
 
-    \ \ (parser 'add-argument "height" 'number
+    \ \ (parser 'add-argument
 
-    \ \ \ \ \ \ \ \ \ \ '((default . 60))) \ ; without short name
+    \ \ \ \ '((name "height") (type 'number) (default . 60))) \ ; without short name
 
     \ \ (parser 'parse-args '("--height" "120"))
 
@@ -15416,13 +15484,13 @@
 
     (let ((parser (make-argparser)))
 
-    \ \ (parser 'add-argument "width" 'number
+    \ \ (parser 'add-argument
 
-    \ \ \ \ \ \ \ \ \ \ '((short . "w") (default . 80)))
+    \ \ \ \ '((name . "width") (type . 'number) (short . "w") (default . 80)))
 
-    \ \ (parser 'add-argument "title" 'string
+    \ \ (parser 'add-argument\ 
 
-    \ \ \ \ \ \ \ \ \ \ '((default . "Untitled")))
+    \ \ \ \ '((name . "title") (type . 'string) (default . "Untitled")))
 
     \ \ (parser 'parse-args '("-w" "100" "--title" "My Document"))
 
@@ -15480,11 +15548,13 @@
 
     (define (%add-argument args-ht args)
 
-    \ \ (let* ((name (car args))
+    \ \ (let* ((options (car args))
 
-    \ \ \ \ \ \ \ \ \ (type (cadr args))
+    \ \ \ \ \ \ \ \ \ (name (alist-ref options 'name
 
-    \ \ \ \ \ \ \ \ \ (options (caddr args))
+    \ \ \ \ \ \ \ \ \ \ \ (lambda () (value-error "name is required for an option"))))
+
+    \ \ \ \ \ \ \ \ \ (type (alist-ref/default options 'type 'string))
 
     \ \ \ \ \ \ \ \ \ (short-name (alist-ref/default options 'short #f))
 

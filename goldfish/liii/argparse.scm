@@ -1,3 +1,18 @@
+;
+; Copyright (C) 2024 The Goldfish Scheme Authors
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+; http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+; License for the specific language governing permissions and limitations
+; under the License.
+;
 
 (define-library (liii argparse)
 (import (liii base)
@@ -31,9 +46,10 @@
     (else (error "Unsupported type" type))))
 
 (define (%add-argument args-ht args)
-  (let* ((name (car args))
-         (type (cadr args))
-         (options (caddr args))
+  (let* ((options (car args))
+         (name (alist-ref options 'name
+           (lambda () (value-error "name is required for an option"))))
+         (type (alist-ref/default options 'type 'string))
          (short-name (alist-ref/default options 'short #f))
          (default (alist-ref/default options 'default #f))
          (arg-record (make-arg-record name type short-name default)))
