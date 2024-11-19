@@ -15432,7 +15432,7 @@
 
     \ \ (parser 'add-argument
 
-    \ \ \ \ '((name . "name") (type . 'string) (short . "n") (default . "anonymous")))
+    \ \ \ \ '((name . "name") (type . string) (short . "n") (default . "anonymous")))
 
     \ \ (check (parser 'name) =\<gtr\> "anonymous")
 
@@ -15450,7 +15450,7 @@
 
     \ \ (parser 'add-argument
 
-    \ \ \ \ '((name . "width") (type . 'number) (short . "width") (default . 80)))
+    \ \ \ \ '((name . "width") (type . number) (short . "width") (default . 80)))
 
     \ \ (check (parser 'get-argument "width") =\<gtr\> 80)
 
@@ -15472,7 +15472,7 @@
 
     \ \ (parser 'add-argument
 
-    \ \ \ \ '((name "height") (type 'number) (default . 60))) \ ; without short name
+    \ \ \ \ '((name "height") (type number) (default . 60))) \ ; without short name
 
     \ \ (parser 'parse-args '("--height" "120"))
 
@@ -15486,11 +15486,11 @@
 
     \ \ (parser 'add-argument
 
-    \ \ \ \ '((name . "width") (type . 'number) (short . "w") (default . 80)))
+    \ \ \ \ '((name . "width") (type . number) (short . "w") (default . 80)))
 
     \ \ (parser 'add-argument\ 
 
-    \ \ \ \ '((name . "title") (type . 'string) (default . "Untitled")))
+    \ \ \ \ '((name . "title") (type . string) (default . "Untitled")))
 
     \ \ (parser 'parse-args '("-w" "100" "--title" "My Document"))
 
