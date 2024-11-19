@@ -2,38 +2,37 @@
 (import (liii base)
         (liii error)
         (liii list)
+        (liii string)
         (liii hash-table))
-
 (export make-parser)
-
 (begin
-    ;; Internal argument record structure
-    ;; (name type short-name default current-value)
-    (define (make-arg-record name type short-name default)
-      (list name type short-name default default))
-    
-    (define (get-option options key)
-      (let ((pair (assoc key options)))
-        (if pair (cdr pair) #f)))
-    
-    ;; Convert value based on type
-    (define (convert-value value type)
-      (case type
-        ((number) 
-         (if (number? value)
-             value
-             (let ((num (string->number value)))
-               (if num 
-                   num
-                   (error "Invalid number format" value)))))
-        ((string) 
-         (if (string? value)
-             value
-             (error "Value is not a string")))
-        (else (error "Unsupported type" type))))
+
+;; Internal argument record structure
+;; (name type short-name default current-value)
+(define (make-arg-record name type short-name default)
+  (list name type short-name default default))
+
+(define (get-option options key)
+  (let ((pair (assoc key options)))
+    (if pair (cdr pair) #f)))
+
+;; Convert value based on type
+(define (convert-value value type)
+  (case type
+    ((number) 
+     (if (number? value)
+         value
+         (let ((num (string->number value)))
+           (if num 
+               num
+               (error "Invalid number format" value)))))
+    ((string) 
+     (if (string? value)
+         value
+         (error "Value is not a string")))
+    (else (error "Unsupported type" type))))
 
 (define (%add-argument args-ht args)
-  (display* "add-argument: " args "\n")
   (let* ((name (car args))
          (type (cadr args))
          (options (caddr args))
@@ -47,14 +46,12 @@
           (hash-table-set! args-ht short-name arg-record))))
 
 (define (%get-argument args-ht args)
-  (display* "args: " args "\n")
   (let ((found (hash-table-ref/default args-ht (car args) #f)))
     (if found
         (car (cddddr found))
         (error "Argument not found" (car args)))))
 
 (define (%parse-args args-ht args)
-  (display* "parse: " args "\n")
   (let loop ((args (car args))
              (current-arg #f))
     (if (null? args)
@@ -64,9 +61,9 @@
             ;; Long form --name
             ((and (string? arg) 
                   (>= (string-length arg) 3)
-                  (string=? (substring arg 0 2) "--"))
+                  (string-starts? arg "--"))
              (let* ((name (substring arg 2))
-                    (found (hash-table-ref args-ht name #f)))
+                    (found (hash-table-ref args-ht name)))
                (if found
                    (if (null? (cdr args))
                        (error "Missing value for argument" name)
@@ -81,7 +78,7 @@
                   (>= (string-length arg) 2)
                   (char=? (string-ref arg 0) #\-))
              (let* ((name (substring arg 1))
-                    (found (hash-table-ref args-ht name #f)))
+                    (found (hash-table-ref args-ht name)))
                (if found
                    (if (null? (cdr args))
                        (error "Missing value for argument" name)
@@ -93,7 +90,6 @@
             
             (else (loop (cdr args) current-arg)))))))
 
-;; Main parser constructor
 (define (make-parser)
   (let ((args-ht (make-hash-table)))
     (lambda (command . args)
@@ -101,7 +97,7 @@
         ((add-argument) (%add-argument args-ht args))
         ((get-argument) (%get-argument args-ht args))
         ((parse-args) (%parse-args args-ht args))
-        (else (error "Unknown parser command" command)))))))
-
-  ;; End library definition
-  )
+        (else (error "Unknown parser command" command))))))
+        
+) ; end of begin
+) ; end of define-library

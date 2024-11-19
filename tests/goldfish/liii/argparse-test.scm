@@ -12,10 +12,12 @@
 ;; Test number type with long form
 (let ((parser (make-parser)))
   (parser 'add-argument "width" 'number
-          '((short . "w") (default . 80)))
+          '((short . "width") (default . 80)))
   (check (parser 'get-argument "width") => 80)
   (parser 'parse-args '("--width" "100"))
-  (check (parser 'get-argument "width") => 100))
+  (check (parser 'get-argument "width") => 100)
+  (parser 'parse-args '("-width" "60"))
+  (check (parser 'get-argument "width") => 60))
 
 ;; Test number type with short form
 (let ((parser (make-parser)))
