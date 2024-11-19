@@ -42,6 +42,11 @@
          (error "Value is not a string")))
     (else (error "Unsupported type" type))))
 
+(define (arg-type? type)
+  (unless (symbol? type)
+    (type-error "type of the argument must be symbol"))
+  (in? type '(string number)))
+
 (define (%add-argument args-ht args)
   (let* ((options (car args))
          (name (alist-ref options 'name
@@ -50,8 +55,12 @@
          (short-name (alist-ref/default options 'short #f))
          (default (alist-ref/default options 'default #f))
          (arg-record (make-arg-record name type short-name default)))
-    (unless (memq type '(number string))
-             (error "Type must be either 'number or 'string" type))
+    (unless (string? name)
+      (type-error "name of the argument must be string"))
+    (unless (arg-type? type)
+      (value-error "Invalid type of the argument" type))
+    (unless (or (not short-name) (string? short-name))
+      (type-error "short name of the argument must be string if given"))
     (hash-table-set! args-ht name arg-record)
     (when short-name
           (hash-table-set! args-ht short-name arg-record))))
@@ -72,8 +81,13 @@
        (>= (string-length arg) 2)
        (char=? (string-ref arg 0) #\-)))
 
-(define (%parse-args args-ht args)
-  (let loop ((args (car args)))
+(define (retrieve-args args)
+  (if (null? args)
+      (vector->list (argv))
+      args))
+
+(define (%parse-args args-ht prog-args)
+  (let loop ((args (retrieve-args (car prog-args))))
     (if (null? args)
         args-ht
         (let ((arg (car args)))

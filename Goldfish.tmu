@@ -15425,6 +15425,10 @@
     \ \ \ \ \ \ \ \ (liii argparse))
 
     \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
   </scm-chunk>
 
   <subparagraph|测试命令行参数的类型>
@@ -15489,7 +15493,7 @@
 
   <subparagraph|测试多个命令行参数多种类型>
 
-  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
     (let ((parser (make-argparser)))
 
     \ \ (parser 'add-argument
@@ -15512,6 +15516,8 @@
   <section|实现>
 
   <paragraph|make-arg-record>
+
+  <todo|使用define-record-type>
 
   <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (make-arg-record name type short-name default)
@@ -15557,6 +15563,30 @@
     \;
   </scm-chunk>
 
+  <paragraph|arg-type?>
+
+  命令行参数的类型必须是<scm|symbol>类型的Scheme字面量。目前命令行参数仅支持两种类型：
+
+  <\description>
+    <item*|string>如果没有指定，那么参数类型默认是字符串类型。
+
+    <item*|number>在传入参数时，参数的值是字符串，我们会调用<scm|number-\<gtr\>string>将字符串转化为Scheme的number类型。
+  </description>
+
+  \;
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (arg-type? type)
+
+    \ \ (unless (symbol? type)
+
+    \ \ \ \ (type-error "type of the argument must be symbol"))
+
+    \ \ (in? type '(string number)))
+
+    \;
+  </scm-chunk>
+
   <paragraph|add-argument>
 
   新增命令行参数。
@@ -15578,15 +15608,33 @@
 
     \ \ \ \ \ \ \ \ \ (arg-record (make-arg-record name type short-name default)))
 
-    \ \ \ \ (unless (memq type '(number string))
+    \ \ \ \ (unless (string? name)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Type must be either 'number or 'string" type))
+    \ \ \ \ \ \ (type-error "name of the argument must be string"))
+
+    \ \ \ \ (unless (arg-type? type)
+
+    \ \ \ \ \ \ (value-error "Invalid type of the argument" type))
+
+    \ \ \ \ (unless (or (not short-name) (string? short-name))
+
+    \ \ \ \ \ \ (type-error "short name of the argument must be string if given"))
 
     \ \ \ \ (hash-table-set! args-ht name arg-record)
 
     \ \ \ \ (when short-name
 
     \ \ \ \ \ \ \ \ \ \ (hash-table-set! args-ht short-name arg-record))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
+    (let1 parser (make-argparser)
+
+    \ \ (check-catch 'type-error (parser 'add-argument '((name name))))
+
+    \ \ (check-catch 'value-error (parser 'add-argument '())))
 
     \;
   </scm-chunk>
@@ -15611,6 +15659,8 @@
 
   <paragraph|long-form?>
 
+  判断是否形如<shell|--help>、<shell|--version>等形式。
+
   <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (long-form? arg)
 
@@ -15625,6 +15675,8 @@
 
   <paragraph|short-form?>
 
+  判断是否形如<shell|-w>、<shell|-help>等形式。
+
   <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (short-form? arg)
 
@@ -15637,14 +15689,30 @@
     \;
   </scm-chunk>
 
+  <paragraph|retrieve-args>
+
+  如果在代码中传入的参数是空列表，那么默认使用命令行参数。
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (retrieve-args args)
+
+    \ \ (if (null? args)
+
+    \ \ \ \ \ \ (vector-\<gtr\>list (argv))
+
+    \ \ \ \ \ \ args))
+
+    \;
+  </scm-chunk>
+
   <paragraph|parse-args>
 
   解析命令行参数。
 
   <\scm-chunk|goldfish/liii/argparse.scm|true|true>
-    (define (%parse-args args-ht args)
+    (define (%parse-args args-ht prog-args)
 
-    \ \ (let loop ((args (car args)))
+    \ \ (let loop ((args (retrieve-args (car prog-args))))
 
     \ \ \ \ (if (null? args)
 

@@ -17,6 +17,8 @@
 (import (liii check)
         (liii argparse))
 
+(check-set-mode! 'report-failed)
+
 (let ((parser (make-argparser)))
   (parser 'add-argument
     '((name . "name") (type . string) (short . "n") (default . "anonymous")))
@@ -51,4 +53,8 @@
   (parser 'parse-args '("-w" "100" "--title" "My Document"))
   (check (parser 'get-argument "width") => 100)
   (check (parser 'get-argument "title") => "My Document"))
+
+(let1 parser (make-argparser)
+  (check-catch 'type-error (parser 'add-argument '((name name))))
+  (check-catch 'value-error (parser 'add-argument '())))
 
