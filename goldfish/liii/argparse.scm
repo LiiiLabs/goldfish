@@ -97,7 +97,10 @@
         ((add-argument) (%add-argument args-ht args))
         ((get-argument) (%get-argument args-ht args))
         ((parse-args) (%parse-args args-ht args))
-        (else (error "Unknown parser command" command))))))
+        (else
+          (if (and (null? args) (symbol? command))
+              (%get-argument args-ht (list (symbol->string command)))
+              (error "Unknown parser command" command)))))))
         
 ) ; end of begin
 ) ; end of define-library

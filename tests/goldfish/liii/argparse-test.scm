@@ -16,6 +16,7 @@
   (check (parser 'get-argument "width") => 80)
   (parser 'parse-args '("--width" "100"))
   (check (parser 'get-argument "width") => 100)
+  (check (parser 'width) => 100)
   (parser 'parse-args '("-width" "60"))
   (check (parser 'get-argument "width") => 60))
 
