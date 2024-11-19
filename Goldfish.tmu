@@ -15559,7 +15559,7 @@
 
   新增命令行参数。
 
-  <\scm-chunk|goldfish/liii/argparse.scm|true|false>
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (%add-argument args-ht args)
 
     \ \ (let* ((options (car args))
@@ -15607,6 +15607,34 @@
     \;
   </scm-chunk>
 
+  <paragraph|long-form?>
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (long-form? arg)
+
+    \ \ (and (string? arg)\ 
+
+    \ \ \ \ \ \ \ (\<gtr\>= (string-length arg) 3)
+
+    \ \ \ \ \ \ \ (string-starts? arg "--")))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|short-form?>
+
+  <\scm-chunk|goldfish/liii/argparse.scm|true|true>
+    (define (short-form? arg)
+
+    \ \ (and (string? arg)
+
+    \ \ \ \ \ \ \ (\<gtr\>= (string-length arg) 2)
+
+    \ \ \ \ \ \ \ (char=? (string-ref arg 0) #\\-)))
+
+    \;
+  </scm-chunk>
+
   <paragraph|parse-args>
 
   解析命令行参数。
@@ -15614,9 +15642,7 @@
   <\scm-chunk|goldfish/liii/argparse.scm|true|true>
     (define (%parse-args args-ht args)
 
-    \ \ (let loop ((args (car args))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (current-arg #f))
+    \ \ (let loop ((args (car args)))
 
     \ \ \ \ (if (null? args)
 
@@ -15626,13 +15652,7 @@
 
     \ \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ;; Long form --name
-
-    \ \ \ \ \ \ \ \ \ \ \ \ ((and (string? arg)\ 
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\<gtr\>= (string-length arg) 3)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-starts? arg "--"))
+    \ \ \ \ \ \ \ \ \ \ \ \ ((long-form? arg)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (let* ((name (substring arg 2))
 
@@ -15650,19 +15670,13 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-car! (cddddr found) value))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args) #f)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Unknown argument" name))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ;; Short form -n
-
-    \ \ \ \ \ \ \ \ \ \ \ \ ((and (string? arg)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (\<gtr\>= (string-length arg) 2)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (char=? (string-ref arg 0) #\\-))
+    \ \ \ \ \ \ \ \ \ \ \ \ ((short-form? arg)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (let* ((name (substring arg 1))
 
@@ -15680,13 +15694,13 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-car! (cddddr found) value))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args) #f)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cddr args))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error "Unknown argument" name))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (cdr args) current-arg)))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (cdr args))))))))
 
     \;
   </scm-chunk>

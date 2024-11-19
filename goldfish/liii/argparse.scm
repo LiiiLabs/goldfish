@@ -62,17 +62,23 @@
         (fifth found)
         (error "Argument not found" (car args)))))
 
+(define (long-form? arg)
+  (and (string? arg) 
+       (>= (string-length arg) 3)
+       (string-starts? arg "--")))
+
+(define (short-form? arg)
+  (and (string? arg)
+       (>= (string-length arg) 2)
+       (char=? (string-ref arg 0) #\-)))
+
 (define (%parse-args args-ht args)
-  (let loop ((args (car args))
-             (current-arg #f))
+  (let loop ((args (car args)))
     (if (null? args)
         args-ht
         (let ((arg (car args)))
           (cond
-            ;; Long form --name
-            ((and (string? arg) 
-                  (>= (string-length arg) 3)
-                  (string-starts? arg "--"))
+            ((long-form? arg)
              (let* ((name (substring arg 2))
                     (found (hash-table-ref args-ht name)))
                (if found
@@ -81,13 +87,10 @@
                        (begin
                          (let ((value (convert-value (cadr args) (cadr found))))
                            (set-car! (cddddr found) value))
-                         (loop (cddr args) #f)))
+                         (loop (cddr args))))
                    (error "Unknown argument" name))))
             
-            ;; Short form -n
-            ((and (string? arg)
-                  (>= (string-length arg) 2)
-                  (char=? (string-ref arg 0) #\-))
+            ((short-form? arg)
              (let* ((name (substring arg 1))
                     (found (hash-table-ref args-ht name)))
                (if found
@@ -96,10 +99,10 @@
                        (begin
                          (let ((value (convert-value (cadr args) (cadr found))))
                            (set-car! (cddddr found) value))
-                         (loop (cddr args) #f)))
+                         (loop (cddr args))))
                    (error "Unknown argument" name))))
             
-            (else (loop (cdr args) current-arg)))))))
+            (else (loop (cdr args))))))))
 
 (define (make-argparser)
   (let ((args-ht (make-hash-table)))
