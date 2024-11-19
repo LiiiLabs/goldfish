@@ -15472,7 +15472,7 @@
 
     \ \ (parser 'add-argument
 
-    \ \ \ \ '((name "height") (type number) (default . 60))) \ ; without short name
+    \ \ \ \ '((name . "height") (type . number) (default . 60))) \ ; without short name
 
     \ \ (parser 'parse-args '("--height" "120"))
 

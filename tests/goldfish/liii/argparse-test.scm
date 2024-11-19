@@ -38,7 +38,7 @@
 ;; Test number type with short form
 (let ((parser (make-argparser)))
   (parser 'add-argument
-    '((name "height") (type number) (default . 60)))  ; without short name
+    '((name . "height") (type . number) (default . 60)))  ; without short name
   (parser 'parse-args '("--height" "120"))
   (check (parser 'get-argument "height") => 120))
 
