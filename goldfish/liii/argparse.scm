@@ -20,7 +20,8 @@
         (liii list)
         (liii string)
         (liii hash-table)
-        (liii alist))
+        (liii alist)
+        (liii sys))
 (export make-argument-parser)
 (begin
 
@@ -83,7 +84,7 @@
 
 (define (retrieve-args args)
   (if (null? args)
-      (vector->list (argv))
+      (cddr (argv))
       (car args)))
 
 (define (%parse-args args-ht prog-args)

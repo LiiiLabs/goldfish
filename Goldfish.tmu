@@ -15408,7 +15408,9 @@
 
     \ \ \ \ \ \ \ \ (liii hash-table)
 
-    \ \ \ \ \ \ \ \ (liii alist))
+    \ \ \ \ \ \ \ \ (liii alist)
+
+    \ \ \ \ \ \ \ \ (liii sys))
 
     (export make-argument-parser)
 
@@ -15629,7 +15631,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|true>
     (let1 parser (make-argument-parser)
 
     \ \ (check-catch 'type-error (parser 'add-argument '((name name))))
@@ -15706,7 +15708,7 @@
 
     \ \ (if (null? args)
 
-    \ \ \ \ \ \ (vector-\<gtr\>list (argv))
+    \ \ \ \ \ \ (cddr (argv))
 
     \ \ \ \ \ \ (car args)))
 
@@ -15823,6 +15825,12 @@
     ) ; end of begin
 
     ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/argparse-test.scm|true|false>
+    (check-report)
 
     \;
   </scm-chunk>

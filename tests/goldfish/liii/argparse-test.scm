@@ -58,3 +58,5 @@
   (check-catch 'type-error (parser 'add-argument '((name name))))
   (check-catch 'value-error (parser 'add-argument '())))
 
+(check-report)
+
