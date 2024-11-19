@@ -1,10 +1,11 @@
+
 (define-library (liii argparse)
 (import (liii base)
         (liii error)
         (liii list)
         (liii string)
         (liii hash-table))
-(export make-parser)
+(export make-argparser)
 (begin
 
 ;; Internal argument record structure
@@ -90,7 +91,7 @@
             
             (else (loop (cdr args) current-arg)))))))
 
-(define (make-parser)
+(define (make-argparser)
   (let ((args-ht (make-hash-table)))
     (lambda (command . args)
       (case command
@@ -101,6 +102,7 @@
           (if (and (null? args) (symbol? command))
               (%get-argument args-ht (list (symbol->string command)))
               (error "Unknown parser command" command)))))))
-        
+
 ) ; end of begin
 ) ; end of define-library
+
