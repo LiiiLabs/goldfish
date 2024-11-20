@@ -37,6 +37,7 @@ target("libs7") do
     if is_plat("windows") then
         set_optimize("faster")
         add_cxxflags("/fp:precise")
+        add_cxxflags("/TP")
     end
     add_packages("gmp")
     if is_mode("debug") then
