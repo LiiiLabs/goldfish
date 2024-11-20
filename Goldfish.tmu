@@ -17707,7 +17707,9 @@
     \;
   </cpp-chunk>
 
-  <paragraph|g_path-getsize>
+  <paragraph|g_path-getsize><index|g_path-getsize>
+
+  返回指定路径的文件大小，如果该文件不存在，那么返回-1。
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
