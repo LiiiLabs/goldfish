@@ -444,15 +444,15 @@ glue_liii_os (s7_scheme* sc) {
              s7_make_typed_function (sc, s_getpid, f_getpid, 0, 0, false,
                                      d_getpid, NULL));
 
-  const char* s_unsetenv   = "g_unsetenv";
-  const char* d_unsetenv   = "(g_unsetenv string): string => boolean";
+  const char* s_unsetenv= "g_unsetenv";
+  const char* d_unsetenv= "(g_unsetenv string): string => boolean";
   s7_define (sc, cur_env, s7_make_symbol (sc, s_unsetenv),
              s7_make_typed_function (sc, s_unsetenv,
                                      f_unset_environment_variable, 1, 0, false,
                                      d_unsetenv, NULL));
 
-  const char* s_path_getsize   = "g_path-getsize";
-  const char* d_path_getsize   = "(g_path_getsize string): string => integer";
+  const char* s_path_getsize= "g_path-getsize";
+  const char* d_path_getsize= "(g_path_getsize string): string => integer";
   s7_define (sc, cur_env, s7_make_symbol (sc, s_path_getsize),
              s7_make_typed_function (sc, s_unsetenv,
                                      f_path_getsize, 1, 0, false,

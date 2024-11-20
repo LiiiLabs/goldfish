@@ -17898,9 +17898,9 @@
   </cpp-chunk>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_unsetenv \ \ = "g_unsetenv";
+    \ \ const char* s_unsetenv= "g_unsetenv";
 
-    \ \ const char* d_unsetenv \ \ = "(g_unsetenv string): string =\<gtr\> boolean";
+    \ \ const char* d_unsetenv= "(g_unsetenv string): string =\<gtr\> boolean";
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_unsetenv),
 
@@ -17916,9 +17916,9 @@
   <subparagraph|path-getsize>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_path_getsize \ \ = "g_path-getsize";
+    \ \ const char* s_path_getsize= "g_path-getsize";
 
-    \ \ const char* d_path_getsize \ \ = "(g_path_getsize string): string =\<gtr\> integer";
+    \ \ const char* d_path_getsize= "(g_path_getsize string): string =\<gtr\> integer";
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_path_getsize),
 
