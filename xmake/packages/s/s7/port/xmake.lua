@@ -35,9 +35,9 @@ target("libs7") do
     add_includedirs(".", {public = true})
     add_options("gmp")
     if is_plat("windows") then
-        set_optimize("faster")
+        set_languages("c++11")
         add_cxxflags("/fp:precise")
-        add_cxxflags("/TP")
+        set_optimize("faster")
     end
     add_packages("gmp")
     if is_mode("debug") then
