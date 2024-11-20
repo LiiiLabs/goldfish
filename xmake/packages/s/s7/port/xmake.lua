@@ -36,7 +36,6 @@ target("libs7") do
     add_options("gmp")
     if is_plat("windows") then
         set_optimize("faster")
-        set_languages("c11")
         add_cxxflags("/fp:precise")
     end
     add_packages("gmp")
