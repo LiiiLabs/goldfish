@@ -30,8 +30,8 @@ target("libs7") do
     set_kind("$(kind)")
     add_defines("WITH_SYSTEM_EXTRAS=0")
     set_basename("s7")
-    add_files("s7.c", {sourcekind = "cxx"})
-    add_headerfiles("s7.h", {sourcekind = "cxx"})
+    add_files("s7.cpp")
+    add_headerfiles("s7.h")
     add_includedirs(".", {public = true})
     add_options("gmp")
     if is_plat("windows") then
