@@ -1,0 +1,13 @@
+diff --git a/s7.h b/s7.h
+index 1de113b..8a6fffe 100644
+--- a/s7.h
++++ b/s7.h
+@@ -33,7 +33,7 @@ typedef double s7_double;
+ #if (__TINYC__ || (__clang__ && __cplusplus))
+   typedef double s7_complex;
+ #else
+-  #if __cplusplus
++  #if (__cplusplus || _MSC_VER)
+     #include <complex>
+     typedef std::complex<s7_double> s7_complex;
+   #else

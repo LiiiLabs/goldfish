@@ -27,6 +27,7 @@ package("s7")
     add_urls("https://github.com/XmacsLabs/s7.git")
 
     add_versions("20241118", "20241118")
+    add_patches("20241118", path.join(os.scriptdir(), "patches", "20241118", "msvc.patch"), "e3f9ebad5b9e8205d6024be171e0eb000910f681db35c53eab58a6a8814e8d77")
 
     add_configs("gmp", {description = "enable gmp support", default = false, type = "boolean"})
 
