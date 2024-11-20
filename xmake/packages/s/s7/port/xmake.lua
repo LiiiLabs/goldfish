@@ -30,14 +30,14 @@ target("libs7") do
     set_kind("$(kind)")
     add_defines("WITH_SYSTEM_EXTRAS=0")
     set_basename("s7")
-    add_files("s7.c")
-    add_headerfiles("s7.h")
+    add_files("s7.c", {languages = "c++11"})
+    add_headerfiles("s7.h", {languages = "c++11"})
     add_includedirs(".", {public = true})
     add_options("gmp")
     if is_plat("windows") then
         set_languages("c++11")
-        add_cxxflags("/fp:precise")
         set_optimize("faster")
+        add_cxxflags("/fp:precise")
     end
     add_packages("gmp")
     if is_mode("debug") then
