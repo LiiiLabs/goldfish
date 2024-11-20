@@ -38,7 +38,7 @@
 #include <wordexp.h>
 #endif
 
-#define GOLDFISH_VERSION "17.10.9"
+#define GOLDFISH_VERSION "17.11.0"
 
 #define GOLDFISH_PATH_MAXN TB_PATH_MAXN
 
@@ -653,3 +653,4 @@ repl_for_community_edition (int argc, char** argv) {
 }
 
 } // namespace goldfish
+
