@@ -17747,10 +17747,12 @@
     \;
   </cpp-chunk>
 
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_os_type \ \ \ = "g_os-type";
+  <subparagraph|g_os-type>
 
-    \ \ const char* d_os_type \ \ \ = "(g_os-type) =\<gtr\> string";
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    \ \ const char* s_os_type= "g_os-type";
+
+    \ \ const char* d_os_type= "(g_os-type) =\<gtr\> string";
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
 
@@ -17758,8 +17760,10 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_type, NULL));
 
-    \ \ 
+    \;
+  </cpp-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     \ \ const char* s_os_arch \ \ \ = "g_os-arch";
 
     \ \ const char* d_os_arch \ \ \ = "(g_os-arch) =\<gtr\> string";
@@ -17811,8 +17815,6 @@
     \ \ const char* s_getpid \ \ \ \ = "g_getpid";
 
     \ \ const char* d_getpid \ \ \ \ = "(g_getpid) =\<gtr\> integer";
-
-    \;
 
     \;
 
@@ -17897,6 +17899,8 @@
     \;
   </cpp-chunk>
 
+  <subparagraph|g_unsetenv>
+
   <\cpp-chunk|src/goldfish.hpp|true|true>
     \ \ const char* s_unsetenv= "g_unsetenv";
 
@@ -17913,7 +17917,7 @@
     \;
   </cpp-chunk>
 
-  <subparagraph|path-getsize>
+  <subparagraph|g_path-getsize>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     \ \ const char* s_path_getsize= "g_path-getsize";
@@ -17922,13 +17926,9 @@
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_path_getsize),
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv,
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv, f_path_getsize, 1, 0,
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f_path_getsize, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_path_getsize, NULL));
-
-    \;
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_path_getsize, NULL));
   </cpp-chunk>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
