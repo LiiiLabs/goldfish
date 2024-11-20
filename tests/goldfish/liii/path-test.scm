@@ -38,4 +38,14 @@
 (when (os-linux?)
   (check (path-file? "/etc/passwd") => #t))
 
+(when (not (os-windows?))
+  (check-true (> (path-getsize "/") 0))
+  (check-true (> (path-getsize "/etc/hosts") 0)))
+
+(when (os-windows?)
+  (check-true (> (path-getsize "C:") 0))
+  (check-true (> (path-getsize "C:/Windows") 0))
+  (check-true (> (path-getsize "C:\\Windows\\System32\\drivers\\etc\\hosts") 0)))
+
 (check-report)
+

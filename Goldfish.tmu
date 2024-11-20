@@ -15176,9 +15176,7 @@
 
     \ \ os-call system
 
-    \ \ mkdir chdir rmdir getenv unsetenv getcwd listdir access getlogin getpid
-
-    \ \ path-getsize)
+    \ \ mkdir chdir rmdir getenv unsetenv getcwd listdir access getlogin getpid)
 
     (import (scheme process-context)
 
@@ -15567,11 +15565,205 @@
     \;
   </goldfish-chunk>
 
+  <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <chapter|(liii path)>
+
+  <section|协议>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define-library (liii path)
+
+    (export
+
+    \ \ path-dir? path-file? path-exists? path-getsize
+
+    )
+
+    (import (liii error))
+
+    (begin
+
+    \;
+  </goldfish-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|true>
+    (import (liii path)
+
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (liii os))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <paragraph|path-dir?>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define (path-dir? path)
+
+    \ \ (g_isdir path))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|true>
+    (check (path-dir? ".") =\<gtr\> #t)
+
+    (check (path-dir? "..") =\<gtr\> #t)
+
+    \;
+
+    (when (not (os-windows?))
+
+    \ \ (check (path-dir? "/") =\<gtr\> #t)
+
+    \ \ (check (path-dir? "/tmp") =\<gtr\> #t)
+
+    \ \ (check (path-dir? "/no_such_dir") =\<gtr\> #f))
+
+    \;
+
+    (when (os-windows?)
+
+    \ \ (check (path-dir? "C:/") =\<gtr\> #t)
+
+    \ \ (check (path-dir? "C:/no_such_dir/") =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|path-file?>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define (path-file? path)
+
+    \ \ (g_isfile path))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|true>
+    (check (path-file? ".") =\<gtr\> #f)
+
+    (check (path-file? "..") =\<gtr\> #f)
+
+    \;
+
+    (when (os-linux?)
+
+    \ \ (check (path-file? "/etc/passwd") =\<gtr\> #t))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|path-exists?>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define (path-exists? path)
+
+    \ \ (file-exists? path))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|path-getsize><index|path-getsize><scm|((path string?)) =\<gtr\> integer?>
 
   返回当前路径的文件大小。
 
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
     (define path-getsize
 
     \ \ (typed-lambda ((path string?))
@@ -15587,7 +15779,9 @@
     \;
   </goldfish-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|true>
     (when (not (os-windows?))
 
     \ \ (check-true (\<gtr\> (path-getsize "/") 0))
@@ -15609,19 +15803,19 @@
 
   <section|结尾>
 
-  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|false>
     ) ; end of begin
 
     ) ; end of define-library
 
     \;
   </goldfish-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|false>
-    (check-report)
-
-    \;
-  </scm-chunk>
 
   <chapter|(liii argparse)>
 
