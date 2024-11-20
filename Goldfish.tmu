@@ -15095,6 +15095,40 @@
 
   <section|协议>
 
+  <\goldfish-chunk|goldfish/liii/os.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
   <\scm-chunk|tests/goldfish/liii/os-test.scm|false|true>
     ;
 
@@ -15131,6 +15165,34 @@
 
   <section|接口>
 
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define-library (liii os)
+
+    (export
+
+    \ \ os-arch os-type os-windows? os-linux? os-macos? os-temp-dir
+
+    \ \ os-sep pathsep
+
+    \ \ os-call system
+
+    \ \ mkdir chdir rmdir getenv unsetenv getcwd listdir access getlogin getpid
+
+    \ \ path-getsize)
+
+    (import (scheme process-context)
+
+    \ \ \ \ \ \ \ \ (liii base)
+
+    \ \ \ \ \ \ \ \ (liii error)
+
+    \ \ \ \ \ \ \ \ (liii string))
+
+    (begin
+
+    \;
+  </goldfish-chunk>
+
   <section|测试>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
@@ -15152,6 +15214,164 @@
   </scm-chunk>
 
   <section|实现>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-call command)
+
+    \ \ (g_os-call command))
+
+    \;
+
+    (define (system command)
+
+    \ \ (g_system command))
+
+    \;
+
+    (define (os-arch)
+
+    \ \ (g_os-arch))
+
+    \;
+
+    (define (os-type)
+
+    \ \ (g_os-type))
+
+    \;
+
+    (define (os-windows?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Windows"))))
+
+    \;
+
+    (define (os-linux?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Linux"))))
+
+    \;
+
+    (define (os-macos?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Darwin"))))
+
+    \;
+
+    (define (os-sep)
+
+    \ \ (if (os-windows?)
+
+    \ \ \ \ #\\\\
+
+    \ \ \ \ #\\/))
+
+    \;
+
+    (define (pathsep)
+
+    \ \ (if (os-windows?)
+
+    \ \ \ \ #\\;
+
+    \ \ \ \ #\\:))
+
+    \;
+
+    (define (os-temp-dir)
+
+    \ \ (let1 temp-dir (g_os-temp-dir)
+
+    \ \ \ \ (string-remove-suffix temp-dir (string (os-sep)))))
+
+    \;
+
+    (define (access path mode)
+
+    \ \ (cond ((eq? mode 'F_OK) (g_access path 0))
+
+    \ \ \ \ \ \ \ \ ((eq? mode 'X_OK) (g_access path 1))
+
+    \ \ \ \ \ \ \ \ ((eq? mode 'W_OK) (g_access path 2))
+
+    \ \ \ \ \ \ \ \ ((eq? mode 'R_OK) (g_access path 4))
+
+    \ \ \ \ \ \ \ \ (else (error 'value-error "Allowed mode 'F_OK, 'X_OK,'W_OK, 'R_OK"))))
+
+    \;
+
+    (define (%check-dir-andthen path f)
+
+    \ \ (cond ((not (file-exists? path))
+
+    \ \ \ \ \ \ \ \ \ (file-not-found-error
+
+    \ \ \ \ \ \ \ \ \ \ \ (string-append "No such file or directory: '" path "'")))
+
+    \ \ \ \ \ \ \ \ ((not (g_isdir path))
+
+    \ \ \ \ \ \ \ \ \ (not-a-directory-error
+
+    \ \ \ \ \ \ \ \ \ \ \ (string-append "Not a directory: '" path "'")))
+
+    \ \ \ \ \ \ \ \ (else (f path))))
+
+    \;
+
+    (define (mkdir path)
+
+    \ \ (if (file-exists? path)
+
+    \ \ \ \ (file-exists-error (string-append "File exists: '" path "'"))
+
+    \ \ \ \ (g_mkdir path)))
+
+    \;
+
+    \;
+
+    (define (chdir path)
+
+    \ \ (if (file-exists? path)
+
+    \ \ \ \ (g_chdir path)
+
+    \ \ \ \ (file-not-found-error (string-append "No such file or directory: '" path "'"))))
+
+    \;
+
+    (define (rmdir path)
+
+    \ \ (%check-dir-andthen path delete-file))
+
+    \;
+
+    (define (listdir path)
+
+    \ \ (%check-dir-andthen path g_listdir))
+
+    \;
+
+    (define (getenv key)
+
+    \ \ (get-environment-variable key))
+
+    \;
+
+    (define (unsetenv key)
+
+    \ \ (g_unsetenv key))
+
+    \;
+  </goldfish-chunk>
+
+  \;
 
   <paragraph|os-linux?><goldfish-lang|() =\<gtr\> boolean>
 
@@ -15313,7 +15533,89 @@
     \;
   </scm-chunk>
 
+  <paragraph|getcwd><index|getcwd>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (getcwd)
+
+    \ \ (g_getcwd))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|getlogin><index|getlogin>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (getlogin)
+
+    \ \ (if (os-windows?)
+
+    \ \ \ \ \ \ (getenv "USERNAME")
+
+    \ \ \ \ \ \ (g_getlogin)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|getpid><index|getpid>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (getpid)
+
+    \ \ (g_getpid))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|path-getsize><index|path-getsize><scm|((path string?)) =\<gtr\> integer?>
+
+  返回当前路径的文件大小。
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define path-getsize
+
+    \ \ (typed-lambda ((path string?))
+
+    \ \ \ \ (if (not (file-exists? path))
+
+    \ \ \ \ \ \ (file-not-found-error
+
+    \ \ \ \ \ \ \ \ (string-append "No such file or directory: '" path "'"))
+
+    \ \ \ \ \ \ (g_path-getsize path))))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (not (os-windows?))
+
+    \ \ (check-true (\<gtr\> (path-getsize "/") 0))
+
+    \ \ (check-true (\<gtr\> (path-getsize "/etc/hosts") 0)))
+
+    \;
+
+    (when (os-windows?)
+
+    \ \ (check-true (\<gtr\> (path-getsize "C:") 0))
+
+    \ \ (check-true (\<gtr\> (path-getsize "C:/Windows") 0))
+
+    \ \ (check-true (\<gtr\> (path-getsize "C:\\\\Windows\\\\System32\\\\drivers\\\\etc\\\\hosts") 0)))
+
+    \;
+  </scm-chunk>
+
   <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </goldfish-chunk>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|false>
     (check-report)
@@ -16613,8 +16915,6 @@
     \ \ return goldfish::repl_for_community_edition (argc, argv);
 
     }
-
-    \;
   </cpp-chunk>
 
   <section|实现>
@@ -17427,6 +17727,36 @@
     \;
   </cpp-chunk>
 
+  <paragraph|g_path-getsize><index|g_path-getsize>
+
+  返回指定路径的文件大小，如果该文件不存在，那么返回-1。
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_path_getsize (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
+
+    \ \ tb_file_info_t info;
+
+    \ \ if (tb_file_info (path_c, &info)) {
+
+    \ \ \ \ return s7_make_integer (sc, (int) info.size);
+
+    \ \ }
+
+    \ \ else {
+
+    \ \ \ \ return s7_make_integer (sc, (int) -1);
+
+    \ \ }
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|glue_liii_os>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
@@ -17437,11 +17767,25 @@
     \ \ s7_pointer cur_env= s7_curlet (sc);
 
     \;
+  </cpp-chunk>
 
-    \ \ const char* s_os_type \ \ \ = "g_os-type";
+  <subparagraph|g_os-type>
 
-    \ \ const char* d_os_type \ \ \ = "(g_os-type) =\<gtr\> string";
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    \ \ const char* s_os_type= "g_os-type";
 
+    \ \ const char* d_os_type= "(g_os-type) =\<gtr\> string";
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_type, NULL));
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     \ \ const char* s_os_arch \ \ \ = "g_os-arch";
 
     \ \ const char* d_os_arch \ \ \ = "(g_os-arch) =\<gtr\> string";
@@ -17494,17 +17838,7 @@
 
     \ \ const char* d_getpid \ \ \ \ = "(g_getpid) =\<gtr\> integer";
 
-    \ \ const char* s_unsetenv \ \ = "g_unsetenv";
-
-    \ \ const char* d_unsetenv \ \ = "(g_unsetenv string): string =\<gtr\> boolean";
-
     \;
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_type, NULL));
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
 
@@ -17584,6 +17918,16 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_getpid, NULL));
 
+    \;
+  </cpp-chunk>
+
+  <subparagraph|g_unsetenv>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    \ \ const char* s_unsetenv= "g_unsetenv";
+
+    \ \ const char* d_unsetenv= "(g_unsetenv string): string =\<gtr\> boolean";
+
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_unsetenv),
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv,
@@ -17592,6 +17936,24 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_unsetenv, NULL));
 
+    \;
+  </cpp-chunk>
+
+  <subparagraph|g_path-getsize>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    \ \ const char* s_path_getsize= "g_path-getsize";
+
+    \ \ const char* d_path_getsize= "(g_path_getsize string): string =\<gtr\> integer";
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_path_getsize),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv, f_path_getsize, 1, 0,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_path_getsize, NULL));
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     }
 
     \;
@@ -18105,8 +18467,6 @@
 
   <\cpp-chunk|src/goldfish.hpp|true|false>
     } // namespace goldfish
-
-    \;
   </cpp-chunk>
 
   <chapter|基础设施>
