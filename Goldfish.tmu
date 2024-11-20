@@ -15587,6 +15587,26 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (not (os-windows?))
+
+    \ \ (check-true (\<gtr\> (path-getsize "/") 0))
+
+    \ \ (check-true (\<gtr\> (path-getsize "/etc/hosts") 0)))
+
+    \;
+
+    (when (os-windows?)
+
+    \ \ (check-true (\<gtr\> (path-getsize "C:") 0))
+
+    \ \ (check-true (\<gtr\> (path-getsize "C:/Windows") 0))
+
+    \ \ (check-true (\<gtr\> (path-getsize "C:\\\\Windows\\\\System32\\\\drivers\\\\etc\\\\hosts") 0)))
+
+    \;
+  </scm-chunk>
+
   <section|结尾>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|false>
