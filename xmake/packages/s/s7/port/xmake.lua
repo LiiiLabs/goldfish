@@ -38,6 +38,7 @@ target("libs7") do
         set_optimize("faster")
         set_languages("c11")
         add_cxxflags("/fp:precise")
+        add_cxxflags("/TC")
     end
     add_packages("gmp")
     if is_mode("debug") then
