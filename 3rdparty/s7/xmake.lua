@@ -35,7 +35,8 @@ target("libs7") do
     add_includedirs(".", {public = true})
     add_options("gmp")
     if is_plat("windows") then
-        set_languages("c++98")
+        set_languages("c11")
+        add_defines("HAVE_COMPLEX_NUMBERS=0")
         set_optimize("faster")
         add_cxxflags("/fp:precise")
     end
