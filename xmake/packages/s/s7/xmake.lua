@@ -23,10 +23,7 @@ package("s7")
     set_homepage("https://ccrma.stanford.edu/software/snd/snd/s7.html")
     set_description("s7 is a Scheme interpreter intended as an extension language for other applications.")
 
-    add_urls("https://gitee.com/XmacsLabs/s7.git")
-    add_urls("https://github.com/XmacsLabs/s7.git")
-
-    add_versions("20240816", "20240816")
+    set_sourcedir(path.join(os.scriptdir(), "../../../../3rdparty/s7"))
 
     add_configs("gmp", {description = "enable gmp support", default = false, type = "boolean"})
 
@@ -42,7 +39,6 @@ package("s7")
     end
 
     on_install("bsd", "cross", "cygwin", "linux", "macosx", "mingw", "msys", "wasm", "windows", function (package)
-        os.cp(path.join(package:scriptdir(), "port", "xmake.lua"), "xmake.lua")
         local configs = {}
         if package:config("shared") then
             configs.kind = "shared"
