@@ -326,5 +326,25 @@
 (check (string-remove-suffix "aaa" "") => "aaa")
 (check (string-remove-suffix "Goldfish.tmu" ".tmu") => "Goldfish")
 
+(check (format #f "~A" 'hello) => "hello")
+(check (format #f "~S" 'hello) => "hello")
+(check (format #f "~S" "hello") => "\"hello\"")
+
+(check (format #f "~D" 123) => "123")
+(check (format #f "~X" 255) => "ff")
+(check (format #f "~B" 13) => "1101")
+(check (format #f "~O" 13) => "15")
+
+(check (format #f "~E" 100.1) => "1.001000e+02")
+(check (format #f "~F" 100.1) => "100.100000")
+(check (format #f "~G" 100.1) => "100.1")
+
+(check (format #f "~%") => "\n")
+(check (format #f "~~") => "~")
+
+(check (format #f "~{~C~^ ~}" "hiho") => "h i h o")
+(check (format #f "~{~{~C~^ ~}~^...~}" (list "hiho" "test"))
+       => "h i h o...t e s t")
+
 (check-report)
 

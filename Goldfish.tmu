@@ -10253,6 +10253,108 @@
     \;
   </scm-chunk>
 
+  <section|字符串的格式化>
+
+  <paragraph|format><index|format><scm|(output-choice control-string . arguments)>
+
+  <scm|format>是S7 Scheme的内置函数，用于生成格式化的字符串，它提供了多种指令来控制输出格式。
+
+  关于输出选项：<code*|(format #f ...)> 简单地返回格式化后的字符串；<code*|(format #t ...)> 也会将字符串发送到当前的输出端口。<code*|(format () ...)> 将输出发送到当前的输出端口，并且不返回字符串（这模仿了其他IO例程，如<code*|display>和<code*|newline>）。其他内置的端口选择包括<code*|*stdout*>和<code*|*stderr*>。
+
+  关于控制格式的字符串，分小段落讨论如下：
+
+  <subparagraph|Scheme对象的格式化>
+
+  <\itemize>
+    <item><code*|~A>：按照<code*|display>的方式输出对象。
+
+    <item><code*|~S>：按照<code*|write>的方式输出对象。
+  </itemize>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (format #f "~A" 'hello) =\<gtr\> "hello")
+
+    (check (format #f "~S" 'hello) =\<gtr\> "hello")
+
+    (check (format #f "~S" "hello") =\<gtr\> "\\"hello\\"")
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|整数的格式化>
+
+  <\itemize>
+    <item><code*|~B>：以二进制形式输出整数。
+
+    <item><code*|~O>：以八进制形式输出整数。
+
+    <item><code*|~D>：以十进制形式输出整数。
+
+    <item><code*|~X>：以十六进制形式输出。
+  </itemize>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (format #f "~D" 123) =\<gtr\> "123")
+
+    (check (format #f "~X" 255) =\<gtr\> "ff")
+
+    (check (format #f "~B" 13) =\<gtr\> "1101")
+
+    (check (format #f "~O" 13) =\<gtr\> "15")
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|基本格式指令>
+
+  <\itemize>
+    <item><code*|~E>：这个指令将浮点数转换为科学计数法表示的字符串。例如，<code*|(format #f "~E" 100.1)>将输出<code*|"1.001000e+02">。
+
+    <item><code*|~F>：这个指令将浮点数转换为固定小数点表示的字符串。例如，<code*|(format #f "~F" 100.1)>将输出<code*|"100.100000">。
+
+    <item><code*|~G>：这个指令根据数值的大小自动选择最合适的表示方法。例如，<code*|(format #f "~G" 100.1)>将输出<code*|"100.1">。
+  </itemize>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (format #f "~E" 100.1) =\<gtr\> "1.001000e+02")
+
+    (check (format #f "~F" 100.1) =\<gtr\> "100.100000")
+
+    (check (format #f "~G" 100.1) =\<gtr\> "100.1")
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|特殊符号>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (format #f "~%") =\<gtr\> "\\n")
+
+    (check (format #f "~~") =\<gtr\> "~")
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|控制结构>
+
+  <\itemize>
+    <item><code*|~&>：如果前一个字符不是换行符，则输出一个换行符。
+
+    <item><code*|~{> 和 <code*|~}>：用于迭代，可以迭代列表、字符串、向量等。
+
+    <item><code*|~^>：在迭代中，用于在元素之间插入分隔符。
+  </itemize>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+    (check (format #f "~{~C~^ ~}" "hiho") =\<gtr\> "h i h o")
+
+    (check (format #f "~{~{~C~^ ~}~^...~}" (list "hiho" "test"))
+
+    \ \ \ \ \ \ \ =\<gtr\> "h i h o...t e s t")
+
+    \;
+  </scm-chunk>
+
   <section|结尾>
 
   <\scm-chunk|goldfish/liii/string.scm|true|false>
