@@ -33,6 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo dnf update -y
+          sudo dnf groupinstall "Development Tools"
           sudo dnf install -y xmake git unzip curl
       - uses: actions/checkout@v3
         with:

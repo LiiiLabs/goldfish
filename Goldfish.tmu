@@ -10345,7 +10345,7 @@
     <item><code*|~^>：在迭代中，用于在元素之间插入分隔符。
   </itemize>
 
-  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (format #f "~{~C~^ ~}" "hiho") =\<gtr\> "h i h o")
 
     (check (format #f "~{~{~C~^ ~}~^...~}" (list "hiho" "test"))
@@ -19269,6 +19269,8 @@
     \ \ \ \ \ \ \ \ run: \|
 
     \ \ \ \ \ \ \ \ \ \ sudo dnf update -y
+
+    \ \ \ \ \ \ \ \ \ \ sudo dnf groupinstall "Development Tools"
 
     \ \ \ \ \ \ \ \ \ \ sudo dnf install -y xmake git unzip curl
 
