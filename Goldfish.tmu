@@ -1471,9 +1471,57 @@
     \;
   </scm-chunk>
 
-  <value|r7rs><paragraph|odd?><index|odd?>
+  <value|r7rs><paragraph|odd?><index|odd?><scm|((x integer?)) =\<gtr\> boolean?>
 
-  <value|r7rs><paragraph|even?><index|even?>
+  判断一个整数是否是奇数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (odd? 1))
+
+    (check-false (odd? 0))
+
+    \;
+
+    (check-catch 'wrong-type-arg (odd? 1+i))
+
+    (check-catch 'wrong-type-arg (odd? 1.0))
+
+    (check-catch 'wrong-type-arg (odd? 0.0))
+
+    (check-catch 'wrong-type-arg (odd? #\\A))
+
+    (check-catch 'wrong-type-arg (odd? #t))
+
+    (check-catch 'wrong-type-arg (odd? #f))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|even?><index|even?><scm|((x integer?)) =\<gtr\> boolean?>
+
+  判断一个整数是否是偶数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (even? 0))
+
+    (check-false (even? 1))
+
+    \;
+
+    (check-catch 'wrong-type-arg (even? 0.0))
+
+    (check-catch 'wrong-type-arg (even? 1.0))
+
+    (check-catch 'wrong-type-arg (even? 1+i))
+
+    (check-catch 'wrong-type-arg (even? #\\A))
+
+    (check-catch 'wrong-type-arg (even? #t))
+
+    (check-catch 'wrong-type-arg (even? #f))
+
+    \;
+  </scm-chunk>
 
   <value|r7rs><paragraph|floor><index|floor><scm|(x) =\<gtr\> integer>
 

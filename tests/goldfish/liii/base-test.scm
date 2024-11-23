@@ -213,6 +213,26 @@
 (check-catch 'wrong-type-arg (negative? 'symbol))
 (check-catch 'wrong-type-arg (negative? '(1 2 3)))
 
+(check-true (odd? 1))
+(check-false (odd? 0))
+
+(check-catch 'wrong-type-arg (odd? 1+i))
+(check-catch 'wrong-type-arg (odd? 1.0))
+(check-catch 'wrong-type-arg (odd? 0.0))
+(check-catch 'wrong-type-arg (odd? #\A))
+(check-catch 'wrong-type-arg (odd? #t))
+(check-catch 'wrong-type-arg (odd? #f))
+
+(check-true (even? 0))
+(check-false (even? 1))
+
+(check-catch 'wrong-type-arg (even? 0.0))
+(check-catch 'wrong-type-arg (even? 1.0))
+(check-catch 'wrong-type-arg (even? 1+i))
+(check-catch 'wrong-type-arg (even? #\A))
+(check-catch 'wrong-type-arg (even? #t))
+(check-catch 'wrong-type-arg (even? #f))
+
 (check (floor 1.1) => 1.0)
 (check (floor 1) => 1)
 (check (floor 1/2) => 0)
