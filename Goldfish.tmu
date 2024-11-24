@@ -17360,19 +17360,19 @@
 
     #elif TB_CONFIG_OS_MACOSX
 
-    #include \<less\>mach-o/dyld.h\<gtr\>
-
     #include \<less\>limits.h\<gtr\>
+
+    #include \<less\>mach-o/dyld.h\<gtr\>
 
     #include \<less\>stdlib.h\<gtr\>
 
     #else
 
+    #include \<less\>linux/limits.h\<gtr\>
+
     #include \<less\>pwd.h\<gtr\>
 
     #include \<less\>unistd.h\<gtr\>
-
-    #include \<less\>linux/limits.h\<gtr\>
 
     #endif
 
@@ -17818,11 +17818,9 @@
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_executable),
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_executable,
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_executable, f_executable, 0, 0,
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f_executable, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_executable, NULL));
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_executable, NULL));
 
     }
 
@@ -17900,7 +17898,7 @@
 
     #else
 
-    \ \ wordexp_t \ \ p;
+    \ \ wordexp_t p;
 
     \ \ ret= wordexp (cmd_c, &p, 0);
 

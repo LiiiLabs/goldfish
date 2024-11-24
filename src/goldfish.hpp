@@ -30,13 +30,13 @@
 #include <io.h>
 #include <windows.h>
 #elif TB_CONFIG_OS_MACOSX
-#include <mach-o/dyld.h>
 #include <limits.h>
+#include <mach-o/dyld.h>
 #include <stdlib.h>
 #else
+#include <linux/limits.h>
 #include <pwd.h>
 #include <unistd.h>
-#include <linux/limits.h>
 #endif
 
 #if !defined(TB_CONFIG_OS_WINDOWS)
@@ -220,9 +220,8 @@ glue_liii_sys (s7_scheme* sc) {
   const char* d_executable= "(g_executable) => string";
 
   s7_define (sc, cur_env, s7_make_symbol (sc, s_executable),
-             s7_make_typed_function (sc, s_executable,
-                                     f_executable, 0, 0, false,
-                                     d_executable, NULL));
+             s7_make_typed_function (sc, s_executable, f_executable, 0, 0,
+                                     false, d_executable, NULL));
 }
 
 static s7_pointer
@@ -254,7 +253,7 @@ f_os_call (s7_scheme* sc, s7_pointer args) {
 #if _MSC_VER
   ret= (int) std::system (cmd_c);
 #else
-  wordexp_t   p;
+  wordexp_t p;
   ret= wordexp (cmd_c, &p, 0);
   if (ret != 0) {
     // failed after calling wordexp
