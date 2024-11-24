@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <s7.h>
 #include <string>
@@ -564,9 +565,8 @@ customize_goldfish_by_mode (s7_scheme* sc, string mode,
   }
 }
 
-int
-repl_for_community_edition (int argc, char** argv) {
-  // Check if the standard library and boot.scm exists
+string
+find_goldfish_library (char** argv) {
   tb_char_t        data_goldfish[TB_PATH_MAXN]= {0};
   tb_char_t const* goldfish=
       tb_path_absolute (argv[0], data_goldfish, sizeof (data_goldfish));
@@ -580,22 +580,47 @@ repl_for_community_edition (int argc, char** argv) {
       tb_path_directory (ret_bin, data_root, sizeof (data_root));
 
   tb_char_t        data_lib[TB_PATH_MAXN]= {0};
-  tb_char_t const* gf_lib=
-      tb_path_absolute_to (gf_root, "goldfish", data_lib, sizeof (data_lib));
+  tb_char_t const* gf_lib= tb_path_absolute_to (gf_root, "share/goldfish",
+                                                data_lib, sizeof (data_lib));
+#ifdef TB_CONFIG_OS_LINUX
+  if (strcmp (gf_root, "/") == 0) {
+    gf_lib= "/usr/share/goldfish";
+  }
+#endif
 
+  if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
+    gf_lib=
+        tb_path_absolute_to (gf_root, "goldfish", data_lib, sizeof (data_lib));
+    if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
+      cerr << "The load path for Goldfish standard library does not exist"
+           << endl;
+      exit (-1);
+    }
+  }
+
+  return string (gf_lib);
+}
+
+string
+find_goldfish_boot (const char* gf_lib) {
   tb_char_t        data_boot[TB_PATH_MAXN]= {0};
   tb_char_t const* gf_boot= tb_path_absolute_to (gf_lib, "scheme/boot.scm",
                                                  data_boot, sizeof (data_boot));
 
-  if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
-    cerr << "The load path for Goldfish Scheme Standard Library does not exist"
-         << endl;
-    exit (-1);
-  }
   if (!tb_file_access (gf_boot, TB_FILE_MODE_RO)) {
     cerr << "The boot.scm for Goldfish Scheme does not exist" << endl;
     exit (-1);
   }
+  return string (gf_boot);
+}
+
+int
+repl_for_community_edition (int argc, char** argv) {
+  string      gf_lib_dir  = find_goldfish_library (argv);
+  const char* gf_lib      = gf_lib_dir.c_str ();
+  string      gf_boot_path= find_goldfish_boot (gf_lib);
+  const char* gf_boot     = gf_boot_path.c_str ();
+
   vector<string> all_args (argv, argv + argc);
   int            all_args_N= all_args.size ();
   for (int i= 0; i < all_args_N; i++) {
