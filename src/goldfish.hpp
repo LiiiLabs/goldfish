@@ -184,24 +184,24 @@ string
 goldfish_exe () {
 #ifdef TB_CONFIG_OS_WINDOWS
   char buffer[GOLDFISH_PATH_MAXN];
-  GetModuleFileName(NULL, buffer, GOLDFISH_PATH_MAXN);
-  return string(buffer);
+  GetModuleFileName (NULL, buffer, GOLDFISH_PATH_MAXN);
+  return string (buffer);
 #elif TB_CONFIG_OS_MACOSX
-  char buffer[PATH_MAX];
-  uint32_t size = sizeof(buffer);
-  if (_NSGetExecutablePath(buffer, &size) == 0) {
+  char        buffer[PATH_MAX];
+  uint32_t    size= sizeof (buffer);
+  if (_NSGetExecutablePath (buffer, &size) == 0) {
     char real_path[GOLDFISH_PATH_MAXN];
-    if (realpath(buffer, real_path) != NULL) {
-      return string(real_path);
+    if (realpath (buffer, real_path) != NULL) {
+      return string (real_path);
     }
   }
   return "";
 #elif TB_CONFIG_OS_LINUX
-  char buffer[GOLDFISH_PATH_MAXN];
-  ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer)-1);
+  char    buffer[GOLDFISH_PATH_MAXN];
+  ssize_t len= readlink ("/proc/self/exe", buffer, sizeof (buffer) - 1);
   if (len != -1) {
-    buffer[len] = '\0';
-    return std::string(buffer);
+    buffer[len]= '\0';
+    return std::string (buffer);
   }
   return "";
 #endif
