@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <s7.h>
 #include <string>
@@ -579,19 +580,30 @@ repl_for_community_edition (int argc, char** argv) {
   tb_char_t const* gf_root=
       tb_path_directory (ret_bin, data_root, sizeof (data_root));
 
-  tb_char_t        data_lib[TB_PATH_MAXN]= {0};
-  tb_char_t const* gf_lib=
-      tb_path_absolute_to (gf_root, "goldfish", data_lib, sizeof (data_lib));
+  tb_char_t data_lib[TB_PATH_MAXN]= {0};
+
+  tb_char_t const* gf_lib= tb_path_absolute_to (gf_root, "share/goldfish",
+                                                data_lib, sizeof (data_lib));
+#ifdef TB_CONFIG_OS_LINUX
+  if (strcmp (gf_root, "/") == 0) {
+    gf_lib= "/usr/share/goldfish";
+  }
+#endif
+
+  if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
+    gf_lib=
+        tb_path_absolute_to (gf_root, "goldfish", data_lib, sizeof (data_lib));
+    if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
+      cerr << "The load path for Goldfish standard library does not exist"
+           << endl;
+      exit (-1);
+    }
+  }
 
   tb_char_t        data_boot[TB_PATH_MAXN]= {0};
   tb_char_t const* gf_boot= tb_path_absolute_to (gf_lib, "scheme/boot.scm",
                                                  data_boot, sizeof (data_boot));
 
-  if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
-    cerr << "The load path for Goldfish Scheme Standard Library does not exist"
-         << endl;
-    exit (-1);
-  }
   if (!tb_file_access (gf_boot, TB_FILE_MODE_RO)) {
     cerr << "The boot.scm for Goldfish Scheme does not exist" << endl;
     exit (-1);

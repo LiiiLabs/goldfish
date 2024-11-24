@@ -1,3 +1,5 @@
+set_version ("17.11.0")
+
 -- mode
 set_allowedmodes("releasedbg", "release", "debug", "profile")
 add_rules("mode.releasedbg", "mode.release", "mode.debug", "mode.profile")
@@ -39,7 +41,24 @@ target ("goldfish") do
     add_packages("s7")
     add_packages("tbox")
 
-    add_installfiles("goldfish/(scheme/*.scm)", {prefixdir = "goldfish"})
-    add_installfiles("goldfish/(srfi/*.scm)", {prefixdir = "goldfish"})
+    add_installfiles("$(projectdir)/goldfish/(scheme/*.scm)", {prefixdir = "share/goldfish"})
+    add_installfiles("$(projectdir)/goldfish/(srfi/*.scm)", {prefixdir = "share/goldfish"})
+    add_installfiles("$(projectdir)/goldfish/(liii/*.scm)", {prefixdir = "share/goldfish"})
 end
 
+includes("@builtin/xpack")
+xpack ("goldfish")
+    set_formats("deb")
+    set_author("Da Shen <da@liii.pro>")
+    set_license("Apache-2.0")
+    set_title("Goldfish Scheme")
+    set_description("A Python-like Scheme Interpreter") 
+    add_targets ("goldfish")
+
+    on_load(function (package)
+        if package:with_source() then
+            package:set("basename", "goldfish-$(plat)-src-v$(version)")
+        else
+            package:set("basename", "goldfish-$(plat)-$(arch)-v$(version)")
+        end
+    end)
