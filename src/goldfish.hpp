@@ -580,8 +580,7 @@ repl_for_community_edition (int argc, char** argv) {
   tb_char_t const* gf_root=
       tb_path_directory (ret_bin, data_root, sizeof (data_root));
 
-  tb_char_t data_lib[TB_PATH_MAXN]= {0};
-
+  tb_char_t        data_lib[TB_PATH_MAXN]= {0};
   tb_char_t const* gf_lib= tb_path_absolute_to (gf_root, "share/goldfish",
                                                 data_lib, sizeof (data_lib));
 #ifdef TB_CONFIG_OS_LINUX

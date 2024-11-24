@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7-rc2>>
+<TMU|<tuple|1.0.5|1.2.9.7-rc3>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -17272,6 +17272,8 @@
 
     #include \<less\>cstdlib\<gtr\>
 
+    #include \<less\>cstring\<gtr\>
+
     #include \<less\>iostream\<gtr\>
 
     #include \<less\>s7.h\<gtr\>
@@ -18624,9 +18626,39 @@
 
     \ \ tb_char_t \ \ \ \ \ \ \ data_lib[TB_PATH_MAXN]= {0};
 
-    \ \ tb_char_t const* gf_lib=
+    \ \ tb_char_t const* gf_lib= tb_path_absolute_to (gf_root, "share/goldfish",
 
-    \ \ \ \ \ \ tb_path_absolute_to (gf_root, "goldfish", data_lib, sizeof (data_lib));
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data_lib, sizeof (data_lib));
+
+    #ifdef TB_CONFIG_OS_LINUX
+
+    \ \ if (strcmp (gf_root, "/") == 0) {
+
+    \ \ \ \ gf_lib= "/usr/share/goldfish";
+
+    \ \ }
+
+    #endif
+
+    \;
+
+    \ \ if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
+
+    \ \ \ \ gf_lib=
+
+    \ \ \ \ \ \ \ \ tb_path_absolute_to (gf_root, "goldfish", data_lib, sizeof (data_lib));
+
+    \ \ \ \ if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
+
+    \ \ \ \ \ \ cerr \<less\>\<less\> "The load path for Goldfish standard library does not exist"
+
+    \ \ \ \ \ \ \ \ \ \ \ \<less\>\<less\> endl;
+
+    \ \ \ \ \ \ exit (-1);
+
+    \ \ \ \ }
+
+    \ \ }
 
     \;
 
@@ -18637,16 +18669,6 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ data_boot, sizeof (data_boot));
 
     \;
-
-    \ \ if (!tb_file_access (gf_lib, TB_FILE_MODE_RO)) {
-
-    \ \ \ \ cerr \<less\>\<less\> "The load path for Goldfish Scheme Standard Library does not exist"
-
-    \ \ \ \ \ \ \ \ \ \<less\>\<less\> endl;
-
-    \ \ \ \ exit (-1);
-
-    \ \ }
 
     \ \ if (!tb_file_access (gf_boot, TB_FILE_MODE_RO)) {
 
