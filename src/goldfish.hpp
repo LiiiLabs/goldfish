@@ -565,9 +565,8 @@ customize_goldfish_by_mode (s7_scheme* sc, string mode,
   }
 }
 
-int
-repl_for_community_edition (int argc, char** argv) {
-  // Check if the standard library and boot.scm exists
+string
+find_goldfish_library (char** argv) {
   tb_char_t        data_goldfish[TB_PATH_MAXN]= {0};
   tb_char_t const* goldfish=
       tb_path_absolute (argv[0], data_goldfish, sizeof (data_goldfish));
@@ -599,6 +598,11 @@ repl_for_community_edition (int argc, char** argv) {
     }
   }
 
+  return string (gf_lib);
+}
+
+string
+find_goldfish_boot (const char* gf_lib) {
   tb_char_t        data_boot[TB_PATH_MAXN]= {0};
   tb_char_t const* gf_boot= tb_path_absolute_to (gf_lib, "scheme/boot.scm",
                                                  data_boot, sizeof (data_boot));
@@ -607,6 +611,16 @@ repl_for_community_edition (int argc, char** argv) {
     cerr << "The boot.scm for Goldfish Scheme does not exist" << endl;
     exit (-1);
   }
+  return string (gf_boot);
+}
+
+int
+repl_for_community_edition (int argc, char** argv) {
+  string      gf_lib_dir  = find_goldfish_library (argv);
+  const char* gf_lib      = gf_lib_dir.c_str ();
+  string      gf_boot_path= find_goldfish_boot (gf_lib);
+  const char* gf_boot     = gf_boot_path.c_str ();
+
   vector<string> all_args (argv, argv + argc);
   int            all_args_N= all_args.size ();
   for (int i= 0; i < all_args_N; i++) {

@@ -119,7 +119,7 @@
     <item>中国科学技术大学-德清阿尔法创新研究院
   </itemize>
 
-  <chapter|boot.scm>
+  <chapter|boot.scm><label|chapter:scheme_boot>
 
   S7 Scheme默认并不遵循R7RS，在启动S7 Scheme之后，我们需要做的第一件事就是加载<scm|boot.scm>，实现R7RS的<scm|define-library>和<scm|import>。
 
@@ -18593,12 +18593,32 @@
 
   <paragraph|REPL>
 
+  <subparagraph|find_goldfish_library>
+
+  定位Goldfish的函数库的目录，如果不存在，直接以-1为返回值退出，如果存在，则返回目录对应的完整路径。
+
+  <\description>
+    <item*|开发者模式>在这种模式下，Goldfish的可执行文件的路径是<shell|$(projectdir)/bin/goldfish>，而函数库的路径是<shell|$(projectdir)/goldfish)>。这种情况仅用于开发或者集成Goldfish。
+
+    <item*|Linux>
+
+    <\description>
+      <item*|/usr/bin/goldfish>
+
+      <item*|/usr/local/goldfish>
+
+      这两种情况可以通过相对路径分别定位到Goldfish的函数库目录是<shell|/usr/share/goldfish>和<shell|/usr/local/share/goldfish>。
+
+      <item*|/bin/goldfish>
+
+      在这种情况下，我们直接将函数库目录设置为<shell|/usr/share/goldfish>。
+    </description>
+  </description>
+
   <\cpp-chunk|src/goldfish.hpp|true|true>
-    int
+    string
 
-    repl_for_community_edition (int argc, char** argv) {
-
-    \ \ // Check if the standard library and boot.scm exists
+    find_goldfish_library (char** argv) {
 
     \ \ tb_char_t \ \ \ \ \ \ \ data_goldfish[TB_PATH_MAXN]= {0};
 
@@ -18662,6 +18682,22 @@
 
     \;
 
+    \ \ return string (gf_lib);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <subparagraph|find_goldfish_boot>
+
+  定位Goldfish用于启动的Scheme脚本文件，如果不存在，直接以-1为返回值退出，如果存在，则返回改文件对应的完整路径。关于<shell|boot.scm>的具体细节，见<smart-ref|chapter:scheme_boot>。
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    string
+
+    find_goldfish_boot (const char* gf_lib) {
+
     \ \ tb_char_t \ \ \ \ \ \ \ data_boot[TB_PATH_MAXN]= {0};
 
     \ \ tb_char_t const* gf_boot= tb_path_absolute_to (gf_lib, "scheme/boot.scm",
@@ -18677,6 +18713,30 @@
     \ \ \ \ exit (-1);
 
     \ \ }
+
+    \ \ return string (gf_boot);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <subparagraph|repl_for_community_edition>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    int
+
+    repl_for_community_edition (int argc, char** argv) {
+
+    \ \ string \ \ \ \ \ gf_lib_dir \ = find_goldfish_library (argv);
+
+    \ \ const char* gf_lib \ \ \ \ \ = gf_lib_dir.c_str ();
+
+    \ \ string \ \ \ \ \ gf_boot_path= find_goldfish_boot (gf_lib);
+
+    \ \ const char* gf_boot \ \ \ \ = gf_boot_path.c_str ();
+
+    \;
 
     \ \ vector\<less\>string\<gtr\> all_args (argv, argv + argc);
 
