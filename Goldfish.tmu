@@ -17406,15 +17406,9 @@
 
     #include \<less\>mach-o/dyld.h\<gtr\>
 
-    #include \<less\>stdlib.h\<gtr\>
-
     #else
 
     #include \<less\>linux/limits.h\<gtr\>
-
-    #include \<less\>pwd.h\<gtr\>
-
-    #include \<less\>unistd.h\<gtr\>
 
     #endif
 
@@ -17423,6 +17417,10 @@
     #if !defined(TB_CONFIG_OS_WINDOWS)
 
     #include \<less\>errno.h\<gtr\>
+
+    #include \<less\>pwd.h\<gtr\>
+
+    #include \<less\>unistd.h\<gtr\>
 
     #include \<less\>wordexp.h\<gtr\>
 

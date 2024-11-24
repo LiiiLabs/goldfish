@@ -32,15 +32,14 @@
 #elif TB_CONFIG_OS_MACOSX
 #include <limits.h>
 #include <mach-o/dyld.h>
-#include <stdlib.h>
 #else
 #include <linux/limits.h>
-#include <pwd.h>
-#include <unistd.h>
 #endif
 
 #if !defined(TB_CONFIG_OS_WINDOWS)
 #include <errno.h>
+#include <pwd.h>
+#include <unistd.h>
 #include <wordexp.h>
 #endif
 
