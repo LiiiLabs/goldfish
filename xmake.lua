@@ -47,14 +47,19 @@ target ("goldfish") do
 end
 
 includes("@builtin/xpack")
+
 xpack ("goldfish")
-    set_formats("deb")
+    set_formats("deb", "rpm", "srpm")
     set_author("Da Shen <da@liii.pro>")
     set_license("Apache-2.0")
     set_title("Goldfish Scheme")
     set_description("A Python-like Scheme Interpreter") 
+    set_homepage("https://gitee.com/LiiiLabs/goldfish")
     add_targets ("goldfish")
-
+    add_sourcefiles("(xmake/**)")
+    add_sourcefiles("xmake.lua")
+    add_sourcefiles("(src/**)")
+    add_sourcefiles("(goldfish/**)")
     on_load(function (package)
         if package:with_source() then
             package:set("basename", "goldfish-$(plat)-src-v$(version)")
