@@ -209,7 +209,8 @@ goldfish_exe () {
 
 static s7_pointer
 f_executable (s7_scheme* sc, s7_pointer args) {
-  return s7_make_string (sc, goldfish_exe ().c_str ());
+  string exe_path= goldfish_exe ();
+  return s7_make_string (sc, exe_path.c_str ());
 }
 
 inline void
@@ -617,11 +618,11 @@ customize_goldfish_by_mode (s7_scheme* sc, string mode,
 
 string
 find_goldfish_library () {
-  tb_char_t const* goldfish= goldfish_exe ().c_str ();
+  string exe_path= goldfish_exe ();
 
   tb_char_t        data_bin[TB_PATH_MAXN]= {0};
   tb_char_t const* ret_bin=
-      tb_path_directory (goldfish, data_bin, sizeof (data_bin));
+      tb_path_directory (exe_path.c_str (), data_bin, sizeof (data_bin));
 
   tb_char_t        data_root[TB_PATH_MAXN]= {0};
   tb_char_t const* gf_root=
