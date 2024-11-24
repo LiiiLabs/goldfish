@@ -15245,7 +15245,9 @@
 
   <chapter|(liii sys)>
 
-  <\goldfish-chunk|goldfish/liii/sys.scm|false|false>
+  <section|许可证>
+
+  <\goldfish-chunk|goldfish/liii/sys.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -15277,7 +15279,11 @@
     ;
 
     \;
+  </goldfish-chunk>
 
+  <section|接口>
+
+  <\goldfish-chunk|goldfish/liii/sys.scm|true|true>
     (define-library (liii sys)
 
     (export argv executable)
@@ -15287,15 +15293,51 @@
     (begin
 
     \;
+  </goldfish-chunk>
 
+  <section|测试>
+
+  <\goldfish-chunk|tests/goldfish/liii/sys-test.scm|false|false>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii sys))
+
+    \;
+
+    (display (executable))
+
+    (newline)
+
+    \;
+
+    (check-report)
+
+    \;
+  </goldfish-chunk>
+
+  <section|实现>
+
+  <paragraph|argv>
+
+  <\goldfish-chunk|goldfish/liii/sys.scm|true|true>
     (define (argv) (command-line))
 
     \;
+  </goldfish-chunk>
 
+  <paragraph|executable><index|executable><typehint|() =\<gtr\> string?>
+
+  具体实现见<smart-ref|paragraph:g_executable>。
+
+  <\goldfish-chunk|goldfish/liii/sys.scm|true|true>
     (define (executable) (g_executable))
 
     \;
+  </goldfish-chunk>
 
+  <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/sys.scm|true|false>
     ) ; end of begin
 
     ) ; end of define-library
@@ -17729,7 +17771,7 @@
 
   <subsubsection|(liii sys)的胶水代码>
 
-  <paragraph|g_executable><index|g_executable>
+  <paragraph|g_executable><index|g_executable><label|paragraph:g_executable>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     string
