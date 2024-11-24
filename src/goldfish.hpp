@@ -29,9 +29,14 @@
 #ifdef TB_CONFIG_OS_WINDOWS
 #include <io.h>
 #include <windows.h>
+#elif TB_CONFIG_OS_MACOSX
+#include <mach-o/dyld.h>
+#include <limits.h>
+#include <stdlib.h>
 #else
 #include <pwd.h>
 #include <unistd.h>
+#include <linux/limits.h>
 #endif
 
 #if !defined(TB_CONFIG_OS_WINDOWS)
@@ -173,6 +178,51 @@ glue_scheme_process_context (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_command_line),
              s7_make_typed_function (sc, s_command_line, f_command_line, 0, 0,
                                      false, d_command_line, NULL));
+}
+
+string
+goldfish_exe () {
+#ifdef TB_CONFIG_OS_WINDOWS
+  char buffer[GOLDFISH_PATH_MAXN];
+  GetModuleFileName(NULL, buffer, GOLDFISH_PATH_MAXN);
+  return string(buffer);
+#elif TB_CONFIG_OS_MACOSX
+  char buffer[PATH_MAX];
+  uint32_t size = sizeof(buffer);
+  if (_NSGetExecutablePath(buffer, &size) == 0) {
+    char real_path[GOLDFISH_PATH_MAXN];
+    if (realpath(buffer, real_path) != NULL) {
+      return string(real_path);
+    }
+  }
+  return "";
+#elif TB_CONFIG_OS_LINUX
+  char buffer[GOLDFISH_PATH_MAXN];
+  ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer)-1);
+  if (len != -1) {
+    buffer[len] = '\0';
+    return std::string(buffer);
+  }
+  return "";
+#endif
+}
+
+static s7_pointer
+f_executable (s7_scheme* sc, s7_pointer args) {
+  return s7_make_string (sc, goldfish_exe ().c_str ());
+}
+
+inline void
+glue_liii_sys (s7_scheme* sc) {
+  s7_pointer cur_env= s7_curlet (sc);
+
+  const char* s_executable= "g_executable";
+  const char* d_executable= "(g_executable) => string";
+
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_executable),
+             s7_make_typed_function (sc, s_executable,
+                                     f_executable, 0, 0, false,
+                                     d_executable, NULL));
 }
 
 static s7_pointer
@@ -480,6 +530,7 @@ glue_for_community_edition (s7_scheme* sc) {
   glue_goldfish (sc);
   glue_scheme_time (sc);
   glue_scheme_process_context (sc);
+  glue_liii_sys (sc);
   glue_liii_os (sc);
   glue_liii_uuid (sc);
 }
@@ -566,10 +617,8 @@ customize_goldfish_by_mode (s7_scheme* sc, string mode,
 }
 
 string
-find_goldfish_library (char** argv) {
-  tb_char_t        data_goldfish[TB_PATH_MAXN]= {0};
-  tb_char_t const* goldfish=
-      tb_path_absolute (argv[0], data_goldfish, sizeof (data_goldfish));
+find_goldfish_library () {
+  tb_char_t const* goldfish= goldfish_exe ().c_str ();
 
   tb_char_t        data_bin[TB_PATH_MAXN]= {0};
   tb_char_t const* ret_bin=
@@ -616,7 +665,7 @@ find_goldfish_boot (const char* gf_lib) {
 
 int
 repl_for_community_edition (int argc, char** argv) {
-  string      gf_lib_dir  = find_goldfish_library (argv);
+  string      gf_lib_dir  = find_goldfish_library ();
   const char* gf_lib      = gf_lib_dir.c_str ();
   string      gf_boot_path= find_goldfish_boot (gf_lib);
   const char* gf_boot     = gf_boot_path.c_str ();

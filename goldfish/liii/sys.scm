@@ -15,11 +15,14 @@
 ;
 
 (define-library (liii sys)
-(export argv)
+(export argv executable)
 (import (scheme process-context))
 (begin
 
 (define (argv) (command-line))
 
+(define (executable) (g_executable))
+
 ) ; end of begin
 ) ; end of define-library
+
