@@ -104,6 +104,8 @@
 
     Noctis Zhang \<less\>noctis@umass.edu\<gtr\>
 
+    Andy Yu \<less\>andy87654@outlook.com\<gtr\>
+
     \;
   </verbatim-chunk>
 
@@ -4498,6 +4500,242 @@
 
     \;
   </scm-chunk>
+
+  <chapter|(liii cut)>
+
+  <section|许可证>
+
+  <\goldfish-chunk|goldfish/liii/cut.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/cut-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|goldfish/srfi/srfi-26.scm|false|false>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+
+    (define-library (srfi srfi-26)
+
+    \ \ (import (liii cut))
+
+    \ \ (export cut cute))
+
+    \;
+  </goldfish-chunk>
+
+  <section|测试>
+
+  <\goldfish-chunk|tests/goldfish/liii/cut-test.scm|true|false>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii cut))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (check ((cut list \<less\>\<gtr\> 'y \<less\>\<gtr\>) 'x 'z) =\<gtr\> '(x y z))
+
+    (check ((cut + 1 \<less\>...\<gtr\>) 2 3) =\<gtr\> 6)
+
+    (check ((cut + 1 \<less\>...\<gtr\>)) =\<gtr\> 1)
+
+    (check ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\>) 1 2 3) =\<gtr\> '(1 2 3))
+
+    (check ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\>) 1 2) =\<gtr\> '(1 2))
+
+    (check-catch 'wrong-number-of-args ((cut list \<less\>\<gtr\> \<less\>\<gtr\>) 1))
+
+    (check-catch 'wrong-number-of-args ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\>) 1))
+
+    (check-catch 'syntax-error ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\> \<less\>\<gtr\>) 1 2 3))
+
+    \;
+
+    (check-report)
+
+    \;
+  </goldfish-chunk>
+
+  <section|实现>
+
+  <\goldfish-chunk|goldfish/liii/cut.scm|true|false>
+    (define-library (liii cut)
+
+    (export cut cute)
+
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii error))
+
+    (begin
+
+    \;
+
+    (define-macro (cut . paras)
+
+    \ \ (letrec*
+
+    \ \ \ \ ((slot? (lambda (x) (equal? '\<less\>\<gtr\> x)))
+
+    \ \ \ \ \ (more-slot? (lambda (x) (equal? '\<less\>...\<gtr\> x)))
+
+    \ \ \ \ \ (slots (filter slot? paras))
+
+    \ \ \ \ \ (more-slots (filter more-slot? paras))
+
+    \ \ \ \ \ (xs (map (lambda (x) (gensym)) slots))
+
+    \ \ \ \ \ (rest (gensym))
+
+    \ \ \ \ \ (parse
+
+    \ \ \ \ \ \ \ (lambda (xs paras)
+
+    \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ ((null? paras) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((not (list? paras)) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((more-slot? (car paras)) `(,rest ,@(parse xs (cdr paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((slot? (car paras)) `(,(car xs) ,@(parse (cdr xs) (cdr paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else ‘(,(car paras) ,@(parse xs (cdr paras))))))))
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((null? more-slots)
+
+    \ \ \ \ \ \ \ `(lambda ,xs ,(parse xs paras)))
+
+    \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ (when
+
+    \ \ \ \ \ \ \ \ \ \ (or (\<gtr\> (length more-slots) 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (more-slot? (last paras))))
+
+    \ \ \ \ \ \ \ \ \ \ (error 'syntax-error "\<less\>...\<gtr\> must be the last parameter of cut"))
+
+    \ \ \ \ \ \ \ \ (let ((parsed (parse xs paras)))
+
+    \ \ \ \ \ \ \ \ \ \ `(lambda (,@xs . ,rest) (apply ,@parsed)))))))
+
+    \;
+
+    (define-macro (cute . paras)
+
+    \ \ (???))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </goldfish-chunk>
 
   <chapter|(liii case)>
 
