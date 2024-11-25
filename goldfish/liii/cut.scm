@@ -48,7 +48,7 @@
           `(lambda (,@xs . ,rest) (apply ,@parsed)))))))
 
 (define-macro (cute . paras)
-  (error 'not-implemented))
+  (???))
 
 ) ; end of begin
 ) ; end of library
