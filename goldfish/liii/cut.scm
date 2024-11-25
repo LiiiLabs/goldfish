@@ -19,6 +19,7 @@
 (import (liii list)
         (liii error))
 (begin
+
 (define-macro (cut . paras)
   (letrec*
     ((slot? (lambda (x) (equal? '<> x)))
@@ -45,6 +46,10 @@
           (error 'syntax-error "<...> must be the last parameter of cut"))
         (let ((parsed (parse xs paras)))
           `(lambda (,@xs . ,rest) (apply ,@parsed)))))))
+
 (define-macro (cute . paras)
   (error 'not-implemented))
-))
+
+) ; end of begin
+) ; end of library
+

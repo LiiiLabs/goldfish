@@ -29,3 +29,4 @@
 (check-catch 'syntax-error ((cut list <> <> <...> <>) 1 2 3))
 
 (check-report)
+
