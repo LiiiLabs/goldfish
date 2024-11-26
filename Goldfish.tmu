@@ -25,6 +25,8 @@
     <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
   </hide-preamble>
 
+  <part|语言和数据>
+
   <chapter|金鱼Scheme简介>
 
   \;
@@ -351,7 +353,7 @@
     \;
   </scm-chunk>
 
-  <chapter|(liii base)>
+  <chapter|(liii base)><label|chapter:liii_base>
 
   \;
 
@@ -4501,6 +4503,144 @@
     \;
   </scm-chunk>
 
+  <chapter|(scheme case-lambda)>
+
+  <section|协议>
+
+  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  在Scheme语言中，<scm|case-lambda>是一种特殊的lambda表达式，它可以根据不同数量的参数执行不同的代码块。<scm|case-lambda>允许你定义一个函数，这个函数根据传入参数的数量来选择执行不同的lambda表达式。
+
+  \;
+
+  下面是一个使用<scm|case-lambda>的示例：
+
+  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|true|false>
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (scheme case-lambda))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (define (my-func . args)
+
+    \ \ (case-lambda
+
+    \ \ \ \ (() "zero args")
+
+    \ \ \ \ ((x) (+ x x))
+
+    \ \ \ \ ((x y) (+ x y))
+
+    \ \ \ \ ((x y . rest) (reduce + 0 (cons x (cons y rest))))))
+
+    \;
+
+    (check ((my-func)) =\<gtr\> "zero args")
+
+    (check ((my-func) 2) =\<gtr\> 4)
+
+    (check ((my-func) 3 4) =\<gtr\> 7)
+
+    (check ((my-func) 1 2 3 4) =\<gtr\> 10)
+
+    \;
+
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <\scm-chunk|goldfish/scheme/case-lambda.scm|false|false>
+    ; 0-clause BSD
+
+    ; Bill Schottstaedt
+
+    ; from S7 source repo: r7rs.scm
+
+    \;
+
+    (define-library (scheme case-lambda)
+
+    (export case-lambda)
+
+    (begin
+
+    \;
+
+    ;; case-lambda \ \ \ \ \ \ 
+
+    (define-macro (case-lambda . choices)
+
+    \ \ `(lambda args
+
+    \ \ \ \ \ (case (length args)
+
+    \ \ \ \ \ \ \ ,@(map (lambda (choice)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (symbol? (car choice))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (negative? (length (car choice))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(else (apply (lambda ,(car choice) ,@(cdr choice)) args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((,(length (car choice)))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply (lambda ,(car choice) ,@(cdr choice)) args))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ choices))))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
   <chapter|(liii cut)>
 
   <section|许可证>
@@ -4577,7 +4717,7 @@
 
   \;
 
-  <\goldfish-chunk|goldfish/srfi/srfi-26.scm|false|false>
+  <\goldfish-chunk|goldfish/srfi/srfi-26.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -4609,20 +4749,12 @@
     ;
 
     \;
-
-    (define-library (srfi srfi-26)
-
-    \ \ (import (liii cut))
-
-    \ \ (export cut cute))
-
-    \;
   </goldfish-chunk>
 
   <section|接口>
 
-  <\goldfish-chunk|goldfish/liii/cut.scm|true|true>
-    (define-library (liii cut)
+  <\goldfish-chunk|goldfish/srfi/srfi-26.scm|true|true>
+    (define-library (srfi srfi-26)
 
     (export cut cute)
 
@@ -4631,6 +4763,16 @@
     \ \ \ \ \ \ \ \ (liii error))
 
     (begin
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|goldfish/liii/cut.scm|true|false>
+    (define-library (liii cut)
+
+    \ \ (import (srfi srfi-26))
+
+    \ \ (export cut cute))
 
     \;
   </goldfish-chunk>
@@ -4713,7 +4855,7 @@
 
   <paragraph|cut>
 
-  <\goldfish-chunk|goldfish/liii/cut.scm|true|true>
+  <\goldfish-chunk|goldfish/srfi/srfi-26.scm|true|true>
     (define-macro (cut . paras)
 
     \ \ (letrec*
@@ -4771,7 +4913,7 @@
 
   <paragraph|cute>
 
-  <\goldfish-chunk|goldfish/liii/cut.scm|true|true>
+  <\goldfish-chunk|goldfish/srfi/srfi-26.scm|true|true>
     (define-macro (cute . paras)
 
     \ \ (letrec*
@@ -4811,7 +4953,7 @@
 
   <section|结尾>
 
-  <\goldfish-chunk|goldfish/liii/cut.scm|true|false>
+  <\goldfish-chunk|goldfish/srfi/srfi-26.scm|true|false>
     ) ; end of begin
 
     ) ; end of library
@@ -15077,11 +15219,57 @@
 
   \;
 
-  <chapter|三鲤扩展库说明>
+  <chapter|函数库和章节设计>
 
-  三鲤扩展库都是形如<scm|(liii xyz)>的Scheme库。
+  <section|函数库的依赖关系>
 
-  <section|结尾>
+  <subsection|R7RS以及和语言特性相关函数库的依赖关系>
+
+  <\enumerate>
+    <item>本节的依赖方向是父节点依赖于子节点，根节点仅仅是一个虚拟节点
+
+    <item>下图中的<scm|srfi-n>表示函数库<scm|(srfi srfi-n)>
+
+    <item>下图中的<scm|base>和<scm|case-lambda>分别表示<scm|(scheme base)>和<scm|(scheme case-lambda)>
+  </enumerate>
+
+  <\big-figure|<tree|root|<tree|(liii base)|base|srfi-2|srfi-8>|(liii error)|<tree|(liii cut)|srfi-26>|(liii case)|case-lambda>>
+    语言基础和语言特性函数库
+  </big-figure>
+
+  \;
+
+  <subsection|基础数据类型和数据结构相关函数库的依赖关系>
+
+  <\enumerate>
+    <item>本节的依赖方向是子节点依赖于父节点
+
+    <item>下图中的<scm|srfi-n>表示函数库<scm|(srfi srfi-n)>
+
+    <item>下图中的char表示函数库<scm|(scheme char)>，别的<scm|xyz>均表示函数库<scm|(liii xyz)>
+
+    <item>本节中的函数库在实现时可以自由依赖上一节中的函数库，但仍旧需要遵守最小依赖原则
+  </enumerate>
+
+  <\big-figure|<tree|(liii base) and others|char|<tree|srfi-1|list>|alist|<tree|srfi-151|bitwise>|<tree|srfi-13|string>|<tree|srfi-133|vector>|stack|queue|<tree|srfi-128|comparator>|<tree|srfi-125|hash-table>|<tree|srfi-133|set>>>
+    数据类型和数据结构函数库
+  </big-figure>
+
+  <section|章节设计>
+
+  R7RS定义的函数库<scm|(scheme base)>所涉及的章节如下所示：
+
+  <\itemize>
+    <item><smart-ref|chapter:liii_base>：<scm|(liii base)>
+
+    <item><smart-ref|chapter:liii_list>：<scm|(liii list)>
+
+    <item><smart-ref|chapter:liii_string>：<scm|(liii string)>
+
+    <item><smart-ref|chapter:liii_vector>：<scm|(liii vector)>
+  </itemize>
+
+  比如<scm|list-ref>这个函数，按照R7RS的定义，可以从<scm|(scheme base)>中得到。按照<scm|liii>开头的函数库的设计，也可以从<scm|(liii list)>中得到。
 
   <\scm-chunk|goldfish/scheme/base.scm|true|false>
     ) ; end of begin
@@ -15090,6 +15278,8 @@
 
     \;
   </scm-chunk>
+
+  <part|标准库>
 
   <chapter|(liii base64)>
 
@@ -16905,144 +17095,6 @@
     \;
   </scm-chunk>
 
-  <chapter|(scheme case-lambda)>
-
-  <section|协议>
-
-  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|false|true>
-    ;
-
-    ; Copyright (C) 2024 The Goldfish Scheme Authors
-
-    ;
-
-    ; Licensed under the Apache License, Version 2.0 (the "License");
-
-    ; you may not use this file except in compliance with the License.
-
-    ; You may obtain a copy of the License at
-
-    ;
-
-    ; http://www.apache.org/licenses/LICENSE-2.0
-
-    ;
-
-    ; Unless required by applicable law or agreed to in writing, software
-
-    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    ; License for the specific language governing permissions and limitations
-
-    ; under the License.
-
-    ;
-
-    \;
-  </scm-chunk>
-
-  <section|接口>
-
-  在Scheme语言中，<scm|case-lambda>是一种特殊的lambda表达式，它可以根据不同数量的参数执行不同的代码块。<scm|case-lambda>允许你定义一个函数，这个函数根据传入参数的数量来选择执行不同的lambda表达式。
-
-  \;
-
-  下面是一个使用<scm|case-lambda>的示例：
-
-  <\scm-chunk|tests/goldfish/scheme/case-lambda-test.scm|true|false>
-    (import (liii list)
-
-    \ \ \ \ \ \ \ \ (liii check)
-
-    \ \ \ \ \ \ \ \ (scheme case-lambda))
-
-    \;
-
-    (check-set-mode! 'report-failed)
-
-    \;
-
-    (define (my-func . args)
-
-    \ \ (case-lambda
-
-    \ \ \ \ (() "zero args")
-
-    \ \ \ \ ((x) (+ x x))
-
-    \ \ \ \ ((x y) (+ x y))
-
-    \ \ \ \ ((x y . rest) (reduce + 0 (cons x (cons y rest))))))
-
-    \;
-
-    (check ((my-func)) =\<gtr\> "zero args")
-
-    (check ((my-func) 2) =\<gtr\> 4)
-
-    (check ((my-func) 3 4) =\<gtr\> 7)
-
-    (check ((my-func) 1 2 3 4) =\<gtr\> 10)
-
-    \;
-
-    (check-report)
-
-    \;
-  </scm-chunk>
-
-  <section|实现>
-
-  <\scm-chunk|goldfish/scheme/case-lambda.scm|false|false>
-    ; 0-clause BSD
-
-    ; Bill Schottstaedt
-
-    ; from S7 source repo: r7rs.scm
-
-    \;
-
-    (define-library (scheme case-lambda)
-
-    (export case-lambda)
-
-    (begin
-
-    \;
-
-    ;; case-lambda \ \ \ \ \ \ 
-
-    (define-macro (case-lambda . choices)
-
-    \ \ `(lambda args
-
-    \ \ \ \ \ (case (length args)
-
-    \ \ \ \ \ \ \ ,@(map (lambda (choice)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (symbol? (car choice))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (negative? (length (car choice))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(else (apply (lambda ,(car choice) ,@(cdr choice)) args))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((,(length (car choice)))\ 
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply (lambda ,(car choice) ,@(cdr choice)) args))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ choices))))
-
-    \;
-
-    ) ; end of begin
-
-    ) ; end of define-library
-
-    \;
-  </scm-chunk>
-
   <chapter|(scheme char)>
 
   <section|许可证>
@@ -17594,6 +17646,8 @@
 
     \;
   </scm-chunk>
+
+  <part|基础设施>
 
   <chapter|C++部分>
 
@@ -19427,7 +19481,7 @@
     } // namespace goldfish
   </cpp-chunk>
 
-  <chapter|基础设施>
+  <chapter|CI/CD流水线>
 
   <section|持续集成>
 
