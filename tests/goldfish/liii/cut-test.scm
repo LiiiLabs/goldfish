@@ -22,11 +22,30 @@
 (check ((cut list <> 'y <>) 'x 'z) => '(x y z))
 (check ((cut + 1 <...>) 2 3) => 6)
 (check ((cut + 1 <...>)) => 1)
+(check ((cut <> 1 <...>) + 2 3) => 6)
 (check ((cut list <> <> <...>) 1 2 3) => '(1 2 3))
 (check ((cut list <> <> <...>) 1 2) => '(1 2))
+(check ((cut + 1 2)) => 3)
+(check ((cut <>) list) => ())
+(check ((cut)) => ())
+(check ((cut <> #t <...>) if 1 0) => 1)
+
 (check-catch 'wrong-number-of-args ((cut list <> <>) 1))
 (check-catch 'wrong-number-of-args ((cut list <> <> <...>) 1))
 (check-catch 'syntax-error ((cut list <> <> <...> <>) 1 2 3))
+
+(let* ((a 1)
+       (f (cut <> (set! a 2))))
+  (check a => 1)
+  (check (f (lambda (x) x)) => 2)
+  (check a => 2))
+
+(let* ((a 1)
+       (f (cute <> (set! a 2))))
+  (check a => 2)
+  (set! a 1)
+  (check (f (lambda (x) x)) => 2)
+  (check a => 1))
 
 (check-report)
 
