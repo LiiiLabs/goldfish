@@ -4619,6 +4619,22 @@
     \;
   </goldfish-chunk>
 
+  <section|接口>
+
+  <\goldfish-chunk|goldfish/liii/cut.scm|true|true>
+    (define-library (liii cut)
+
+    (export cut cute)
+
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii error))
+
+    (begin
+
+    \;
+  </goldfish-chunk>
+
   <section|测试>
 
   <\goldfish-chunk|tests/goldfish/liii/cut-test.scm|true|false>
@@ -4638,15 +4654,53 @@
 
     (check ((cut + 1 \<less\>...\<gtr\>)) =\<gtr\> 1)
 
+    (check ((cut \<less\>\<gtr\> 1 \<less\>...\<gtr\>) + 2 3) =\<gtr\> 6)
+
     (check ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\>) 1 2 3) =\<gtr\> '(1 2 3))
 
     (check ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\>) 1 2) =\<gtr\> '(1 2))
+
+    (check ((cut + 1 2)) =\<gtr\> 3)
+
+    (check ((cut \<less\>\<gtr\>) list) =\<gtr\> ())
+
+    (check ((cut)) =\<gtr\> ())
+
+    (check ((cut \<less\>\<gtr\> #t \<less\>...\<gtr\>) if 1 0) =\<gtr\> 1)
+
+    \;
 
     (check-catch 'wrong-number-of-args ((cut list \<less\>\<gtr\> \<less\>\<gtr\>) 1))
 
     (check-catch 'wrong-number-of-args ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\>) 1))
 
     (check-catch 'syntax-error ((cut list \<less\>\<gtr\> \<less\>\<gtr\> \<less\>...\<gtr\> \<less\>\<gtr\>) 1 2 3))
+
+    \;
+
+    (let* ((a 1)
+
+    \ \ \ \ \ \ \ (f (cut \<less\>\<gtr\> (set! a 2))))
+
+    \ \ (check a =\<gtr\> 1)
+
+    \ \ (check (f (lambda (x) x)) =\<gtr\> 2)
+
+    \ \ (check a =\<gtr\> 2))
+
+    \;
+
+    (let* ((a 1)
+
+    \ \ \ \ \ \ \ (f (cute \<less\>\<gtr\> (set! a 2))))
+
+    \ \ (check a =\<gtr\> 2)
+
+    \ \ (set! a 1)
+
+    \ \ (check (f (lambda (x) x)) =\<gtr\> 2)
+
+    \ \ (check a =\<gtr\> 1))
 
     \;
 
@@ -4657,19 +4711,9 @@
 
   <section|实现>
 
-  <\goldfish-chunk|goldfish/liii/cut.scm|true|false>
-    (define-library (liii cut)
+  <paragraph|cut>
 
-    (export cut cute)
-
-    (import (liii list)
-
-    \ \ \ \ \ \ \ \ (liii error))
-
-    (begin
-
-    \;
-
+  <\goldfish-chunk|goldfish/liii/cut.scm|true|true>
     (define-macro (cut . paras)
 
     \ \ (letrec*
@@ -4700,7 +4744,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ ((slot? (car paras)) `(,(car xs) ,@(parse (cdr xs) (cdr paras))))
 
-    \ \ \ \ \ \ \ \ \ \ \ (else ‘(,(car paras) ,@(parse xs (cdr paras))))))))
+    \ \ \ \ \ \ \ \ \ \ \ (else `(,(car paras) ,@(parse xs (cdr paras))))))))
 
     \ \ \ \ (cond
 
@@ -4723,13 +4767,51 @@
     \ \ \ \ \ \ \ \ \ \ `(lambda (,@xs . ,rest) (apply ,@parsed)))))))
 
     \;
+  </goldfish-chunk>
 
+  <paragraph|cute>
+
+  <\goldfish-chunk|goldfish/liii/cut.scm|true|true>
     (define-macro (cute . paras)
 
-    \ \ (???))
+    \ \ (letrec*
+
+    \ \ \ \ ((slot? (lambda (x) (equal? '\<less\>\<gtr\> x)))
+
+    \ \ \ \ \ (more-slot? (lambda (x) (equal? '\<less\>...\<gtr\> x)))
+
+    \ \ \ \ \ (exprs (filter (lambda (x) (not (or (slot? x) (more-slot? x))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ paras))
+
+    \ \ \ \ \ (xs (map (lambda (x) (gensym)) exprs))
+
+    \ \ \ \ \ (lets (map list xs exprs))
+
+    \ \ \ \ \ (parse
+
+    \ \ \ \ \ \ \ (lambda (xs paras)
+
+    \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ ((null? paras) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((not (list? paras)) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((not (or (slot? (car paras)) (more-slot? (car paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ `(,(car xs) ,@(parse (cdr xs) (cdr paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else `(,(car paras) ,@(parse xs (cdr paras))))))))
+
+    \ \ \ \ `(let ,lets (cut ,@(parse xs paras)))))
 
     \;
+  </goldfish-chunk>
 
+  <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/cut.scm|true|false>
     ) ; end of begin
 
     ) ; end of library
