@@ -48,7 +48,22 @@
           `(lambda (,@xs . ,rest) (apply ,@parsed)))))))
 
 (define-macro (cute . paras)
-  (???))
+  (letrec*
+    ((slot? (lambda (x) (equal? '<> x)))
+     (more-slot? (lambda (x) (equal? '<...> x)))
+     (exprs (filter (lambda (x) (not (or (slot? x) (more-slot? x))))
+                    paras))
+     (xs (map (lambda (x) (gensym)) exprs))
+     (lets (map list xs exprs))
+     (parse
+       (lambda (xs paras)
+         (cond
+           ((null? paras) paras)
+           ((not (list? paras)) paras)
+           ((not (or (slot? (car paras)) (more-slot? (car paras))))
+            `(,(car xs) ,@(parse (cdr xs) (cdr paras))))
+           (else `(,(car paras) ,@(parse xs (cdr paras))))))))
+    `(let ,lets (cut ,@(parse xs paras)))))
 
 ) ; end of begin
 ) ; end of library
