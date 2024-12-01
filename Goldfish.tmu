@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7-rc3>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -1900,8 +1900,6 @@
 
     \;
   </scm-chunk>
-
-  <paragraph|sqrt>
 
   <paragraph|exact-integer-sqrt>
 
@@ -17311,6 +17309,172 @@
     ) ; end of define-library
 
     \;
+  </scm-chunk>
+
+  \;
+
+  <chapter|(scheme inexact)>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/scheme/inexact.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/scheme/inexact-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/scheme/inexact.scm|true|true>
+    ; The (scheme inexact) library exports procedures which are typically only
+
+    ; useful with inexact values
+
+    (define-library (scheme inexact)
+
+    (export acos asin atan cos exp finite? infinite? log nan? sin sqrt tan)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/scheme/inexact-test.scm|true|true>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (scheme inexact))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+  </scm-chunk>
+
+  <section|实现>
+
+  <value|r7rs><paragraph|finite?><index|finite?>
+
+  \;
+
+  <value|r7rs><paragraph|infinite?><index|infinite?>
+
+  \;
+
+  <value|r7rs><paragraph|nan?><index|nan?>
+
+  \;
+
+  <value|r7rs><paragraph|exp><index|acos>
+
+  \;
+
+  <value|r7rs><paragraph|log><index|log>
+
+  \;
+
+  <value|r7rs><paragraph|sin><index|sin>
+
+  \;
+
+  <value|r7rs><paragraph|cos><index|cos>
+
+  \;
+
+  <value|r7rs><paragraph|tan><index|tan>
+
+  \;
+
+  <value|r7rs><paragraph|asin><index|asin>
+
+  \;
+
+  <value|r7rs><paragraph|acos><index|acos>
+
+  \;
+
+  <value|r7rs><paragraph|atan><index|atan>
+
+  \;
+
+  <value|r7rs><paragraph|sqrt><index| sqrt>
+
+  \;
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/scheme/inexact.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/scheme/inexact-test.scm|true|false>
+    (check-report)
   </scm-chunk>
 
   <chapter|(srfi sicp)>
