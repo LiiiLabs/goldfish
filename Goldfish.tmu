@@ -15123,7 +15123,7 @@
     <item>本节中的函数库在实现时可以自由依赖上一节中的函数库，但仍旧需要遵守最小依赖原则
   </enumerate>
 
-  <\big-figure|<tree|(liii base) and others|char|<tree|srfi-1|list>|alist|<tree|srfi-151|bitwise>|<tree|srfi-13|string>|<tree|srfi-133|vector>|stack|queue|<tree|srfi-128|comparator>|<tree|srfi-125|hash-table>|<tree|srfi-133|set>>>
+  <\big-figure|<tree|(liii base) and others|char|<tree|srfi-1|list>|alist|<tree|srfi-151|bitwise>|<tree|srfi-13|string>|<tree|srfi-133|vector>|stack|queue|<tree|srfi-128|comparator>|<tree|srfi-125|hash-table>|<tree|srfi-113|set>>>
     数据类型和数据结构函数库
   </big-figure>
 
