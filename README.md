@@ -6,7 +6,7 @@ Goldfish Scheme is a Scheme interpreter with the following features:
 + Python-like standard library
 + Small and fast
 
-<img src="goldfish_scheme_logo.png" alt="示例图片" style="height: 256pt;">
+<img src="goldfish_scheme_logo.png" alt="示例图片" style="width: 360pt;">
 
 ## Simplicity is Beauty
 Goldfish Scheme still follows the same principle of simplicity as S7 Scheme. Currently, Goldfish Scheme only depends on [S7 Scheme](https://ccrma.stanford.edu/software/s7/), [tbox](https://gitee.com/tboox/tbox) and C++ standard library defined in C++ 98.

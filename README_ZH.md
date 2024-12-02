@@ -6,7 +6,7 @@
 + 提供类似 Python 的标准库
 + 小巧且快速
 
-<img src="goldfish_scheme_logo.png" alt="示例图片" style="height: 256pt;">
+<img src="goldfish_scheme_logo.png" alt="示例图片" style="width: 360pt;">
 
 ## 以简为美
 金鱼Scheme仍旧遵循和 S7 Scheme 一样的简约的原则。目前，它仅依赖于 [S7 Scheme](https://ccrma.stanford.edu/software/s7/) 、[tbox](https://gitee.com/tboox/tbox) 和 C++98 范围内的标准库。
