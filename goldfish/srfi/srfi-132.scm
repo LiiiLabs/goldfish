@@ -52,6 +52,20 @@
         ((less-p (car lis2) (car lis1)) (loop (cons (car lis2) res) lis1 (cdr lis2)))
         (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
 
+  (define (list-stable-sort less-p lis)
+    (define (sort l r)
+      (cond
+        ((= l r) '())
+        ((= (+ l 1) r) (list (list-ref lis l)))
+        (else
+          (let* ((mid (quotient (+ l r) 2))
+                 (l-sorted (sort l mid))
+                 (r-sorted (sort mid r)))
+            (list-merge less-p l-sorted r-sorted)))))
+    (sort 0 (length lis)))
+
+  (define list-sort list-stable-sort)
+
   (define (subvector->list v start end)
     (do ((r '() (cons (vector-ref v p) r))
          (p start (+ 1 p)))
@@ -69,20 +83,6 @@
        (list->vector (list-merge less-p (subvector->list v1 start1 end1) (subvector->list v2 start2 (vector-length v2)))))
       ((less-p v1 v2 start1 end1 start2 end2)
        (list->vector (list-merge less-p (subvector->list v1 start1 end1) (subvector->list v2 start2 end2))))))
-
-  (define (list-stable-sort less-p lis)
-    (define (sort l r)
-      (cond
-        ((= l r) '())
-        ((= (+ l 1) r) (list (list-ref lis l)))
-        (else
-          (let* ((mid (quotient (+ l r) 2))
-                 (l-sorted (sort l mid))
-                 (r-sorted (sort mid r)))
-            (list-merge less-p l-sorted r-sorted)))))
-    (sort 0 (length lis)))
-
-  (define list-sort list-stable-sort)
 
   (define vector-stable-sort
     (case-lambda
