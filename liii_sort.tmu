@@ -1,8 +1,16 @@
 <TMU|<tuple|1.0.5|1.2.9.7>>
 
-<style|<tuple|generic|chinese|goldfish|literate>>
+<style|<tuple|generic|chinese|goldfish|literate|reduced-margins>>
 
 <\body>
+  <\hide-preamble>
+    <assign|r7rs|<flag|R7RS|dark cyan>>
+
+    <assign|srfi|<flag|SRFI|dark red>>
+
+    <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+  </hide-preamble>
+
   <chapter|(liii sort)>
 
   <section|许可证>
@@ -420,55 +428,12 @@
 
 <\initial>
   <\collection>
+    <associate|font-base-size|8>
+    <associate|page-height|auto>
     <associate|page-screen-margin|false>
+    <associate|page-type|a5>
+    <associate|page-width|auto>
     <associate|preamble|false>
+    <associate|save-aux|false>
   </collection>
 </initial>
-
-<\references>
-  <\collection>
-    <associate|auto-1|<tuple|1|?>>
-    <associate|auto-2|<tuple|1|?>>
-    <associate|auto-3|<tuple|2|?>>
-    <associate|auto-4|<tuple|3|?>>
-    <associate|auto-5|<tuple|3.1|?>>
-    <associate|auto-6|<tuple|3.2|?>>
-    <associate|auto-7|<tuple|3.3|?>>
-    <associate|auto-8|<tuple|4|?>>
-    <associate|auto-9|<tuple|5|?>>
-    <associate|chunk-goldfish/liii/sort.scm-1|<tuple|goldfish/liii/sort.scm|?>>
-    <associate|chunk-goldfish/liii/sort.scm-2|<tuple|goldfish/liii/sort.scm|?>>
-    <associate|chunk-goldfish/srfi/srfi-132.scm-1|<tuple|goldfish/srfi/srfi-132.scm|?>>
-    <associate|chunk-goldfish/srfi/srfi-132.scm-2|<tuple|goldfish/srfi/srfi-132.scm|?>>
-    <associate|chunk-goldfish/srfi/srfi-132.scm-3|<tuple|goldfish/srfi/srfi-132.scm|?>>
-    <associate|chunk-goldfish/srfi/srfi-132.scm-4|<tuple|goldfish/srfi/srfi-132.scm|?>>
-    <associate|chunk-goldfish/srfi/srfi-132.scm-5|<tuple|goldfish/srfi/srfi-132.scm|?>>
-    <associate|chunk-goldfish/srfi/srfi-132.scm-6|<tuple|goldfish/srfi/srfi-132.scm|?>>
-    <associate|chunk-tests/goldfish/liii/sort-test.scm-1|<tuple|tests/goldfish/liii/sort-test.scm|?>>
-    <associate|chunk-tests/goldfish/liii/sort-test.scm-2|<tuple|tests/goldfish/liii/sort-test.scm|?>>
-  </collection>
-</references>
-
-<\auxiliary>
-  <\collection>
-    <\associate|toc>
-      <vspace*|2fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|font-size|<quote|1.19>|1<space|2spc>(liii sort)> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-1><vspace|1fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>许可证> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-2><vspace|0.5fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|2<space|2spc>接口> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-3><vspace|0.5fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|3<space|2spc>实现> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-4><vspace|0.5fn>
-
-      <with|par-left|<quote|1tab>|3.1<space|2spc>list-sorted?, vector-sorted? <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-5>>
-
-      <with|par-left|<quote|1tab>|3.2<space|2spc>list-merge, list-sort, list-stable-sort <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-6>>
-
-      <with|par-left|<quote|1tab>|3.3<space|2spc>vector-merge, vector-sort, vector-stable-sort <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-7>>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|4<space|2spc>测试> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-8><vspace|0.5fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|5<space|2spc>结尾> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-9><vspace|0.5fn>
-    </associate>
-  </collection>
-</auxiliary>

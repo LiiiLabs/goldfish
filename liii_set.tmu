@@ -1,8 +1,16 @@
-<TMU|<tuple|1.0.5|1.2.9.7-rc3>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
-<style|<tuple|generic|chinese|goldfish|literate>>
+<style|<tuple|generic|chinese|goldfish|literate|reduced-margins>>
 
 <\body>
+  <\hide-preamble>
+    <assign|r7rs|<flag|R7RS|dark cyan>>
+
+    <assign|srfi|<flag|SRFI|dark red>>
+
+    <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+  </hide-preamble>
+
   <chapter|(liii set)>
 
   <section|许可证>
@@ -134,35 +142,11 @@
 
 <\initial>
   <\collection>
+    <associate|font-base-size|8>
+    <associate|page-height|auto>
     <associate|page-screen-margin|false>
+    <associate|page-type|a5>
+    <associate|page-width|auto>
+    <associate|save-aux|false>
   </collection>
 </initial>
-
-<\references>
-  <\collection>
-    <associate|auto-1|<tuple|1|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|auto-2|<tuple|1|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|auto-3|<tuple|2|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|auto-4|<tuple|3|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|chunk-goldfish/liii/set.scm-1|<tuple|goldfish/liii/set.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|chunk-goldfish/liii/set.scm-2|<tuple|goldfish/liii/set.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|chunk-goldfish/liii/set.scm-3|<tuple|goldfish/liii/set.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|chunk-goldfish/srfi/srfi-113.scm-1|<tuple|goldfish/srfi/srfi-113.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|chunk-goldfish/srfi/srfi-113.scm-2|<tuple|goldfish/srfi/srfi-113.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-    <associate|chunk-goldfish/srfi/srfi-113.scm-3|<tuple|goldfish/srfi/srfi-113.scm|?|../../.local/share/XmacsLabs/texts/scratch/no_name_14.tm>>
-  </collection>
-</references>
-
-<\auxiliary>
-  <\collection>
-    <\associate|toc>
-      <vspace*|2fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|font-size|<quote|1.19>|1<space|2spc>(liii set)> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-1><vspace|1fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>许可证> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-2><vspace|0.5fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|2<space|2spc>接口> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-3><vspace|0.5fn>
-
-      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|3<space|2spc>结尾> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-4><vspace|0.5fn>
-    </associate>
-  </collection>
-</auxiliary>
