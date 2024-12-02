@@ -19,15 +19,6 @@
 
 (check-set-mode! 'report-failed)
 
-(define (sorted? less-p lis)
-  (if (< (length lis) 2)
-    #t
-    (and (not (less-p (cadr lis) (car lis)))
-         (sorted? less-p (cdr lis)))))
-
-(define (vector-sorted? less-p v)
-  (sorted? less-p (vector->list v)))
-
 (define (pair-< x y)
   (< (car x) (car y)))
 
@@ -36,14 +27,15 @@
     ((not (= (car x) (car y))) (< (car x) (car y)))
     (else (< (cdr y) (cdr x)))))
 
-(check-false (sorted? < '(1 5 1 0 -1 9 2 4 3)))
+(check-false (list-sorted? < '(1 5 1 0 -1 9 2 4 3)))
+(check-false (vector-sorted? < #(1 5 1 0 -1 9 2 4 3)))
 
-(check-true (sorted? < (list-sort < '(1 5 1 0 -1 9 2 4 3))))
-(check-true (sorted? < (list-stable-sort < '(1 5 1 0 -1 9 2 4 3))))
-(check-true (sorted? pair-< (list-merge pair-< '((1 . 1) (1 . 2) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+(check-true (list-sorted? < (list-sort < '(1 5 1 0 -1 9 2 4 3))))
+(check-true (list-sorted? < (list-stable-sort < '(1 5 1 0 -1 9 2 4 3))))
+(check-true (list-sorted? pair-< (list-merge pair-< '((1 . 1) (1 . 2) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
 (check (list-merge pair-< '((1 . 1) (1 . 2) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
        => '((1 . 1) (1 . 2) (1 . 3) (2 . 1) (3 . 1) (3 . 2) (4 . 1)))
-(check-true (sorted? pair-full-< (list-merge pair-full-< '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+(check-true (list-sorted? pair-full-< (list-merge pair-full-< '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
 (check (list-merge pair-full-< '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
        => '((1 . 3) (1 . 2) (1 . 1) (2 . 1) (3 . 2) (3 . 1) (4 . 1)))
 
