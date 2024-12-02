@@ -18,5 +18,5 @@
 (export list-sorted? vector-sorted?
         list-merge  list-sort  list-stable-sort  vector-merge  vector-sort  vector-stable-sort
         list-merge! list-sort! list-stable-sort! vector-merge! vector-sort! vector-stable-sort!)
-(import (srfi srfi-132))
-)
+(import (srfi srfi-132)))
+

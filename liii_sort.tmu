@@ -1,0 +1,474 @@
+<TMU|<tuple|1.0.5|1.2.9.7>>
+
+<style|<tuple|generic|chinese|goldfish|literate>>
+
+<\body>
+  <chapter|(liii sort)>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/liii/sort.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-132.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/sort-test.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/sort.scm|true|false>
+    (define-library (liii sort)
+
+    (export list-sorted? vector-sorted?
+
+    \ \ \ \ \ \ \ \ list-merge \ list-sort \ list-stable-sort \ vector-merge \ vector-sort \ vector-stable-sort
+
+    \ \ \ \ \ \ \ \ list-merge! list-sort! list-stable-sort! vector-merge! vector-sort! vector-stable-sort!)
+
+    (import (srfi srfi-132)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
+    (define-library (srfi srfi-132)
+
+    (export list-sorted? vector-sorted?
+
+    \ \ \ \ \ \ \ \ list-merge \ list-sort \ list-stable-sort \ vector-merge \ vector-sort \ vector-stable-sort
+
+    \ \ \ \ \ \ \ \ list-merge! list-sort! list-stable-sort! vector-merge! vector-sort! vector-stable-sort!)
+
+    (import (liii list)
+
+    \ \ \ \ \ \ \ \ (liii error)
+
+    \ \ \ \ \ \ \ \ (scheme case-lambda))
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  <\section>
+    实现
+  </section>
+
+  <subsection|list-sorted?, vector-sorted?>
+
+  判断 list 或 vector 是否有序。<verbatim|vector-sorted?> 尚未实现可选参数 start 和 end。
+
+  <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
+    \ \ (define (list-sorted? less-p lis)
+
+    \ \ \ \ (if (null? lis)
+
+    \ \ \ \ \ \ #t
+
+    \ \ \ \ \ \ (do ((first lis (cdr first))
+
+    \ \ \ \ \ \ \ \ \ \ \ (second (cdr lis) (cdr second))
+
+    \ \ \ \ \ \ \ \ \ \ \ (res #t (not (less-p (car second) (car first)))))
+
+    \ \ \ \ \ \ \ \ ((or (null? second) (not res)) res))))
+
+    \;
+
+    \ \ ; TODO optional parameters
+
+    \ \ (define (vector-sorted? less-p v)
+
+    \ \ \ \ (let ((start 0)
+
+    \ \ \ \ \ \ \ \ \ \ (end (length v)))
+
+    \ \ \ \ \ \ (do ((first start (+ 1 first))
+
+    \ \ \ \ \ \ \ \ \ \ \ (second (+ 1 start) (+ 1 second))
+
+    \ \ \ \ \ \ \ \ \ \ \ (res #t (not (less-p (vector-ref v second) (vector-ref v first)))))
+
+    \ \ \ \ \ \ \ \ ((or (\<gtr\>= second end) (not res)) res))))
+
+    \;
+  </scm-chunk>
+
+  <subsection|list-merge, list-sort, list-stable-sort>
+
+  归并排序。需要注意 <verbatim|list-sort!> 不必修改原 list，但 <verbatim|vector-sort!> 要保证修改原 vector。
+
+  <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
+    \ \ (define (list-merge less-p lis1 lis2)
+
+    \ \ \ \ (let loop
+
+    \ \ \ \ \ \ ((res '())
+
+    \ \ \ \ \ \ \ (lis1 lis1)
+
+    \ \ \ \ \ \ \ (lis2 lis2))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((and (null? lis1) (null? lis2)) (reverse res))
+
+    \ \ \ \ \ \ \ \ ((null? lis1) (loop (cons (car lis2) res) lis1 (cdr lis2)))
+
+    \ \ \ \ \ \ \ \ ((null? lis2) (loop (cons (car lis1) res) lis2 (cdr lis1)))
+
+    \ \ \ \ \ \ \ \ ((less-p (car lis2) (car lis1)) (loop (cons (car lis2) res) lis1 (cdr lis2)))
+
+    \ \ \ \ \ \ \ \ (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
+
+    \;
+
+    \ \ ; this list-merge! violates SRFI 132, since it does not satisfy the constant running space constraint specified in SRFI 132, and does not work "in place"
+
+    \ \ (define list-merge! list-merge)
+
+    \;
+
+    \ \ (define (list-stable-sort less-p lis)
+
+    \ \ \ \ (define (sort l r)
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((= l r) '())
+
+    \ \ \ \ \ \ \ \ ((= (+ l 1) r) (list (list-ref lis l)))
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ (let* ((mid (quotient (+ l r) 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l-sorted (sort l mid))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (r-sorted (sort mid r)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (list-merge less-p l-sorted r-sorted)))))
+
+    \ \ \ \ (sort 0 (length lis)))
+
+    \;
+
+    \ \ (define list-sort list-stable-sort)
+
+    \ \ (define list-sort! list-stable-sort)
+
+    \ \ (define list-stable-sort! list-stable-sort)
+
+    \;
+  </scm-chunk>
+
+  <subsection|vector-merge, vector-sort, vector-stable-sort>
+
+  无副作用时调用 list 相关函数实现。原地排序尚未实现。
+
+  <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
+    \ \ (define vector-stable-sort
+
+    \ \ \ \ (case-lambda
+
+    \ \ \ \ \ \ ((less-p v)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (vector-\<gtr\>list v))))
+
+    \ \ \ \ \ \ ((less-p v start)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (subvector-\<gtr\>list v start (vector-length v)))))
+
+    \ \ \ \ \ \ ((less-p v start end)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (subvector-\<gtr\>list v start end))))))
+
+    \;
+
+    \ \ (define vector-sort vector-stable-sort)
+
+    \;
+
+    \ \ (define (vector-sort! . r) (???))
+
+    \ \ (define (vector-stable-sort! . r) (???))
+
+    \;
+
+    \ \ (define (subvector-\<gtr\>list v start end)
+
+    \ \ \ \ (do ((r '() (cons (vector-ref v p) r))
+
+    \ \ \ \ \ \ \ \ \ (p start (+ 1 p)))
+
+    \ \ \ \ \ \ ((\<gtr\>= p end) (reverse r))))
+
+    \;
+
+    \ \ (define vector-merge
+
+    \ \ \ \ (case-lambda
+
+    \ \ \ \ \ \ ((less-p v1 v2)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (vector-\<gtr\>list v1) (vector-\<gtr\>list v2))))
+
+    \ \ \ \ \ \ ((less-p v1 v2 start1)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 (vector-length v1)) (vector-\<gtr\>list v2))))
+
+    \ \ \ \ \ \ ((less-p v1 v2 start1 end1)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (vector-\<gtr\>list v2))))
+
+    \ \ \ \ \ \ ((less-p v1 v2 start1 end1 start2)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (subvector-\<gtr\>list v2 start2 (vector-length v2)))))
+
+    \ \ \ \ \ \ ((less-p v1 v2 start1 end1 start2 end2)
+
+    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (subvector-\<gtr\>list v2 start2 end2))))))
+
+    \;
+
+    \ \ (define (vector-merge! . r) (???))
+
+    \;
+  </scm-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/sort-test.scm|true|false>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii sort))
+
+    \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
+
+    (define (pair-\<less\> x y)
+
+    \ \ (\<less\> (car x) (car y)))
+
+    \;
+
+    (define (pair-full-\<less\> x y)
+
+    \ \ (cond
+
+    \ \ \ \ ((not (= (car x) (car y))) (\<less\> (car x) (car y)))
+
+    \ \ \ \ (else (\<less\> (cdr y) (cdr x)))))
+
+    \;
+
+    (check-false (list-sorted? \<less\> '(1 5 1 0 -1 9 2 4 3)))
+
+    (check-false (vector-sorted? \<less\> #(1 5 1 0 -1 9 2 4 3)))
+
+    \;
+
+    (check-true (list-sorted? \<less\> (list-sort \<less\> '(1 5 1 0 -1 9 2 4 3))))
+
+    (check-true (list-sorted? \<less\> (list-stable-sort \<less\> '(1 5 1 0 -1 9 2 4 3))))
+
+    (check-true (list-sorted? pair-\<less\> (list-merge pair-\<less\> '((1 . 1) (1 . 2) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+
+    (check (list-merge pair-\<less\> '((1 . 1) (1 . 2) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
+
+    \ \ \ \ \ \ \ =\<gtr\> '((1 . 1) (1 . 2) (1 . 3) (2 . 1) (3 . 1) (3 . 2) (4 . 1)))
+
+    (check-true (list-sorted? pair-full-\<less\> (list-merge pair-full-\<less\> '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+
+    (check (list-merge pair-full-\<less\> '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
+
+    \ \ \ \ \ \ \ =\<gtr\> '((1 . 3) (1 . 2) (1 . 1) (2 . 1) (3 . 2) (3 . 1) (4 . 1)))
+
+    \;
+
+    (check-true (vector-sorted? \<less\> (vector-sort \<less\> #(1 5 1 0 -1 9 2 4 3))))
+
+    (check-true (vector-sorted? \<less\> (vector-stable-sort \<less\> #(1 5 1 0 -1 9 2 4 3))))
+
+    (check-true (vector-sorted? pair-\<less\> (vector-merge pair-\<less\> #((1 . 1) (1 . 2) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+
+    (check (vector-merge pair-\<less\> #((1 . 1) (1 . 2) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
+
+    \ \ \ \ \ \ \ =\<gtr\> #((1 . 1) (1 . 2) (1 . 3) (2 . 1) (3 . 1) (3 . 2) (4 . 1)))
+
+    (check-true (vector-sorted? pair-full-\<less\> (vector-merge pair-full-\<less\> #((1 . 2) (1 . 1) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+
+    (check (vector-merge pair-full-\<less\> #((1 . 2) (1 . 1) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
+
+    \ \ \ \ \ \ \ =\<gtr\> #((1 . 3) (1 . 2) (1 . 1) (2 . 1) (3 . 2) (3 . 1) (4 . 1)))
+
+    \;
+
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/srfi/srfi-132.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </scm-chunk>
+</body>
+
+<\initial>
+  <\collection>
+    <associate|page-screen-margin|false>
+    <associate|preamble|false>
+  </collection>
+</initial>
+
+<\references>
+  <\collection>
+    <associate|auto-1|<tuple|1|?>>
+    <associate|auto-2|<tuple|1|?>>
+    <associate|auto-3|<tuple|2|?>>
+    <associate|auto-4|<tuple|3|?>>
+    <associate|auto-5|<tuple|3.1|?>>
+    <associate|auto-6|<tuple|3.2|?>>
+    <associate|auto-7|<tuple|3.3|?>>
+    <associate|auto-8|<tuple|4|?>>
+    <associate|auto-9|<tuple|5|?>>
+    <associate|chunk-goldfish/liii/sort.scm-1|<tuple|goldfish/liii/sort.scm|?>>
+    <associate|chunk-goldfish/liii/sort.scm-2|<tuple|goldfish/liii/sort.scm|?>>
+    <associate|chunk-goldfish/srfi/srfi-132.scm-1|<tuple|goldfish/srfi/srfi-132.scm|?>>
+    <associate|chunk-goldfish/srfi/srfi-132.scm-2|<tuple|goldfish/srfi/srfi-132.scm|?>>
+    <associate|chunk-goldfish/srfi/srfi-132.scm-3|<tuple|goldfish/srfi/srfi-132.scm|?>>
+    <associate|chunk-goldfish/srfi/srfi-132.scm-4|<tuple|goldfish/srfi/srfi-132.scm|?>>
+    <associate|chunk-goldfish/srfi/srfi-132.scm-5|<tuple|goldfish/srfi/srfi-132.scm|?>>
+    <associate|chunk-goldfish/srfi/srfi-132.scm-6|<tuple|goldfish/srfi/srfi-132.scm|?>>
+    <associate|chunk-tests/goldfish/liii/sort-test.scm-1|<tuple|tests/goldfish/liii/sort-test.scm|?>>
+    <associate|chunk-tests/goldfish/liii/sort-test.scm-2|<tuple|tests/goldfish/liii/sort-test.scm|?>>
+  </collection>
+</references>
+
+<\auxiliary>
+  <\collection>
+    <\associate|toc>
+      <vspace*|2fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|font-size|<quote|1.19>|1<space|2spc>(liii sort)> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-1><vspace|1fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|1<space|2spc>许可证> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-2><vspace|0.5fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|2<space|2spc>接口> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-3><vspace|0.5fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|3<space|2spc>实现> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-4><vspace|0.5fn>
+
+      <with|par-left|<quote|1tab>|3.1<space|2spc>list-sorted?, vector-sorted? <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-5>>
+
+      <with|par-left|<quote|1tab>|3.2<space|2spc>list-merge, list-sort, list-stable-sort <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-6>>
+
+      <with|par-left|<quote|1tab>|3.3<space|2spc>vector-merge, vector-sort, vector-stable-sort <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-7>>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|4<space|2spc>测试> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-8><vspace|0.5fn>
+
+      <vspace*|1fn><with|font-series|<quote|bold>|math-font-series|<quote|bold>|5<space|2spc>结尾> <datoms|<macro|x|<repeat|<arg|x>|<with|font-series|medium|<with|font-size|1|<space|0.2fn>.<space|0.2fn>>>>>|<htab|5mm>> <no-break><pageref|auto-9><vspace|0.5fn>
+    </associate>
+  </collection>
+</auxiliary>

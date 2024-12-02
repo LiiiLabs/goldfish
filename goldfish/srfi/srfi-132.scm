@@ -23,25 +23,6 @@
         (scheme case-lambda))
 (begin
 
-  (define-macro (trace-define head . body)
-                (let ((f-name (car head))
-                      (f-args (cdr head)))
-                  (format () "~a\n" `(define ,head
-                     (let-values ((res (begin ,@body)))
-                       (format () "~a\n=> ~a\n" (list ,f-name ,@f-args) res)
-                       (apply values res))))
-                  `(define ,head
-                     (let-values ((res (begin ,@body)))
-                       (format () "~a\n=> ~a\n" (list ,f-name ,@f-args) res)
-                       (apply values res)))))
-
-  (define-macro (trace-lambda f-name head . body)
-                (let ((f-args head))
-                  `(lambda ,head
-                     (let-values ((res (begin ,@body)))
-                       (format () "~a\n=> ~a\n" (list ,f-name ,@f-args) res)
-                       (apply values res)))))
-
   (define (list-sorted? less-p lis)
     (if (null? lis)
       #t
@@ -126,3 +107,4 @@
 
 ) ; end of begin
 ) ; end of library
+
