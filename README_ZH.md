@@ -129,9 +129,9 @@ based on S7 Scheme 10.11 (2-July-2024)
 ```
 > bin/goldfish -e "(+ 1 2)"
 3
-> bin/goldfish -e "(begin (import `srfi srfi-1`) (first (list 1 2 3)))"
+> bin/goldfish -e "(begin (import (srfi srfi-1)) (first (list 1 2 3)))"
 1
-> bin/goldfish -e "(begin (import `liii sys`) (display (argv)) (newline))" 1 2 3
+> bin/goldfish -e "(begin (import (liii sys)) (display (argv)) (newline))" 1 2 3
 ("bin/goldfish" "-e" "(begin (import `liii sys`) (display (argv)) (newline))" "1" "2" 3)
 #\newline
 ```
