@@ -63,6 +63,22 @@
     \;
   </scm-chunk>
 
+  <paragraph|HTTP响应对象>
+
+  <\description>
+    <item*|status_code>HTTP状态码
+
+    <item*|url>最终有效的请求URL
+
+    <item*|elapsed>请求的总时间，以秒为单位
+
+    <item*|text>HTTP响应的正文
+
+    <item*|reason>HTTP响应出错的原因
+
+    <item*|headers>HTTP响应头
+  </description>
+
   <section|Goldfish的可选参数>
 
   <\session|goldfish|default>
@@ -400,7 +416,11 @@
 
     \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/")
 
-    \ \ (check-true (real? (r 'elapsed))))
+    \ \ (check-true (real? (r 'elapsed)))
+
+    \ \ (check (r 'reason) =\<gtr\> "")
+
+    \ \ (check (r 'text) =\<gtr\> ""))
 
     \;
   </goldfish-chunk>
