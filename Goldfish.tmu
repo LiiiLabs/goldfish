@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -8020,208 +8020,6 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|false>
-    (check-report)
-
-    \;
-  </scm-chunk>
-
-  <chapter|(liii alist)><label|chapter:liii_alist>
-
-  <section|概述>
-
-  alist-lib是Chicken Scheme中的函数库：
-
-  <\description>
-    <item*|文档><slink|https://wiki.call-cc.org/eggref/5/alist-lib>
-
-    <item*|官网><slink|https://github.com/klutometis/alist-lib>
-  </description>
-
-  <section|许可证>
-
-  <\goldfish-chunk|goldfish/liii/alist.scm|false|true>
-    ;
-
-    ; BSD License by Peter Danenberg
-
-    ;
-
-    \;
-  </goldfish-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|false|true>
-    ;
-
-    ; Copyright (C) 2024 The Goldfish Scheme Authors
-
-    ;
-
-    ; Licensed under the Apache License, Version 2.0 (the "License");
-
-    ; you may not use this file except in compliance with the License.
-
-    ; You may obtain a copy of the License at
-
-    ;
-
-    ; http://www.apache.org/licenses/LICENSE-2.0
-
-    ;
-
-    ; Unless required by applicable law or agreed to in writing, software
-
-    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    ; License for the specific language governing permissions and limitations
-
-    ; under the License.
-
-    ;
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <section|接口>
-
-  <\goldfish-chunk|goldfish/liii/alist.scm|true|true>
-    (define-library (liii alist)
-
-    (import (liii base)
-
-    \ \ \ \ \ \ \ \ (liii error)
-
-    \ \ \ \ \ \ \ \ (scheme case-lambda))
-
-    (export alist-ref alist-ref/default)
-
-    (begin
-
-    \;
-  </goldfish-chunk>
-
-  <section|测试>
-
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
-    (import (liii check)
-
-    \ \ \ \ \ \ \ \ (liii alist))
-
-    \;
-
-    (check-set-mode! 'report-failed)
-
-    \;
-  </scm-chunk>
-
-  <section|实现>
-
-  <paragraph|alist-ref><index|alist-ref><scm|(alist key thunk =) =\<gtr\> object>
-
-  alist-ref 是一个用于从关联列表（alist）中检索与给定键（key）相关联的值的函数。如果给定的键在列表中不存在，函数将执行一个提供的thunk（或错误处理函数），或者返回一个默认值。
-
-  <subsubsection*|参数>
-
-  <\itemize>
-    <item><code*|alist>: 要搜索的关联列表。
-
-    <item><code*|key>: 要检索的键。
-
-    <item><code*|thunk> (可选): 当键不存在时执行的thunk。默认情况下，如果没有提供thunk，函数将抛出一个错误。
-
-    <item><code*|=> (可选): 用于比较键的等价谓词。默认使用 <code*|eqv?>。
-  </itemize>
-
-  <subsubsection*|返回值>
-
-  <itemize|<item>返回与给定键相关联的值，或者如果键不存在，则返回thunk的执行结果或默认值。>
-
-  <\goldfish-chunk|goldfish/liii/alist.scm|true|true>
-    (define alist-ref
-
-    \ \ (case-lambda
-
-    \ \ \ \ ((alist key)
-
-    \ \ \ \ \ (alist-ref
-
-    \ \ \ \ \ \ \ alist
-
-    \ \ \ \ \ \ \ key
-
-    \ \ \ \ \ \ \ (lambda () (key-error "alist-ref: key not found " key))))
-
-    \ \ \ \ ((alist key thunk)
-
-    \ \ \ \ \ (alist-ref alist key thunk eqv?))
-
-    \ \ \ \ ((alist key thunk =)
-
-    \ \ \ \ \ (let ((value (assoc key alist =)))
-
-    \ \ \ \ \ \ \ (if value
-
-    \ \ \ \ \ \ \ \ \ \ \ (cdr value)
-
-    \ \ \ \ \ \ \ \ \ \ \ (thunk))))))
-
-    \;
-  </goldfish-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
-    (check (alist-ref '((a 1)) 'a) =\<gtr\> '(1))
-
-    (check (alist-ref '((a . 1)) 'a) =\<gtr\> 1)
-
-    (check-catch 'key-error (alist-ref '((a . 1)) 'b))
-
-    \;
-
-    (check (alist-ref '((a . 1)) 'b (lambda () 2)) =\<gtr\> 2)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|alist-ref/default><index|alist-ref/default><scm|(alist key default =) =\<gtr\> object>
-
-  <\goldfish-chunk|goldfish/liii/alist.scm|true|true>
-    (define alist-ref/default
-
-    \ \ (case-lambda
-
-    \ \ \ \ ((alist key default)
-
-    \ \ \ \ \ (alist-ref alist key (lambda () default)))
-
-    \ \ \ \ ((alist key default =)
-
-    \ \ \ \ \ (alist-ref alist key (lambda () default) =))))
-
-    \;
-  </goldfish-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
-    (check (alist-ref/default '((a . 1)) 'b 2) =\<gtr\> 2)
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <section|结束>
-
-  <\goldfish-chunk|goldfish/liii/alist.scm|true|false>
-    ) ; end of begin
-
-    ) ; end of library
-
-    \;
-  </goldfish-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|false>
     (check-report)
 
     \;
@@ -17764,13 +17562,21 @@
   <\cpp-chunk|src/goldfish.cpp|true|false>
     #include "goldfish.hpp"
 
+    #include \<less\>string\<gtr\>
+
     \;
 
     int
 
     main (int argc, char** argv) {
 
-    \ \ return goldfish::repl_for_community_edition (argc, argv);
+    \ \ std::string \ \ \ \ \ gf_lib_dir \ = goldfish::find_goldfish_library ();
+
+    \ \ const char* gf_lib \ \ \ \ \ = gf_lib_dir.c_str ();
+
+    \ \ s7_scheme* sc= goldfish::init_goldfish_scheme (gf_lib);
+
+    \ \ return goldfish::repl_for_community_edition (sc, argc, argv);
 
     }
   </cpp-chunk>
@@ -19346,7 +19152,7 @@
   <\cpp-chunk|src/goldfish.hpp|true|true>
     int
 
-    repl_for_community_edition (int argc, char** argv) {
+    repl_for_community_edition (s7_scheme* sc, int argc, char** argv) {
 
     \ \ string \ \ \ \ \ gf_lib_dir \ = find_goldfish_library ();
 
@@ -19381,12 +19187,6 @@
     \ \ \ \ exit (0);
 
     \ \ }
-
-    \;
-
-    \ \ // Init the underlying S7 Scheme and add the load_path
-
-    \ \ s7_scheme* sc= init_goldfish_scheme (gf_lib);
 
     \;
 

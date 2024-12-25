@@ -663,7 +663,7 @@ find_goldfish_boot (const char* gf_lib) {
 }
 
 int
-repl_for_community_edition (int argc, char** argv) {
+repl_for_community_edition (s7_scheme* sc, int argc, char** argv) {
   string      gf_lib_dir  = find_goldfish_library ();
   const char* gf_lib      = gf_lib_dir.c_str ();
   string      gf_boot_path= find_goldfish_boot (gf_lib);
@@ -681,9 +681,6 @@ repl_for_community_edition (int argc, char** argv) {
     display_help ();
     exit (0);
   }
-
-  // Init the underlying S7 Scheme and add the load_path
-  s7_scheme* sc= init_goldfish_scheme (gf_lib);
 
   const char* errmsg= NULL;
   s7_pointer  old_port=

@@ -30,6 +30,16 @@ else
     add_requires("tbox " .. TBOX_VERSION, {system=false, configs=tbox_configs})
 end
 
+option("http")
+    set_description("Enable http")
+    set_default(false)
+    set_values(false, true)
+option_end()
+
+if has_config("http") then
+    add_requires("cpr 1.10.5")
+end
+
 target ("goldfish") do
     set_languages("c++98")
     if is_plat("linux") then
@@ -44,6 +54,20 @@ target ("goldfish") do
     add_installfiles("$(projectdir)/goldfish/(scheme/*.scm)", {prefixdir = "share/goldfish"})
     add_installfiles("$(projectdir)/goldfish/(srfi/*.scm)", {prefixdir = "share/goldfish"})
     add_installfiles("$(projectdir)/goldfish/(liii/*.scm)", {prefixdir = "share/goldfish"})
+end
+
+target ("http") do
+    set_languages("c++17")
+    if is_plat("linux") then
+        -- for Ubuntu 20.04
+        add_syslinks("stdc++")
+    end
+    set_targetdir("$(projectdir)/bin/")
+    add_includedirs("src/")
+    add_files ("http/src/http.cpp")
+    add_packages("s7")
+    add_packages("tbox")
+    add_packages("cpr")
 end
 
 includes("@builtin/xpack")
