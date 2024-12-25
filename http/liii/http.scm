@@ -20,15 +20,17 @@
 (begin
 
 (define (http-ok? r)
-  (let1 status-code (r 'status-code)
+  (let ((status-code (r 'status-code))
+        (reason (r 'reason))
+        (url (r 'url)))
     (cond ((and (>= status-code 400) (< status-code 500))
            (error 'http-error
-                  (string-append (integer->string status-code)
-                                 " Client Error: {reason} for url: {self.url}")))
+             (string-append (integer->string status-code)
+                            " Client Error: " reason " for url: " url)))
           ((and (>= status-code 500) (< status-code 600))
            (error 'http-error
-                  (string-append (integer->string status-code)
-                                 " Server Error: {reason} for url: {self.url}")))
+             (string-append (integer->string status-code)
+                            " Server Error: " reason " for url: " url)))
           (else #t))))
 
 (define* (http-head url)

@@ -9,6 +9,8 @@
     <assign|srfi|<flag|SRFI|dark red>>
 
     <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+
+    <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
   </hide-preamble>
 
   <chapter|(liii http)>
@@ -355,47 +357,43 @@
     \;
   </goldfish-chunk>
 
-  <section|内部公共函数>
+  \;
 
-  <paragraph|http-ok?>
+  <section|实现>
+
+  <paragraph|http-ok?><typehint|((r hash-table?)) =\<gtr\> boolean?>
+
+  接受HTTP响应作为输入，返回该HTTP响应是否OK，一般来说，HTTP状态码小于400就是OK状态。
 
   <\scm-chunk|http/liii/http.scm|true|true>
     (define (http-ok? r)
 
-    \ \ (let1 status-code (r 'status-code)
+    \ \ (let ((status-code (r 'status-code))
+
+    \ \ \ \ \ \ \ \ (reason (r 'reason))
+
+    \ \ \ \ \ \ \ \ (url (r 'url)))
 
     \ \ \ \ (cond ((and (\<gtr\>= status-code 400) (\<less\> status-code 500))
 
     \ \ \ \ \ \ \ \ \ \ \ (error 'http-error
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Client Error: {reason} for url: {self.url}")))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Client Error: " reason " for url: " url)))
 
     \ \ \ \ \ \ \ \ \ \ ((and (\<gtr\>= status-code 500) (\<less\> status-code 600))
 
     \ \ \ \ \ \ \ \ \ \ \ (error 'http-error
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Server Error: {reason} for url: {self.url}")))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Server Error: " reason " for url: " url)))
 
     \ \ \ \ \ \ \ \ \ \ (else #t))))
 
     \;
   </scm-chunk>
-
-  <\goldfish-chunk|http/tests/http_test.scm|true|true>
-    (let1 r (make-hash-table)
-
-    \ \ (hash-table-set! r 'status-code 200)
-
-    \ \ (check-true (http-ok? r)))
-
-    \;
-  </goldfish-chunk>
-
-  <section|实现>
 
   <paragraph|http-head>
 
@@ -420,7 +418,9 @@
 
     \ \ (check (r 'reason) =\<gtr\> "")
 
-    \ \ (check (r 'text) =\<gtr\> ""))
+    \ \ (check (r 'text) =\<gtr\> "")
+
+    \ \ (check-true (http-ok? r)))
 
     \;
   </goldfish-chunk>
