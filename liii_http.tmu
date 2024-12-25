@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
 
@@ -15,7 +15,7 @@
 
   <section|许可证>
 
-  <\scm-chunk|goldfish/liii/http.scm|false|true>
+  <\scm-chunk|http/liii/http.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -51,7 +51,7 @@
 
   <section|接口>
 
-  <\scm-chunk|goldfish/liii/http.scm|true|true>
+  <\scm-chunk|http/liii/http.scm|true|true>
     (define-library (liii http)
 
     (begin
@@ -59,7 +59,55 @@
     \;
   </scm-chunk>
 
-  <section|实现>
+  <section|Goldfish的可选参数>
+
+  <\session|goldfish|default>
+    <\output>
+      Goldfish Scheme 17.11.0 Community Edition by LiiiLabs
+
+      implemented on S7 Scheme (11.2, 22-Nov-2024)
+    </output>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (define* (hi a (b 32) (c "hi")) (list a b c))
+    <|unfolded-io>
+      <goldfish-result|hi>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (hi 1)
+    <|unfolded-io>
+      <goldfish-result|(1 32 "hi")>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (hi :b 2 :a 3)
+    <|unfolded-io>
+      <goldfish-result|(3 2 "hi")>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (hi 3 2 1)
+    <|unfolded-io>
+      <goldfish-result|(3 2 1)>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <section|Python相关接口>
 
   <\session|python|default>
     <\output>
@@ -119,7 +167,7 @@
     <|unfolded-io>
       r.elapsed
     <|unfolded-io>
-      0:00:01.629869
+      0:00:01.233036
     </unfolded-io>
 
     <\unfolded-io>
@@ -127,7 +175,45 @@
     <|unfolded-io>
       r.headers
     <|unfolded-io>
-      {'Date': 'Wed, 25 Dec 2024 02:48:12 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '9593', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+      {'Date': 'Wed, 25 Dec 2024 03:02:07 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '9593', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.reason
+    <|unfolded-io>
+      OK
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.content
+    <|unfolded-io>
+      b''
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      r= requests.head("https://baidu.com/xxxxx")
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.status_code
+    <|unfolded-io>
+      302
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.reason
+    <|unfolded-io>
+      Moved Temporarily
     </unfolded-io>
 
     <\input>
@@ -137,11 +223,63 @@
     </input>
   </session>
 
-  \;
+  <section|Goldfish Scheme中的response设计>
+
+  <\session|goldfish|default>
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (import (liii hash-table))
+    <|unfolded-io>
+      <goldfish-result|(rootlet)>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (define r (make-hash-table))
+    <|unfolded-io>
+      <goldfish-result|(hash-table)>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      (hash-table-set! r 'ok #t)
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (r 'ok)
+    <|unfolded-io>
+      <goldfish-result|#t>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      (hash-table-set! r 'status-code 200)
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (r 'status-code)
+    <|unfolded-io>
+      <goldfish-result|200>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
 
   <section|结尾>
 
-  <\scm-chunk|goldfish/liii/http.scm|true|false>
+  <\scm-chunk|http/liii/http.scm|true|false>
     ) ; end of begin
 
     ) ; end of define-library
