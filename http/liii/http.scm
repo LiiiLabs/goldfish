@@ -37,8 +37,8 @@
   (let1 r (g_http-head url)
         r))
 
-(define* (http-get url)
-  (let1 r (g_http-get url)
+(define* (http-get url (params '()))
+  (let1 r (g_http-get url params)
         r))
 
 ) ; end of begin

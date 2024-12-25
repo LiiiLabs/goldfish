@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
 
@@ -9,6 +9,8 @@
     <assign|srfi|<flag|SRFI|dark red>>
 
     <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+
+    <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
   </hide-preamble>
 
   <chapter|(liii alist)><label|chapter:liii_alist>
@@ -78,11 +80,13 @@
 
     (import (liii base)
 
+    \ \ \ \ \ \ \ \ (liii list)
+
     \ \ \ \ \ \ \ \ (liii error)
 
     \ \ \ \ \ \ \ \ (scheme case-lambda))
 
-    (export alist-ref alist-ref/default)
+    (export alist? alist-cons alist-ref alist-ref/default)
 
     (begin
 
@@ -104,6 +108,50 @@
   </scm-chunk>
 
   <section|实现>
+
+  <paragraph|alist?>
+
+  如果一个列表中的每一个元素都是序对，那么该列表是关联列表。
+
+  <\goldfish-chunk|goldfish/liii/alist.scm|true|false>
+    (define (alist? l)
+
+    \ \ (and (list? l)
+
+    \ \ \ \ \ \ \ (every pair? l)))
+
+    \;
+  </goldfish-chunk>
+
+  空列表是关联列表
+
+  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+    (check-true (alist? '()))
+
+    \;
+  </scm-chunk>
+
+  下面是常见的关联列表
+
+  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+    (check-true (alist? '((a 1))))
+
+    (check-true (alist? '((a . 1))))
+
+    (check-true (alist? '((a . 1) (b . 2))))
+
+    \;
+  </scm-chunk>
+
+  下面例子是列表，但不是关联列表：
+
+  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|false>
+    (check-false (alist? '(1 2 3)))
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <paragraph|alist-ref><index|alist-ref><scm|(alist key thunk =) =\<gtr\> object>
 

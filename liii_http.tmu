@@ -171,14 +171,6 @@
     <\unfolded-io>
       \<gtr\>\<gtr\>\<gtr\>\ 
     <|unfolded-io>
-      dir(r)
-    <|unfolded-io>
-      ['__attrs__', '__bool__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__enter__', '__eq__', '__exit__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__nonzero__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_content', '_content_consumed', '_next', 'apparent_encoding', 'close', 'connection', 'content', 'cookies', 'elapsed', 'encoding', 'headers', 'history', 'is_permanent_redirect', 'is_redirect', 'iter_content', 'iter_lines', 'json', 'links', 'next', 'ok', 'raise_for_status', 'raw', 'reason', 'request', 'status_code', 'text', 'url']
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
       r.url
     <|unfolded-io>
       https://httpbin.org/
@@ -235,7 +227,7 @@
     <\input>
       \<gtr\>\<gtr\>\<gtr\>\ 
     <|input>
-      r= requests.head("https://baidu.com/xxxxx")
+      r= requests.get("https://httpbin.org")
     </input>
 
     <\unfolded-io>
@@ -243,13 +235,13 @@
     <|unfolded-io>
       r.status_code
     <|unfolded-io>
-      302
+      200
     </unfolded-io>
 
     <\unfolded-io>
       \<gtr\>\<gtr\>\<gtr\>\ 
     <|unfolded-io>
-      r.reason
+      r.r
     <|unfolded-io>
       Moved Temporarily
     </unfolded-io>
@@ -352,7 +344,9 @@
 
     (import (liii check)
 
-    \ \ \ \ \ \ \ \ (liii http))
+    \ \ \ \ \ \ \ \ (liii http)
+
+    \ \ \ \ \ \ \ \ (liii string))
 
     \;
   </goldfish-chunk>
@@ -432,16 +426,18 @@
   <paragraph|http-get>
 
   <\goldfish-chunk|http/liii/http.scm|true|true>
-    (define* (http-get url)
+    (define* (http-get url (params '()))
 
-    \ \ (let1 r (g_http-get url)
+    \ \ (let1 r (g_http-get url params)
 
     \ \ \ \ \ \ \ \ r))
 
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|http/tests/http_test.scm|true|false>
+  <subparagraph|不带参数的GET请求>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|true>
     (let1 r (http-get "https://httpbin.org")
 
     \ \ (check (r 'status-code) =\<gtr\> 200)
@@ -449,6 +445,20 @@
     \ \ (check-true (\<gtr\> (string-length (r 'text)) 0))
 
     \ \ (check ((r 'headers) "content-type") =\<gtr\> "text/html; charset=utf-8"))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|带参数的GET请求>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|true>
+    (let1 r (http-get "https://httpbin.org/get"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :params '(("key1" . "value1") ("key2" . "value2")))
+
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value1"))
+
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2")))
 
     \;
   </goldfish-chunk>

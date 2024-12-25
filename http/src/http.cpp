@@ -40,6 +40,24 @@ response2hashtable (s7_scheme* sc, cpr::Response r) {
   return ht;
 }
 
+static cpr::Parameters
+to_cpr_paramters (s7_scheme* sc, s7_pointer args) {
+  cpr::Parameters params= cpr::Parameters{};
+  if (s7_is_list(sc, args)) {
+    s7_pointer iter= args;
+    while (!s7_is_null (sc, iter)) {
+      s7_pointer pair= s7_car (iter);
+      if (s7_is_pair (pair)) {
+        const char* key= s7_string (s7_car (pair));
+        const char* value= s7_string (s7_cdr (pair));
+        params.Add (cpr::Parameter (string (key), string (value)));
+      }
+      iter= s7_cdr (iter);
+    }
+  }
+  return params;
+}
+
 static s7_pointer
 f_http_head (s7_scheme* sc, s7_pointer args) {
   const char* url= s7_string (s7_car (args));
@@ -52,8 +70,13 @@ f_http_head (s7_scheme* sc, s7_pointer args) {
 static s7_pointer
 f_http_get (s7_scheme* sc, s7_pointer args) {
   const char* url= s7_string (s7_car (args));
+  s7_pointer params= s7_cadr (args);
+  cpr::Parameters cpr_params= to_cpr_paramters(sc, params);
+
   cpr::Session session;
   session.SetUrl (cpr::Url (url));
+  session.SetParameters (cpr_params);
+
   cpr::Response r= session.Get ();
   return response2hashtable (sc, r);
 }
@@ -71,7 +94,7 @@ glue_http (s7_scheme* sc) {
   const char* s_http_get= "g_http-get";
   const char* d_http_get= "(g_http-get url ...) => hash-table?";
   auto func_http_get= s7_make_typed_function (
-    sc, s_http_get, f_http_get, 1, 0, false, d_http_get, NULL);
+    sc, s_http_get, f_http_get, 2, 0, false, d_http_get, NULL);
   s7_define (sc, cur_env, s7_make_symbol (sc, s_http_get), func_http_get);
 }
 

@@ -1,7 +1,8 @@
 (set! *load-path* (cons "http" *load-path*))
 
 (import (liii check)
-        (liii http))
+        (liii http)
+        (liii string))
 
 (let1 r (http-head "https://httpbin.org")
   (check (r 'status-code) => 200)
@@ -17,6 +18,11 @@
   (check (r 'status-code) => 200)
   (check-true (> (string-length (r 'text)) 0))
   (check ((r 'headers) "content-type") => "text/html; charset=utf-8"))
+
+(let1 r (http-get "https://httpbin.org/get"
+                  :params '(("key1" . "value1") ("key2" . "value2")))
+      (check-true (string-contains (r 'text) "value1"))
+      (check-true (string-contains (r 'text) "value2")))
 
 (check-report)
 
