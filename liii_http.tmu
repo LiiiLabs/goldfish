@@ -1,0 +1,84 @@
+<TMU|<tuple|1.0.5|1.2.9.7>>
+
+<style|<tuple|generic|chinese|goldfish|literate|reduced-margins>>
+
+<\body>
+  <\hide-preamble>
+    <assign|r7rs|<flag|R7RS|dark cyan>>
+
+    <assign|srfi|<flag|SRFI|dark red>>
+
+    <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+  </hide-preamble>
+
+  <chapter|(liii http)>
+
+  <section|许可证>
+
+  <\scm-chunk|goldfish/liii/http.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </scm-chunk>
+
+  <section|接口>
+
+  <\scm-chunk|goldfish/liii/http.scm|true|true>
+    (define-library (liii http)
+
+    (begin
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <section|结尾>
+
+  <\scm-chunk|goldfish/liii/http.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </scm-chunk>
+</body>
+
+<\initial>
+  <\collection>
+    <associate|font-base-size|8>
+    <associate|page-height|auto>
+    <associate|page-screen-margin|false>
+    <associate|page-type|a5>
+    <associate|page-width|auto>
+    <associate|save-aux|false>
+  </collection>
+</initial>
