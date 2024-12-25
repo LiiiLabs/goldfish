@@ -13,3 +13,10 @@
   (check ((r 'headers) "content-length") => "9593")
   (check-true (http-ok? r)))
 
+(let1 r (http-get "https://httpbin.org")
+  (check (r 'status-code) => 200)
+  (check-true (> (string-length (r 'text)) 0))
+  (check ((r 'headers) "content-type") => "text/html; charset=utf-8"))
+
+(check-report)
+

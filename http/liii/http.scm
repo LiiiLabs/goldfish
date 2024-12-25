@@ -16,7 +16,7 @@
 
 (define-library (liii http)
 (import (liii hash-table))
-(export http-head http-ok?)
+(export http-head http-get http-ok?)
 (begin
 
 (define (http-ok? r)
@@ -35,6 +35,10 @@
 
 (define* (http-head url)
   (let1 r (g_http-head url)
+        r))
+
+(define* (http-get url)
+  (let1 r (g_http-get url)
         r))
 
 ) ; end of begin
