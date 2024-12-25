@@ -56,7 +56,7 @@
 
     (begin
 
-    (export http-head)
+    (export http-head http-ok?)
 
     \;
   </scm-chunk>
@@ -129,7 +129,7 @@
     <\input>
       \<gtr\>\<gtr\>\<gtr\>\ 
     <|input>
-      r= requests.head("https://httpbin.org")
+      r= requests.head("https://httpbin.org/xxx")
     </input>
 
     <\unfolded-io>
@@ -137,7 +137,15 @@
     <|unfolded-io>
       r.status_code
     <|unfolded-io>
-      200
+      404
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.url
+    <|unfolded-io>
+      https://httpbin.org/xxx
     </unfolded-io>
 
     <\unfolded-io>
@@ -309,6 +317,14 @@
 
   <section|测试>
 
+  如何测试：
+
+  <\shell-code>
+    xmake config --http=y --yes -vD
+
+    bin/http http/tests/http_test.scm
+  </shell-code>
+
   <\goldfish-chunk|http/tests/http_test.scm|false|true>
     (set! *load-path* (cons "http" *load-path*))
 
@@ -321,22 +337,68 @@
     \;
   </goldfish-chunk>
 
-  <section|实现>
+  <section|内部公共函数>
 
-  <paragraph|http-head>
+  <paragraph|http-ok?>
 
   <\scm-chunk|http/liii/http.scm|true|true>
-    (define* (http-head url)
+    (define (http-ok? r)
 
-    \ \ (g_http-head url))
+    \ \ (let1 status-code (r 'status-code)
+
+    \ \ \ \ (cond ((and (\<gtr\>= status-code 400) (\<less\> status-code 500))
+
+    \ \ \ \ \ \ \ \ \ \ \ (error 'http-error
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Client Error: {reason} for url: {self.url}")))
+
+    \ \ \ \ \ \ \ \ \ \ ((and (\<gtr\>= status-code 500) (\<less\> status-code 600))
+
+    \ \ \ \ \ \ \ \ \ \ \ (error 'http-error
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Server Error: {reason} for url: {self.url}")))
+
+    \ \ \ \ \ \ \ \ \ \ (else #t))))
 
     \;
   </scm-chunk>
 
+  <\goldfish-chunk|http/tests/http_test.scm|true|true>
+    (let1 r (make-hash-table)
+
+    \ \ (hash-table-set! r 'status-code 200)
+
+    \ \ (check-true (http-ok? r)))
+
+    \;
+  </goldfish-chunk>
+
+  <section|实现>
+
+  <paragraph|http-head>
+
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-head url)
+
+    \ \ (let1 r (g_http-head url)
+
+    \ \ \ \ \ \ \ \ (hash-table-set! r 'url url)
+
+    \ \ \ \ \ \ \ \ r))
+
+    \;
+  </goldfish-chunk>
+
   <\goldfish-chunk|http/tests/http_test.scm|true|false>
     (let1 r (http-head "https://httpbin.org")
 
-    \ \ (check (r 'status-code) =\<gtr\> 200))
+    \ \ (check (r 'status-code) =\<gtr\> 200)
+
+    \ \ (check (r 'url) =\<gtr\> "https://httpbin.org"))
 
     \;
   </goldfish-chunk>

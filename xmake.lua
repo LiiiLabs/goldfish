@@ -29,7 +29,16 @@ else
     tbox_configs = {hash=true, ["force-utf8"]=true}
     add_requires("tbox " .. TBOX_VERSION, {system=false, configs=tbox_configs})
 end
-add_requires("cpr 1.10.5")
+
+option("http")
+    set_description("Enable http")
+    set_default(false)
+    set_values(false, true)
+option_end()
+
+if has_config("http") then
+    add_requires("cpr 1.10.5")
+end
 
 target ("goldfish") do
     set_languages("c++98")
