@@ -113,7 +113,7 @@
 
   如果一个列表中的每一个元素都是序对，那么该列表是关联列表。
 
-  <\goldfish-chunk|goldfish/liii/alist.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/alist.scm|true|true>
     (define (alist? l)
 
     \ \ (and (list? l)
@@ -145,7 +145,7 @@
 
   下面例子是列表，但不是关联列表：
 
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
     (check-false (alist? '(1 2 3)))
 
     \;
