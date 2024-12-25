@@ -167,7 +167,7 @@
     <|unfolded-io>
       r.elapsed
     <|unfolded-io>
-      0:00:01.233036
+      0:00:01.221606
     </unfolded-io>
 
     <\unfolded-io>
@@ -175,7 +175,15 @@
     <|unfolded-io>
       r.headers
     <|unfolded-io>
-      {'Date': 'Wed, 25 Dec 2024 03:02:07 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '9593', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+      {'Date': 'Wed, 25 Dec 2024 07:28:12 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '9593', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.headers["Content-Length"]
+    <|unfolded-io>
+      9593
     </unfolded-io>
 
     <\unfolded-io>
@@ -268,6 +276,26 @@
       (r 'status-code)
     <|unfolded-io>
       <goldfish-result|200>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      (hash-table-set! r 'headers (make-hash-table))
+    </input>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      (hash-table-set! (r 'headers) "Content-Length" "9593")
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      ((r 'headers) "Content-Length")
+    <|unfolded-io>
+      <goldfish-result|"9593">
     </unfolded-io>
 
     <\input>

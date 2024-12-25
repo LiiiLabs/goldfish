@@ -7,6 +7,8 @@
 build/
 bin/goldfish
 bin/goldfish.exe
+bin/http
+bin/http.exe
 goldfish/**/*-test.scm
 compile_commands.json
 .cache/

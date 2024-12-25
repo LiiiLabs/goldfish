@@ -29,6 +29,7 @@ else
     tbox_configs = {hash=true, ["force-utf8"]=true}
     add_requires("tbox " .. TBOX_VERSION, {system=false, configs=tbox_configs})
 end
+add_requires("cpr 1.10.5")
 
 target ("goldfish") do
     set_languages("c++98")
@@ -57,10 +58,7 @@ target ("http") do
     add_files ("http/src/http.cpp")
     add_packages("s7")
     add_packages("tbox")
-
-    add_installfiles("$(projectdir)/goldfish/(scheme/*.scm)", {prefixdir = "share/goldfish"})
-    add_installfiles("$(projectdir)/goldfish/(srfi/*.scm)", {prefixdir = "share/goldfish"})
-    add_installfiles("$(projectdir)/goldfish/(liii/*.scm)", {prefixdir = "share/goldfish"})
+    add_packages("cpr")
 end
 
 includes("@builtin/xpack")
