@@ -9,6 +9,8 @@
     <assign|srfi|<flag|SRFI|dark red>>
 
     <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+
+    <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
   </hide-preamble>
 
   <chapter|(liii http)>
@@ -54,12 +56,30 @@
   <\scm-chunk|http/liii/http.scm|true|true>
     (define-library (liii http)
 
-    (begin
+    (import (liii hash-table))
 
     (export http-head http-ok?)
 
+    (begin
+
     \;
   </scm-chunk>
+
+  <paragraph|HTTP响应对象>
+
+  <\description>
+    <item*|status_code>HTTP状态码
+
+    <item*|url>最终有效的请求URL
+
+    <item*|elapsed>请求的总时间，以秒为单位
+
+    <item*|text>HTTP响应的正文
+
+    <item*|reason>HTTP响应出错的原因
+
+    <item*|headers>HTTP响应头
+  </description>
 
   <section|Goldfish的可选参数>
 
@@ -129,7 +149,7 @@
     <\input>
       \<gtr\>\<gtr\>\<gtr\>\ 
     <|input>
-      r= requests.head("https://httpbin.org/xxx")
+      r= requests.head("https://httpbin.org")
     </input>
 
     <\unfolded-io>
@@ -137,7 +157,7 @@
     <|unfolded-io>
       r.status_code
     <|unfolded-io>
-      404
+      200
     </unfolded-io>
 
     <\unfolded-io>
@@ -145,7 +165,7 @@
     <|unfolded-io>
       r.url
     <|unfolded-io>
-      https://httpbin.org/xxx
+      https://httpbin.org/
     </unfolded-io>
 
     <\unfolded-io>
@@ -337,47 +357,43 @@
     \;
   </goldfish-chunk>
 
-  <section|内部公共函数>
+  \;
 
-  <paragraph|http-ok?>
+  <section|实现>
+
+  <paragraph|http-ok?><typehint|((r hash-table?)) =\<gtr\> boolean?>
+
+  接受HTTP响应作为输入，返回该HTTP响应是否OK，一般来说，HTTP状态码小于400就是OK状态。
 
   <\scm-chunk|http/liii/http.scm|true|true>
     (define (http-ok? r)
 
-    \ \ (let1 status-code (r 'status-code)
+    \ \ (let ((status-code (r 'status-code))
+
+    \ \ \ \ \ \ \ \ (reason (r 'reason))
+
+    \ \ \ \ \ \ \ \ (url (r 'url)))
 
     \ \ \ \ (cond ((and (\<gtr\>= status-code 400) (\<less\> status-code 500))
 
     \ \ \ \ \ \ \ \ \ \ \ (error 'http-error
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Client Error: {reason} for url: {self.url}")))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Client Error: " reason " for url: " url)))
 
     \ \ \ \ \ \ \ \ \ \ ((and (\<gtr\>= status-code 500) (\<less\> status-code 600))
 
     \ \ \ \ \ \ \ \ \ \ \ (error 'http-error
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (integer-\<gtr\>string status-code)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Server Error: {reason} for url: {self.url}")))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ " Server Error: " reason " for url: " url)))
 
     \ \ \ \ \ \ \ \ \ \ (else #t))))
 
     \;
   </scm-chunk>
-
-  <\goldfish-chunk|http/tests/http_test.scm|true|true>
-    (let1 r (make-hash-table)
-
-    \ \ (hash-table-set! r 'status-code 200)
-
-    \ \ (check-true (http-ok? r)))
-
-    \;
-  </goldfish-chunk>
-
-  <section|实现>
 
   <paragraph|http-head>
 
@@ -385,8 +401,6 @@
     (define* (http-head url)
 
     \ \ (let1 r (g_http-head url)
-
-    \ \ \ \ \ \ \ \ (hash-table-set! r 'url url)
 
     \ \ \ \ \ \ \ \ r))
 
@@ -398,7 +412,19 @@
 
     \ \ (check (r 'status-code) =\<gtr\> 200)
 
-    \ \ (check (r 'url) =\<gtr\> "https://httpbin.org"))
+    \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/")
+
+    \ \ (check-true (real? (r 'elapsed)))
+
+    \ \ (check (r 'reason) =\<gtr\> "")
+
+    \ \ (check (r 'text) =\<gtr\> "")
+
+    \ \ (check ((r 'headers) "content-type") =\<gtr\> "text/html; charset=utf-8")
+
+    \ \ (check ((r 'headers) "content-length") =\<gtr\> "9593")
+
+    \ \ (check-true (http-ok? r)))
 
     \;
   </goldfish-chunk>
