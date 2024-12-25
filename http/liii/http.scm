@@ -15,8 +15,9 @@
 ;
 
 (define-library (liii http)
-(begin
+(import (liii hash-table))
 (export http-head http-ok?)
+(begin
 
 (define (http-ok? r)
   (let1 status-code (r 'status-code)
@@ -32,7 +33,6 @@
 
 (define* (http-head url)
   (let1 r (g_http-head url)
-        (hash-table-set! r 'url url)
         r))
 
 ) ; end of begin

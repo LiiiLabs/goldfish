@@ -54,9 +54,11 @@
   <\scm-chunk|http/liii/http.scm|true|true>
     (define-library (liii http)
 
-    (begin
+    (import (liii hash-table))
 
     (export http-head http-ok?)
+
+    (begin
 
     \;
   </scm-chunk>
@@ -129,7 +131,7 @@
     <\input>
       \<gtr\>\<gtr\>\<gtr\>\ 
     <|input>
-      r= requests.head("https://httpbin.org/xxx")
+      r= requests.head("https://httpbin.org")
     </input>
 
     <\unfolded-io>
@@ -137,7 +139,7 @@
     <|unfolded-io>
       r.status_code
     <|unfolded-io>
-      404
+      200
     </unfolded-io>
 
     <\unfolded-io>
@@ -145,7 +147,7 @@
     <|unfolded-io>
       r.url
     <|unfolded-io>
-      https://httpbin.org/xxx
+      https://httpbin.org/
     </unfolded-io>
 
     <\unfolded-io>
@@ -386,8 +388,6 @@
 
     \ \ (let1 r (g_http-head url)
 
-    \ \ \ \ \ \ \ \ (hash-table-set! r 'url url)
-
     \ \ \ \ \ \ \ \ r))
 
     \;
@@ -398,7 +398,7 @@
 
     \ \ (check (r 'status-code) =\<gtr\> 200)
 
-    \ \ (check (r 'url) =\<gtr\> "https://httpbin.org"))
+    \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/"))
 
     \;
   </goldfish-chunk>
