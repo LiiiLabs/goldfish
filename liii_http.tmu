@@ -1,6 +1,6 @@
 <TMU|<tuple|1.0.5|1.2.9.7>>
 
-<style|<tuple|generic|chinese|goldfish|literate|reduced-margins>>
+<style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
 
 <\body>
   <\hide-preamble>
@@ -58,6 +58,84 @@
 
     \;
   </scm-chunk>
+
+  <section|实现>
+
+  <\session|python|default>
+    <\output>
+      Python 3.11.2 [/usr/bin/python3]
+
+      Python plugin for TeXmacs.
+
+      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
+    </output>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      import requests
+    </input>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      r= requests.head("https://httpbin.org")
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.status_code
+    <|unfolded-io>
+      200
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      dir(r)
+    <|unfolded-io>
+      ['__attrs__', '__bool__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__enter__', '__eq__', '__exit__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__nonzero__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_content', '_content_consumed', '_next', 'apparent_encoding', 'close', 'connection', 'content', 'cookies', 'elapsed', 'encoding', 'headers', 'history', 'is_permanent_redirect', 'is_redirect', 'iter_content', 'iter_lines', 'json', 'links', 'next', 'ok', 'raise_for_status', 'raw', 'reason', 'request', 'status_code', 'text', 'url']
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.url
+    <|unfolded-io>
+      https://httpbin.org/
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.ok
+    <|unfolded-io>
+      True
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.elapsed
+    <|unfolded-io>
+      0:00:01.629869
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.headers
+    <|unfolded-io>
+      {'Date': 'Wed, 25 Dec 2024 02:48:12 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '9593', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
 
   \;
 
