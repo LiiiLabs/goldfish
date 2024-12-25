@@ -17,7 +17,7 @@
 
   <section|许可证>
 
-  <\scm-chunk|http/liii/http.scm|false|true>
+  <\goldfish-chunk|http/liii/http.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -49,7 +49,7 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <section|接口>
 
@@ -58,7 +58,7 @@
 
     (import (liii hash-table))
 
-    (export http-head http-ok?)
+    (export http-head http-get http-ok?)
 
     (begin
 
@@ -365,7 +365,7 @@
 
   接受HTTP响应作为输入，返回该HTTP响应是否OK，一般来说，HTTP状态码小于400就是OK状态。
 
-  <\scm-chunk|http/liii/http.scm|true|true>
+  <\goldfish-chunk|http/liii/http.scm|true|true>
     (define (http-ok? r)
 
     \ \ (let ((status-code (r 'status-code))
@@ -393,7 +393,7 @@
     \ \ \ \ \ \ \ \ \ \ (else #t))))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <paragraph|http-head>
 
@@ -407,7 +407,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|http/tests/http_test.scm|true|false>
+  <\goldfish-chunk|http/tests/http_test.scm|true|true>
     (let1 r (http-head "https://httpbin.org")
 
     \ \ (check (r 'status-code) =\<gtr\> 200)
@@ -429,7 +429,37 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|http-get>
+
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-get url)
+
+    \ \ (let1 r (g_http-get url)
+
+    \ \ \ \ \ \ \ \ r))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|false>
+    (let1 r (http-get "https://httpbin.org")
+
+    \ \ (check (r 'status-code) =\<gtr\> 200)
+
+    \ \ (check-true (\<gtr\> (string-length (r 'text)) 0))
+
+    \ \ (check ((r 'headers) "content-type") =\<gtr\> "text/html; charset=utf-8"))
+
+    \;
+  </goldfish-chunk>
+
   <section|结尾>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|false>
+    (check-report)
+
+    \;
+  </goldfish-chunk>
 
   <\scm-chunk|http/liii/http.scm|true|false>
     ) ; end of begin

@@ -24,11 +24,7 @@ using namespace goldfish;
 using namespace std;
 
 static s7_pointer
-f_http_head (s7_scheme* sc, s7_pointer args) {
-  const char* url= s7_string (s7_car (args));
-  cpr::Session session;
-  session.SetUrl (cpr::Url (url));
-  cpr::Response r= session.Head ();
+response2hashtable (s7_scheme* sc, cpr::Response r) {
   s7_pointer ht= s7_make_hash_table (sc, 8);
   s7_hash_table_set (sc, ht, s7_make_symbol (sc, "status-code"), s7_make_integer (sc, r.status_code));
   s7_hash_table_set (sc, ht, s7_make_symbol (sc, "url"), s7_make_string (sc, r.url.c_str()));
@@ -44,16 +40,39 @@ f_http_head (s7_scheme* sc, s7_pointer args) {
   return ht;
 }
 
+static s7_pointer
+f_http_head (s7_scheme* sc, s7_pointer args) {
+  const char* url= s7_string (s7_car (args));
+  cpr::Session session;
+  session.SetUrl (cpr::Url (url));
+  cpr::Response r= session.Head ();
+  return response2hashtable (sc, r);
+}
+
+static s7_pointer
+f_http_get (s7_scheme* sc, s7_pointer args) {
+  const char* url= s7_string (s7_car (args));
+  cpr::Session session;
+  session.SetUrl (cpr::Url (url));
+  cpr::Response r= session.Get ();
+  return response2hashtable (sc, r);
+}
+
 inline void
 glue_http (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
 
   const char* s_http_head = "g_http-head";
   const char* d_http_head = "(g_http-head url ...) => hash-table?";
+  auto func_http_head= s7_make_typed_function (
+    sc, s_http_head, f_http_head, 1, 0, false, d_http_head, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_head), func_http_head);
 
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_head),
-             s7_make_typed_function (sc, s_http_head, f_http_head, 1, 0, false,
-                                     d_http_head, NULL));
+  const char* s_http_get= "g_http-get";
+  const char* d_http_get= "(g_http-get url ...) => hash-table?";
+  auto func_http_get= s7_make_typed_function (
+    sc, s_http_get, f_http_get, 1, 0, false, d_http_get, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_get), func_http_get);
 }
 
 int
