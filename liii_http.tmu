@@ -398,7 +398,9 @@
 
     \ \ (check (r 'status-code) =\<gtr\> 200)
 
-    \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/"))
+    \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/")
+
+    \ \ (check-true (real? (r 'elapsed))))
 
     \;
   </goldfish-chunk>
