@@ -35,6 +35,11 @@ f_http_head (s7_scheme* sc, s7_pointer args) {
   s7_hash_table_set (sc, ht, s7_make_symbol(sc, "elapsed"), s7_make_real (sc, r.elapsed));
   s7_hash_table_set (sc, ht, s7_make_symbol (sc, "text"), s7_make_string (sc, r.text.c_str ()));
   s7_hash_table_set (sc, ht, s7_make_symbol (sc, "reason"), s7_make_string (sc, r.reason.c_str ()));
+  s7_pointer headers= s7_make_hash_table(sc, 8);
+  for (const auto &header : r.header) {
+    s7_hash_table_set (sc, headers, s7_make_string (sc, header.first.c_str ()), s7_make_string (sc, header.second.c_str ())) ;
+  }
+  s7_hash_table_set (sc, ht, s7_make_symbol(sc, "headers"), headers);
 
   return ht;
 }

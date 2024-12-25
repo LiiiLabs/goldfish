@@ -420,6 +420,10 @@
 
     \ \ (check (r 'text) =\<gtr\> "")
 
+    \ \ (check ((r 'headers) "content-type") =\<gtr\> "text/html; charset=utf-8")
+
+    \ \ (check ((r 'headers) "content-length") =\<gtr\> "9593")
+
     \ \ (check-true (http-ok? r)))
 
     \;
