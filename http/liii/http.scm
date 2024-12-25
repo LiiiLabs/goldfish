@@ -16,6 +16,10 @@
 
 (define-library (liii http)
 (begin
+(export http-head)
+
+(define* (http-head url)
+  (g_http-head url))
 
 ) ; end of begin
 ) ; end of define-library

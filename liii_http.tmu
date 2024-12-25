@@ -56,6 +56,8 @@
 
     (begin
 
+    (export http-head)
+
     \;
   </scm-chunk>
 
@@ -290,13 +292,13 @@
       (hash-table-set! (r 'headers) "Content-Length" "9593")
     </input>
 
-    <\unfolded-io>
+    <\folded-io>
       \<gtr\>\ 
-    <|unfolded-io>
+    <|folded-io>
       ((r 'headers) "Content-Length")
-    <|unfolded-io>
+    <|folded-io>
       <goldfish-result|"9593">
-    </unfolded-io>
+    </folded-io>
 
     <\input>
       \<gtr\>\ 
@@ -304,6 +306,40 @@
       \;
     </input>
   </session>
+
+  <section|测试>
+
+  <\goldfish-chunk|http/tests/http_test.scm|false|true>
+    (set! *load-path* (cons "http" *load-path*))
+
+    \;
+
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii http))
+
+    \;
+  </goldfish-chunk>
+
+  <section|实现>
+
+  <paragraph|http-head>
+
+  <\scm-chunk|http/liii/http.scm|true|true>
+    (define* (http-head url)
+
+    \ \ (g_http-head url))
+
+    \;
+  </scm-chunk>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|false>
+    (let1 r (http-head "https://httpbin.org")
+
+    \ \ (check (r 'status-code) =\<gtr\> 200))
+
+    \;
+  </goldfish-chunk>
 
   <section|结尾>
 

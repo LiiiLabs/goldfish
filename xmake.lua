@@ -48,7 +48,7 @@ target ("goldfish") do
 end
 
 target ("http") do
-    set_languages("c++98")
+    set_languages("c++17")
     if is_plat("linux") then
         -- for Ubuntu 20.04
         add_syslinks("stdc++")

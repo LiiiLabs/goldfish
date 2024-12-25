@@ -15,13 +15,44 @@
 //
 
 #include "goldfish.hpp"
+#include "s7.h"
 #include <string>
+#include <iostream>
+#include <cpr/cpr.h>
+
+using namespace goldfish;
+using namespace std;
+
+static s7_pointer
+f_http_head (s7_scheme* sc, s7_pointer args) {
+  const char* url= s7_string (s7_car (args));
+  cout << url << std::endl;
+  cpr::Session session;
+  session.SetUrl (cpr::Url (url));
+  cpr::Response r= session.Head ();
+  s7_pointer ht= s7_make_hash_table (sc, 8);
+  s7_hash_table_set (sc, ht, s7_make_symbol(sc, "status-code"), s7_make_integer(sc, r.status_code));
+
+  return ht;
+}
+
+inline void
+glue_http (s7_scheme* sc) {
+  s7_pointer cur_env= s7_curlet (sc);
+
+  const char* s_http_head = "g_http-head";
+  const char* d_http_head = "(g_http-head url ...) => hash-table?";
+
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_head),
+             s7_make_typed_function (sc, s_http_head, f_http_head, 1, 0, false,
+                                     d_http_head, NULL));
+}
 
 int
 main (int argc, char** argv) {
-  std::string      gf_lib_dir  = goldfish::find_goldfish_library ();
+  string      gf_lib_dir  = find_goldfish_library ();
   const char* gf_lib      = gf_lib_dir.c_str ();
-  s7_scheme* sc= goldfish::init_goldfish_scheme (gf_lib);
-  return goldfish::repl_for_community_edition (sc, argc, argv);
+  s7_scheme* sc= init_goldfish_scheme (gf_lib);
+  glue_http (sc);
+  return repl_for_community_edition (sc, argc, argv);
 }
-
