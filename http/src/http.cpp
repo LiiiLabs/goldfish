@@ -15,12 +15,8 @@
 //
 
 #include "goldfish.hpp"
-#include <string>
 
 int
 main (int argc, char** argv) {
-  std::string      gf_lib_dir  = goldfish::find_goldfish_library ();
-  const char* gf_lib      = gf_lib_dir.c_str ();
-  s7_scheme* sc= goldfish::init_goldfish_scheme (gf_lib);
-  return goldfish::repl_for_community_edition (sc, argc, argv);
+  return goldfish::repl_for_community_edition (argc, argv);
 }

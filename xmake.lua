@@ -46,6 +46,23 @@ target ("goldfish") do
     add_installfiles("$(projectdir)/goldfish/(liii/*.scm)", {prefixdir = "share/goldfish"})
 end
 
+target ("http") do
+    set_languages("c++98")
+    if is_plat("linux") then
+        -- for Ubuntu 20.04
+        add_syslinks("stdc++")
+    end
+    set_targetdir("$(projectdir)/bin/")
+    add_includedirs("src/")
+    add_files ("http/src/http.cpp")
+    add_packages("s7")
+    add_packages("tbox")
+
+    add_installfiles("$(projectdir)/goldfish/(scheme/*.scm)", {prefixdir = "share/goldfish"})
+    add_installfiles("$(projectdir)/goldfish/(srfi/*.scm)", {prefixdir = "share/goldfish"})
+    add_installfiles("$(projectdir)/goldfish/(liii/*.scm)", {prefixdir = "share/goldfish"})
+end
+
 includes("@builtin/xpack")
 
 xpack ("goldfish")
