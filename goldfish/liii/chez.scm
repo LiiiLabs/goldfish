@@ -14,17 +14,13 @@
 ; under the License.
 ;
 
-(import (liii check)
-        (liii json))
+(define-library (liii chez)
+(export atom?)
+(begin
 
-(check (string->json "{\"age\":18}") => `(("age" . 18)))
-(check (string->json "{\"name\":\"中文\"}") => `(("name" . "中文"))) 
+(define (atom? x)
+  (not (pair? x)))
 
-(check (json->string '(("age" . 18))) => "{\"age\":18}")
-(check (json->string #(0 1 2 3)) => "[0,1,2,3]")
-
-(check (json-ref '(("age" . 18)) "age") => 18)
-(check (json-ref #(0 1 2 3) 0) => 0)
-
-(check-report)
+) ; end of begin
+) ; end of define-library
 
