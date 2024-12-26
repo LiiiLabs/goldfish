@@ -44,9 +44,8 @@
   (let1 r (g_http-get url params)
         r))
 
-(define* (http-post url (data '()))
-  (cond ((alist? data) (g_http-post url data))
-        (else (???))))
+(define* (http-post url (params '()))
+  (g_http-post url params))
 
 ) ; end of begin
 ) ; end of define-library

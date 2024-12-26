@@ -119,225 +119,9 @@
 
   <section|Python相关代码示例>
 
-  <paragraph|HEAD和GET>
-
-  <\session|python|default>
-    <\output>
-      Python 3.11.2 [/usr/bin/python3]
-
-      Python plugin for TeXmacs.
-
-      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
-    </output>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      import requests
-    </input>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      r= requests.head("https://httpbin.org")
-    </input>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.status_code
-    <|unfolded-io>
-      200
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.url
-    <|unfolded-io>
-      https://httpbin.org/
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.url
-    <|unfolded-io>
-      https://httpbin.org/
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.ok
-    <|unfolded-io>
-      True
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.elapsed
-    <|unfolded-io>
-      0:00:01.221606
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.headers
-    <|unfolded-io>
-      {'Date': 'Wed, 25 Dec 2024 07:28:12 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '9593', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.headers["Content-Length"]
-    <|unfolded-io>
-      9593
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.reason
-    <|unfolded-io>
-      OK
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.content
-    <|unfolded-io>
-      b''
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      r= requests.get("https://httpbin.org")
-    </input>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.status_code
-    <|unfolded-io>
-      200
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      r.r
-    <|unfolded-io>
-      Moved Temporarily
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
   <paragraph|POST发送表单数据>
 
-  <\session|python|default>
-    <\output>
-      Python 3.11.2 [/usr/bin/python3]
-
-      Python plugin for TeXmacs.
-
-      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
-    </output>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      import requests
-
-      \;
-
-      # 表单数据
-
-      data = {
-
-      \ \ \ \ 'key1': 'value1',
-
-      \ \ \ \ 'key2': 'value2'
-
-      }
-
-      \;
-
-      # 发送 POST 请求
-
-      response = requests.post('https://httpbin.org/post', data=data)
-
-      \;
-
-      # 打印响应
-
-      print(response.status_code)
-
-      print(response.text)
-    <|unfolded-io>
-      200
-
-      {
-
-      \ \ "args": {},\ 
-
-      \ \ "data": "",\ 
-
-      \ \ "files": {},\ 
-
-      \ \ "form": {
-
-      \ \ \ \ "key1": "value1",\ 
-
-      \ \ \ \ "key2": "value2"
-
-      \ \ },\ 
-
-      \ \ "headers": {
-
-      \ \ \ \ "Accept": "*/*",\ 
-
-      \ \ \ \ "Accept-Encoding": "gzip, deflate, br",\ 
-
-      \ \ \ \ "Content-Length": "23",\ 
-
-      \ \ \ \ "Content-Type": "application/x-www-form-urlencoded",\ 
-
-      \ \ \ \ "Host": "httpbin.org",\ 
-
-      \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
-
-      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cc1d2-4ee7523b5d6601e16a2cb68d"
-
-      \ \ },\ 
-
-      \ \ "json": null,\ 
-
-      \ \ "origin": "117.148.121.181",\ 
-
-      \ \ "url": "https://httpbin.org/post"
-
-      }
-
-      \;
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
+  \;
 
   <paragraph|POST发送原始数据>
 
@@ -659,7 +443,9 @@
 
   <subsection|C++和Scheme的混合>
 
-  <paragraph|http-head>
+  <subsubsection|http-head>
+
+  <paragraph|实现>
 
   <\goldfish-chunk|http/liii/http.scm|true|true>
     (define* (http-head url)
@@ -711,7 +497,7 @@
     \;
   </cpp-chunk>
 
-  <subparagraph|测试：HEAD的基础功能>
+  <paragraph|测试：HEAD的基础功能>
 
   <\goldfish-chunk|http/tests/http_test.scm|true|true>
     (let1 r (http-head "https://httpbin.org")
@@ -735,7 +521,101 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|http-get>
+  <\session|python|default>
+    <\output>
+      Python 3.11.2 [/usr/bin/python3]
+
+      Python plugin for TeXmacs.
+
+      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
+    </output>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      import requests
+    </input>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      r= requests.head("https://httpbin.org")
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.status_code
+    <|unfolded-io>
+      200
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.url
+    <|unfolded-io>
+      https://httpbin.org/
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.ok
+    <|unfolded-io>
+      True
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.elapsed
+    <|unfolded-io>
+      0:00:01.308550
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.headers
+    <|unfolded-io>
+      {'Date': 'Thu, 26 Dec 2024 05:07:04 GMT', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '9593', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.headers["Content-Length"]
+    <|unfolded-io>
+      9593
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.reason
+    <|unfolded-io>
+      OK
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      r.content
+    <|unfolded-io>
+      b''
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <subsubsection|http-get>
+
+  <paragraph|实现>
 
   <\goldfish-chunk|http/liii/http.scm|true|true>
     (define* (http-get url (params '()))
@@ -801,7 +681,7 @@
     \;
   </cpp-chunk>
 
-  <subparagraph|不带参数的GET请求>
+  <paragraph|不带参数的GET请求>
 
   <\goldfish-chunk|http/tests/http_test.scm|true|true>
     (let1 r (http-get "https://httpbin.org")
@@ -815,7 +695,7 @@
     \;
   </goldfish-chunk>
 
-  <subparagraph|带参数的GET请求>
+  <paragraph|带参数的GET请求>
 
   <\goldfish-chunk|http/tests/http_test.scm|true|true>
     (let1 r (http-get "https://httpbin.org/get"
@@ -831,17 +711,9 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|http-post>
+  <subsubsection|http-post>
 
-  <\goldfish-chunk|http/liii/http.scm|true|true>
-    (define* (http-post url (data '()))
-
-    \ \ (cond ((alist? data) (g_http-post url data))
-
-    \ \ \ \ \ \ \ \ (else (???))))
-
-    \;
-  </goldfish-chunk>
+  <paragraph|实现>
 
   <\cpp-chunk|http/src/http.cpp|true|true>
     static s7_pointer
@@ -893,27 +765,63 @@
     \;
   </cpp-chunk>
 
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-post url (params '()))
+
+    \ \ (g_http-post url params))
+
+    \;
+  </goldfish-chunk>
+
   \;
 
-  <subparagraph|带参数的POST请求>
+  <paragraph|带参数的POST请求>
 
   <\goldfish-chunk|http/tests/http_test.scm|true|true>
     (let1 r (http-post "https://httpbin.org/post"
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :data '(("key1" . "value1") ("key2" . "value2")))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :params '(("key1" . "value1") ("key2" . "value2")))
 
     \ \ \ \ \ \ (check-true (string-contains (r 'text) "value1"))
 
     \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2"))
+
+    \ \ \ \ \ \ (check (r 'status-code) =\<gtr\> 200)
 
     \ \ \ \ \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/post?key1=value1&key2=value2"))
 
     \;
   </goldfish-chunk>
 
-  <subparagraph|带数据的POST请求>
+  <\session|python|default>
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      import requests
 
-  <paragraph|glue_http>
+      params = {'key1': 'value1', 'key2': 'value2'}
+
+      response = requests.post('https://httpbin.org/post', params=params)
+
+      print(response.status_code)
+
+      print(response.url)
+    <|unfolded-io>
+      200
+
+      https://httpbin.org/post?key1=value1&key2=value2
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <paragraph|带数据的POST请求>
+
+  <subsubsection|glue_http>
 
   <\cpp-chunk|http/src/http.cpp|true|true>
     inline void
@@ -931,7 +839,7 @@
     \;
   </cpp-chunk>
 
-  <paragraph|main>
+  <subsubsection|main>
 
   <\cpp-chunk|http/src/http.cpp|true|false>
     int
