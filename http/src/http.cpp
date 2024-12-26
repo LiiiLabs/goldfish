@@ -126,3 +126,4 @@ main (int argc, char** argv) {
   glue_http (sc);
   return repl_for_community_edition (sc, argc, argv);
 }
+
