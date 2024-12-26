@@ -212,9 +212,7 @@
 
     \ \ \ \ \ \ \ \ (liii string)
 
-    \ \ \ \ \ \ \ \ (liii json)
-
-    \ \ \ \ \ \ \ \ (liii alist))
+    \ \ \ \ \ \ \ \ (liii json))
 
     \;
   </goldfish-chunk>
@@ -807,7 +805,7 @@
     </input>
   </session>
 
-  <paragraph|带数据的POST请求>
+  <paragraph|测试：带数据的POST请求>
 
   <\goldfish-chunk|http/tests/http_test.scm|true|true>
     (let* ((r (http-post "https://httpbin.org/post"
@@ -818,15 +816,7 @@
 
     \ \ (check (r 'status-code) =\<gtr\> 200)
 
-    \ \ (display* (r 'text))
-
-    \ \ (newline)
-
-    \ \ (display* json)
-
-    \ \ (newline)
-
-    \ \ (check (alist-ref json "data") =\<gtr\> "This is raw data"))
+    \ \ (check (json-ref json "data") =\<gtr\> "This is raw data"))
 
     \;
   </goldfish-chunk>

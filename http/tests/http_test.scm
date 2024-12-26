@@ -3,8 +3,7 @@
 (import (liii check)
         (liii http)
         (liii string)
-        (liii json)
-        (liii alist))
+        (liii json))
 
 (let1 r (http-head "https://httpbin.org")
   (check (r 'status-code) => 200)
@@ -38,11 +37,7 @@
             :data "This is raw data"))
        (json (string->json (r 'text))))
   (check (r 'status-code) => 200)
-  (display* (r 'text))
-  (newline)
-  (display* json)
-  (newline)
-  (check (alist-ref json "data") => "This is raw data"))
+  (check (json-ref json "data") => "This is raw data"))
 
 (check-report)
 
