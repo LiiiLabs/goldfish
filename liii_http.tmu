@@ -564,7 +564,11 @@
 
     \ \ for (const auto &header : r.header) {
 
-    \ \ \ \ s7_hash_table_set (sc, headers, s7_make_string (sc, header.first.c_str ()), s7_make_string (sc, header.second.c_str ())) ;
+    \ \ \ \ const auto key= header.first.c_str ();
+
+    \ \ \ \ const auto value= header.second.c_str ();
+
+    \ \ \ \ s7_hash_table_set (sc, headers, s7_make_string (sc, key), s7_make_string (sc, value));
 
     \ \ }
 
@@ -968,11 +972,11 @@
 
 <\initial>
   <\collection>
-    <associate|font-base-size|8>
+    <associate|font-base-size|12>
     <associate|page-height|auto>
     <associate|page-orientation|landscape>
     <associate|page-screen-margin|false>
-    <associate|page-type|a5>
+    <associate|page-type|a4>
     <associate|page-width|auto>
     <associate|save-aux|false>
   </collection>
