@@ -131,7 +131,9 @@
     </input>
   </session>
 
-  <section|Python相关接口>
+  <section|Python相关代码示例>
+
+  <paragraph|HEAD和GET>
 
   <\session|python|default>
     <\output>
@@ -254,6 +256,138 @@
       \;
     </input>
   </session>
+
+  <paragraph|POST>
+
+  <\session|python|default>
+    <\output>
+      Python 3.11.2 [/usr/bin/python3]
+
+      Python plugin for TeXmacs.
+
+      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
+    </output>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      import requests
+
+      \;
+
+      # 定义要发送的数据和参数
+
+      data = {
+
+      \ \ \ \ 'key1': 'value1',
+
+      \ \ \ \ 'key2': 'value2'
+
+      }
+
+      \;
+
+      # 定义要发送的 JSON 数据
+
+      json_data = {
+
+      \ \ \ \ 'name': 'John Doe',
+
+      \ \ \ \ 'age': 30
+
+      }
+
+      \;
+
+      # 发送 POST 请求
+
+      response = requests.post('https://httpbin.org/post', data=data, json=json_data)
+
+      \;
+
+      # 打印响应内容
+
+      print(response.status_code) \ # 打印状态码
+
+      print(response.json()) \ \ \ \ \ \ # 打印 JSON 格式的响应内容
+    <|unfolded-io>
+      200
+
+      {'args': {}, 'data': '', 'files': {}, 'form': {'key1': 'value1', 'key2': 'value2'}, 'headers': {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate, br', 'Content-Length': '23', 'Content-Type': 'application/x-www-form-urlencoded', 'Host': 'httpbin.org', 'User-Agent': 'python-requests/2.28.1', 'X-Amzn-Trace-Id': 'Root=1-676cbf2f-1074e7327ba39ff261db1d4b'}, 'json': None, 'origin': '117.148.121.181', 'url': 'https://httpbin.org/post'}
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      response.url
+    <|unfolded-io>
+      https://httpbin.org/post
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      response.ok
+    <|unfolded-io>
+      True
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      response.text
+    <|unfolded-io>
+      {
+
+      \ \ "args": {},\ 
+
+      \ \ "data": "",\ 
+
+      \ \ "files": {},\ 
+
+      \ \ "form": {
+
+      \ \ \ \ "key1": "value1",\ 
+
+      \ \ \ \ "key2": "value2"
+
+      \ \ },\ 
+
+      \ \ "headers": {
+
+      \ \ \ \ "Accept": "*/*",\ 
+
+      \ \ \ \ "Accept-Encoding": "gzip, deflate, br",\ 
+
+      \ \ \ \ "Content-Length": "23",\ 
+
+      \ \ \ \ "Content-Type": "application/x-www-form-urlencoded",\ 
+
+      \ \ \ \ "Host": "httpbin.org",\ 
+
+      \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
+
+      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cbf2f-1074e7327ba39ff261db1d4b"
+
+      \ \ },\ 
+
+      \ \ "json": null,\ 
+
+      \ \ "origin": "117.148.121.181",\ 
+
+      \ \ "url": "https://httpbin.org/post"
+
+      }
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  \;
 
   <section|Goldfish Scheme中的response设计>
 
@@ -464,7 +598,9 @@
 
     \ \ \ \ \ \ (check-true (string-contains (r 'text) "value1"))
 
-    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2")))
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2"))
+
+    \ \ \ \ \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/get?key1=value1&key2=value2"))
 
     \;
   </goldfish-chunk>
