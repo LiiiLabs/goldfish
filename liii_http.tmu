@@ -60,7 +60,7 @@
 
     \ \ \ \ \ \ \ \ (liii alist))
 
-    (export http-head http-get http-ok?)
+    (export http-head http-get http-post http-ok?)
 
     (begin
 
@@ -131,7 +131,9 @@
     </input>
   </session>
 
-  <section|Python相关接口>
+  <section|Python相关代码示例>
+
+  <paragraph|HEAD和GET>
 
   <\session|python|default>
     <\output>
@@ -254,6 +256,194 @@
       \;
     </input>
   </session>
+
+  <paragraph|POST发送表单数据>
+
+  <\session|python|default>
+    <\output>
+      Python 3.11.2 [/usr/bin/python3]
+
+      Python plugin for TeXmacs.
+
+      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
+    </output>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      import requests
+
+      \;
+
+      # 表单数据
+
+      data = {
+
+      \ \ \ \ 'key1': 'value1',
+
+      \ \ \ \ 'key2': 'value2'
+
+      }
+
+      \;
+
+      # 发送 POST 请求
+
+      response = requests.post('https://httpbin.org/post', data=data)
+
+      \;
+
+      # 打印响应
+
+      print(response.status_code)
+
+      print(response.text)
+    <|unfolded-io>
+      200
+
+      {
+
+      \ \ "args": {},\ 
+
+      \ \ "data": "",\ 
+
+      \ \ "files": {},\ 
+
+      \ \ "form": {
+
+      \ \ \ \ "key1": "value1",\ 
+
+      \ \ \ \ "key2": "value2"
+
+      \ \ },\ 
+
+      \ \ "headers": {
+
+      \ \ \ \ "Accept": "*/*",\ 
+
+      \ \ \ \ "Accept-Encoding": "gzip, deflate, br",\ 
+
+      \ \ \ \ "Content-Length": "23",\ 
+
+      \ \ \ \ "Content-Type": "application/x-www-form-urlencoded",\ 
+
+      \ \ \ \ "Host": "httpbin.org",\ 
+
+      \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
+
+      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cc1d2-4ee7523b5d6601e16a2cb68d"
+
+      \ \ },\ 
+
+      \ \ "json": null,\ 
+
+      \ \ "origin": "117.148.121.181",\ 
+
+      \ \ "url": "https://httpbin.org/post"
+
+      }
+
+      \;
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <paragraph|POST发送原始数据>
+
+  <\session|python|default>
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      import requests
+
+      \;
+
+      # 原始字符串数据
+
+      raw_data = 'This is raw data'
+
+      \;
+
+      # 设置自定义头部
+
+      headers = {
+
+      \ \ \ \ 'Content-Type': 'text/plain'
+
+      }
+
+      \;
+
+      # 发送 POST 请求
+
+      response = requests.post('https://httpbin.org/post', data=raw_data, headers=headers)
+
+      \;
+
+      # 打印响应
+
+      print(response.status_code)
+
+      print(response.text)
+
+      print(response.headers)
+    <|unfolded-io>
+      200
+
+      {
+
+      \ \ "args": {},\ 
+
+      \ \ "data": "This is raw data",\ 
+
+      \ \ "files": {},\ 
+
+      \ \ "form": {},\ 
+
+      \ \ "headers": {
+
+      \ \ \ \ "Accept": "*/*",\ 
+
+      \ \ \ \ "Accept-Encoding": "gzip, deflate, br",\ 
+
+      \ \ \ \ "Content-Length": "16",\ 
+
+      \ \ \ \ "Content-Type": "text/plain",\ 
+
+      \ \ \ \ "Host": "httpbin.org",\ 
+
+      \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
+
+      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cc3e9-0c4a68f816a8b53a48efcf34"
+
+      \ \ },\ 
+
+      \ \ "json": null,\ 
+
+      \ \ "origin": "117.148.121.181",\ 
+
+      \ \ "url": "https://httpbin.org/post"
+
+      }
+
+      \;
+
+      {'Date': 'Thu, 26 Dec 2024 02:48:09 GMT', 'Content-Type': 'application/json', 'Content-Length': '457', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  \;
 
   <section|Goldfish Scheme中的response设计>
 
@@ -464,7 +654,35 @@
 
     \ \ \ \ \ \ (check-true (string-contains (r 'text) "value1"))
 
-    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2")))
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2"))
+
+    \ \ \ \ \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/get?key1=value1&key2=value2"))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|http-post>
+
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-post url (data '()))
+
+    \ \ (cond ((alist? data) (g_http-post url data))
+
+    \ \ \ \ \ \ \ \ (else (???))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|true>
+    (let1 r (http-post "https://httpbin.org/post"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :data '(("key1" . "value1") ("key2" . "value2")))
+
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value1"))
+
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2"))
+
+    \ \ \ \ \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/post?key1=value1&key2=value2"))
 
     \;
   </goldfish-chunk>
