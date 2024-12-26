@@ -26,5 +26,7 @@
 (check (json-ref '(("age" . 18)) "age") => 18)
 (check (json-ref #(0 1 2 3) 0) => 0)
 
+(check (json-ref* `((bob . ((age . 18) (sex . male)))) 'bob 'age) => 18)
+
 (check-report)
 

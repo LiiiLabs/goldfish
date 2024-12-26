@@ -23,7 +23,7 @@
 
 (define-library (liii json)
 (import (liii chez))
-(export string->json json->string json-ref)
+(export string->json json->string json-ref json-ref*)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -162,12 +162,18 @@
             x)))
     (if (vector? x)
         (return (vector-ref x k))
-        (let l ((x x)(k k))
+        (let l ((x x) (k k))
           (if (null? x)
               '()
               (if (equal? (caar x) k)
                   (return (cdar x))
                   (l (cdr x) k)))))))
+
+(define (json-ref* j . keys)
+  (let loop ((expr j) (keys keys))
+    (if (null? keys)
+        expr
+        (loop (json-ref expr (car keys)) (cdr keys)))))
 
 ) ; end of begin
 ) ; end of define-library

@@ -106,7 +106,7 @@
 
     (import (liii chez))
 
-    (export string-\<gtr\>json json-\<gtr\>string json-ref)
+    (export string-\<gtr\>json json-\<gtr\>string json-ref json-ref*)
 
     (begin
 
@@ -420,7 +420,7 @@
 
     \ \ \ \ \ \ \ \ (return (vector-ref x k))
 
-    \ \ \ \ \ \ \ \ (let l ((x x)(k k))
+    \ \ \ \ \ \ \ \ (let l ((x x) (k k))
 
     \ \ \ \ \ \ \ \ \ \ (if (null? x)
 
@@ -439,6 +439,28 @@
     (check (json-ref '(("age" . 18)) "age") =\<gtr\> 18)
 
     (check (json-ref #(0 1 2 3) 0) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|json-ref*>
+
+  <\scm-chunk|goldfish/liii/json.scm|true|true>
+    (define (json-ref* j . keys)
+
+    \ \ (let loop ((expr j) (keys keys))
+
+    \ \ \ \ (if (null? keys)
+
+    \ \ \ \ \ \ \ \ expr
+
+    \ \ \ \ \ \ \ \ (loop (json-ref expr (car keys)) (cdr keys)))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (check (json-ref* `((bob . ((age . 18) (sex . male)))) 'bob 'age) =\<gtr\> 18)
 
     \;
   </scm-chunk>
