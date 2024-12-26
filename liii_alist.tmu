@@ -210,6 +210,8 @@
 
     (check (alist-ref '((a . 1)) 'a) =\<gtr\> 1)
 
+    (check-catch 'key-error (alist-ref '(("a" . 1)) "a"))
+
     (check-catch 'key-error (alist-ref '((a . 1)) 'b))
 
     \;
@@ -266,10 +268,11 @@
 
 <\initial>
   <\collection>
-    <associate|font-base-size|8>
+    <associate|font-base-size|12>
     <associate|page-height|auto>
+    <associate|page-orientation|landscape>
     <associate|page-screen-margin|false>
-    <associate|page-type|a5>
+    <associate|page-type|a4>
     <associate|page-width|auto>
     <associate|save-aux|false>
   </collection>

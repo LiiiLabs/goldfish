@@ -42,8 +42,8 @@ response2hashtable (s7_scheme* sc, cpr::Response r) {
   return ht;
 }
 
-static cpr::Parameters
-to_cpr_paramters (s7_scheme* sc, s7_pointer args) {
+inline cpr::Parameters
+to_cpr_parameters (s7_scheme* sc, s7_pointer args) {
   cpr::Parameters params= cpr::Parameters{};
   if (s7_is_list(sc, args)) {
     s7_pointer iter= args;
@@ -58,6 +58,24 @@ to_cpr_paramters (s7_scheme* sc, s7_pointer args) {
     }
   }
   return params;
+}
+
+inline cpr::Header
+to_cpr_headers (s7_scheme* sc, s7_pointer args) {
+  cpr::Header headers= cpr::Header{};
+  if (s7_is_list(sc, args)) {
+    s7_pointer iter= args;
+    while (!s7_is_null (sc, iter)) {
+      s7_pointer pair= s7_car (iter);
+      if (s7_is_pair (pair)) {
+        const char* key= s7_string (s7_car (pair));
+        const char* value= s7_string (s7_cdr (pair));
+        headers.insert (std::make_pair (key, value));
+      }
+      iter= s7_cdr (iter);
+    }
+  }
+  return headers;
 }
 
 static s7_pointer
@@ -82,7 +100,7 @@ static s7_pointer
 f_http_get (s7_scheme* sc, s7_pointer args) {
   const char* url= s7_string (s7_car (args));
   s7_pointer params= s7_cadr (args);
-  cpr::Parameters cpr_params= to_cpr_paramters(sc, params);
+  cpr::Parameters cpr_params= to_cpr_parameters(sc, params);
 
   cpr::Session session;
   session.SetUrl (cpr::Url (url));
@@ -105,11 +123,17 @@ static s7_pointer
 f_http_post (s7_scheme* sc, s7_pointer args) {
   const char* url= s7_string (s7_car (args));
   s7_pointer params= s7_cadr (args);
-  cpr::Parameters cpr_params= to_cpr_paramters(sc, params);
+  cpr::Parameters cpr_params= to_cpr_parameters(sc, params);
+  const char* body= s7_string (s7_caddr (args));
+  cpr::Body cpr_body= cpr::Body (body);
+  s7_pointer headers= s7_cadddr (args);
+  cpr::Header cpr_headers= to_cpr_headers (sc, headers);
 
   cpr::Session session;
   session.SetUrl (cpr::Url (url));
   session.SetParameters (cpr_params);
+  session.SetBody (cpr_body);
+  session.SetHeader (cpr_headers);
 
   cpr::Response r= session.Post ();
   return response2hashtable (sc, r);
@@ -118,10 +142,10 @@ f_http_post (s7_scheme* sc, s7_pointer args) {
 inline void
 glue_http_post (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
-  const char* s_http_post= "g_http-post";
-  const char* d_http_post= "(g_http-get url params) => hash-table?";
-  auto func_http_post= s7_make_typed_function (sc, s_http_post, f_http_post, 2, 0, false, d_http_post, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_post), func_http_post);
+  const char* name= "g_http-post";
+  const char* doc= "(g_http-post url params body) => hash-table?";
+  auto func_http_post= s7_make_typed_function (sc, name, f_http_post, 4, 0, false, doc, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, name), func_http_post);
 }
 
 inline void
