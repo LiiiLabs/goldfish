@@ -117,88 +117,6 @@
     <item*|headers>HTTP响应头
   </description>
 
-  <section|Python相关代码示例>
-
-  <paragraph|POST发送表单数据>
-
-  \;
-
-  <paragraph|POST发送原始数据>
-
-  <\session|python|default>
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      import requests
-
-      \;
-
-      # 原始字符串数据
-
-      raw_data = 'This is raw data'
-
-      \;
-
-      # 发送 POST 请求
-
-      response = requests.post('https://httpbin.org/post', data=raw_data)
-
-      \;
-
-      # 打印响应
-
-      print(response.status_code)
-
-      print(response.text)
-    <|unfolded-io>
-      200
-
-      {
-
-      \ \ "args": {},\ 
-
-      \ \ "data": "This is raw data",\ 
-
-      \ \ "files": {},\ 
-
-      \ \ "form": {},\ 
-
-      \ \ "headers": {
-
-      \ \ \ \ "Accept": "*/*",\ 
-
-      \ \ \ \ "Accept-Encoding": "gzip, deflate, br",\ 
-
-      \ \ \ \ "Content-Length": "16",\ 
-
-      \ \ \ \ "Host": "httpbin.org",\ 
-
-      \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
-
-      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cc7b8-1466a6d757e3cd38526b7310"
-
-      \ \ },\ 
-
-      \ \ "json": null,\ 
-
-      \ \ "origin": "117.148.121.181",\ 
-
-      \ \ "url": "https://httpbin.org/post"
-
-      }
-
-      \;
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
-  \;
-
   <section|Goldfish Scheme中的response设计>
 
   <\session|goldfish|default>
@@ -367,10 +285,12 @@
     \;
   </cpp-chunk>
 
-  <\cpp-chunk|http/src/http.cpp|true|true>
-    static cpr::Parameters
+  <paragraph|to_cpr_parameters>
 
-    to_cpr_paramters (s7_scheme* sc, s7_pointer args) {
+  <\cpp-chunk|http/src/http.cpp|true|true>
+    inline cpr::Parameters
+
+    to_cpr_parameters (s7_scheme* sc, s7_pointer args) {
 
     \ \ cpr::Parameters params= cpr::Parameters{};
 
@@ -399,6 +319,46 @@
     \ \ }
 
     \ \ return params;
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|to_cpr_headers>
+
+  <\cpp-chunk|http/src/http.cpp|true|true>
+    inline cpr::Header
+
+    to_cpr_headers (s7_scheme* sc, s7_pointer args) {
+
+    \ \ cpr::Header headers= cpr::Header{};
+
+    \ \ if (s7_is_list(sc, args)) {
+
+    \ \ \ \ s7_pointer iter= args;
+
+    \ \ \ \ while (!s7_is_null (sc, iter)) {
+
+    \ \ \ \ \ \ s7_pointer pair= s7_car (iter);
+
+    \ \ \ \ \ \ if (s7_is_pair (pair)) {
+
+    \ \ \ \ \ \ \ \ const char* key= s7_string (s7_car (pair));
+
+    \ \ \ \ \ \ \ \ const char* value= s7_string (s7_cdr (pair));
+
+    \ \ \ \ \ \ \ \ headers.insert (std::make_pair (key, value));
+
+    \ \ \ \ \ \ }
+
+    \ \ \ \ \ \ iter= s7_cdr (iter);
+
+    \ \ \ \ }
+
+    \ \ }
+
+    \ \ return headers;
 
     }
 
@@ -445,17 +405,7 @@
 
   <subsubsection|http-head>
 
-  <paragraph|实现>
-
-  <\goldfish-chunk|http/liii/http.scm|true|true>
-    (define* (http-head url)
-
-    \ \ (let1 r (g_http-head url)
-
-    \ \ \ \ \ \ \ \ r))
-
-    \;
-  </goldfish-chunk>
+  <paragraph|C++实现>
 
   <\cpp-chunk|http/src/http.cpp|true|true>
     static s7_pointer
@@ -496,6 +446,18 @@
 
     \;
   </cpp-chunk>
+
+  <paragraph|Scheme实现>
+
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-head url)
+
+    \ \ (let1 r (g_http-head url)
+
+    \ \ \ \ \ \ \ \ r))
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|测试：HEAD的基础功能>
 
@@ -615,21 +577,7 @@
 
   <subsubsection|http-get>
 
-  <paragraph|实现>
-
-  <\goldfish-chunk|http/liii/http.scm|true|true>
-    (define* (http-get url (params '()))
-
-    \ \ (when (not (alist? params))
-
-    \ \ \ \ (type-error params "is not a association list"))
-
-    \ \ (let1 r (g_http-get url params)
-
-    \ \ \ \ \ \ \ \ r))
-
-    \;
-  </goldfish-chunk>
+  <paragraph|C++实现>
 
   <\cpp-chunk|http/src/http.cpp|true|true>
     static s7_pointer
@@ -640,7 +588,7 @@
 
     \ \ s7_pointer params= s7_cadr (args);
 
-    \ \ cpr::Parameters cpr_params= to_cpr_paramters(sc, params);
+    \ \ cpr::Parameters cpr_params= to_cpr_parameters(sc, params);
 
     \;
 
@@ -681,6 +629,22 @@
     \;
   </cpp-chunk>
 
+  <paragraph|Scheme实现>
+
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-get url (params '()))
+
+    \ \ (when (not (alist? params))
+
+    \ \ \ \ (type-error params "is not a association list"))
+
+    \ \ (let1 r (g_http-get url params)
+
+    \ \ \ \ \ \ \ \ r))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|不带参数的GET请求>
 
   <\goldfish-chunk|http/tests/http_test.scm|true|true>
@@ -713,7 +677,7 @@
 
   <subsubsection|http-post>
 
-  <paragraph|实现>
+  <paragraph|C++实现>
 
   <\cpp-chunk|http/src/http.cpp|true|true>
     static s7_pointer
@@ -724,7 +688,15 @@
 
     \ \ s7_pointer params= s7_cadr (args);
 
-    \ \ cpr::Parameters cpr_params= to_cpr_paramters(sc, params);
+    \ \ cpr::Parameters cpr_params= to_cpr_parameters(sc, params);
+
+    \ \ const char* body= s7_string (s7_caddr (args));
+
+    \ \ cpr::Body cpr_body= cpr::Body (body);
+
+    \ \ s7_pointer headers= s7_cadddr (args);
+
+    \ \ cpr::Header cpr_headers= to_cpr_headers (sc, headers);
 
     \;
 
@@ -733,6 +705,10 @@
     \ \ session.SetUrl (cpr::Url (url));
 
     \ \ session.SetParameters (cpr_params);
+
+    \ \ session.SetBody (cpr_body);
+
+    \ \ session.SetHeader (cpr_headers);
 
     \;
 
@@ -752,23 +728,31 @@
 
     \ \ s7_pointer cur_env= s7_curlet (sc);
 
-    \ \ const char* s_http_post= "g_http-post";
+    \ \ const char* name= "g_http-post";
 
-    \ \ const char* d_http_post= "(g_http-get url params) =\<gtr\> hash-table?";
+    \ \ const char* doc= "(g_http-post url params body) =\<gtr\> hash-table?";
 
-    \ \ auto func_http_post= s7_make_typed_function (sc, s_http_post, f_http_post, 2, 0, false, d_http_post, NULL);
+    \ \ auto func_http_post= s7_make_typed_function (sc, name, f_http_post, 4, 0, false, doc, NULL);
 
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_http_post), func_http_post);
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func_http_post);
 
     }
 
     \;
   </cpp-chunk>
 
-  <\goldfish-chunk|http/liii/http.scm|true|true>
-    (define* (http-post url (params '()))
+  <paragraph|Scheme实现>
 
-    \ \ (g_http-post url params))
+  如果不设置HTTP请求头，默认的<shell|Content-Type>是<shell|application/x-www-form-urlencoded>。
+
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-post url (params '()) (data "") (headers '()))
+
+    \ \ (cond ((and (string? data) (\<gtr\> (string-length data) 0) (null? headers))
+
+    \ \ \ \ \ \ \ \ \ (g_http-post url params data '(("Content-Type" . "text/plain"))))
+
+    \ \ \ \ \ \ \ \ (else (g_http-post url params data headers))))
 
     \;
   </goldfish-chunk>
@@ -820,6 +804,90 @@
   </session>
 
   <paragraph|带数据的POST请求>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|true>
+    (let1 r (http-post "https://httpbin.org/post"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :data "This is raw data")
+
+    \ \ \ \ \ \ (check (r 'status-code) =\<gtr\> 200)
+
+    \ \ \ \ \ \ (display* (r 'text))
+
+    \ \ \ \ \ \ (newline))
+
+    \;
+  </goldfish-chunk>
+
+  <\session|python|default>
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      import requests
+
+      raw_data = 'This is raw data'
+
+      response = requests.post('https://httpbin.org/post', data=raw_data)
+
+      response.status_code
+    <|unfolded-io>
+      200
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      response.headers
+    <|unfolded-io>
+      {'Date': 'Thu, 26 Dec 2024 05:34:22 GMT', 'Content-Type': 'application/json', 'Content-Length': '422', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      response.text
+    <|unfolded-io>
+      {
+
+      \ \ "args": {},\ 
+
+      \ \ "data": "This is raw data",\ 
+
+      \ \ "files": {},\ 
+
+      \ \ "form": {},\ 
+
+      \ \ "headers": {
+
+      \ \ \ \ "Accept": "*/*",\ 
+
+      \ \ \ \ "Accept-Encoding": "gzip, deflate, br",\ 
+
+      \ \ \ \ "Content-Length": "16",\ 
+
+      \ \ \ \ "Host": "httpbin.org",\ 
+
+      \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
+
+      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676ceade-23e96e5e6c4daa9a11303fd4"
+
+      \ \ },\ 
+
+      \ \ "json": null,\ 
+
+      \ \ "origin": "117.148.121.181",\ 
+
+      \ \ "url": "https://httpbin.org/post"
+
+      }
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
 
   <subsubsection|glue_http>
 

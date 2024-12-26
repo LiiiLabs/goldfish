@@ -32,5 +32,11 @@
       (check (r 'status-code) => 200)
       (check (r 'url) => "https://httpbin.org/post?key1=value1&key2=value2"))
 
+(let1 r (http-post "https://httpbin.org/post"
+                   :data "This is raw data")
+      (check (r 'status-code) => 200)
+      (display* (r 'text))
+      (newline))
+
 (check-report)
 
