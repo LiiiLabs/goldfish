@@ -1,6 +1,7 @@
 ;;  MIT License
 
-;  Copyright guenchi (c) 2018 - 2019 
+;  Copyright guenchi (c) 2018 - 2019
+;            Da Shen (c) 2024 - 2025
      
 ;  Permission is hereby granted, free of charge, to any person obtaining a copy
 ;  of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +22,7 @@
 ;  SOFTWARE.
 
 (define-library (liii json)
-(export string->json json->string)
+(export string->json json->string json-ref)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -147,6 +148,26 @@
                 ((list? k)(string-append x "\"" (caar lst) "\":" (l k "{") ","))
                 ((vector? k)(string-append x "\"" (caar lst) "\":" (l k "[") ","))
                 (else (string-append x "\"" (caar lst) "\":" (f k) ","))))))))))
+
+(define json-ref
+  (lambda (x k)
+    (define return
+      (lambda (x)
+        (if (symbol? x)
+            (cond
+              ((symbol=? x 'true) #t)
+              ((symbol=? x 'false) #f)
+              ((symbol=? x 'null) '())
+              (else x))
+            x)))
+    (if (vector? x)
+        (return (vector-ref x k))
+        (let l ((x x)(k k))
+          (if (null? x)
+              '()
+              (if (equal? (caar x) k)
+                  (return (cdar x))
+                  (l (cdr x) k)))))))
 
 ) ; end of begin
 ) ; end of define-library

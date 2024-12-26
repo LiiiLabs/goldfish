@@ -22,7 +22,9 @@
 
     \;
 
-    ; \ Copyright guenchi (c) 2018 - 2019\ 
+    ; \ Copyright guenchi (c) 2018 - 2019
+
+    ; \ \ \ \ \ \ \ \ \ \ \ Da Shen (c) 2024 - 2025
 
     \ \ \ \ \ 
 
@@ -68,7 +70,7 @@
   <\scm-chunk|goldfish/liii/json.scm|true|true>
     (define-library (liii json)
 
-    (export string-\<gtr\>json json-\<gtr\>string)
+    (export string-\<gtr\>json json-\<gtr\>string json-ref)
 
     (begin
 
@@ -77,16 +79,16 @@
 
   <subsection|测试>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|false|false>
-    (import (srfi srfi-78)
+  <\scm-chunk|tests/goldfish/liii/json-test.scm|false|true>
+    (import (liii check)
 
     \ \ \ \ \ \ \ \ (liii json))
 
     \;
 
-    (check (string-\<gtr\>json "{\\"age\\":18}") =\<gtr\> ‘(("age" . 18)))
+    (check (string-\<gtr\>json "{\\"age\\":18}") =\<gtr\> `(("age" . 18)))
 
-    (check (string-\<gtr\>json "{\\"name\\":\\"中文\\"}") =\<gtr\> ‘(("name" . "中文")))\ 
+    (check (string-\<gtr\>json "{\\"name\\":\\"中文\\"}") =\<gtr\> `(("name" . "中文")))\ 
 
     \;
   </scm-chunk>
@@ -343,7 +345,63 @@
     \;
   </scm-chunk>
 
+  <paragraph|json-ref>
+
+  <\scm-chunk|goldfish/liii/json.scm|true|true>
+    (define json-ref
+
+    \ \ (lambda (x k)
+
+    \ \ \ \ (define return
+
+    \ \ \ \ \ \ (lambda (x)
+
+    \ \ \ \ \ \ \ \ (if (symbol? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((symbol=? x 'true) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((symbol=? x 'false) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((symbol=? x 'null) '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ x)))
+
+    \ \ \ \ (if (vector? x)
+
+    \ \ \ \ \ \ \ \ (return (vector-ref x k))
+
+    \ \ \ \ \ \ \ \ (let l ((x x)(k k))
+
+    \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) k)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (return (cdar x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l (cdr x) k)))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (check (json-ref '(("age" . 18)) "age") =\<gtr\> 18)
+
+    \;
+  </scm-chunk>
+
   <subsection|结尾>
+
+  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
 
   <\scm-chunk|goldfish/liii/json.scm|true|false>
     ) ; end of begin
