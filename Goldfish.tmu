@@ -15421,6 +15421,104 @@
     \;
   </scm-chunk>
 
+  <chapter|(liii chez)>
+
+  <section|许可证>
+
+  <\goldfish-chunk|goldfish/liii/chez.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
+  <section|接口>
+
+  <\goldfish-chunk|goldfish/liii/chez.scm|true|true>
+    (define-library (liii chez)
+
+    (export atom?)
+
+    (begin
+
+    \;
+  </goldfish-chunk>
+
+  <section|测试>
+
+  <\goldfish-chunk|tests/goldfish/liii/chez-test.scm|false|false>
+    (import (liii check)
+
+    \ \ \ \ \ \ \ \ (liii chez))
+
+    \;
+
+    (check-true (atom? 42))
+
+    \;
+
+    (check-false (atom? '(1 2 3)))
+
+    (check-false (atom? (cons 1 2)))
+
+    \;
+
+    (check-true (atom? #(1 2 3)))
+
+    \;
+
+    (check-report)
+
+    \;
+  </goldfish-chunk>
+
+  <section|实现>
+
+  <\goldfish-chunk|goldfish/liii/chez.scm|true|true>
+    (define (atom? x)
+
+    \ \ (not (pair? x)))
+
+    \;
+  </goldfish-chunk>
+
+  <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/chez.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </goldfish-chunk>
+
   <chapter|(liii sys)>
 
   <section|许可证>
@@ -19892,13 +19990,15 @@
 
 <\initial>
   <\collection>
-    <associate|font-base-size|8>
+    <associate|font-base-size|12>
     <associate|info-flag|paper>
     <associate|page-height|auto>
     <associate|page-medium|papyrus>
+    <associate|page-orientation|landscape>
     <associate|page-screen-margin|false>
-    <associate|page-type|a5>
+    <associate|page-type|a4>
     <associate|page-width|auto>
+    <associate|par-columns|1>
     <associate|par-par-sep|0.3333fn>
     <associate|save-aux|false>
   </collection>

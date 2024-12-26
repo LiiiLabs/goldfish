@@ -22,6 +22,7 @@
 ;  SOFTWARE.
 
 (define-library (liii json)
+(import (liii chez))
 (export string->json json->string json-ref)
 (begin
 
@@ -111,7 +112,6 @@
             (else
               (l s bgn (+ 1 end) rst len quts? lst))))))))))
 
-              
 (define json->string
   (lambda (lst)
     (define f
