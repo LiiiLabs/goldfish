@@ -67,6 +67,15 @@ f_http_head (s7_scheme* sc, s7_pointer args) {
   return response2hashtable (sc, r);
 }
 
+inline void
+glue_http_head (s7_scheme* sc) {
+  s7_pointer cur_env= s7_curlet (sc);
+  const char* s_http_head = "g_http-head";
+  const char* d_http_head = "(g_http-head url ...) => hash-table?";
+  auto func_http_head= s7_make_typed_function (sc, s_http_head, f_http_head, 1, 0, false, d_http_head, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_head), func_http_head);
+}
+
 static s7_pointer
 f_http_get (s7_scheme* sc, s7_pointer args) {
   const char* url= s7_string (s7_car (args));
@@ -79,6 +88,15 @@ f_http_get (s7_scheme* sc, s7_pointer args) {
 
   cpr::Response r= session.Get ();
   return response2hashtable (sc, r);
+}
+
+inline void
+glue_http_get (s7_scheme* sc) {
+  s7_pointer cur_env= s7_curlet (sc);
+  const char* s_http_get= "g_http-get";
+  const char* d_http_get= "(g_http-get url params) => hash-table?";
+  auto func_http_get= s7_make_typed_function (sc, s_http_get, f_http_get, 2, 0, false, d_http_get, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_get), func_http_get);
 }
 
 static s7_pointer
@@ -96,26 +114,19 @@ f_http_post (s7_scheme* sc, s7_pointer args) {
 }
 
 inline void
-glue_http (s7_scheme* sc) {
+glue_http_post (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
-
-  const char* s_http_head = "g_http-head";
-  const char* d_http_head = "(g_http-head url ...) => hash-table?";
-  auto func_http_head= s7_make_typed_function (
-    sc, s_http_head, f_http_head, 1, 0, false, d_http_head, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_head), func_http_head);
-
-  const char* s_http_get= "g_http-get";
-  const char* d_http_get= "(g_http-get url params) => hash-table?";
-  auto func_http_get= s7_make_typed_function (
-    sc, s_http_get, f_http_get, 2, 0, false, d_http_get, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_http_get), func_http_get);
-
   const char* s_http_post= "g_http-post";
   const char* d_http_post= "(g_http-get url params) => hash-table?";
-  auto func_http_post= s7_make_typed_function (
-    sc, s_http_post, f_http_post, 2, 0, false, d_http_post, NULL);
+  auto func_http_post= s7_make_typed_function (sc, s_http_post, f_http_post, 2, 0, false, d_http_post, NULL);
   s7_define (sc, cur_env, s7_make_symbol (sc, s_http_post), func_http_post);
+}
+
+inline void
+glue_http (s7_scheme* sc) {
+  glue_http_head (sc);
+  glue_http_get (sc);
+  glue_http_post (sc);
 }
 
 int
