@@ -17,7 +17,7 @@
 (define-library (liii http)
 (import (liii hash-table)
         (liii alist))
-(export http-head http-get http-ok?)
+(export http-head http-get http-post http-ok?)
 (begin
 
 (define (http-ok? r)
@@ -43,6 +43,10 @@
     (type-error params "is not a association list"))
   (let1 r (g_http-get url params)
         r))
+
+(define* (http-post url (data '()))
+  (cond ((alist? data) (g_http-post url data))
+        (else (???))))
 
 ) ; end of begin
 ) ; end of define-library

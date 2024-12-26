@@ -25,5 +25,11 @@
       (check-true (string-contains (r 'text) "value2"))
       (check (r 'url) => "https://httpbin.org/get?key1=value1&key2=value2"))
 
+(let1 r (http-post "https://httpbin.org/post"
+                  :data '(("key1" . "value1") ("key2" . "value2")))
+      (check-true (string-contains (r 'text) "value1"))
+      (check-true (string-contains (r 'text) "value2"))
+      (check (r 'url) => "https://httpbin.org/post?key1=value1&key2=value2"))
+
 (check-report)
 

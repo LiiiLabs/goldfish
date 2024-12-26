@@ -60,7 +60,7 @@
 
     \ \ \ \ \ \ \ \ (liii alist))
 
-    (export http-head http-get http-ok?)
+    (export http-head http-get http-post http-ok?)
 
     (begin
 
@@ -257,7 +257,7 @@
     </input>
   </session>
 
-  <paragraph|POST>
+  <paragraph|POST发送表单数据>
 
   <\session|python|default>
     <\output>
@@ -275,7 +275,7 @@
 
       \;
 
-      # 定义要发送的数据和参数
+      # 表单数据
 
       data = {
 
@@ -287,56 +287,20 @@
 
       \;
 
-      # 定义要发送的 JSON 数据
-
-      json_data = {
-
-      \ \ \ \ 'name': 'John Doe',
-
-      \ \ \ \ 'age': 30
-
-      }
-
-      \;
-
       # 发送 POST 请求
 
-      response = requests.post('https://httpbin.org/post', data=data, json=json_data)
+      response = requests.post('https://httpbin.org/post', data=data)
 
       \;
 
-      # 打印响应内容
+      # 打印响应
 
-      print(response.status_code) \ # 打印状态码
+      print(response.status_code)
 
-      print(response.json()) \ \ \ \ \ \ # 打印 JSON 格式的响应内容
+      print(response.text)
     <|unfolded-io>
       200
 
-      {'args': {}, 'data': '', 'files': {}, 'form': {'key1': 'value1', 'key2': 'value2'}, 'headers': {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate, br', 'Content-Length': '23', 'Content-Type': 'application/x-www-form-urlencoded', 'Host': 'httpbin.org', 'User-Agent': 'python-requests/2.28.1', 'X-Amzn-Trace-Id': 'Root=1-676cbf2f-1074e7327ba39ff261db1d4b'}, 'json': None, 'origin': '117.148.121.181', 'url': 'https://httpbin.org/post'}
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      response.url
-    <|unfolded-io>
-      https://httpbin.org/post
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      response.ok
-    <|unfolded-io>
-      True
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      response.text
-    <|unfolded-io>
       {
 
       \ \ "args": {},\ 
@@ -367,7 +331,7 @@
 
       \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
 
-      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cbf2f-1074e7327ba39ff261db1d4b"
+      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cc1d2-4ee7523b5d6601e16a2cb68d"
 
       \ \ },\ 
 
@@ -378,6 +342,98 @@
       \ \ "url": "https://httpbin.org/post"
 
       }
+
+      \;
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <paragraph|POST发送原始数据>
+
+  <\session|python|default>
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      import requests
+
+      \;
+
+      # 原始字符串数据
+
+      raw_data = 'This is raw data'
+
+      \;
+
+      # 设置自定义头部
+
+      headers = {
+
+      \ \ \ \ 'Content-Type': 'text/plain'
+
+      }
+
+      \;
+
+      # 发送 POST 请求
+
+      response = requests.post('https://httpbin.org/post', data=raw_data, headers=headers)
+
+      \;
+
+      # 打印响应
+
+      print(response.status_code)
+
+      print(response.text)
+
+      print(response.headers)
+    <|unfolded-io>
+      200
+
+      {
+
+      \ \ "args": {},\ 
+
+      \ \ "data": "This is raw data",\ 
+
+      \ \ "files": {},\ 
+
+      \ \ "form": {},\ 
+
+      \ \ "headers": {
+
+      \ \ \ \ "Accept": "*/*",\ 
+
+      \ \ \ \ "Accept-Encoding": "gzip, deflate, br",\ 
+
+      \ \ \ \ "Content-Length": "16",\ 
+
+      \ \ \ \ "Content-Type": "text/plain",\ 
+
+      \ \ \ \ "Host": "httpbin.org",\ 
+
+      \ \ \ \ "User-Agent": "python-requests/2.28.1",\ 
+
+      \ \ \ \ "X-Amzn-Trace-Id": "Root=1-676cc3e9-0c4a68f816a8b53a48efcf34"
+
+      \ \ },\ 
+
+      \ \ "json": null,\ 
+
+      \ \ "origin": "117.148.121.181",\ 
+
+      \ \ "url": "https://httpbin.org/post"
+
+      }
+
+      \;
+
+      {'Date': 'Thu, 26 Dec 2024 02:48:09 GMT', 'Content-Type': 'application/json', 'Content-Length': '457', 'Connection': 'keep-alive', 'Server': 'gunicorn/19.9.0', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
     </unfolded-io>
 
     <\input>
@@ -601,6 +657,32 @@
     \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2"))
 
     \ \ \ \ \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/get?key1=value1&key2=value2"))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|http-post>
+
+  <\goldfish-chunk|http/liii/http.scm|true|true>
+    (define* (http-post url (data '()))
+
+    \ \ (cond ((alist? data) (g_http-post url data))
+
+    \ \ \ \ \ \ \ \ (else (???))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|http/tests/http_test.scm|true|true>
+    (let1 r (http-post "https://httpbin.org/post"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :data '(("key1" . "value1") ("key2" . "value2")))
+
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value1"))
+
+    \ \ \ \ \ \ (check-true (string-contains (r 'text) "value2"))
+
+    \ \ \ \ \ \ (check (r 'url) =\<gtr\> "https://httpbin.org/post?key1=value1&key2=value2"))
 
     \;
   </goldfish-chunk>
