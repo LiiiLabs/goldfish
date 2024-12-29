@@ -1,0 +1,615 @@
+<TMU|<tuple|1.0.5|1.2.9.8>>
+
+<style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
+
+<\body>
+  <\hide-preamble>
+    <assign|scm|<macro|body|<goldfish-lang|<arg|body>>>>
+
+    <assign|scm-chunk|<\macro|name|prev|next|body>
+      <\generic-chunk|<arg|name>|<arg|prev>|<arg|next>>
+        <with|mode|prog|prog-language|goldfish|font-family|rm|<arg|body>>
+      </generic-chunk>
+    </macro>>
+
+    <assign|subparagraph|<macro|title|<assign|subparagraph-numbered|<compound|subparagraph-display-numbers>><assign|subparagraph-prefix|<macro|<compound|the-subparagraph>.>><compound|next-subparagraph><compound|subparagraph-clean><compound|subparagraph-header|<arg|title>><compound|subparagraph-toc|<arg|title>><small|<if|<value|subparagraph-numbered>|<compound|subparagraph-numbered-title|<arg|title>>|<compound|subparagraph-unnumbered-title|<arg|title>>>>>>
+
+    <assign|r7rs|<flag|R7RS|dark cyan>>
+
+    <assign|srfi|<flag|SRFI|dark red>>
+
+    <assign|goldfish-version|17.11.0>
+
+    <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
+
+    <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+  </hide-preamble>
+
+  <chapter|CI/CD流水线>
+
+  <section|持续集成>
+
+  <subsection|Github平台macOS系统>
+
+  <paragraph|触发条件>
+
+  <\verbatim-chunk|.github/workflows/ci-macos.yml|false|true>
+    name: Build and Test on macOS
+
+    \;
+
+    on:
+
+    \ \ push:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-macos.yml'
+
+    \ \ pull_request:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-macos.yml'
+
+    \;
+  </verbatim-chunk>
+
+  <paragraph|具体任务>
+
+  <\verbatim-chunk|.github/workflows/ci-macos.yml|true|false>
+    jobs:
+
+    \ \ macosbuild:
+
+    \ \ \ \ runs-on: macos-13
+
+    \ \ \ \ steps:
+
+    \ \ \ \ \ \ - uses: actions/checkout@v2
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ fetch-depth: 1
+
+    \;
+
+    \ \ \ \ \ \ - name: cache xmake
+
+    \ \ \ \ \ \ \ \ uses: actions/cache@v2
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ path: \|
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{github.workspace}}/build/.build_cache
+
+    \ \ \ \ \ \ \ \ \ \ \ \ /Users/runner/.xmake
+
+    \ \ \ \ \ \ \ \ \ \ key: ${{ runner.os }}-xmake-${{ hashFiles('**/xmake.lua') }}
+
+    \;
+
+    \ \ \ \ \ \ - name: set XMAKE_GLOBALDIR
+
+    \ \ \ \ \ \ \ \ run: echo "XMAKE_GLOBALDIR=${{ runner.workspace }}/xmake-global" \<gtr\>\<gtr\> $GITHUB_ENV
+
+    \;
+
+    \ \ \ \ \ \ - uses: xmake-io/github-action-setup-xmake@v1
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ xmake-version: v2.8.7
+
+    \ \ \ \ \ \ \ \ \ \ actions-cache-folder: '.xmake-cache'
+
+    \;
+
+    \ \ \ \ \ \ - name: xmake repo --update
+
+    \ \ \ \ \ \ \ \ run: xmake repo --update
+
+    \;
+
+    \ \ \ \ \ \ - name: cache packages from xrepo
+
+    \ \ \ \ \ \ \ \ uses: actions/cache@v3
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ path: \|
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+
+    \ \ \ \ \ \ \ \ \ \ key: ${{ runner.os }}-xrepo-${{ hashFiles('**/xmake.lua') }}
+
+    \;
+
+    \ \ \ \ \ \ - name: config
+
+    \ \ \ \ \ \ \ \ run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
+
+    \;
+
+    \ \ \ \ \ \ - name: build
+
+    \ \ \ \ \ \ \ \ run: xmake build --yes -vD goldfish
+
+    \;
+
+    \ \ \ \ \ \ - name: run tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \;
+  </verbatim-chunk>
+
+  <subsection|Github平台Windows系统>
+
+  <paragraph|触发条件>
+
+  <\verbatim-chunk|.github/workflows/ci-windows.yml|false|true>
+    name: Build on windows
+
+    \;
+
+    on:
+
+    \ \ push:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-windows.yml'
+
+    \ \ pull_request:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-windows.yml'
+
+    \ \ workflow_dispatch:
+
+    \;
+  </verbatim-chunk>
+
+  <paragraph|具体任务>
+
+  <\verbatim-chunk|.github/workflows/ci-windows.yml|true|false>
+    jobs:
+
+    \ \ windowsbuild:
+
+    \ \ \ \ runs-on: windows-2019
+
+    \ \ \ \ env:
+
+    \ \ \ \ \ \ \ \ # Force xmake to a specific folder (for cache)
+
+    \ \ \ \ \ \ \ \ XMAKE_GLOBALDIR: ${{ github.workspace }}/.xmake-global
+
+    \ \ \ \ steps:
+
+    \ \ \ \ \ \ - uses: xmake-io/github-action-setup-xmake@v1
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ xmake-version: v2.8.9
+
+    \ \ \ \ \ \ - name: update repo
+
+    \ \ \ \ \ \ \ \ run: xmake repo -u
+
+    \ \ \ \ \ \ - name: git crlf
+
+    \ \ \ \ \ \ \ \ run: git config --global core.autocrlf false
+
+    \ \ \ \ \ \ - uses: actions/checkout@v3
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ fetch-depth: 1
+
+    \ \ \ \ \ \ - name: cache xmake
+
+    \ \ \ \ \ \ \ \ uses: actions/cache@v2
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ path: \|
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{ github.workspace }}/build/.build_cache
+
+    \ \ \ \ \ \ \ \ \ \ key: ${{ runner.os }}-xmake-${{ hashFiles('**/xmake.lua') }}
+
+    \ \ \ \ \ \ - name: config
+
+    \ \ \ \ \ \ \ \ run: xmake config --yes -vD
+
+    \ \ \ \ \ \ - name: build
+
+    \ \ \ \ \ \ \ \ run: xmake build --yes -vD goldfish
+
+    \ \ \ \ \ \ - name: test
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \;
+  </verbatim-chunk>
+
+  <subsection|Github平台Debian系统>
+
+  <paragraph|触发条件>
+
+  <\verbatim-chunk|.github/workflows/ci-debian.yml|false|true>
+    name: CI on Debian bookworm
+
+    on:
+
+    \ \ push:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-debian.yml'
+
+    \ \ pull_request:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-debian.yml'
+
+    \;
+  </verbatim-chunk>
+
+  <paragraph|环境变量>
+
+  <\verbatim-chunk|.github/workflows/ci-debian.yml|true|true>
+    env:
+
+    \ \ XMAKE_ROOT: y
+
+    \ \ DEBIAN_FRONTEND: noninteractive
+
+    \;
+  </verbatim-chunk>
+
+  <paragraph|具体任务>
+
+  <\verbatim-chunk|.github/workflows/ci-debian.yml|true|false>
+    jobs:
+
+    \ \ build:
+
+    \ \ \ \ container: debian:bookworm
+
+    \ \ \ \ runs-on: ubuntu-22.04
+
+    \ \ \ \ strategy:
+
+    \ \ \ \ \ \ fail-fast: true
+
+    \ \ \ \ steps:
+
+    \ \ \ \ \ \ - name: Install dependencies
+
+    \ \ \ \ \ \ \ \ run: \|
+
+    \ \ \ \ \ \ \ \ \ \ apt-get update
+
+    \ \ \ \ \ \ \ \ \ \ apt-get install -y git 7zip unzip curl build-essential
+
+    \ \ \ \ \ \ - uses: actions/checkout@v3
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ fetch-depth: 1
+
+    \;
+
+    \ \ \ \ \ \ - name: git add safe directory
+
+    \ \ \ \ \ \ \ \ run: git config --global --add safe.directory '*'
+
+    \;
+
+    \ \ \ \ \ \ - name: de-gitee
+
+    \ \ \ \ \ \ \ \ run: sed -i '/gitee\\.com/d' xmake/packages/s/s7/xmake.lua
+
+    \;
+
+    \ \ \ \ \ \ - name: set XMAKE_GLOBALDIR
+
+    \ \ \ \ \ \ \ \ run: echo "XMAKE_GLOBALDIR=${{ runner.workspace }}/xmake-global" \<gtr\>\<gtr\> $GITHUB_ENV
+
+    \;
+
+    \ \ \ \ \ \ - uses: xmake-io/github-action-setup-xmake@v1
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ xmake-version: v2.8.7
+
+    \ \ \ \ \ \ \ \ \ \ actions-cache-folder: '.xmake-cache'
+
+    \;
+
+    \ \ \ \ \ \ - name: xmake repo --update
+
+    \ \ \ \ \ \ \ \ run: xmake repo --update
+
+    \;
+
+    \ \ \ \ \ \ - name: cache packages from xrepo
+
+    \ \ \ \ \ \ \ \ uses: actions/cache@v3
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ path: \|
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+
+    \ \ \ \ \ \ \ \ \ \ key: ${{ runner.os }}-xrepo-${{ hashFiles('**/xmake.lua') }}
+
+    \;
+
+    \ \ \ \ \ \ - name: config
+
+    \ \ \ \ \ \ \ \ run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
+
+    \;
+
+    \ \ \ \ \ \ - name: build
+
+    \ \ \ \ \ \ \ \ run: xmake build --yes -vD goldfish
+
+    \;
+
+    \ \ \ \ \ \ - name: run tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \;
+  </verbatim-chunk>
+
+  <subsection|Github平台Fedora系统>
+
+  <paragraph|触发条件>
+
+  <\verbatim-chunk|.github/workflows/ci-fedora.yml|false|true>
+    name: CI on Fedora 41
+
+    on:
+
+    \ \ push:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-fedora.yml'
+
+    \ \ pull_request:
+
+    \ \ \ \ branches: [ main ]
+
+    \ \ \ \ paths:
+
+    \ \ \ \ \ \ - 'goldfish/**'
+
+    \ \ \ \ \ \ - 'src/**'
+
+    \ \ \ \ \ \ - 'tests/**'
+
+    \ \ \ \ \ \ - 'xmake/**'
+
+    \ \ \ \ \ \ - 'xmake.lua'
+
+    \ \ \ \ \ \ - '.github/workflows/ci-fedora.yml'
+
+    \;
+  </verbatim-chunk>
+
+  <paragraph|环境变量>
+
+  <\verbatim-chunk|.github/workflows/ci-fedora.yml|true|true>
+    env:
+
+    \ \ XMAKE_ROOT: y
+
+    \ \ DEBIAN_FRONTEND: noninteractive
+
+    \;
+  </verbatim-chunk>
+
+  <paragraph|具体任务>
+
+  <\verbatim-chunk|.github/workflows/ci-fedora.yml|true|false>
+    jobs:
+
+    \ \ build:
+
+    \ \ \ \ container: fedora:41
+
+    \ \ \ \ runs-on: ubuntu-22.04
+
+    \ \ \ \ strategy:
+
+    \ \ \ \ \ \ fail-fast: true
+
+    \ \ \ \ steps:
+
+    \ \ \ \ \ \ - name: Install dependencies
+
+    \ \ \ \ \ \ \ \ run: \|
+
+    \ \ \ \ \ \ \ \ \ \ sudo dnf update -y
+
+    \ \ \ \ \ \ \ \ \ \ sudo dnf install -y gcc g++ xmake git unzip curl
+
+    \ \ \ \ \ \ - uses: actions/checkout@v3
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ fetch-depth: 1
+
+    \;
+
+    \ \ \ \ \ \ - name: git add safe directory
+
+    \ \ \ \ \ \ \ \ run: git config --global --add safe.directory '*'
+
+    \;
+
+    \ \ \ \ \ \ - name: de-gitee
+
+    \ \ \ \ \ \ \ \ run: sed -i '/gitee\\.com/d' xmake/packages/s/s7/xmake.lua
+
+    \;
+
+    \ \ \ \ \ \ - name: set XMAKE_GLOBALDIR
+
+    \ \ \ \ \ \ \ \ run: echo "XMAKE_GLOBALDIR=${{ runner.workspace }}/xmake-global" \<gtr\>\<gtr\> $GITHUB_ENV
+
+    \;
+
+    \ \ \ \ \ \ - name: xmake repo --update
+
+    \ \ \ \ \ \ \ \ run: xmake repo --update
+
+    \;
+
+    \ \ \ \ \ \ - name: cache packages from xrepo
+
+    \ \ \ \ \ \ \ \ uses: actions/cache@v3
+
+    \ \ \ \ \ \ \ \ with:
+
+    \ \ \ \ \ \ \ \ \ \ path: \|
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
+
+    \ \ \ \ \ \ \ \ \ \ key: ${{ runner.os }}-xrepo-${{ hashFiles('**/xmake.lua') }}
+
+    \;
+
+    \ \ \ \ \ \ - name: config
+
+    \ \ \ \ \ \ \ \ run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
+
+    \;
+
+    \ \ \ \ \ \ - name: build
+
+    \ \ \ \ \ \ \ \ run: xmake build --yes -vD goldfish
+
+    \;
+
+    \ \ \ \ \ \ - name: run tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \;
+  </verbatim-chunk>
+</body>
+
+<\initial>
+  <\collection>
+    <associate|font-base-size|12>
+    <associate|info-flag|paper>
+    <associate|page-height|auto>
+    <associate|page-medium|papyrus>
+    <associate|page-orientation|landscape>
+    <associate|page-screen-margin|false>
+    <associate|page-type|a4>
+    <associate|page-width|auto>
+    <associate|par-columns|1>
+    <associate|par-par-sep|0.3333fn>
+    <associate|save-aux|false>
+  </collection>
+</initial>
