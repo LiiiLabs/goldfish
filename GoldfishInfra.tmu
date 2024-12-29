@@ -25,6 +25,236 @@
     <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
   </hide-preamble>
 
+  <chapter|boot.scm><label|chapter:scheme_boot>
+
+  S7 Scheme默认并不遵循R7RS，在启动S7 Scheme之后，我们需要做的第一件事就是加载<scm|boot.scm>，实现R7RS的<scm|define-library>和<scm|import>。
+
+  <value|r7rs><paragraph|file-exists?><index|file-exists?>
+
+  <\scm-chunk|goldfish/scheme/boot.scm|false|true>
+    (define (file-exists? path)
+
+    \ \ (if (string? path)
+
+    \ \ \ \ (if (not (g_access path 0)) ; F_OK
+
+    \ \ \ \ \ \ #f
+
+    \ \ \ \ \ \ (if (g_access path 4) ; R_OK
+
+    \ \ \ \ \ \ \ \ \ \ #t
+
+    \ \ \ \ \ \ \ \ \ \ (error 'permission-error (string-append "No permission: " path))))
+
+    \ \ \ \ (error 'type-error "(file-exists? path): path should be string")))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|delete-file><index|delete-file>
+
+  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
+    (define (delete-file path)
+
+    \ \ (if (not (string? path))
+
+    \ \ \ \ (error 'type-error "(delete-file path): path should be string")
+
+    \ \ \ \ (if (not (file-exists? path))
+
+    \ \ \ \ \ \ (error 'read-error (string-append path " does not exist"))
+
+    \ \ \ \ \ \ (g_delete-file path))))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|define-library><index|define-library>
+
+  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
+    ; 0-clause BSD
+
+    ; Adapted from S7 Scheme's r7rs.scm
+
+    (define-macro (define-library libname . body) ; \|(lib name)\| -\<gtr\> environment
+
+    \ \ `(define ,(symbol (object-\<gtr\>string libname))
+
+    \ \ \ \ \ (with-let (sublet (unlet)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons 'import import)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons '*export* ())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons 'export (define-macro (,(gensym) . names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(set! *export* (append ',names *export*)))))
+
+    \ \ \ \ \ \ \ ,@body
+
+    \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (member (car entry) '(*export* export import))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (pair? *export*)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (member (car entry) *export*))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (curlet))))))
+
+    \;
+
+    (unless (defined? 'r7rs-import-library-filename)
+
+    \ \ (define (r7rs-import-library-filename libs)
+
+    \ \ \ \ (when (pair? libs)
+
+    \ \ \ \ \ \ (let ((lib-filename (let loop ((lib (if (memq (caar libs) '(only except prefix rename))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cadar libs)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car libs)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (name ""))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! name (string-append name (symbol-\<gtr\>string (car lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? (cdr lib))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append name ".scm")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! name (string-append name "/"))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr lib) name))))))
+
+    \ \ \ \ \ \ \ \ (unless (member lib-filename (*s7* 'file-names))
+
+    \ \ \ \ \ \ \ \ \ \ (load lib-filename)))
+
+    \ \ \ \ \ \ (r7rs-import-library-filename (cdr libs)))))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|import><index|import>
+
+  <\scm-chunk|goldfish/scheme/boot.scm|true|false>
+    (define-macro (import . libs)
+
+    \ \ `(begin
+
+    \ \ \ \ \ (r7rs-import-library-filename ',libs)
+
+    \ \ \ \ \ (varlet (curlet)
+
+    \ \ \ \ \ \ \ ,@(map (lambda (lib)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case (car lib)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((only)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons name (e name)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ names)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((except)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (member (car entry) names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((prefix)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e prefx)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (string-\<gtr\>symbol\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (symbol-\<gtr\>string prefx)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>string (car entry))))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr entry)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (caddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((rename)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((info (assoc (car entry) names)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if info
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cadr info) (cdr entry))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry)))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(let ((sym (symbol (object-\<gtr\>string ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (not (defined? sym))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (format () "~A not loaded~%" sym)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value sym))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ libs))))
+
+    \;
+  </scm-chunk>
+
   <chapter|CI/CD流水线>
 
   <section|持续集成>

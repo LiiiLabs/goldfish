@@ -25,15 +25,13 @@
     <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
   </hide-preamble>
 
-  <part|语言和数据>
-
-  <chapter|金鱼Scheme简介>
+  <chapter|Goldfish Scheme简介>
 
   \;
 
-  金鱼Scheme，又称Goldfish Scheme，是三鲤网络发起的Scheme解释器实现。
+  Goldfish Scheme，又称金鱼Scheme，是<hlink|三鲤网络|https://liiistem.cn/>发起的Scheme解释器实现。
 
-  金鱼Scheme解释器具有以下特性：
+  Goldfish Scheme解释器具有以下特性：
 
   <\itemize>
     <item>兼容R7RS small标准
@@ -45,23 +43,23 @@
 
   <section|背景>
 
-  金鱼Scheme创建之初的目的是为了服务墨干理工套件及其商业版Liii STEM。
+  Goldfish Scheme创建之初的目的是为了服务墨干理工套件及其商业版Liii STEM。
 
-  墨干一开始使用的是S7 Scheme，然而S7 Scheme并不严格遵循R7RS small标准，也没有提供常见的SRFI实现。故而我们决定在S7 Scheme的基础上，发布金鱼Scheme，更加严格地遵循R7RS small标准，并提供常见的SRFI实现作为金鱼Scheme的内置标准库。另外，无论是R7RS small还是SRFI都没有提供同时兼容macOS, GNU/Linux和Windows的类似于Python的os模块的标准库，故而我们模仿了Python的os模块，实现金鱼的内置标准库<scm|(liii os)>，以提供<scm|listdir>、<scm|mkdir>等常见功能。
+  墨干一开始使用的是S7 Scheme，然而S7 Scheme并不严格遵循R7RS small标准，也没有提供常见的SRFI实现。故而我们决定在S7 Scheme的基础上，发布Goldfish Scheme，更加严格地遵循R7RS small标准，并提供常见的SRFI实现作为Goldfish Scheme的内置标准库。另外，无论是R7RS small还是SRFI都没有提供同时兼容macOS, GNU/Linux和Windows的类似于Python的os模块的标准库，故而我们模仿了Python的os模块，实现金鱼的内置标准库<scm|(liii os)>，以提供<scm|listdir>、<scm|mkdir>等常见功能。
 
   <section|文学编程>
 
-  金鱼Scheme最初的三位作者是沈达、刘念和Yansong Li，项目立项时就是采用文学编程的方式实现金鱼Scheme的Scheme部分。
+  Goldfish Scheme最初的三位作者是沈达、刘念和Yansong Li，项目立项时就是采用文学编程的方式实现Goldfish Scheme的Scheme部分。
 
-  一开始，我们的文学编程文档<shell|Goldfish.tmu>是不开源的，我们只开源了金鱼Scheme的代码，其中代码是几乎没有任何注释的，因为我们在文学编程文档中的代码块之外会撰写注释。后来来自Emacs China社区的StarSugar开始向金鱼Scheme项目贡献代码，于是我们决定将金鱼Scheme的文学编程文档<shell|Goldfish.tmu>也开源出来，整个项目以开源的方式推进。
+  一开始，我们的文学编程文档<shell|Goldfish.tmu>是不开源的，我们只开源了Goldfish Scheme的代码，其中代码是几乎没有任何注释的，因为我们在文学编程文档中的代码块之外会撰写注释。后来来自Emacs China社区的StarSugar开始向Goldfish Scheme项目贡献代码，于是我们决定将Goldfish Scheme的文学编程文档<shell|Goldfish.tmu>也开源出来，整个项目以开源的方式推进。
 
-  从金鱼Scheme V17.10.8开始，我们确定了金鱼Scheme的文学编程文档的许可证为<with|font-series|bold|知识共享署名-相同方式共享4.0国际许可协议>。
+  从Goldfish Scheme V17.10.8开始，我们确定了Goldfish Scheme的文学编程文档的许可证为<with|font-series|bold|知识共享署名-相同方式共享4.0国际许可协议>。
 
-  本文档是采用中文编写的。在2024年，开源软件项目的文档采用中文编写并不是主流。首先，金鱼Scheme项目的前三位作者的母语都是中文，采用母语作为文档的语言是自然而然的；其次，在大模型时代，计算机辅助翻译已经非常成熟且廉价，我们相信中文文档不会是金鱼Scheme走向世界的阻碍。
+  本文档是采用中文编写的。在2024年，开源软件项目的文档采用中文编写并不是主流。首先，Goldfish Scheme项目的前三位作者的母语都是中文，采用母语作为文档的语言是自然而然的；其次，在大模型时代，计算机辅助翻译已经非常成熟且廉价，我们相信中文文档不会是Goldfish Scheme走向世界的阻碍。
 
   <section|许可证>
 
-  本文档采用文学编程方式编写，金鱼Scheme相关的所有代码几乎都包含在本文档中。本文档的许可证分为代码和文档两部分，其中代码部分采用Apache许可证，相关信息在每一个源代码文件的头部都会显式声明，未显式声明的源代码默认采用Apache许可证；其中文档部分采用<with|font-series|bold|知识共享署名-相同方式共享4.0国际许可协议>授权。您可以自由地分享、修改本作品，只要您遵循以下条件：
+  本文档采用文学编程方式编写，Goldfish Scheme相关的所有代码几乎都包含在本文档中。本文档的许可证分为代码和文档两部分，其中代码部分采用Apache许可证，相关信息在每一个源代码文件的头部都会显式声明，未显式声明的源代码默认采用Apache许可证；其中文档部分采用<with|font-series|bold|知识共享署名-相同方式共享4.0国际许可协议>授权。您可以自由地分享、修改本作品，只要您遵循以下条件：
 
   <\description>
     <item*|署名>您必须给出适当的署名，提供作品的链接，并指明是否有任何变更。您可以以任何合理的方式做这些事，但不得以任何方式暗示许可人赞同您或您的使用。
@@ -69,7 +67,7 @@
     <item*|相同方式共享>如果您再混合、转换或基于本作品创作，您必须以相同的许可协议发布其成果。
   </description>
 
-  金鱼Scheme是浙江三鲤网络科技有限公司发起的开源项目，我们在分发源代码时，版权信息统一采用The Goldfish Scheme Authors作为金鱼Scheme的作者。那么谁是The Goldfish Scheme Authors呢？这些信息我们会在金鱼Scheme的仓库的根目录下的<shell|AUTHORS>文件中维护：
+  Goldfish Scheme是浙江三鲤网络科技有限公司发起的开源项目，我们在分发源代码时，版权信息统一采用The Goldfish Scheme Authors作为Goldfish Scheme的作者。那么谁是The Goldfish Scheme Authors呢？这些信息我们会在Goldfish Scheme的仓库的根目录下的<shell|AUTHORS>文件中维护：
 
   <\verbatim-chunk|AUTHORS|false|false>
     # The original authors of the SRFI reference IMPL are kept in indivisual files
@@ -111,247 +109,17 @@
     \;
   </verbatim-chunk>
 
-  我们会联系金鱼Scheme的贡献者，更新<shell|AUTHORS>文件。金鱼Scheme的贡献者并不一定在这个文件中，有可能我们没有及时更新，也有可能相关贡献者希望保持匿名。
+  我们会联系Goldfish Scheme的贡献者，更新<shell|AUTHORS>文件。Goldfish Scheme的贡献者并不一定在这个文件中，有可能我们没有及时更新，也有可能相关贡献者希望保持匿名。
 
   <section|相关机构>
 
-  支持金鱼Scheme的相关机构如下所示：
+  支持Goldfish Scheme的相关机构如下所示：
 
   <\itemize>
     <item>浙江三鲤网络科技有限公司
 
     <item>中国科学技术大学-德清阿尔法创新研究院
   </itemize>
-
-  <chapter|boot.scm><label|chapter:scheme_boot>
-
-  S7 Scheme默认并不遵循R7RS，在启动S7 Scheme之后，我们需要做的第一件事就是加载<scm|boot.scm>，实现R7RS的<scm|define-library>和<scm|import>。
-
-  <value|r7rs><paragraph|file-exists?><index|file-exists?>
-
-  <\scm-chunk|goldfish/scheme/boot.scm|false|true>
-    (define (file-exists? path)
-
-    \ \ (if (string? path)
-
-    \ \ \ \ (if (not (g_access path 0)) ; F_OK
-
-    \ \ \ \ \ \ #f
-
-    \ \ \ \ \ \ (if (g_access path 4) ; R_OK
-
-    \ \ \ \ \ \ \ \ \ \ #t
-
-    \ \ \ \ \ \ \ \ \ \ (error 'permission-error (string-append "No permission: " path))))
-
-    \ \ \ \ (error 'type-error "(file-exists? path): path should be string")))
-
-    \;
-  </scm-chunk>
-
-  <value|r7rs><paragraph|delete-file><index|delete-file>
-
-  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
-    (define (delete-file path)
-
-    \ \ (if (not (string? path))
-
-    \ \ \ \ (error 'type-error "(delete-file path): path should be string")
-
-    \ \ \ \ (if (not (file-exists? path))
-
-    \ \ \ \ \ \ (error 'read-error (string-append path " does not exist"))
-
-    \ \ \ \ \ \ (g_delete-file path))))
-
-    \;
-  </scm-chunk>
-
-  <value|r7rs><paragraph|define-library><index|define-library>
-
-  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
-    ; 0-clause BSD
-
-    ; Adapted from S7 Scheme's r7rs.scm
-
-    (define-macro (define-library libname . body) ; \|(lib name)\| -\<gtr\> environment
-
-    \ \ `(define ,(symbol (object-\<gtr\>string libname))
-
-    \ \ \ \ \ (with-let (sublet (unlet)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons 'import import)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons '*export* ())
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons 'export (define-macro (,(gensym) . names)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(set! *export* (append ',names *export*)))))
-
-    \ \ \ \ \ \ \ ,@body
-
-    \ \ \ \ \ \ \ (apply inlet
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (member (car entry) '(*export* export import))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (pair? *export*)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (member (car entry) *export*))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (curlet))))))
-
-    \;
-
-    (unless (defined? 'r7rs-import-library-filename)
-
-    \ \ (define (r7rs-import-library-filename libs)
-
-    \ \ \ \ (when (pair? libs)
-
-    \ \ \ \ \ \ (let ((lib-filename (let loop ((lib (if (memq (caar libs) '(only except prefix rename))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cadar libs)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car libs)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (name ""))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! name (string-append name (symbol-\<gtr\>string (car lib))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? (cdr lib))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append name ".scm")
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! name (string-append name "/"))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr lib) name))))))
-
-    \ \ \ \ \ \ \ \ (unless (member lib-filename (*s7* 'file-names))
-
-    \ \ \ \ \ \ \ \ \ \ (load lib-filename)))
-
-    \ \ \ \ \ \ (r7rs-import-library-filename (cdr libs)))))
-
-    \;
-  </scm-chunk>
-
-  <value|r7rs><paragraph|import><index|import>
-
-  <\scm-chunk|goldfish/scheme/boot.scm|true|false>
-    (define-macro (import . libs)
-
-    \ \ `(begin
-
-    \ \ \ \ \ (r7rs-import-library-filename ',libs)
-
-    \ \ \ \ \ (varlet (curlet)
-
-    \ \ \ \ \ \ \ ,@(map (lambda (lib)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case (car lib)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((only)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (name)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons name (e name)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ names)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((except)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (member (car entry) names)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((prefix)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e prefx)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (string-\<gtr\>symbol\ 
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (symbol-\<gtr\>string prefx)\ 
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>string (car entry))))\ 
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr entry)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (caddr ',lib)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((rename)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((info (assoc (car entry) names)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if info
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cadr info) (cdr entry))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry)))\ 
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(let ((sym (symbol (object-\<gtr\>string ',lib))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (not (defined? sym))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (format () "~A not loaded~%" sym)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value sym))))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ libs))))
-
-    \;
-  </scm-chunk>
 
   <chapter|(liii base)><label|chapter:liii_base>
 
@@ -1049,11 +817,11 @@
 
   <subsection|宏>
 
-  金鱼Scheme基于S7 Scheme，不支持<scm|let-syntax>, <scm|letrec-syntax>, <scm|syntax-rules>和<scm|syntax-error>等R7RS定义的宏的基础设施。
+  Goldfish Scheme基于S7 Scheme，不支持<scm|let-syntax>, <scm|letrec-syntax>, <scm|syntax-rules>和<scm|syntax-error>等R7RS定义的宏的基础设施。
 
   <paragraph|define-macro>
 
-  金鱼Scheme支持<scm|define-macro>来定义宏。宏采用正则序求值。
+  Goldfish Scheme支持<scm|define-macro>来定义宏。宏采用正则序求值。
 
   <section|程序结构>
 
@@ -2757,7 +2525,7 @@
     \;
   </scm-chunk>
 
-  在金鱼Scheme中，<scm|values>的用法有一些特别之处，它允许将多个值直接插入到调用者的参数列表中。这种特性使得金鱼Scheme在处理多个返回值时非常灵活和强大。以下是<scm|values>在金鱼Scheme中的一些特殊用法（这些特殊用法源自于S7 Scheme）：
+  在Goldfish Scheme中，<scm|values>的用法有一些特别之处，它允许将多个值直接插入到调用者的参数列表中。这种特性使得Goldfish Scheme在处理多个返回值时非常灵活和强大。以下是<scm|values>在Goldfish Scheme中的一些特殊用法（这些特殊用法源自于S7 Scheme）：
 
   <\description>
     <item*|直接插入到调用者参数列表>使用 <code*|values> 生成的多个值会被直接插入到调用者的参数列表中。这意味着，如果你有一个接受多个参数的函数，你可以直接从<scm|values>获得的多个值中解构这些参数。
@@ -2780,7 +2548,7 @@
 
     这里，<code*|values> 生成的字符串 <code*|"abcd"> 和整数 <code*|2> 被直接插入到 <code*|string-ref> 函数的参数列表中，相当于<goldfish-lang|(string-ref "abcd" 2)>。
 
-    <item*|<scm|values>与<scm|call/cc>的隐式使用><code*|call/cc>（call with current continuation）是一个特殊的函数，它接受一个返回多个值的过程，并将其值作为参数传递给一个消费者。在金鱼Scheme中，<code*|call/cc> 有一个隐式的 <code*|values>，这意味着你可以直接返回多个值：
+    <item*|<scm|values>与<scm|call/cc>的隐式使用><code*|call/cc>（call with current continuation）是一个特殊的函数，它接受一个返回多个值的过程，并将其值作为参数传递给一个消费者。在Goldfish Scheme中，<code*|call/cc> 有一个隐式的 <code*|values>，这意味着你可以直接返回多个值：
 
     <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
       (check (+ (call/cc (lambda (ret) (ret 1 2 3))) 4) =\<gtr\> 10)
@@ -2791,7 +2559,7 @@
     这里，<code*|ret> 宏生成的多个值 <code*|(1 2 3)> 被 <code*|+> 函数接收并求和。
   </description>
 
-  这些特性使得金鱼Scheme在处理多个返回值时非常灵活，允许程序员以一种直观和高效的方式编写代码。
+  这些特性使得Goldfish Scheme在处理多个返回值时非常灵活，允许程序员以一种直观和高效的方式编写代码。
 
   \;
 
@@ -5297,7 +5065,7 @@
 
   <section|测试>
 
-  在金鱼Scheme中的SRFI 1实现需要遵循最小依赖原则，目前<scm|delete-duplicates>是一个复杂度比较高的实现，在SRFI 1中保留，但并不在<scm|(liii list)>导出，故而在本测试文件的开头需要从<scm|(srfi srfi-1)>单独导入。
+  在Goldfish Scheme中的SRFI 1实现需要遵循最小依赖原则，目前<scm|delete-duplicates>是一个复杂度比较高的实现，在SRFI 1中保留，但并不在<scm|(liii list)>导出，故而在本测试文件的开头需要从<scm|(srfi srfi-1)>单独导入。
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
     (import (liii list)
@@ -8035,7 +7803,7 @@
     二进制1位位运算表
   </big-table>
 
-  在金鱼Scheme中，整数类型是64位的有符号整数，上述运算规则执行64次，就是金鱼Scheme中整数的位运算具体规则。
+  在Goldfish Scheme中，整数类型是64位的有符号整数，上述运算规则执行64次，就是Goldfish Scheme中整数的位运算具体规则。
 
   <section|许可证>
 
@@ -11200,7 +10968,7 @@
   返回向量中索引为 k 的元素的内容。当 k 不是向量的有效索引，报错。
 
   <\remark>
-    在金鱼Scheme中，我们推荐使用<scm|(v 0)>而不是<scm|(vector-ref v 0)>，因为前者更加简洁。在使用前者访问向量中的元素时，注意变量的命名需要能够标明变量的类型，比如在<scm|(x 0)>中，我们无法有效分辨<scm|x>是什么类型的变量，而<scm|(vector-ref x 0)>能够有效地标明<scm|x>是向量。故而，在使用前者这种简洁的语法时，建议使用<scm|v->前缀或者<scm|-v>后缀来标明<scm|x>的类型，比如<scm|(v-x 0)>或者<scm|(x-v 0)>。
+    在Goldfish Scheme中，我们推荐使用<scm|(v 0)>而不是<scm|(vector-ref v 0)>，因为前者更加简洁。在使用前者访问向量中的元素时，注意变量的命名需要能够标明变量的类型，比如在<scm|(x 0)>中，我们无法有效分辨<scm|x>是什么类型的变量，而<scm|(vector-ref x 0)>能够有效地标明<scm|x>是向量。故而，在使用前者这种简洁的语法时，建议使用<scm|v->前缀或者<scm|-v>后缀来标明<scm|x>的类型，比如<scm|(v-x 0)>或者<scm|(x-v 0)>。
   </remark>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
@@ -14365,7 +14133,7 @@
 
   <section|接口>
 
-  大部分<scm|(scheme char)>里面的函数都是S7 Scheme内置函数，这里仍旧导出相关符号，以方便金鱼Scheme的用户搜索到相关函数。
+  大部分<scm|(scheme char)>里面的函数都是S7 Scheme内置函数，这里仍旧导出相关符号，以方便Goldfish Scheme的用户搜索到相关函数。
 
   <\scm-chunk|goldfish/scheme/char.scm|true|true>
     (define-library (scheme char)
@@ -15182,6 +14950,7 @@
     <associate|page-width|auto>
     <associate|par-columns|1>
     <associate|par-par-sep|0.3333fn>
+    <associate|project-flag|true>
     <associate|save-aux|false>
   </collection>
 </initial>
