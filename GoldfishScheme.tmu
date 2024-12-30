@@ -1295,6 +1295,34 @@
     \;
   </scm-chunk>
 
+  <value|r7rs><paragraph|max>
+
+  <value|r7rs><paragraph|min>
+
+  <value|r7rs><paragraph|+><index|+>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (+ 1 2) =\<gtr\> 3)
+
+    (check (+ ) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  如果出现整数溢出，默认会在控制台输出溢出提示，整个程序能够正常运行，但是返回码会被设置为非0值，以表示运行中出现了异常。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (set! (*s7* 'muffle-warnings?) #t)
+
+    (check (+ #x7fffffffffffffff 1) =\<gtr\> 9223372036854776000.0)
+
+    (set! (*s7* 'muffle-warnings?) #f)
+
+    \;
+  </scm-chunk>
+
+  \;
+
   <value|r7rs><paragraph|floor><index|floor><scm|(x) =\<gtr\> integer>
 
   返回最大的不大于<math|x>的整数。如果<math|x>是准确值，那么返回值也是准确值，如果<math|x>不是准确值，那么返回值也不是准确值。

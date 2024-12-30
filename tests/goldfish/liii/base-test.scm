@@ -233,6 +233,13 @@
 (check-catch 'wrong-type-arg (even? #t))
 (check-catch 'wrong-type-arg (even? #f))
 
+(check (+ 1 2) => 3)
+(check (+ ) => 0)
+
+(set! (*s7* 'muffle-warnings?) #t)
+(check (+ #x7fffffffffffffff 1) => 9223372036854776000.0)
+(set! (*s7* 'muffle-warnings?) #f)
+
 (check (floor 1.1) => 1.0)
 (check (floor 1) => 1)
 (check (floor 1/2) => 0)

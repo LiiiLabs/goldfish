@@ -34,6 +34,9 @@ target("libs7") do
     add_headerfiles("s7.h")
     add_includedirs(".", {public = true})
     add_options("gmp")
+
+    add_defines("HAVE_OVERFLOW_CHECKS")
+    add_defines("WITH_WARNINGS")
     if is_plat("windows") then
         set_optimize("faster")
         set_languages("c11")
