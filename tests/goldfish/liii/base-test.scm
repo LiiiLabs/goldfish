@@ -20,6 +20,12 @@
 
 (check-set-mode! 'report-failed)
 
+(check (if (> 3 2) 3 2) => 3)
+(check (if (< 3 2) 3 2) => 2)
+
+(check (if (and (> 3 1) (< 3 4)) 'true-branch 'false-branch) => 'true-branch)
+(check (if (or (> 3 4) (< 3 1)) 'true-branch 'false-branch) => 'false-branch)
+
 (check (case '+
          ((+ -) 'p0)
          ((* /) 'p1))
