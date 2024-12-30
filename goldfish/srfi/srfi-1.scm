@@ -141,22 +141,32 @@
     (if (null-list? lis) i
         (lp (cdr lis) (if (pred (car lis)) (+ i 1) i)))))
 
-(define (fold f initial l)
-  (when (not (procedure? f))
-    (error 'type-error "The first param must be a procedure"))
-  (if (null? l)
-      initial
-      (fold f
-            (f (car l) initial)
-            (cdr l))))
+(define (fold f accum . lsts)
+  (if (eq? 1 (length lsts))
+    (let loop ((op f) (acc accum) (lst (car lsts)))
+      (if (null? lst) acc
+        (loop f 
+          (f (car lst) acc) 
+          (cdr lst))))
+    (if (any null? lsts)
+      accum
+      (let* ((heads (map car lsts))
+             (lsts' (map cdr lsts))
+             (accum' (apply f (list (apply f heads) accum))))
+        (apply fold f accum' lsts')))))
 
-(define (fold-right f initial l)
-  (if (null? l)
-    initial
-    (f (car l)
-        (fold-right f
-                    initial
-                    (cdr l)))))
+(define (fold-right f accum . lsts)
+  (if (eq? 1 (length lsts))
+    (let loop ((op f) (acc accum) (lst (car lsts)))
+      (if (null? lst) acc
+        (f (car lst) 
+          (loop f accum (cdr lst)))))
+    (if (any null? lsts)
+      accum
+      (let* ((heads (map car lsts))
+             (lsts' (map cdr lsts))
+             (accum' (apply f heads)))
+        (apply f (list accum' (apply fold-right f accum lsts')))))))
 
 (define (reduce f initial l)
   (if (null-list? l) initial
