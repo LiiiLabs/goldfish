@@ -492,11 +492,9 @@ f_isdir (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_isdir (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
   const char* name= "g_isdir";
   const char* desc= "(g_isdir string) => boolean";
-  s7_pointer func= s7_make_typed_function (sc, name, f_isdir, 1, 0, false, desc, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+  glue_define (sc, name, desc, f_isdir, 1, 0);
 }
 
 static s7_pointer
@@ -534,11 +532,9 @@ f_path_getsize (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_path_getsize (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
   const char* name= "g_path-getsize";
   const char* desc= "(g_path_getsize string): string => integer";
-  s7_pointer func= s7_make_typed_function (sc, name, f_path_getsize, 1, 0, false, desc, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+  glue_define (sc, name, desc, f_path_getsize, 1, 0);
 }
 
 inline void
