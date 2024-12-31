@@ -465,13 +465,15 @@ f_uuid4 (s7_scheme* sc, s7_pointer args) {
 }
 
 inline void
+glue_uuid4 (s7_scheme* sc) {
+  const char* name= "g_uuid4";
+  const char* desc= "(g_uuid4) => string";
+  glue_define (sc, name, desc, f_uuid4, 0, 0);
+}
+
+inline void
 glue_liii_uuid (s7_scheme* sc) {
-  s7_pointer  cur_env= s7_curlet (sc);
-  const char* s_uuid4= "g_uuid4";
-  const char* d_uuid4= "(g_uuid4) => string";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
-             s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
-                                     NULL));
+  glue_uuid4 (sc);
 }
 
 static s7_pointer
