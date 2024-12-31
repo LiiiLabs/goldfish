@@ -1931,7 +1931,7 @@
 
   <paragraph|rmdir>
 
-  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (rmdir path)
 
     \ \ (%check-dir-andthen path delete-file))
@@ -2276,14 +2276,6 @@
 
     \ \ const char* d_os_temp_dir= "(g_os-temp-dir) =\<gtr\> string";
 
-    \ \ const char* s_isdir \ \ \ \ \ = "g_isdir";
-
-    \ \ const char* d_isdir \ \ \ \ \ = "(g_isdir string) =\<gtr\> boolean";
-
-    \ \ const char* s_isfile \ \ \ \ = "g_isfile";
-
-    \ \ const char* d_isfile \ \ \ \ = "(g_isfile string) =\<gtr\> boolean";
-
     \ \ const char* s_mkdir \ \ \ \ \ = "g_mkdir";
 
     \ \ const char* d_mkdir \ \ \ \ \ = "(g_mkdir string) =\<gtr\> boolean";
@@ -2337,18 +2329,6 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_temp_dir, f_os_temp_dir, 0, 0,
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_os_call, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_isdir),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_isdir, f_isdir, 1, 0, false, d_isdir,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_isfile),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_isfile, f_isfile, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_isfile, NULL));
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_mkdir),
 
@@ -2416,18 +2396,6 @@
   <subparagraph|g_path-getsize>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_path_getsize= "g_path-getsize";
-
-    \ \ const char* d_path_getsize= "(g_path_getsize string): string =\<gtr\> integer";
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_path_getsize),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv, f_path_getsize, 1, 0,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_path_getsize, NULL));
-  </cpp-chunk>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
     }
 
     \;
@@ -2453,7 +2421,7 @@
 
   <section|协议>
 
-  <\goldfish-chunk|goldfish/liii/uuid.scm|false|false>
+  <\goldfish-chunk|goldfish/liii/uuid.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -2731,6 +2699,26 @@
     \;
   </cpp-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_isdir (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \ \ const char* name= "g_isdir";
+
+    \ \ const char* desc= "(g_isdir string) =\<gtr\> boolean";
+
+    \ \ s7_pointer func= s7_make_typed_function (sc, name, f_isdir, 1, 0, false, desc, NULL);
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|path-file?>
 
   <\goldfish-chunk|goldfish/liii/path.scm|true|true>
@@ -2754,6 +2742,8 @@
 
     \;
   </scm-chunk>
+
+  <subparagraph|C++实现>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
@@ -2779,6 +2769,26 @@
     \ \ }
 
     \ \ return s7_make_boolean (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_isfile (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \ \ const char* name= "g_isfile";
+
+    \ \ const char* desc= "(g_isfile string) =\<gtr\> boolean";
+
+    \ \ s7_pointer func= s7_make_typed_function (sc, name, f_isfile, 1, 0, false, desc, NULL);
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
 
     }
 
@@ -2859,6 +2869,44 @@
     \ \ \ \ return s7_make_integer (sc, (int) -1);
 
     \ \ }
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_path_getsize (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \ \ const char* name= "g_path-getsize";
+
+    \ \ const char* desc= "(g_path_getsize string): string =\<gtr\> integer";
+
+    \ \ s7_pointer func= s7_make_typed_function (sc, name, f_path_getsize, 1, 0, false, desc, NULL);
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_path>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_liii_path (s7_scheme* sc) {
+
+    \ \ glue_isfile (sc);
+
+    \ \ glue_isdir (sc);
+
+    \ \ glue_path_getsize (sc);
 
     }
 
@@ -3475,6 +3523,8 @@
     \ \ glue_liii_sys (sc);
 
     \ \ glue_liii_os (sc);
+
+    \ \ glue_liii_path (sc);
 
     \ \ glue_liii_uuid (sc);
 
