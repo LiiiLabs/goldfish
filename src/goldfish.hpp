@@ -260,6 +260,18 @@ f_system (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
+f_access (s7_scheme* sc, s7_pointer args) {
+  const char* path_c= s7_string (s7_car (args));
+  int         mode  = s7_integer ((s7_cadr (args)));
+#ifdef TB_CONFIG_OS_WINDOWS
+  bool ret= (_access (path_c, mode) == 0);
+#else
+  bool           ret= (access (path_c, mode) == 0);
+#endif
+  return s7_make_boolean (sc, ret);
+}
+
+static s7_pointer
 f_os_arch (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, TB_ARCH_STRING);
 }
@@ -343,27 +355,6 @@ f_getcwd (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
-f_getpid (s7_scheme* sc, s7_pointer args) {
-#ifdef TB_CONFIG_OS_WINDOWS
-  return s7_make_integer (sc, (int) GetCurrentProcessId ());
-#else
-  return s7_make_integer (sc, getpid ());
-#endif
-}
-
-static s7_pointer
-f_access (s7_scheme* sc, s7_pointer args) {
-  const char* path_c= s7_string (s7_car (args));
-  int         mode  = s7_integer ((s7_cadr (args)));
-#ifdef TB_CONFIG_OS_WINDOWS
-  bool ret= (_access (path_c, mode) == 0);
-#else
-  bool           ret= (access (path_c, mode) == 0);
-#endif
-  return s7_make_boolean (sc, ret);
-}
-
-static s7_pointer
 f_getlogin (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_WINDOWS
   return s7_make_boolean (sc, false);
@@ -371,6 +362,15 @@ f_getlogin (s7_scheme* sc, s7_pointer args) {
   uid_t          uid= getuid ();
   struct passwd* pwd= getpwuid (uid);
   return s7_make_string (sc, pwd->pw_name);
+#endif
+}
+
+static s7_pointer
+f_getpid (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_integer (sc, (int) GetCurrentProcessId ());
+#else
+  return s7_make_integer (sc, getpid ());
 #endif
 }
 

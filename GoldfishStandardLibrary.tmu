@@ -225,7 +225,7 @@
 
   <value|r7rs><paragraph|file-exists?><index|file-exists?>
 
-  <\scm-chunk|goldfish/scheme/boot.scm|false|true>
+  <\goldfish-chunk|goldfish/scheme/boot.scm|false|true>
     (define (file-exists? path)
 
     \ \ (if (string? path)
@@ -243,7 +243,7 @@
     \ \ \ \ (error 'type-error "(file-exists? path): path should be string")))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <value|r7rs><paragraph|delete-file><index|delete-file><typehint|((path string?))>
 
@@ -1489,6 +1489,28 @@
 
   <section|实现>
 
+  <paragraph|%check-dir-andthen>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (%check-dir-andthen path f)
+
+    \ \ (cond ((not (file-exists? path))
+
+    \ \ \ \ \ \ \ \ \ (file-not-found-error
+
+    \ \ \ \ \ \ \ \ \ \ \ (string-append "No such file or directory: '" path "'")))
+
+    \ \ \ \ \ \ \ \ ((not (g_isdir path))
+
+    \ \ \ \ \ \ \ \ \ (not-a-directory-error
+
+    \ \ \ \ \ \ \ \ \ \ \ (string-append "Not a directory: '" path "'")))
+
+    \ \ \ \ \ \ \ \ (else (f path))))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|os-call>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -1611,6 +1633,8 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|access>
+
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (access path mode)
 
@@ -1625,41 +1649,47 @@
     \ \ \ \ \ \ \ \ (else (error 'value-error "Allowed mode 'F_OK, 'X_OK,'W_OK, 'R_OK"))))
 
     \;
+  </goldfish-chunk>
 
-    (define (%check-dir-andthen path f)
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
 
-    \ \ (cond ((not (file-exists? path))
+    f_access (s7_scheme* sc, s7_pointer args) {
 
-    \ \ \ \ \ \ \ \ \ (file-not-found-error
+    \ \ const char* path_c= s7_string (s7_car (args));
 
-    \ \ \ \ \ \ \ \ \ \ \ (string-append "No such file or directory: '" path "'")))
+    \ \ int \ \ \ \ \ \ \ \ mode \ = s7_integer ((s7_cadr (args)));
 
-    \ \ \ \ \ \ \ \ ((not (g_isdir path))
+    #ifdef TB_CONFIG_OS_WINDOWS
 
-    \ \ \ \ \ \ \ \ \ (not-a-directory-error
+    \ \ bool ret= (_access (path_c, mode) == 0);
 
-    \ \ \ \ \ \ \ \ \ \ \ (string-append "Not a directory: '" path "'")))
+    #else
 
-    \ \ \ \ \ \ \ \ (else (f path))))
+    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= (access (path_c, mode) == 0);
 
-    \;
+    #endif
 
-    \;
+    \ \ return s7_make_boolean (sc, ret);
 
-    (define (rmdir path)
-
-    \ \ (%check-dir-andthen path delete-file))
-
-    \;
+    }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|getenv>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (getenv key)
 
     \ \ (get-environment-variable key))
 
     \;
+  </goldfish-chunk>
 
+  <paragraph|unsetenv>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (unsetenv key)
 
     \ \ (g_unsetenv key))
@@ -1899,9 +1929,19 @@
     \;
   </cpp-chunk>
 
-  <paragraph|chdir>
+  <paragraph|rmdir>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+    (define (rmdir path)
+
+    \ \ (%check-dir-andthen path delete-file))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|chdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (chdir path)
 
     \ \ (if (file-exists? path)
@@ -2135,6 +2175,30 @@
     \;
   </goldfish-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_getlogin (s7_scheme* sc, s7_pointer args) {
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ return s7_make_boolean (sc, false);
+
+    #else
+
+    \ \ uid_t \ \ \ \ \ \ \ \ \ uid= getuid ();
+
+    \ \ struct passwd* pwd= getpwuid (uid);
+
+    \ \ return s7_make_string (sc, pwd-\<gtr\>pw_name);
+
+    #endif
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|getpid><index|getpid>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -2166,64 +2230,6 @@
   </cpp-chunk>
 
   \;
-
-  \;
-
-  \;
-
-  <paragraph|g_access><index|g_access>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_access (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* path_c= s7_string (s7_car (args));
-
-    \ \ int \ \ \ \ \ \ \ \ mode \ = s7_integer ((s7_cadr (args)));
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ bool ret= (_access (path_c, mode) == 0);
-
-    #else
-
-    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= (access (path_c, mode) == 0);
-
-    #endif
-
-    \ \ return s7_make_boolean (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_getlogin><index|g_getlogin>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_getlogin (s7_scheme* sc, s7_pointer args) {
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ return s7_make_boolean (sc, false);
-
-    #else
-
-    \ \ uid_t \ \ \ \ \ \ \ \ \ uid= getuid ();
-
-    \ \ struct passwd* pwd= getpwuid (uid);
-
-    \ \ return s7_make_string (sc, pwd-\<gtr\>pw_name);
-
-    #endif
-
-    }
-
-    \;
-  </cpp-chunk>
 
   <paragraph|glue_liii_os>
 
@@ -2445,9 +2451,67 @@
 
   <chapter|(liii uuid)>
 
+  <section|协议>
+
+  <\goldfish-chunk|goldfish/liii/uuid.scm|false|false>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
+  <section|实现>
+
   <scm|(liii uuid)>是通过C++实现的，本节是相关的胶水代码。
 
-  <paragraph|g_uuid4><index|g_uuid4><typehint|=\<gtr\> string?>
+  <paragraph|uuid4><index|g_uuid4><typehint|=\<gtr\> string?>
+
+  <\goldfish-chunk|goldfish/liii/uuid.scm|true|false>
+    (define-library (liii uuid)
+
+    (export uuid4)
+
+    (begin
+
+    \;
+
+    (define (uuid4) (g_uuid4))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </goldfish-chunk>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer

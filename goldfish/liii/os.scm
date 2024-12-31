@@ -26,6 +26,15 @@
         (liii string))
 (begin
 
+(define (%check-dir-andthen path f)
+  (cond ((not (file-exists? path))
+         (file-not-found-error
+           (string-append "No such file or directory: '" path "'")))
+        ((not (g_isdir path))
+         (not-a-directory-error
+           (string-append "Not a directory: '" path "'")))
+        (else (f path))))
+
 (define (os-call command)
   (g_os-call command))
 
@@ -48,20 +57,6 @@
         ((eq? mode 'W_OK) (g_access path 2))
         ((eq? mode 'R_OK) (g_access path 4))
         (else (error 'value-error "Allowed mode 'F_OK, 'X_OK,'W_OK, 'R_OK"))))
-
-(define (%check-dir-andthen path f)
-  (cond ((not (file-exists? path))
-         (file-not-found-error
-           (string-append "No such file or directory: '" path "'")))
-        ((not (g_isdir path))
-         (not-a-directory-error
-           (string-append "Not a directory: '" path "'")))
-        (else (f path))))
-
-
-(define (rmdir path)
-  (%check-dir-andthen path delete-file))
-
 
 (define (getenv key)
   (get-environment-variable key))
@@ -95,6 +90,9 @@
   (if (file-exists? path)
     (file-exists-error (string-append "File exists: '" path "'"))
     (g_mkdir path)))
+
+(define (rmdir path)
+  (%check-dir-andthen path delete-file))
 
 (define (chdir path)
   (if (file-exists? path)
