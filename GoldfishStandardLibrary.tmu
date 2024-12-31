@@ -171,9 +171,7 @@
     \;
   </cpp-chunk>
 
-  <subsection|胶水代码>
-
-  <subsubsection|公共辅助函数>
+  <section|公共辅助函数>
 
   <subparagraph|string_vector_to_s7_vector>
 
@@ -195,6 +193,24 @@
     \ \ }
 
     \ \ return ret;
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_define>
+
+  <\cpp-chunk|src/goldfish.hpp|true|false>
+    inline void
+
+    glue_define (s7_scheme *sc, const char* name, const char* desc, s7_function f, s7_int required, s7_int optional) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \ \ s7_pointer func= s7_make_typed_function (sc, name, f, required, optional, false, desc, NULL);
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
 
     }
 
@@ -2780,15 +2796,11 @@
 
     glue_isfile (s7_scheme* sc) {
 
-    \ \ s7_pointer cur_env= s7_curlet (sc);
-
     \ \ const char* name= "g_isfile";
 
     \ \ const char* desc= "(g_isfile string) =\<gtr\> boolean";
 
-    \ \ s7_pointer func= s7_make_typed_function (sc, name, f_isfile, 1, 0, false, desc, NULL);
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+    \ \ glue_define (sc, name, desc, f_isfile, 1, 0);
 
     }
 

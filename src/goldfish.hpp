@@ -66,6 +66,13 @@ string_vector_to_s7_vector (s7_scheme* sc, vector<string> v) {
   return ret;
 }
 
+inline void
+glue_define (s7_scheme *sc, const char* name, const char* desc, s7_function f, s7_int required, s7_int optional) {
+  s7_pointer cur_env= s7_curlet (sc);
+  s7_pointer func= s7_make_typed_function (sc, name, f, required, optional, false, desc, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+}
+
 static s7_pointer
 f_version (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, GOLDFISH_VERSION);
@@ -508,11 +515,9 @@ f_isfile (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_isfile (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
   const char* name= "g_isfile";
   const char* desc= "(g_isfile string) => boolean";
-  s7_pointer func= s7_make_typed_function (sc, name, f_isfile, 1, 0, false, desc, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+  glue_define (sc, name, desc, f_isfile, 1, 0);
 }
 
 static s7_pointer
