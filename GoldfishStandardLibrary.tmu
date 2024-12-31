@@ -1646,25 +1646,11 @@
 
     \;
 
-    (define (chdir path)
-
-    \ \ (if (file-exists? path)
-
-    \ \ \ \ (g_chdir path)
-
-    \ \ \ \ (file-not-found-error (string-append "No such file or directory: '" path "'"))))
-
-    \;
-
     (define (rmdir path)
 
     \ \ (%check-dir-andthen path delete-file))
 
     \;
-
-    (define (listdir path)
-
-    \ \ (%check-dir-andthen path g_listdir))
 
     \;
 
@@ -1865,7 +1851,7 @@
 
   <paragraph|mkdir>
 
-  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (mkdir path)
 
     \ \ (if (file-exists? path)
@@ -1913,7 +1899,45 @@
     \;
   </cpp-chunk>
 
+  <paragraph|chdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+    (define (chdir path)
+
+    \ \ (if (file-exists? path)
+
+    \ \ \ \ (g_chdir path)
+
+    \ \ \ \ (file-not-found-error (string-append "No such file or directory: '" path "'"))))
+
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_chdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* dir_c= s7_string (s7_car (args));
+
+    \ \ return s7_make_boolean (sc, tb_directory_current_set (dir_c));
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|listdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (listdir path)
+
+    \ \ (%check-dir-andthen path g_listdir))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (not (os-windows?))
@@ -1972,6 +1996,86 @@
 
     \;
   </scm-chunk>
+
+  <subparagraph|C++实现>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static tb_long_t
+
+    tb_directory_walk_func (tb_char_t const* path, tb_file_info_t const* info,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tb_cpointer_t priv) {
+
+    \ \ // check
+
+    \ \ tb_assert_and_check_return_val (path && info, TB_DIRECTORY_WALK_CODE_END);
+
+    \;
+
+    \ \ vector\<less\>string\<gtr\>* p_v_result= (vector\<less\>string\<gtr\>*) priv;
+
+    \ \ p_v_result-\<gtr\>push_back (string (path));
+
+    \ \ return TB_DIRECTORY_WALK_CODE_CONTINUE;
+
+    }
+
+    \;
+
+    static s7_pointer
+
+    f_listdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
+
+    \ \ vector\<less\>string\<gtr\> entries;
+
+    \ \ s7_pointer \ \ \ \ ret= s7_make_vector (sc, 0);
+
+    \ \ tb_directory_walk (path_c, 0, tb_false, tb_directory_walk_func, &entries);
+
+    \;
+
+    \ \ int \ \ \ entries_N \ \ = entries.size ();
+
+    \ \ string path_s \ \ \ \ \ = string (path_c);
+
+    \ \ int \ \ \ path_N \ \ \ \ \ = path_s.size ();
+
+    \ \ int \ \ \ path_slash_N= path_N;
+
+    \ \ char \ \ last_ch \ \ \ \ = path_s[path_N - 1];
+
+    #if defined(TB_CONFIG_OS_WINDOWS)
+
+    \ \ if (last_ch != '/' && last_ch != '\\\\') {
+
+    \ \ \ \ path_slash_N= path_slash_N + 1;
+
+    \ \ }
+
+    #else
+
+    \ \ if (last_ch != '/') {
+
+    \ \ \ \ path_slash_N= path_slash_N + 1;
+
+    \ \ }
+
+    #endif
+
+    \ \ for (int i= 0; i \<less\> entries_N; i++) {
+
+    \ \ \ \ entries[i]= entries[i].substr (path_slash_N);
+
+    \ \ }
+
+    \ \ return string_vector_to_s7_vector (sc, entries);
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <paragraph|getenv>
 
@@ -2063,175 +2167,9 @@
 
   \;
 
-  <paragraph|g_os-temp-dir><index|g_os-temp-dir>
-
-  <paragraph|g_isdir><index|g_isdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_isdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
-
-    \ \ tb_file_info_t info;
-
-    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
-
-    \ \ if (tb_file_info (dir_c, &info)) {
-
-    \ \ \ \ switch (info.type) {
-
-    \ \ \ \ case TB_FILE_TYPE_DIRECTORY:
-
-    \ \ \ \ case TB_FILE_TYPE_DOT:
-
-    \ \ \ \ case TB_FILE_TYPE_DOT2:
-
-    \ \ \ \ \ \ ret= true;
-
-    \ \ \ \ }
-
-    \ \ }
-
-    \ \ return s7_make_boolean (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_isfile><index|g_isfile>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_isfile (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
-
-    \ \ tb_file_info_t info;
-
-    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
-
-    \ \ if (tb_file_info (dir_c, &info)) {
-
-    \ \ \ \ switch (info.type) {
-
-    \ \ \ \ case TB_FILE_TYPE_FILE:
-
-    \ \ \ \ \ \ ret= true;
-
-    \ \ \ \ }
-
-    \ \ }
-
-    \ \ return s7_make_boolean (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
   \;
 
-  <paragraph|g_chdir><index|g_chdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_chdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* dir_c= s7_string (s7_car (args));
-
-    \ \ return s7_make_boolean (sc, tb_directory_current_set (dir_c));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_getcwd><index|g_getcwd>
-
-  <paragraph|g_listdir><index|g_listdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static tb_long_t
-
-    tb_directory_walk_func (tb_char_t const* path, tb_file_info_t const* info,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tb_cpointer_t priv) {
-
-    \ \ // check
-
-    \ \ tb_assert_and_check_return_val (path && info, TB_DIRECTORY_WALK_CODE_END);
-
-    \;
-
-    \ \ vector\<less\>string\<gtr\>* p_v_result= (vector\<less\>string\<gtr\>*) priv;
-
-    \ \ p_v_result-\<gtr\>push_back (string (path));
-
-    \ \ return TB_DIRECTORY_WALK_CODE_CONTINUE;
-
-    }
-
-    \;
-
-    static s7_pointer
-
-    f_listdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
-
-    \ \ vector\<less\>string\<gtr\> entries;
-
-    \ \ s7_pointer \ \ \ \ ret= s7_make_vector (sc, 0);
-
-    \ \ tb_directory_walk (path_c, 0, tb_false, tb_directory_walk_func, &entries);
-
-    \;
-
-    \ \ int \ \ \ entries_N \ \ = entries.size ();
-
-    \ \ string path_s \ \ \ \ \ = string (path_c);
-
-    \ \ int \ \ \ path_N \ \ \ \ \ = path_s.size ();
-
-    \ \ int \ \ \ path_slash_N= path_N;
-
-    \ \ char \ \ last_ch \ \ \ \ = path_s[path_N - 1];
-
-    #if defined(TB_CONFIG_OS_WINDOWS)
-
-    \ \ if (last_ch != '/' && last_ch != '\\\\') {
-
-    \ \ \ \ path_slash_N= path_slash_N + 1;
-
-    \ \ }
-
-    #else
-
-    \ \ if (last_ch != '/') {
-
-    \ \ \ \ path_slash_N= path_slash_N + 1;
-
-    \ \ }
-
-    #endif
-
-    \ \ for (int i= 0; i \<less\> entries_N; i++) {
-
-    \ \ \ \ entries[i]= entries[i].substr (path_slash_N);
-
-    \ \ }
-
-    \ \ return string_vector_to_s7_vector (sc, entries);
-
-    }
-
-    \;
-  </cpp-chunk>
+  \;
 
   <paragraph|g_access><index|g_access>
 
@@ -2281,38 +2219,6 @@
     \ \ return s7_make_string (sc, pwd-\<gtr\>pw_name);
 
     #endif
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_getpid><index|g_getpid>
-
-  <paragraph|g_path-getsize><index|g_path-getsize>
-
-  返回指定路径的文件大小，如果该文件不存在，那么返回-1。
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_path_getsize (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
-
-    \ \ tb_file_info_t info;
-
-    \ \ if (tb_file_info (path_c, &info)) {
-
-    \ \ \ \ return s7_make_integer (sc, (int) info.size);
-
-    \ \ }
-
-    \ \ else {
-
-    \ \ \ \ return s7_make_integer (sc, (int) -1);
-
-    \ \ }
 
     }
 
@@ -2727,6 +2633,40 @@
     \;
   </scm-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_isdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
+
+    \ \ tb_file_info_t info;
+
+    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
+
+    \ \ if (tb_file_info (dir_c, &info)) {
+
+    \ \ \ \ switch (info.type) {
+
+    \ \ \ \ case TB_FILE_TYPE_DIRECTORY:
+
+    \ \ \ \ case TB_FILE_TYPE_DOT:
+
+    \ \ \ \ case TB_FILE_TYPE_DOT2:
+
+    \ \ \ \ \ \ ret= true;
+
+    \ \ \ \ }
+
+    \ \ }
+
+    \ \ return s7_make_boolean (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|path-file?>
 
   <\goldfish-chunk|goldfish/liii/path.scm|true|true>
@@ -2750,6 +2690,36 @@
 
     \;
   </scm-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_isfile (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
+
+    \ \ tb_file_info_t info;
+
+    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
+
+    \ \ if (tb_file_info (dir_c, &info)) {
+
+    \ \ \ \ switch (info.type) {
+
+    \ \ \ \ case TB_FILE_TYPE_FILE:
+
+    \ \ \ \ \ \ ret= true;
+
+    \ \ \ \ }
+
+    \ \ }
+
+    \ \ return s7_make_boolean (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <paragraph|path-exists?>
 
@@ -2802,6 +2772,34 @@
 
     \;
   </scm-chunk>
+
+  返回指定路径的文件大小，如果该文件不存在，那么返回-1。
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_path_getsize (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
+
+    \ \ tb_file_info_t info;
+
+    \ \ if (tb_file_info (path_c, &info)) {
+
+    \ \ \ \ return s7_make_integer (sc, (int) info.size);
+
+    \ \ }
+
+    \ \ else {
+
+    \ \ \ \ return s7_make_integer (sc, (int) -1);
+
+    \ \ }
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <section|结尾>
 

@@ -59,16 +59,9 @@
         (else (f path))))
 
 
-(define (chdir path)
-  (if (file-exists? path)
-    (g_chdir path)
-    (file-not-found-error (string-append "No such file or directory: '" path "'"))))
-
 (define (rmdir path)
   (%check-dir-andthen path delete-file))
 
-(define (listdir path)
-  (%check-dir-andthen path g_listdir))
 
 (define (getenv key)
   (get-environment-variable key))
@@ -102,6 +95,14 @@
   (if (file-exists? path)
     (file-exists-error (string-append "File exists: '" path "'"))
     (g_mkdir path)))
+
+(define (chdir path)
+  (if (file-exists? path)
+    (g_chdir path)
+    (file-not-found-error (string-append "No such file or directory: '" path "'"))))
+
+(define (listdir path)
+  (%check-dir-andthen path g_listdir))
 
 (define (getcwd)
   (g_getcwd))

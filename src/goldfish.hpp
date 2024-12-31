@@ -292,52 +292,6 @@ f_mkdir (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
-f_getcwd (s7_scheme* sc, s7_pointer args) {
-  tb_char_t path[GOLDFISH_PATH_MAXN];
-  tb_directory_current (path, GOLDFISH_PATH_MAXN);
-  return s7_make_string (sc, path);
-}
-
-static s7_pointer
-f_getpid (s7_scheme* sc, s7_pointer args) {
-#ifdef TB_CONFIG_OS_WINDOWS
-  return s7_make_integer (sc, (int) GetCurrentProcessId ());
-#else
-  return s7_make_integer (sc, getpid ());
-#endif
-}
-
-static s7_pointer
-f_isdir (s7_scheme* sc, s7_pointer args) {
-  const char*    dir_c= s7_string (s7_car (args));
-  tb_file_info_t info;
-  bool           ret= false;
-  if (tb_file_info (dir_c, &info)) {
-    switch (info.type) {
-    case TB_FILE_TYPE_DIRECTORY:
-    case TB_FILE_TYPE_DOT:
-    case TB_FILE_TYPE_DOT2:
-      ret= true;
-    }
-  }
-  return s7_make_boolean (sc, ret);
-}
-
-static s7_pointer
-f_isfile (s7_scheme* sc, s7_pointer args) {
-  const char*    dir_c= s7_string (s7_car (args));
-  tb_file_info_t info;
-  bool           ret= false;
-  if (tb_file_info (dir_c, &info)) {
-    switch (info.type) {
-    case TB_FILE_TYPE_FILE:
-      ret= true;
-    }
-  }
-  return s7_make_boolean (sc, ret);
-}
-
-static s7_pointer
 f_chdir (s7_scheme* sc, s7_pointer args) {
   const char* dir_c= s7_string (s7_car (args));
   return s7_make_boolean (sc, tb_directory_current_set (dir_c));
@@ -382,6 +336,22 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
+f_getcwd (s7_scheme* sc, s7_pointer args) {
+  tb_char_t path[GOLDFISH_PATH_MAXN];
+  tb_directory_current (path, GOLDFISH_PATH_MAXN);
+  return s7_make_string (sc, path);
+}
+
+static s7_pointer
+f_getpid (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_integer (sc, (int) GetCurrentProcessId ());
+#else
+  return s7_make_integer (sc, getpid ());
+#endif
+}
+
+static s7_pointer
 f_access (s7_scheme* sc, s7_pointer args) {
   const char* path_c= s7_string (s7_car (args));
   int         mode  = s7_integer ((s7_cadr (args)));
@@ -402,18 +372,6 @@ f_getlogin (s7_scheme* sc, s7_pointer args) {
   struct passwd* pwd= getpwuid (uid);
   return s7_make_string (sc, pwd->pw_name);
 #endif
-}
-
-static s7_pointer
-f_path_getsize (s7_scheme* sc, s7_pointer args) {
-  const char*    path_c= s7_string (s7_car (args));
-  tb_file_info_t info;
-  if (tb_file_info (path_c, &info)) {
-    return s7_make_integer (sc, (int) info.size);
-  }
-  else {
-    return s7_make_integer (sc, (int) -1);
-  }
 }
 
 inline void
@@ -522,6 +480,48 @@ glue_liii_uuid (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
              s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
                                      NULL));
+}
+
+static s7_pointer
+f_isdir (s7_scheme* sc, s7_pointer args) {
+  const char*    dir_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  bool           ret= false;
+  if (tb_file_info (dir_c, &info)) {
+    switch (info.type) {
+    case TB_FILE_TYPE_DIRECTORY:
+    case TB_FILE_TYPE_DOT:
+    case TB_FILE_TYPE_DOT2:
+      ret= true;
+    }
+  }
+  return s7_make_boolean (sc, ret);
+}
+
+static s7_pointer
+f_isfile (s7_scheme* sc, s7_pointer args) {
+  const char*    dir_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  bool           ret= false;
+  if (tb_file_info (dir_c, &info)) {
+    switch (info.type) {
+    case TB_FILE_TYPE_FILE:
+      ret= true;
+    }
+  }
+  return s7_make_boolean (sc, ret);
+}
+
+static s7_pointer
+f_path_getsize (s7_scheme* sc, s7_pointer args) {
+  const char*    path_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  if (tb_file_info (path_c, &info)) {
+    return s7_make_integer (sc, (int) info.size);
+  }
+  else {
+    return s7_make_integer (sc, (int) -1);
+  }
 }
 
 void
