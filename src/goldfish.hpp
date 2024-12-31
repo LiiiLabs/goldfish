@@ -66,6 +66,13 @@ string_vector_to_s7_vector (s7_scheme* sc, vector<string> v) {
   return ret;
 }
 
+inline void
+glue_define (s7_scheme *sc, const char* name, const char* desc, s7_function f, s7_int required, s7_int optional) {
+  s7_pointer cur_env= s7_curlet (sc);
+  s7_pointer func= s7_make_typed_function (sc, name, f, required, optional, false, desc, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+}
+
 static s7_pointer
 f_version (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, GOLDFISH_VERSION);
@@ -213,15 +220,48 @@ f_executable (s7_scheme* sc, s7_pointer args) {
 }
 
 inline void
+glue_executable (s7_scheme* sc) {
+  const char* name= "g_executable";
+  const char* desc= "(g_executable) => string";
+  glue_define (sc, name, desc, f_executable, 0, 0);
+}
+
+inline void
 glue_liii_sys (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
+  glue_executable (sc);
+}
 
-  const char* s_executable= "g_executable";
-  const char* d_executable= "(g_executable) => string";
+static s7_pointer
+f_os_arch (s7_scheme* sc, s7_pointer args) {
+  return s7_make_string (sc, TB_ARCH_STRING);
+}
 
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_executable),
-             s7_make_typed_function (sc, s_executable, f_executable, 0, 0,
-                                     false, d_executable, NULL));
+inline void
+glue_os_arch (s7_scheme* sc) {
+  const char* name= "g_os-arch";
+  const char* desc= "(g_os-arch) => string";
+  glue_define (sc, name, desc, f_os_arch, 0, 0);
+}
+
+static s7_pointer
+f_os_type (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_LINUX
+  return s7_make_string (sc, "Linux");
+#endif
+#ifdef TB_CONFIG_OS_MACOSX
+  return s7_make_string (sc, "Darwin");
+#endif
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_string (sc, "Windows");
+#endif
+  return s7_make_boolean (sc, false);
+}
+
+inline void
+glue_os_type (s7_scheme* sc) {
+  const char* name= "g_os-type";
+  const char* desc= "(g_os-type) => string";
+  glue_define (sc, name, desc, f_os_type, 0, 0);
 }
 
 static s7_pointer
@@ -252,11 +292,23 @@ f_os_call (s7_scheme* sc, s7_pointer args) {
   return s7_make_integer (sc, ret);
 }
 
+inline void glue_os_call(s7_scheme* sc) {
+  const char* name = "g_os-call";
+  const char* desc = "(g_os-call string) => int, execute a shell command and return the exit code";
+  glue_define(sc, name, desc, f_os_call, 1, 0);
+}
+
 static s7_pointer
 f_system (s7_scheme* sc, s7_pointer args) {
   const char* cmd_c= s7_string (s7_car (args));
   int         ret  = (int) std::system (cmd_c);
   return s7_make_integer (sc, ret);
+}
+
+inline void glue_system(s7_scheme* sc) {
+  const char* name = "g_system";
+  const char* desc = "(g_system string) => int, execute a shell command and return the exit code";
+  glue_define(sc, name, desc, f_system, 1, 0);
 }
 
 static s7_pointer
@@ -271,23 +323,17 @@ f_access (s7_scheme* sc, s7_pointer args) {
   return s7_make_boolean (sc, ret);
 }
 
-static s7_pointer
-f_os_arch (s7_scheme* sc, s7_pointer args) {
-  return s7_make_string (sc, TB_ARCH_STRING);
+inline void glue_access(s7_scheme* sc) {
+  const char* name = "g_access";
+  const char* desc = "(g_access string integer) => boolean, check file access permissions";
+  glue_define(sc, name, desc, f_access, 2, 0);
 }
 
-static s7_pointer
-f_os_type (s7_scheme* sc, s7_pointer args) {
-#ifdef TB_CONFIG_OS_LINUX
-  return s7_make_string (sc, "Linux");
-#endif
-#ifdef TB_CONFIG_OS_MACOSX
-  return s7_make_string (sc, "Darwin");
-#endif
-#ifdef TB_CONFIG_OS_WINDOWS
-  return s7_make_string (sc, "Windows");
-#endif
-  return s7_make_boolean (sc, false);
+inline void
+glue_unsetenv (s7_scheme* sc) {
+  const char* name= "g_unsetenv";
+  const char* desc= "(g_unsetenv string): string => boolean";
+  glue_define (sc, name, desc, f_unset_environment_variable, 1, 0);
 }
 
 static s7_pointer
@@ -297,16 +343,35 @@ f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, path);
 }
 
+inline void
+glue_os_temp_dir (s7_scheme* sc) {
+  const char* name= "g_os-temp-dir";
+  const char* desc= "(g_os-temp-dir) => string, get the temporary directory path";
+  glue_define (sc, name, desc, f_os_temp_dir, 0, 0);
+}
+
 static s7_pointer
 f_mkdir (s7_scheme* sc, s7_pointer args) {
   const char* dir_c= s7_string (s7_car (args));
   return s7_make_boolean (sc, tb_directory_create (dir_c));
 }
 
+inline void glue_mkdir(s7_scheme* sc) {
+  const char* name = "g_mkdir";
+  const char* desc = "(g_mkdir string) => boolean, create a directory";
+  glue_define(sc, name, desc, f_mkdir, 1, 0);
+}
+
 static s7_pointer
 f_chdir (s7_scheme* sc, s7_pointer args) {
   const char* dir_c= s7_string (s7_car (args));
   return s7_make_boolean (sc, tb_directory_current_set (dir_c));
+}
+
+inline void glue_chdir(s7_scheme* sc) {
+  const char* name = "g_chdir";
+  const char* desc = "(g_chdir string) => boolean, change the current working directory";
+  glue_define(sc, name, desc, f_chdir, 1, 0);
 }
 
 static tb_long_t
@@ -347,11 +412,25 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
   return string_vector_to_s7_vector (sc, entries);
 }
 
+inline void
+glue_listdir (s7_scheme* sc) {
+  const char* name= "g_listdir";
+  const char* desc= "(g_listdir string) => vector, list the contents of a directory";
+  glue_define (sc, name, desc, f_listdir, 1, 0);
+}
+
 static s7_pointer
 f_getcwd (s7_scheme* sc, s7_pointer args) {
   tb_char_t path[GOLDFISH_PATH_MAXN];
   tb_directory_current (path, GOLDFISH_PATH_MAXN);
   return s7_make_string (sc, path);
+}
+
+inline void
+glue_getcwd (s7_scheme* sc) {
+  const char* name= "g_getcwd";
+  const char* desc= "(g_getcwd) => string, get the current working directory";
+  glue_define (sc, name, desc, f_getcwd, 0, 0);
 }
 
 static s7_pointer
@@ -365,6 +444,13 @@ f_getlogin (s7_scheme* sc, s7_pointer args) {
 #endif
 }
 
+inline void
+glue_getlogin (s7_scheme* sc) {
+  const char* name= "g_getlogin";
+  const char* desc= "(g_getlogin) => string, get the current user's login name";
+  glue_define (sc, name, desc, f_getlogin, 0, 0);
+}
+
 static s7_pointer
 f_getpid (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_WINDOWS
@@ -375,79 +461,27 @@ f_getpid (s7_scheme* sc, s7_pointer args) {
 }
 
 inline void
+glue_getpid (s7_scheme* sc) {
+  const char* name= "g_getpid";
+  const char* desc= "(g_getpid) => integer";
+  glue_define (sc, name, desc, f_getpid, 0, 0);
+}
+
+inline void
 glue_liii_os (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
-
-  const char* s_os_type= "g_os-type";
-  const char* d_os_type= "(g_os-type) => string";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
-             s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
-                                     d_os_type, NULL));
-
-  const char* s_os_arch    = "g_os-arch";
-  const char* d_os_arch    = "(g_os-arch) => string";
-  const char* s_os_call    = "g_os-call";
-  const char* d_os_call    = "(string) => int";
-  const char* s_system     = "g_system";
-  const char* d_system     = "(string) => int";
-  const char* s_os_temp_dir= "g_os-temp-dir";
-  const char* d_os_temp_dir= "(g_os-temp-dir) => string";
-  const char* s_mkdir      = "g_mkdir";
-  const char* d_mkdir      = "(g_mkdir string) => boolean";
-  const char* s_chdir      = "g_chdir";
-  const char* d_chdir      = "(g_chdir string) => boolean";
-  const char* s_listdir    = "g_listdir";
-  const char* d_listdir    = "(g_listdir) => vector";
-  const char* s_getcwd     = "g_getcwd";
-  const char* d_getcwd     = "(g_getcwd) => string";
-  const char* s_access     = "g_access";
-  const char* d_access     = "(g_access string integer) => boolean";
-  const char* s_getlogin   = "g_getlogin";
-  const char* d_getlogin   = "(g_getlogin) => string";
-  const char* s_getpid     = "g_getpid";
-  const char* d_getpid     = "(g_getpid) => integer";
-
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
-             s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
-                                     d_os_arch, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
-             s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
-                                     d_os_call, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_system),
-             s7_make_typed_function (sc, s_system, f_system, 1, 0, false,
-                                     d_system, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_temp_dir),
-             s7_make_typed_function (sc, s_os_temp_dir, f_os_temp_dir, 0, 0,
-                                     false, d_os_call, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_mkdir),
-             s7_make_typed_function (sc, s_mkdir, f_mkdir, 1, 0, false, d_mkdir,
-                                     NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_chdir),
-             s7_make_typed_function (sc, s_chdir, f_chdir, 1, 0, false, d_chdir,
-                                     NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_listdir),
-             s7_make_typed_function (sc, s_listdir, f_listdir, 1, 0, false,
-                                     d_listdir, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_getcwd),
-             s7_make_typed_function (sc, s_getcwd, f_getcwd, 0, 0, false,
-                                     d_getcwd, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_access),
-             s7_make_typed_function (sc, s_access, f_access, 2, 0, false,
-                                     d_access, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_getlogin),
-             s7_make_typed_function (sc, s_getlogin, f_getlogin, 0, 0, false,
-                                     d_access, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_getpid),
-             s7_make_typed_function (sc, s_getpid, f_getpid, 0, 0, false,
-                                     d_getpid, NULL));
-
-  const char* s_unsetenv= "g_unsetenv";
-  const char* d_unsetenv= "(g_unsetenv string): string => boolean";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_unsetenv),
-             s7_make_typed_function (sc, s_unsetenv,
-                                     f_unset_environment_variable, 1, 0, false,
-                                     d_unsetenv, NULL));
-
+  glue_os_arch (sc);
+  glue_os_type (sc);
+  glue_os_call (sc);
+  glue_system (sc);
+  glue_access (sc);
+  glue_unsetenv (sc);
+  glue_getcwd (sc);
+  glue_os_temp_dir (sc);
+  glue_mkdir (sc);
+  glue_chdir (sc);
+  glue_listdir (sc);
+  glue_getlogin (sc);
+  glue_getpid (sc);
 }
 
 static s7_pointer
@@ -458,13 +492,15 @@ f_uuid4 (s7_scheme* sc, s7_pointer args) {
 }
 
 inline void
+glue_uuid4 (s7_scheme* sc) {
+  const char* name= "g_uuid4";
+  const char* desc= "(g_uuid4) => string";
+  glue_define (sc, name, desc, f_uuid4, 0, 0);
+}
+
+inline void
 glue_liii_uuid (s7_scheme* sc) {
-  s7_pointer  cur_env= s7_curlet (sc);
-  const char* s_uuid4= "g_uuid4";
-  const char* d_uuid4= "(g_uuid4) => string";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
-             s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
-                                     NULL));
+  glue_uuid4 (sc);
 }
 
 static s7_pointer
@@ -485,11 +521,9 @@ f_isdir (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_isdir (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
   const char* name= "g_isdir";
   const char* desc= "(g_isdir string) => boolean";
-  s7_pointer func= s7_make_typed_function (sc, name, f_isdir, 1, 0, false, desc, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+  glue_define (sc, name, desc, f_isdir, 1, 0);
 }
 
 static s7_pointer
@@ -508,11 +542,9 @@ f_isfile (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_isfile (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
   const char* name= "g_isfile";
   const char* desc= "(g_isfile string) => boolean";
-  s7_pointer func= s7_make_typed_function (sc, name, f_isfile, 1, 0, false, desc, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+  glue_define (sc, name, desc, f_isfile, 1, 0);
 }
 
 static s7_pointer
@@ -529,11 +561,9 @@ f_path_getsize (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_path_getsize (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
   const char* name= "g_path-getsize";
   const char* desc= "(g_path_getsize string): string => integer";
-  s7_pointer func= s7_make_typed_function (sc, name, f_path_getsize, 1, 0, false, desc, NULL);
-  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+  glue_define (sc, name, desc, f_path_getsize, 1, 0);
 }
 
 inline void

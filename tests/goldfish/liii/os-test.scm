@@ -37,6 +37,10 @@
     (let ((t2 (current-second)))
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
+(check (string-null? (getenv "PATH")) => #f)
+(unsetenv "PATH")
+(check (getenv "PATH") => #f)
+
 (when (os-windows?)
   (check (string-starts? (os-temp-dir) "C:") => #t))
 
@@ -80,10 +84,6 @@
 
 (when (os-windows?)
   (check (> (vector-length (listdir "C:")) 0) => #t))
-
-(check (string-null? (getenv "PATH")) => #f)
-(unsetenv "PATH")
-(check (getenv "PATH") => #f)
 
 (check-false (string-null? (getcwd)))
 

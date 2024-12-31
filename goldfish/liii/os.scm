@@ -26,6 +26,34 @@
         (liii string))
 (begin
 
+(define (os-arch)
+  (g_os-arch))
+
+(define (os-type)
+  (g_os-type))
+
+(define (os-linux?)
+  (let ((name (os-type)))
+    (and name (string=? name "Linux"))))
+
+(define (os-macos?)
+  (let ((name (os-type)))
+    (and name (string=? name "Darwin"))))
+
+(define (os-windows?)
+  (let ((name (os-type)))
+    (and name (string=? name "Windows"))))
+
+(define (os-sep)
+  (if (os-windows?)
+    #\\
+    #\/))
+
+(define (pathsep)
+  (if (os-windows?)
+    #\;
+    #\:))
+
 (define (%check-dir-andthen path f)
   (cond ((not (file-exists? path))
          (file-not-found-error
@@ -41,16 +69,6 @@
 (define (system command)
   (g_system command))
 
-(define (os-sep)
-  (if (os-windows?)
-    #\\
-    #\/))
-
-(define (pathsep)
-  (if (os-windows?)
-    #\;
-    #\:))
-
 (define (access path mode)
   (cond ((eq? mode 'F_OK) (g_access path 0))
         ((eq? mode 'X_OK) (g_access path 1))
@@ -63,24 +81,6 @@
 
 (define (unsetenv key)
   (g_unsetenv key))
-
-(define (os-linux?)
-  (let ((name (os-type)))
-    (and name (string=? name "Linux"))))
-
-(define (os-macos?)
-  (let ((name (os-type)))
-    (and name (string=? name "Darwin"))))
-
-(define (os-windows?)
-  (let ((name (os-type)))
-    (and name (string=? name "Windows"))))
-
-(define (os-arch)
-  (g_os-arch))
-
-(define (os-type)
-  (g_os-type))
 
 (define (os-temp-dir)
   (let1 temp-dir (g_os-temp-dir)
