@@ -1511,6 +1511,168 @@
 
   <section|实现>
 
+  <paragraph|os-arch><typehint|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-arch)
+
+    \ \ (g_os-arch))
+
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_arch (s7_scheme* sc, s7_pointer args) {
+
+    \ \ return s7_make_string (sc, TB_ARCH_STRING);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|os-type><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-type)
+
+    \ \ (g_os-type))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试用例>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (os-linux?)
+
+    \ \ (check (os-type) =\<gtr\> "Linux"))
+
+    \;
+
+    (when (os-macos?)
+
+    \ \ (check (os-type) =\<gtr\> "Darwin"))
+
+    \;
+
+    (when (os-windows?)
+
+    \ \ (check (os-type) =\<gtr\> "Windows"))
+
+    \;
+
+    (when (not (os-windows?))
+
+    \ \ (let ((t1 (current-second)))
+
+    \ \ \ \ (os-call "sleep 1")
+
+    \ \ \ \ (let ((t2 (current-second)))
+
+    \ \ \ \ \ \ (check (\<gtr\>= (ceiling (- t2 t1)) 1) =\<gtr\> #t))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|C++实现>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_type (s7_scheme* sc, s7_pointer args) {
+
+    #ifdef TB_CONFIG_OS_LINUX
+
+    \ \ return s7_make_string (sc, "Linux");
+
+    #endif
+
+    #ifdef TB_CONFIG_OS_MACOSX
+
+    \ \ return s7_make_string (sc, "Darwin");
+
+    #endif
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ return s7_make_string (sc, "Windows");
+
+    #endif
+
+    \ \ return s7_make_boolean (sc, false);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|os-linux?><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-linux?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Linux"))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|os-macos?><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-macos?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Darwin"))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|os-windows?><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-windows?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Windows"))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|os-sep>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-sep)
+
+    \ \ (if (os-windows?)
+
+    \ \ \ \ #\\\\
+
+    \ \ \ \ #\\/))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|pathsep>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (pathsep)
+
+    \ \ (if (os-windows?)
+
+    \ \ \ \ #\\;
+
+    \ \ \ \ #\\:))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|%check-dir-andthen>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -1627,34 +1789,6 @@
     \;
   </cpp-chunk>
 
-  <paragraph|os-sep>
-
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (os-sep)
-
-    \ \ (if (os-windows?)
-
-    \ \ \ \ #\\\\
-
-    \ \ \ \ #\\/))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|pathsep>
-
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (pathsep)
-
-    \ \ (if (os-windows?)
-
-    \ \ \ \ #\\;
-
-    \ \ \ \ #\\:))
-
-    \;
-  </goldfish-chunk>
-
   <paragraph|access>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -1718,142 +1852,6 @@
 
     \;
   </goldfish-chunk>
-
-  \;
-
-  <paragraph|os-linux?><goldfish-lang|() =\<gtr\> boolean?>
-
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (os-linux?)
-
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Linux"))))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|os-macos?><goldfish-lang|() =\<gtr\> boolean?>
-
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (os-macos?)
-
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Darwin"))))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|os-windows?><goldfish-lang|() =\<gtr\> boolean?>
-
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (os-windows?)
-
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Windows"))))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|os-arch><typehint|() =\<gtr\> boolean?>
-
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (os-arch)
-
-    \ \ (g_os-arch))
-
-    \;
-  </goldfish-chunk>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_os_arch (s7_scheme* sc, s7_pointer args) {
-
-    \ \ return s7_make_string (sc, TB_ARCH_STRING);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|os-type><goldfish-lang|() =\<gtr\> boolean?>
-
-  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (os-type)
-
-    \ \ (g_os-type))
-
-    \;
-  </goldfish-chunk>
-
-  <subparagraph|测试用例>
-
-  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
-    (when (os-linux?)
-
-    \ \ (check (os-type) =\<gtr\> "Linux"))
-
-    \;
-
-    (when (os-macos?)
-
-    \ \ (check (os-type) =\<gtr\> "Darwin"))
-
-    \;
-
-    (when (os-windows?)
-
-    \ \ (check (os-type) =\<gtr\> "Windows"))
-
-    \;
-
-    (when (not (os-windows?))
-
-    \ \ (let ((t1 (current-second)))
-
-    \ \ \ \ (os-call "sleep 1")
-
-    \ \ \ \ (let ((t2 (current-second)))
-
-    \ \ \ \ \ \ (check (\<gtr\>= (ceiling (- t2 t1)) 1) =\<gtr\> #t))))
-
-    \;
-  </scm-chunk>
-
-  <subparagraph|C++实现>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_os_type (s7_scheme* sc, s7_pointer args) {
-
-    #ifdef TB_CONFIG_OS_LINUX
-
-    \ \ return s7_make_string (sc, "Linux");
-
-    #endif
-
-    #ifdef TB_CONFIG_OS_MACOSX
-
-    \ \ return s7_make_string (sc, "Darwin");
-
-    #endif
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ return s7_make_string (sc, "Windows");
-
-    #endif
-
-    \ \ return s7_make_boolean (sc, false);
-
-    }
-
-    \;
-  </cpp-chunk>
 
   <paragraph|os-temp-dir>
 

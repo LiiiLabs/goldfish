@@ -232,6 +232,25 @@ glue_liii_sys (s7_scheme* sc) {
 }
 
 static s7_pointer
+f_os_arch (s7_scheme* sc, s7_pointer args) {
+  return s7_make_string (sc, TB_ARCH_STRING);
+}
+
+static s7_pointer
+f_os_type (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_LINUX
+  return s7_make_string (sc, "Linux");
+#endif
+#ifdef TB_CONFIG_OS_MACOSX
+  return s7_make_string (sc, "Darwin");
+#endif
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_string (sc, "Windows");
+#endif
+  return s7_make_boolean (sc, false);
+}
+
+static s7_pointer
 f_os_call (s7_scheme* sc, s7_pointer args) {
   const char*       cmd_c= s7_string (s7_car (args));
   tb_process_attr_t attr = {tb_null};
@@ -276,25 +295,6 @@ f_access (s7_scheme* sc, s7_pointer args) {
   bool           ret= (access (path_c, mode) == 0);
 #endif
   return s7_make_boolean (sc, ret);
-}
-
-static s7_pointer
-f_os_arch (s7_scheme* sc, s7_pointer args) {
-  return s7_make_string (sc, TB_ARCH_STRING);
-}
-
-static s7_pointer
-f_os_type (s7_scheme* sc, s7_pointer args) {
-#ifdef TB_CONFIG_OS_LINUX
-  return s7_make_string (sc, "Linux");
-#endif
-#ifdef TB_CONFIG_OS_MACOSX
-  return s7_make_string (sc, "Darwin");
-#endif
-#ifdef TB_CONFIG_OS_WINDOWS
-  return s7_make_string (sc, "Windows");
-#endif
-  return s7_make_boolean (sc, false);
 }
 
 static s7_pointer
