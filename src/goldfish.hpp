@@ -220,15 +220,15 @@ f_executable (s7_scheme* sc, s7_pointer args) {
 }
 
 inline void
+glue_executable (s7_scheme* sc) {
+  const char* name= "g_executable";
+  const char* desc= "(g_executable) => string";
+  glue_define (sc, name, desc, f_executable, 0, 0);
+}
+
+inline void
 glue_liii_sys (s7_scheme* sc) {
-  s7_pointer cur_env= s7_curlet (sc);
-
-  const char* s_executable= "g_executable";
-  const char* d_executable= "(g_executable) => string";
-
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_executable),
-             s7_make_typed_function (sc, s_executable, f_executable, 0, 0,
-                                     false, d_executable, NULL));
+  glue_executable (sc);
 }
 
 static s7_pointer
