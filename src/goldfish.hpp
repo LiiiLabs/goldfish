@@ -225,6 +225,11 @@ glue_liii_sys (s7_scheme* sc) {
 }
 
 static s7_pointer
+f_os_arch (s7_scheme* sc, s7_pointer args) {
+  return s7_make_string (sc, TB_ARCH_STRING);
+}
+
+static s7_pointer
 f_os_type (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_LINUX
   return s7_make_string (sc, "Linux");
@@ -236,11 +241,6 @@ f_os_type (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, "Windows");
 #endif
   return s7_make_boolean (sc, false);
-}
-
-static s7_pointer
-f_os_arch (s7_scheme* sc, s7_pointer args) {
-  return s7_make_string (sc, TB_ARCH_STRING);
 }
 
 static s7_pointer

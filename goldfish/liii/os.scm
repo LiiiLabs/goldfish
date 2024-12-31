@@ -32,12 +32,6 @@
 (define (system command)
   (g_system command))
 
-(define (os-arch)
-  (g_os-arch))
-
-(define (os-type)
-  (g_os-type))
-
 (define (os-windows?)
   (let ((name (os-type)))
     (and name (string=? name "Windows"))))
@@ -102,6 +96,12 @@
 
 (define (unsetenv key)
   (g_unsetenv key))
+
+(define (os-arch)
+  (g_os-arch))
+
+(define (os-type)
+  (g_os-type))
 
 (define (getcwd)
   (g_getcwd))
