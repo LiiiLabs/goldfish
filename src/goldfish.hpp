@@ -225,25 +225,6 @@ glue_liii_sys (s7_scheme* sc) {
 }
 
 static s7_pointer
-f_os_arch (s7_scheme* sc, s7_pointer args) {
-  return s7_make_string (sc, TB_ARCH_STRING);
-}
-
-static s7_pointer
-f_os_type (s7_scheme* sc, s7_pointer args) {
-#ifdef TB_CONFIG_OS_LINUX
-  return s7_make_string (sc, "Linux");
-#endif
-#ifdef TB_CONFIG_OS_MACOSX
-  return s7_make_string (sc, "Darwin");
-#endif
-#ifdef TB_CONFIG_OS_WINDOWS
-  return s7_make_string (sc, "Windows");
-#endif
-  return s7_make_boolean (sc, false);
-}
-
-static s7_pointer
 f_os_call (s7_scheme* sc, s7_pointer args) {
   const char*       cmd_c= s7_string (s7_car (args));
   tb_process_attr_t attr = {tb_null};
@@ -279,10 +260,51 @@ f_system (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
+f_os_arch (s7_scheme* sc, s7_pointer args) {
+  return s7_make_string (sc, TB_ARCH_STRING);
+}
+
+static s7_pointer
+f_os_type (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_LINUX
+  return s7_make_string (sc, "Linux");
+#endif
+#ifdef TB_CONFIG_OS_MACOSX
+  return s7_make_string (sc, "Darwin");
+#endif
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_string (sc, "Windows");
+#endif
+  return s7_make_boolean (sc, false);
+}
+
+static s7_pointer
 f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
   tb_char_t path[GOLDFISH_PATH_MAXN];
   tb_directory_temporary (path, GOLDFISH_PATH_MAXN);
   return s7_make_string (sc, path);
+}
+
+static s7_pointer
+f_mkdir (s7_scheme* sc, s7_pointer args) {
+  const char* dir_c= s7_string (s7_car (args));
+  return s7_make_boolean (sc, tb_directory_create (dir_c));
+}
+
+static s7_pointer
+f_getcwd (s7_scheme* sc, s7_pointer args) {
+  tb_char_t path[GOLDFISH_PATH_MAXN];
+  tb_directory_current (path, GOLDFISH_PATH_MAXN);
+  return s7_make_string (sc, path);
+}
+
+static s7_pointer
+f_getpid (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_integer (sc, (int) GetCurrentProcessId ());
+#else
+  return s7_make_integer (sc, getpid ());
+#endif
 }
 
 static s7_pointer
@@ -316,22 +338,9 @@ f_isfile (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
-f_mkdir (s7_scheme* sc, s7_pointer args) {
-  const char* dir_c= s7_string (s7_car (args));
-  return s7_make_boolean (sc, tb_directory_create (dir_c));
-}
-
-static s7_pointer
 f_chdir (s7_scheme* sc, s7_pointer args) {
   const char* dir_c= s7_string (s7_car (args));
   return s7_make_boolean (sc, tb_directory_current_set (dir_c));
-}
-
-static s7_pointer
-f_getcwd (s7_scheme* sc, s7_pointer args) {
-  tb_char_t path[GOLDFISH_PATH_MAXN];
-  tb_directory_current (path, GOLDFISH_PATH_MAXN);
-  return s7_make_string (sc, path);
 }
 
 static tb_long_t
@@ -392,15 +401,6 @@ f_getlogin (s7_scheme* sc, s7_pointer args) {
   uid_t          uid= getuid ();
   struct passwd* pwd= getpwuid (uid);
   return s7_make_string (sc, pwd->pw_name);
-#endif
-}
-
-static s7_pointer
-f_getpid (s7_scheme* sc, s7_pointer args) {
-#ifdef TB_CONFIG_OS_WINDOWS
-  return s7_make_integer (sc, (int) GetCurrentProcessId ());
-#else
-  return s7_make_integer (sc, getpid ());
 #endif
 }
 

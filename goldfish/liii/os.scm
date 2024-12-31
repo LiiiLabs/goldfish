@@ -32,18 +32,6 @@
 (define (system command)
   (g_system command))
 
-(define (os-windows?)
-  (let ((name (os-type)))
-    (and name (string=? name "Windows"))))
-
-(define (os-linux?)
-  (let ((name (os-type)))
-    (and name (string=? name "Linux"))))
-
-(define (os-macos?)
-  (let ((name (os-type)))
-    (and name (string=? name "Darwin"))))
-
 (define (os-sep)
   (if (os-windows?)
     #\\
@@ -53,10 +41,6 @@
   (if (os-windows?)
     #\;
     #\:))
-
-(define (os-temp-dir)
-  (let1 temp-dir (g_os-temp-dir)
-    (string-remove-suffix temp-dir (string (os-sep)))))
 
 (define (access path mode)
   (cond ((eq? mode 'F_OK) (g_access path 0))
@@ -73,11 +57,6 @@
          (not-a-directory-error
            (string-append "Not a directory: '" path "'")))
         (else (f path))))
-
-(define (mkdir path)
-  (if (file-exists? path)
-    (file-exists-error (string-append "File exists: '" path "'"))
-    (g_mkdir path)))
 
 
 (define (chdir path)
@@ -97,11 +76,32 @@
 (define (unsetenv key)
   (g_unsetenv key))
 
+(define (os-linux?)
+  (let ((name (os-type)))
+    (and name (string=? name "Linux"))))
+
+(define (os-macos?)
+  (let ((name (os-type)))
+    (and name (string=? name "Darwin"))))
+
+(define (os-windows?)
+  (let ((name (os-type)))
+    (and name (string=? name "Windows"))))
+
 (define (os-arch)
   (g_os-arch))
 
 (define (os-type)
   (g_os-type))
+
+(define (os-temp-dir)
+  (let1 temp-dir (g_os-temp-dir)
+    (string-remove-suffix temp-dir (string (os-sep)))))
+
+(define (mkdir path)
+  (if (file-exists? path)
+    (file-exists-error (string-append "File exists: '" path "'"))
+    (g_mkdir path)))
 
 (define (getcwd)
   (g_getcwd))

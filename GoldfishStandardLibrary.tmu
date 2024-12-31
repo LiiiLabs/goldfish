@@ -1489,7 +1489,7 @@
 
   <section|实现>
 
-  \;
+  <paragraph|os-call>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (os-call command)
@@ -1497,37 +1497,95 @@
     \ \ (g_os-call command))
 
     \;
+  </goldfish-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_call (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ \ \ \ cmd_c= s7_string (s7_car (args));
+
+    \ \ tb_process_attr_t attr = {tb_null};
+
+    \ \ attr.flags \ \ \ \ \ \ \ \ \ \ \ \ = TB_PROCESS_FLAG_NO_WINDOW;
+
+    \ \ int ret;
+
+    \;
+
+    #if _MSC_VER
+
+    \ \ ret= (int) std::system (cmd_c);
+
+    #else
+
+    \ \ wordexp_t p;
+
+    \ \ ret= wordexp (cmd_c, &p, 0);
+
+    \ \ if (ret != 0) {
+
+    \ \ \ \ // failed after calling wordexp
+
+    \ \ }
+
+    \ \ else if (p.we_wordc == 0) {
+
+    \ \ \ \ wordfree (&p);
+
+    \ \ \ \ ret= EINVAL;
+
+    \ \ }
+
+    \ \ else {
+
+    \ \ \ \ ret= (int) tb_process_run (p.we_wordv[0], (tb_char_t const**) p.we_wordv,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ &attr);
+
+    \ \ \ \ wordfree (&p);
+
+    \ \ }
+
+    #endif
+
+    \ \ return s7_make_integer (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|system>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (system command)
 
     \ \ (g_system command))
 
     \;
+  </goldfish-chunk>
 
-    (define (os-windows?)
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
 
-    \ \ (let ((name (os-type)))
+    f_system (s7_scheme* sc, s7_pointer args) {
 
-    \ \ \ \ (and name (string=? name "Windows"))))
+    \ \ const char* cmd_c= s7_string (s7_car (args));
 
-    \;
+    \ \ int \ \ \ \ \ \ \ \ ret \ = (int) std::system (cmd_c);
 
-    (define (os-linux?)
+    \ \ return s7_make_integer (sc, ret);
 
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Linux"))))
-
-    \;
-
-    (define (os-macos?)
-
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Darwin"))))
+    }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|os-sep>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (os-sep)
 
     \ \ (if (os-windows?)
@@ -1537,7 +1595,11 @@
     \ \ \ \ #\\/))
 
     \;
+  </goldfish-chunk>
 
+  <paragraph|pathsep>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (pathsep)
 
     \ \ (if (os-windows?)
@@ -1547,15 +1609,9 @@
     \ \ \ \ #\\:))
 
     \;
+  </goldfish-chunk>
 
-    (define (os-temp-dir)
-
-    \ \ (let1 temp-dir (g_os-temp-dir)
-
-    \ \ \ \ (string-remove-suffix temp-dir (string (os-sep)))))
-
-    \;
-
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (access path mode)
 
     \ \ (cond ((eq? mode 'F_OK) (g_access path 0))
@@ -1585,16 +1641,6 @@
     \ \ \ \ \ \ \ \ \ \ \ (string-append "Not a directory: '" path "'")))
 
     \ \ \ \ \ \ \ \ (else (f path))))
-
-    \;
-
-    (define (mkdir path)
-
-    \ \ (if (file-exists? path)
-
-    \ \ \ \ (file-exists-error (string-append "File exists: '" path "'"))
-
-    \ \ \ \ (g_mkdir path)))
 
     \;
 
@@ -1639,9 +1685,39 @@
 
   <paragraph|os-linux?><goldfish-lang|() =\<gtr\> boolean?>
 
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-linux?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Linux"))))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|os-macos?><goldfish-lang|() =\<gtr\> boolean?>
 
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-macos?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Darwin"))))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|os-windows?><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-windows?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Windows"))))
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|os-arch><typehint|() =\<gtr\> boolean?>
 
@@ -1667,7 +1743,7 @@
 
   <paragraph|os-type><goldfish-lang|() =\<gtr\> boolean?>
 
-  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (os-type)
 
     \ \ (g_os-type))
@@ -1743,6 +1819,18 @@
 
   <paragraph|os-temp-dir>
 
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-temp-dir)
+
+    \ \ (let1 temp-dir (g_os-temp-dir)
+
+    \ \ \ \ (string-remove-suffix temp-dir (string (os-sep)))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试用例>
+
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (os-windows?)
 
@@ -1757,7 +1845,37 @@
     \;
   </scm-chunk>
 
+  <subparagraph|C++实现>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
+
+    \ \ tb_directory_temporary (path, GOLDFISH_PATH_MAXN);
+
+    \ \ return s7_make_string (sc, path);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|mkdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|false>
+    (define (mkdir path)
+
+    \ \ (if (file-exists? path)
+
+    \ \ \ \ (file-exists-error (string-append "File exists: '" path "'"))
+
+    \ \ \ \ (g_mkdir path)))
+
+    \;
+  </goldfish-chunk>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (not (os-windows?))
@@ -1781,13 +1899,19 @@
     \;
   </scm-chunk>
 
-  <paragraph|getcwd>
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
 
-  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
-    (check-false (string-null? (getcwd)))
+    f_mkdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* dir_c= s7_string (s7_car (args));
+
+    \ \ return s7_make_boolean (sc, tb_directory_create (dir_c));
+
+    }
 
     \;
-  </scm-chunk>
+  </cpp-chunk>
 
   <paragraph|listdir>
 
@@ -1871,6 +1995,28 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (check-false (string-null? (getcwd)))
+
+    \;
+  </scm-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_getcwd (s7_scheme* sc, s7_pointer args) {
+
+    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
+
+    \ \ tb_directory_current (path, GOLDFISH_PATH_MAXN);
+
+    \ \ return s7_make_string (sc, path);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|getlogin><index|getlogin>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -1895,105 +2041,29 @@
     \;
   </goldfish-chunk>
 
-  \;
-
-  <paragraph|g_os-arch><index|g_os-arch>
-
-  <paragraph|g_os-call><index|g_os-call>
-
   <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
 
-    f_os_call (s7_scheme* sc, s7_pointer args) {
+    f_getpid (s7_scheme* sc, s7_pointer args) {
 
-    \ \ const char* \ \ \ \ \ \ cmd_c= s7_string (s7_car (args));
+    #ifdef TB_CONFIG_OS_WINDOWS
 
-    \ \ tb_process_attr_t attr = {tb_null};
-
-    \ \ attr.flags \ \ \ \ \ \ \ \ \ \ \ \ = TB_PROCESS_FLAG_NO_WINDOW;
-
-    \ \ int ret;
-
-    \;
-
-    #if _MSC_VER
-
-    \ \ ret= (int) std::system (cmd_c);
+    \ \ return s7_make_integer (sc, (int) GetCurrentProcessId ());
 
     #else
 
-    \ \ wordexp_t p;
-
-    \ \ ret= wordexp (cmd_c, &p, 0);
-
-    \ \ if (ret != 0) {
-
-    \ \ \ \ // failed after calling wordexp
-
-    \ \ }
-
-    \ \ else if (p.we_wordc == 0) {
-
-    \ \ \ \ wordfree (&p);
-
-    \ \ \ \ ret= EINVAL;
-
-    \ \ }
-
-    \ \ else {
-
-    \ \ \ \ ret= (int) tb_process_run (p.we_wordv[0], (tb_char_t const**) p.we_wordv,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ &attr);
-
-    \ \ \ \ wordfree (&p);
-
-    \ \ }
+    \ \ return s7_make_integer (sc, getpid ());
 
     #endif
 
-    \ \ return s7_make_integer (sc, ret);
-
     }
 
     \;
   </cpp-chunk>
 
-  <paragraph|g_system><index|g_system>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_system (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* cmd_c= s7_string (s7_car (args));
-
-    \ \ int \ \ \ \ \ \ \ \ ret \ = (int) std::system (cmd_c);
-
-    \ \ return s7_make_integer (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
+  \;
 
   <paragraph|g_os-temp-dir><index|g_os-temp-dir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
-
-    \ \ tb_directory_temporary (path, GOLDFISH_PATH_MAXN);
-
-    \ \ return s7_make_string (sc, path);
-
-    }
-
-    \;
-  </cpp-chunk>
 
   <paragraph|g_isdir><index|g_isdir>
 
@@ -2063,21 +2133,7 @@
     \;
   </cpp-chunk>
 
-  <paragraph|g_mkdir><index|g_mkdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_mkdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* dir_c= s7_string (s7_car (args));
-
-    \ \ return s7_make_boolean (sc, tb_directory_create (dir_c));
-
-    }
-
-    \;
-  </cpp-chunk>
+  \;
 
   <paragraph|g_chdir><index|g_chdir>
 
@@ -2096,22 +2152,6 @@
   </cpp-chunk>
 
   <paragraph|g_getcwd><index|g_getcwd>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_getcwd (s7_scheme* sc, s7_pointer args) {
-
-    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
-
-    \ \ tb_directory_current (path, GOLDFISH_PATH_MAXN);
-
-    \ \ return s7_make_string (sc, path);
-
-    }
-
-    \;
-  </cpp-chunk>
 
   <paragraph|g_listdir><index|g_listdir>
 
@@ -2248,26 +2288,6 @@
   </cpp-chunk>
 
   <paragraph|g_getpid><index|g_getpid>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_getpid (s7_scheme* sc, s7_pointer args) {
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ return s7_make_integer (sc, (int) GetCurrentProcessId ());
-
-    #else
-
-    \ \ return s7_make_integer (sc, getpid ());
-
-    #endif
-
-    }
-
-    \;
-  </cpp-chunk>
 
   <paragraph|g_path-getsize><index|g_path-getsize>
 
