@@ -25,6 +25,678 @@
     <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
   </hide-preamble>
 
+  <chapter|C++部分开始>
+
+  <section|许可证>
+
+  <\cpp-chunk|src/goldfish.hpp|false|true>
+    //
+
+    // Copyright (C) 2024 The Goldfish Scheme Authors
+
+    //
+
+    // Licensed under the Apache License, Version 2.0 (the "License");
+
+    // you may not use this file except in compliance with the License.
+
+    // You may obtain a copy of the License at
+
+    //
+
+    // http://www.apache.org/licenses/LICENSE-2.0
+
+    //
+
+    // Unless required by applicable law or agreed to in writing, software
+
+    // distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    // License for the specific language governing permissions and limitations
+
+    // under the License.
+
+    //
+
+    \;
+  </cpp-chunk>
+
+  <section|实现>
+
+  <paragraph|头文件>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    #include \<less\>algorithm\<gtr\>
+
+    #include \<less\>cstdlib\<gtr\>
+
+    #include \<less\>cstring\<gtr\>
+
+    #include \<less\>iostream\<gtr\>
+
+    #include \<less\>s7.h\<gtr\>
+
+    #include \<less\>string\<gtr\>
+
+    #include \<less\>vector\<gtr\>
+
+    \;
+
+    #include \<less\>tbox/platform/file.h\<gtr\>
+
+    #include \<less\>tbox/platform/path.h\<gtr\>
+
+    #include \<less\>tbox/tbox.h\<gtr\>
+
+    \;
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    #include \<less\>io.h\<gtr\>
+
+    #include \<less\>windows.h\<gtr\>
+
+    #elif TB_CONFIG_OS_MACOSX
+
+    #include \<less\>limits.h\<gtr\>
+
+    #include \<less\>mach-o/dyld.h\<gtr\>
+
+    #else
+
+    #include \<less\>linux/limits.h\<gtr\>
+
+    #endif
+
+    \;
+
+    #if !defined(TB_CONFIG_OS_WINDOWS)
+
+    #include \<less\>errno.h\<gtr\>
+
+    #include \<less\>pwd.h\<gtr\>
+
+    #include \<less\>unistd.h\<gtr\>
+
+    #include \<less\>wordexp.h\<gtr\>
+
+    #endif
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|GOLDFISH_VERSION>
+
+  金鱼Scheme的版本，<todo|后续统一使用<value|goldfish-version>这个在导言区预定义的值>。文学编程的Build Buffer功能暂时不支持展开导言区预定义的值。
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    #define GOLDFISH_VERSION "17.11.0"
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|GOLDFISH_PATH_MAXN>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    #define GOLDFISH_PATH_MAXN TB_PATH_MAXN
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|全局变量>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static std::vector\<less\>std::string\<gtr\> command_args= std::vector\<less\>std::string\<gtr\> ();
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|goldfish命名空间的开始>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    namespace goldfish {
+
+    using std::cerr;
+
+    using std::cout;
+
+    using std::endl;
+
+    using std::string;
+
+    using std::vector;
+
+    \;
+  </cpp-chunk>
+
+  <subsection|胶水代码>
+
+  <subsubsection|公共辅助函数>
+
+  <subparagraph|string_vector_to_s7_vector>
+
+  将<cpp|std::vector>复制为S7的<scm|vector>。
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline s7_pointer
+
+    string_vector_to_s7_vector (s7_scheme* sc, vector\<less\>string\<gtr\> v) {
+
+    \ \ int \ \ \ \ \ \ \ N \ = v.size ();
+
+    \ \ s7_pointer ret= s7_make_vector (sc, N);
+
+    \ \ for (int i= 0; i \<less\> N; i++) {
+
+    \ \ \ \ s7_vector_set (sc, ret, i, s7_make_string (sc, v[i].c_str ()));
+
+    \ \ }
+
+    \ \ return ret;
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <chapter|boot.scm><label|chapter:scheme_boot>
+
+  S7 Scheme默认并不遵循R7RS，在启动S7 Scheme之后，我们需要做的第一件事就是加载<scm|boot.scm>，实现R7RS的<scm|define-library>和<scm|import>。
+
+  <section|基础文件操作>
+
+  <paragraph|version><index|g_version><typehint|=\<gtr\> string?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_version (s7_scheme* sc, s7_pointer args) {
+
+    \ \ return s7_make_string (sc, GOLDFISH_VERSION);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  \;
+
+  <value|r7rs><paragraph|file-exists?><index|file-exists?>
+
+  <\goldfish-chunk|goldfish/scheme/boot.scm|false|true>
+    (define (file-exists? path)
+
+    \ \ (if (string? path)
+
+    \ \ \ \ (if (not (g_access path 0)) ; F_OK
+
+    \ \ \ \ \ \ #f
+
+    \ \ \ \ \ \ (if (g_access path 4) ; R_OK
+
+    \ \ \ \ \ \ \ \ \ \ #t
+
+    \ \ \ \ \ \ \ \ \ \ (error 'permission-error (string-append "No permission: " path))))
+
+    \ \ \ \ (error 'type-error "(file-exists? path): path should be string")))
+
+    \;
+  </goldfish-chunk>
+
+  <value|r7rs><paragraph|delete-file><index|delete-file><typehint|((path string?))>
+
+  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
+    (define (delete-file path)
+
+    \ \ (if (not (string? path))
+
+    \ \ \ \ (error 'type-error "(delete-file path): path should be string")
+
+    \ \ \ \ (if (not (file-exists? path))
+
+    \ \ \ \ \ \ (error 'read-error (string-append path " does not exist"))
+
+    \ \ \ \ \ \ (g_delete-file path))))
+
+    \;
+  </scm-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_delete_file (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* path_c= s7_string (s7_car (args));
+
+    \ \ return s7_make_boolean (sc, tb_file_remove (path_c));
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_goldfish>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_goldfish (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \;
+
+    \ \ const char* s_version \ \ \ = "version";
+
+    \ \ const char* d_version \ \ \ = "(version) =\<gtr\> string";
+
+    \ \ const char* s_delete_file= "g_delete-file";
+
+    \ \ const char* d_delete_file= "(g_delete-file string) =\<gtr\> boolean";
+
+    \;
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_version),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_version, f_version, 0, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_version, NULL));
+
+    \;
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_delete_file),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_delete_file, f_delete_file, 1, 0,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_delete_file, NULL));
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <section|R7RS函数库>
+
+  <value|r7rs><paragraph|define-library><index|define-library>
+
+  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
+    ; 0-clause BSD
+
+    ; Adapted from S7 Scheme's r7rs.scm
+
+    (define-macro (define-library libname . body) ; \|(lib name)\| -\<gtr\> environment
+
+    \ \ `(define ,(symbol (object-\<gtr\>string libname))
+
+    \ \ \ \ \ (with-let (sublet (unlet)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons 'import import)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons '*export* ())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons 'export (define-macro (,(gensym) . names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(set! *export* (append ',names *export*)))))
+
+    \ \ \ \ \ \ \ ,@body
+
+    \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (member (car entry) '(*export* export import))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (pair? *export*)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (member (car entry) *export*))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (curlet))))))
+
+    \;
+
+    (unless (defined? 'r7rs-import-library-filename)
+
+    \ \ (define (r7rs-import-library-filename libs)
+
+    \ \ \ \ (when (pair? libs)
+
+    \ \ \ \ \ \ (let ((lib-filename (let loop ((lib (if (memq (caar libs) '(only except prefix rename))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cadar libs)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car libs)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (name ""))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! name (string-append name (symbol-\<gtr\>string (car lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? (cdr lib))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append name ".scm")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! name (string-append name "/"))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr lib) name))))))
+
+    \ \ \ \ \ \ \ \ (unless (member lib-filename (*s7* 'file-names))
+
+    \ \ \ \ \ \ \ \ \ \ (load lib-filename)))
+
+    \ \ \ \ \ \ (r7rs-import-library-filename (cdr libs)))))
+
+    \;
+  </scm-chunk>
+
+  <value|r7rs><paragraph|import><index|import>
+
+  <\scm-chunk|goldfish/scheme/boot.scm|true|false>
+    (define-macro (import . libs)
+
+    \ \ `(begin
+
+    \ \ \ \ \ (r7rs-import-library-filename ',libs)
+
+    \ \ \ \ \ (varlet (curlet)
+
+    \ \ \ \ \ \ \ ,@(map (lambda (lib)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case (car lib)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((only)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons name (e name)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ names)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((except)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (member (car entry) names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((prefix)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e prefx)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (string-\<gtr\>symbol\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append (symbol-\<gtr\>string prefx)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>string (car entry))))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr entry)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (caddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((rename)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((lambda (e names)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply inlet
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (map (lambda (entry)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((info (assoc (car entry) names)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if info
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cadr info) (cdr entry))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ entry)))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ e)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value (symbol (object-\<gtr\>string (cadr ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr ',lib)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(let ((sym (symbol (object-\<gtr\>string ',lib))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (not (defined? sym))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (format () "~A not loaded~%" sym)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (symbol-\<gtr\>value sym))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ libs))))
+
+    \;
+  </scm-chunk>
+
+  <chapter|(scheme time)>
+
+  <paragraph|g_current-second><index|g_current-second><typehint|=\<gtr\> inexact?>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_current_second (s7_scheme* sc, s7_pointer args) {
+
+    \ \ // TODO: use std::chrono::tai_clock::now() when using C++ 20
+
+    \ \ tb_timeval_t tp= {0};
+
+    \ \ tb_gettimeofday (&tp, tb_null);
+
+    \ \ s7_double res= (time_t) tp.tv_sec + (tp.tv_usec / 1000000.0);
+
+    \ \ return s7_make_real (sc, res);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_scheme_time>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_scheme_time (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \;
+
+    \ \ const char* s_current_second= "g_current-second";
+
+    \ \ const char* d_current_second= "(g_current-second): () =\<gtr\> double, return the "
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "current unix timestamp in double";
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_current_second),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_current_second, f_current_second, 0,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0, false, d_current_second, NULL));
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <chapter|(scheme process-context)>
+
+  <paragraph|g_get-environment-variable><index|g_get-environment-variable>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
+
+    #ifdef _MSC_VER
+
+    \ \ std::string path_sep= ";";
+
+    #else
+
+    \ \ std::string path_sep= ":";
+
+    #endif
+
+    \ \ std::string \ \ \ \ \ \ \ \ \ ret;
+
+    \ \ tb_size_t \ \ \ \ \ \ \ \ \ \ \ size \ \ \ \ \ \ = 0;
+
+    \ \ const char* \ \ \ \ \ \ \ \ \ key \ \ \ \ \ \ \ = s7_string (s7_car (args));
+
+    \ \ tb_environment_ref_t environment= tb_environment_init ();
+
+    \ \ if (environment) {
+
+    \ \ \ \ size= tb_environment_load (environment, key);
+
+    \ \ \ \ if (size \<gtr\>= 1) {
+
+    \ \ \ \ \ \ tb_for_all_if (tb_char_t const*, value, environment, value) {
+
+    \ \ \ \ \ \ \ \ ret.append (value).append (path_sep);
+
+    \ \ \ \ \ \ }
+
+    \ \ \ \ }
+
+    \ \ }
+
+    \ \ tb_environment_exit (environment);
+
+    \ \ if (size == 0) { // env key not found
+
+    \ \ \ \ return s7_make_boolean (sc, false);
+
+    \ \ }
+
+    \ \ else {
+
+    \ \ \ \ return s7_make_string (sc, ret.substr (0, ret.size () - 1).c_str ());
+
+    \ \ }
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|g_command-line><index|g_command-line>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_command_line (s7_scheme* sc, s7_pointer args) {
+
+    \ \ s7_pointer ret = s7_nil (sc);
+
+    \ \ int \ \ \ \ \ \ \ size= command_args.size ();
+
+    \ \ for (int i= size - 1; i \<gtr\>= 0; i--) {
+
+    \ \ \ \ ret= s7_cons (sc, s7_make_string (sc, command_args[i].c_str ()), ret);
+
+    \ \ }
+
+    \ \ return ret;
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_scheme_process_context>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* env_name= s7_string (s7_car (args));
+
+    \ \ return s7_make_boolean (sc, tb_environment_remove (env_name));
+
+    }
+
+    \;
+
+    inline void
+
+    glue_scheme_process_context (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \;
+
+    \ \ const char* s_get_environment_variable= "g_get-environment-variable";
+
+    \ \ const char* d_get_environment_variable=
+
+    \ \ \ \ \ \ "(g_get-environemt-variable string) =\<gtr\> string";
+
+    \ \ const char* s_command_line= "g_command-line";
+
+    \ \ const char* d_command_line= "(g_command-line) =\<gtr\> string";
+
+    \;
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_get_environment_variable),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_get_environment_variable,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f_get_environment_variable, 1, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_get_environment_variable, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_command_line),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_command_line, f_command_line, 0, 0,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_command_line, NULL));
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <chapter|(liii base64)>
 
   <section|协议>
@@ -581,13 +1253,109 @@
 
   <paragraph|executable><index|executable><typehint|() =\<gtr\> string?>
 
-  具体实现见<smart-ref|paragraph:g_executable>。
-
   <\goldfish-chunk|goldfish/liii/sys.scm|true|true>
     (define (executable) (g_executable))
 
     \;
   </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    string
+
+    goldfish_exe () {
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ char buffer[GOLDFISH_PATH_MAXN];
+
+    \ \ GetModuleFileName (NULL, buffer, GOLDFISH_PATH_MAXN);
+
+    \ \ return string (buffer);
+
+    #elif TB_CONFIG_OS_MACOSX
+
+    \ \ char \ \ \ \ \ \ \ buffer[PATH_MAX];
+
+    \ \ uint32_t \ \ \ size= sizeof (buffer);
+
+    \ \ if (_NSGetExecutablePath (buffer, &size) == 0) {
+
+    \ \ \ \ char real_path[GOLDFISH_PATH_MAXN];
+
+    \ \ \ \ if (realpath (buffer, real_path) != NULL) {
+
+    \ \ \ \ \ \ return string (real_path);
+
+    \ \ \ \ }
+
+    \ \ }
+
+    \ \ return "";
+
+    #elif TB_CONFIG_OS_LINUX
+
+    \ \ char \ \ \ buffer[GOLDFISH_PATH_MAXN];
+
+    \ \ ssize_t len= readlink ("/proc/self/exe", buffer, sizeof (buffer) - 1);
+
+    \ \ if (len != -1) {
+
+    \ \ \ \ buffer[len]= '\\0';
+
+    \ \ \ \ return std::string (buffer);
+
+    \ \ }
+
+    \ \ return "";
+
+    #endif
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_executable (s7_scheme* sc, s7_pointer args) {
+
+    \ \ string exe_path= goldfish_exe ();
+
+    \ \ return s7_make_string (sc, exe_path.c_str ());
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_liii_sys>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_liii_sys (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \;
+
+    \ \ const char* s_executable= "g_executable";
+
+    \ \ const char* d_executable= "(g_executable) =\<gtr\> string";
+
+    \;
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_executable),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_executable, f_executable, 0, 0,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_executable, NULL));
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <section|结尾>
 
@@ -721,97 +1489,9 @@
 
   <section|实现>
 
+  <paragraph|%check-dir-andthen>
+
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (os-call command)
-
-    \ \ (g_os-call command))
-
-    \;
-
-    (define (system command)
-
-    \ \ (g_system command))
-
-    \;
-
-    (define (os-arch)
-
-    \ \ (g_os-arch))
-
-    \;
-
-    (define (os-type)
-
-    \ \ (g_os-type))
-
-    \;
-
-    (define (os-windows?)
-
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Windows"))))
-
-    \;
-
-    (define (os-linux?)
-
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Linux"))))
-
-    \;
-
-    (define (os-macos?)
-
-    \ \ (let ((name (os-type)))
-
-    \ \ \ \ (and name (string=? name "Darwin"))))
-
-    \;
-
-    (define (os-sep)
-
-    \ \ (if (os-windows?)
-
-    \ \ \ \ #\\\\
-
-    \ \ \ \ #\\/))
-
-    \;
-
-    (define (pathsep)
-
-    \ \ (if (os-windows?)
-
-    \ \ \ \ #\\;
-
-    \ \ \ \ #\\:))
-
-    \;
-
-    (define (os-temp-dir)
-
-    \ \ (let1 temp-dir (g_os-temp-dir)
-
-    \ \ \ \ (string-remove-suffix temp-dir (string (os-sep)))))
-
-    \;
-
-    (define (access path mode)
-
-    \ \ (cond ((eq? mode 'F_OK) (g_access path 0))
-
-    \ \ \ \ \ \ \ \ ((eq? mode 'X_OK) (g_access path 1))
-
-    \ \ \ \ \ \ \ \ ((eq? mode 'W_OK) (g_access path 2))
-
-    \ \ \ \ \ \ \ \ ((eq? mode 'R_OK) (g_access path 4))
-
-    \ \ \ \ \ \ \ \ (else (error 'value-error "Allowed mode 'F_OK, 'X_OK,'W_OK, 'R_OK"))))
-
-    \;
-
     (define (%check-dir-andthen path f)
 
     \ \ (cond ((not (file-exists? path))
@@ -829,47 +1509,187 @@
     \ \ \ \ \ \ \ \ (else (f path))))
 
     \;
+  </goldfish-chunk>
 
-    (define (mkdir path)
+  <paragraph|os-call>
 
-    \ \ (if (file-exists? path)
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-call command)
 
-    \ \ \ \ (file-exists-error (string-append "File exists: '" path "'"))
+    \ \ (g_os-call command))
 
-    \ \ \ \ (g_mkdir path)))
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_call (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ \ \ \ cmd_c= s7_string (s7_car (args));
+
+    \ \ tb_process_attr_t attr = {tb_null};
+
+    \ \ attr.flags \ \ \ \ \ \ \ \ \ \ \ \ = TB_PROCESS_FLAG_NO_WINDOW;
+
+    \ \ int ret;
 
     \;
 
+    #if _MSC_VER
+
+    \ \ ret= (int) std::system (cmd_c);
+
+    #else
+
+    \ \ wordexp_t p;
+
+    \ \ ret= wordexp (cmd_c, &p, 0);
+
+    \ \ if (ret != 0) {
+
+    \ \ \ \ // failed after calling wordexp
+
+    \ \ }
+
+    \ \ else if (p.we_wordc == 0) {
+
+    \ \ \ \ wordfree (&p);
+
+    \ \ \ \ ret= EINVAL;
+
+    \ \ }
+
+    \ \ else {
+
+    \ \ \ \ ret= (int) tb_process_run (p.we_wordv[0], (tb_char_t const**) p.we_wordv,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ &attr);
+
+    \ \ \ \ wordfree (&p);
+
+    \ \ }
+
+    #endif
+
+    \ \ return s7_make_integer (sc, ret);
+
+    }
+
     \;
+  </cpp-chunk>
 
-    (define (chdir path)
+  <paragraph|system>
 
-    \ \ (if (file-exists? path)
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (system command)
 
-    \ \ \ \ (g_chdir path)
-
-    \ \ \ \ (file-not-found-error (string-append "No such file or directory: '" path "'"))))
-
-    \;
-
-    (define (rmdir path)
-
-    \ \ (%check-dir-andthen path delete-file))
+    \ \ (g_system command))
 
     \;
+  </goldfish-chunk>
 
-    (define (listdir path)
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
 
-    \ \ (%check-dir-andthen path g_listdir))
+    f_system (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* cmd_c= s7_string (s7_car (args));
+
+    \ \ int \ \ \ \ \ \ \ \ ret \ = (int) std::system (cmd_c);
+
+    \ \ return s7_make_integer (sc, ret);
+
+    }
 
     \;
+  </cpp-chunk>
 
+  <paragraph|os-sep>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-sep)
+
+    \ \ (if (os-windows?)
+
+    \ \ \ \ #\\\\
+
+    \ \ \ \ #\\/))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|pathsep>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (pathsep)
+
+    \ \ (if (os-windows?)
+
+    \ \ \ \ #\\;
+
+    \ \ \ \ #\\:))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|access>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (access path mode)
+
+    \ \ (cond ((eq? mode 'F_OK) (g_access path 0))
+
+    \ \ \ \ \ \ \ \ ((eq? mode 'X_OK) (g_access path 1))
+
+    \ \ \ \ \ \ \ \ ((eq? mode 'W_OK) (g_access path 2))
+
+    \ \ \ \ \ \ \ \ ((eq? mode 'R_OK) (g_access path 4))
+
+    \ \ \ \ \ \ \ \ (else (error 'value-error "Allowed mode 'F_OK, 'X_OK,'W_OK, 'R_OK"))))
+
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_access (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* path_c= s7_string (s7_car (args));
+
+    \ \ int \ \ \ \ \ \ \ \ mode \ = s7_integer ((s7_cadr (args)));
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ bool ret= (_access (path_c, mode) == 0);
+
+    #else
+
+    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= (access (path_c, mode) == 0);
+
+    #endif
+
+    \ \ return s7_make_boolean (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|getenv>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (getenv key)
 
     \ \ (get-environment-variable key))
 
     \;
+  </goldfish-chunk>
 
+  <paragraph|unsetenv>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
     (define (unsetenv key)
 
     \ \ (g_unsetenv key))
@@ -879,13 +1699,75 @@
 
   \;
 
-  <paragraph|os-linux?><goldfish-lang|() =\<gtr\> boolean>
+  <paragraph|os-linux?><goldfish-lang|() =\<gtr\> boolean?>
 
-  <paragraph|os-macos?><goldfish-lang|() =\<gtr\> boolean>
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-linux?)
 
-  <paragraph|os-windows?><goldfish-lang|() =\<gtr\> boolean>
+    \ \ (let ((name (os-type)))
 
-  <paragraph|os-type><goldfish-lang|() =\<gtr\> boolean>
+    \ \ \ \ (and name (string=? name "Linux"))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|os-macos?><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-macos?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Darwin"))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|os-windows?><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-windows?)
+
+    \ \ (let ((name (os-type)))
+
+    \ \ \ \ (and name (string=? name "Windows"))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|os-arch><typehint|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-arch)
+
+    \ \ (g_os-arch))
+
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_arch (s7_scheme* sc, s7_pointer args) {
+
+    \ \ return s7_make_string (sc, TB_ARCH_STRING);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|os-type><goldfish-lang|() =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-type)
+
+    \ \ (g_os-type))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (os-linux?)
@@ -919,7 +1801,51 @@
     \;
   </scm-chunk>
 
+  <subparagraph|C++实现>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_type (s7_scheme* sc, s7_pointer args) {
+
+    #ifdef TB_CONFIG_OS_LINUX
+
+    \ \ return s7_make_string (sc, "Linux");
+
+    #endif
+
+    #ifdef TB_CONFIG_OS_MACOSX
+
+    \ \ return s7_make_string (sc, "Darwin");
+
+    #endif
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ return s7_make_string (sc, "Windows");
+
+    #endif
+
+    \ \ return s7_make_boolean (sc, false);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|os-temp-dir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (os-temp-dir)
+
+    \ \ (let1 temp-dir (g_os-temp-dir)
+
+    \ \ \ \ (string-remove-suffix temp-dir (string (os-sep)))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (os-windows?)
@@ -935,7 +1861,37 @@
     \;
   </scm-chunk>
 
+  <subparagraph|C++实现>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
+
+    \ \ tb_directory_temporary (path, GOLDFISH_PATH_MAXN);
+
+    \ \ return s7_make_string (sc, path);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|mkdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (mkdir path)
+
+    \ \ (if (file-exists? path)
+
+    \ \ \ \ (file-exists-error (string-append "File exists: '" path "'"))
+
+    \ \ \ \ (g_mkdir path)))
+
+    \;
+  </goldfish-chunk>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (not (os-windows?))
@@ -959,15 +1915,69 @@
     \;
   </scm-chunk>
 
-  <paragraph|getcwd>
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
 
-  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
-    (check-false (string-null? (getcwd)))
+    f_mkdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* dir_c= s7_string (s7_car (args));
+
+    \ \ return s7_make_boolean (sc, tb_directory_create (dir_c));
+
+    }
 
     \;
-  </scm-chunk>
+  </cpp-chunk>
+
+  <paragraph|rmdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (rmdir path)
+
+    \ \ (%check-dir-andthen path delete-file))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|chdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (chdir path)
+
+    \ \ (if (file-exists? path)
+
+    \ \ \ \ (g_chdir path)
+
+    \ \ \ \ (file-not-found-error (string-append "No such file or directory: '" path "'"))))
+
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_chdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* dir_c= s7_string (s7_car (args));
+
+    \ \ return s7_make_boolean (sc, tb_directory_current_set (dir_c));
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <paragraph|listdir>
+
+  <\goldfish-chunk|goldfish/liii/os.scm|true|true>
+    (define (listdir path)
+
+    \ \ (%check-dir-andthen path g_listdir))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
     (when (not (os-windows?))
@@ -1027,6 +2037,86 @@
     \;
   </scm-chunk>
 
+  <subparagraph|C++实现>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static tb_long_t
+
+    tb_directory_walk_func (tb_char_t const* path, tb_file_info_t const* info,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tb_cpointer_t priv) {
+
+    \ \ // check
+
+    \ \ tb_assert_and_check_return_val (path && info, TB_DIRECTORY_WALK_CODE_END);
+
+    \;
+
+    \ \ vector\<less\>string\<gtr\>* p_v_result= (vector\<less\>string\<gtr\>*) priv;
+
+    \ \ p_v_result-\<gtr\>push_back (string (path));
+
+    \ \ return TB_DIRECTORY_WALK_CODE_CONTINUE;
+
+    }
+
+    \;
+
+    static s7_pointer
+
+    f_listdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
+
+    \ \ vector\<less\>string\<gtr\> entries;
+
+    \ \ s7_pointer \ \ \ \ ret= s7_make_vector (sc, 0);
+
+    \ \ tb_directory_walk (path_c, 0, tb_false, tb_directory_walk_func, &entries);
+
+    \;
+
+    \ \ int \ \ \ entries_N \ \ = entries.size ();
+
+    \ \ string path_s \ \ \ \ \ = string (path_c);
+
+    \ \ int \ \ \ path_N \ \ \ \ \ = path_s.size ();
+
+    \ \ int \ \ \ path_slash_N= path_N;
+
+    \ \ char \ \ last_ch \ \ \ \ = path_s[path_N - 1];
+
+    #if defined(TB_CONFIG_OS_WINDOWS)
+
+    \ \ if (last_ch != '/' && last_ch != '\\\\') {
+
+    \ \ \ \ path_slash_N= path_slash_N + 1;
+
+    \ \ }
+
+    #else
+
+    \ \ if (last_ch != '/') {
+
+    \ \ \ \ path_slash_N= path_slash_N + 1;
+
+    \ \ }
+
+    #endif
+
+    \ \ for (int i= 0; i \<less\> entries_N; i++) {
+
+    \ \ \ \ entries[i]= entries[i].substr (path_slash_N);
+
+    \ \ }
+
+    \ \ return string_vector_to_s7_vector (sc, entries);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|getenv>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
@@ -1049,6 +2139,28 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (check-false (string-null? (getcwd)))
+
+    \;
+  </scm-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_getcwd (s7_scheme* sc, s7_pointer args) {
+
+    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
+
+    \ \ tb_directory_current (path, GOLDFISH_PATH_MAXN);
+
+    \ \ return s7_make_string (sc, path);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|getlogin><index|getlogin>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -1063,6 +2175,30 @@
     \;
   </goldfish-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_getlogin (s7_scheme* sc, s7_pointer args) {
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ return s7_make_boolean (sc, false);
+
+    #else
+
+    \ \ uid_t \ \ \ \ \ \ \ \ \ uid= getuid ();
+
+    \ \ struct passwd* pwd= getpwuid (uid);
+
+    \ \ return s7_make_string (sc, pwd-\<gtr\>pw_name);
+
+    #endif
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|getpid><index|getpid>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -1072,6 +2208,198 @@
 
     \;
   </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_getpid (s7_scheme* sc, s7_pointer args) {
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ return s7_make_integer (sc, (int) GetCurrentProcessId ());
+
+    #else
+
+    \ \ return s7_make_integer (sc, getpid ());
+
+    #endif
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  \;
+
+  <paragraph|glue_liii_os>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_liii_os (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \;
+  </cpp-chunk>
+
+  <subparagraph|g_os-type>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    \ \ const char* s_os_type= "g_os-type";
+
+    \ \ const char* d_os_type= "(g_os-type) =\<gtr\> string";
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_type, NULL));
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    \ \ const char* s_os_arch \ \ \ = "g_os-arch";
+
+    \ \ const char* d_os_arch \ \ \ = "(g_os-arch) =\<gtr\> string";
+
+    \ \ const char* s_os_call \ \ \ = "g_os-call";
+
+    \ \ const char* d_os_call \ \ \ = "(string) =\<gtr\> int";
+
+    \ \ const char* s_system \ \ \ \ = "g_system";
+
+    \ \ const char* d_system \ \ \ \ = "(string) =\<gtr\> int";
+
+    \ \ const char* s_os_temp_dir= "g_os-temp-dir";
+
+    \ \ const char* d_os_temp_dir= "(g_os-temp-dir) =\<gtr\> string";
+
+    \ \ const char* s_mkdir \ \ \ \ \ = "g_mkdir";
+
+    \ \ const char* d_mkdir \ \ \ \ \ = "(g_mkdir string) =\<gtr\> boolean";
+
+    \ \ const char* s_chdir \ \ \ \ \ = "g_chdir";
+
+    \ \ const char* d_chdir \ \ \ \ \ = "(g_chdir string) =\<gtr\> boolean";
+
+    \ \ const char* s_listdir \ \ \ = "g_listdir";
+
+    \ \ const char* d_listdir \ \ \ = "(g_listdir) =\<gtr\> vector";
+
+    \ \ const char* s_getcwd \ \ \ \ = "g_getcwd";
+
+    \ \ const char* d_getcwd \ \ \ \ = "(g_getcwd) =\<gtr\> string";
+
+    \ \ const char* s_access \ \ \ \ = "g_access";
+
+    \ \ const char* d_access \ \ \ \ = "(g_access string integer) =\<gtr\> boolean";
+
+    \ \ const char* s_getlogin \ \ = "g_getlogin";
+
+    \ \ const char* d_getlogin \ \ = "(g_getlogin) =\<gtr\> string";
+
+    \ \ const char* s_getpid \ \ \ \ = "g_getpid";
+
+    \ \ const char* d_getpid \ \ \ \ = "(g_getpid) =\<gtr\> integer";
+
+    \;
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_arch, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_call, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_system),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_system, f_system, 1, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_system, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_temp_dir),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_temp_dir, f_os_temp_dir, 0, 0,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_os_call, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_mkdir),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_mkdir, f_mkdir, 1, 0, false, d_mkdir,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_chdir),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_chdir, f_chdir, 1, 0, false, d_chdir,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_listdir),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_listdir, f_listdir, 1, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_listdir, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_getcwd),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_getcwd, f_getcwd, 0, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_getcwd, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_access),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_access, f_access, 2, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_access, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_getlogin),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_getlogin, f_getlogin, 0, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_access, NULL));
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_getpid),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_getpid, f_getpid, 0, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_getpid, NULL));
+
+    \;
+  </cpp-chunk>
+
+  <subparagraph|g_unsetenv>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    \ \ const char* s_unsetenv= "g_unsetenv";
+
+    \ \ const char* d_unsetenv= "(g_unsetenv string): string =\<gtr\> boolean";
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_unsetenv),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f_unset_environment_variable, 1, 0, false,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_unsetenv, NULL));
+
+    \;
+  </cpp-chunk>
+
+  <subparagraph|g_path-getsize>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    }
+
+    \;
+  </cpp-chunk>
 
   <section|结尾>
 
@@ -1088,6 +2416,110 @@
 
     \;
   </scm-chunk>
+
+  <chapter|(liii uuid)>
+
+  <section|协议>
+
+  <\goldfish-chunk|goldfish/liii/uuid.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
+  <section|实现>
+
+  <scm|(liii uuid)>是通过C++实现的，本节是相关的胶水代码。
+
+  <paragraph|uuid4><index|g_uuid4><typehint|=\<gtr\> string?>
+
+  <\goldfish-chunk|goldfish/liii/uuid.scm|true|false>
+    (define-library (liii uuid)
+
+    (export uuid4)
+
+    (begin
+
+    \;
+
+    (define (uuid4) (g_uuid4))
+
+    \;
+
+    ) ; end of begin
+
+    ) ; end of define-library
+
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_uuid4 (s7_scheme* sc, s7_pointer args) {
+
+    \ \ tb_char_t \ \ \ \ \ \ \ uuid[37];
+
+    \ \ const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
+
+    \ \ return s7_make_string (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_liii_uuid>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_liii_uuid (s7_scheme* sc) {
+
+    \ \ s7_pointer \ cur_env= s7_curlet (sc);
+
+    \ \ const char* s_uuid4= "g_uuid4";
+
+    \ \ const char* d_uuid4= "(g_uuid4) =\<gtr\> string";
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <chapter|(liii path)>
 
@@ -1233,6 +2665,60 @@
     \;
   </scm-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_isdir (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
+
+    \ \ tb_file_info_t info;
+
+    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
+
+    \ \ if (tb_file_info (dir_c, &info)) {
+
+    \ \ \ \ switch (info.type) {
+
+    \ \ \ \ case TB_FILE_TYPE_DIRECTORY:
+
+    \ \ \ \ case TB_FILE_TYPE_DOT:
+
+    \ \ \ \ case TB_FILE_TYPE_DOT2:
+
+    \ \ \ \ \ \ ret= true;
+
+    \ \ \ \ }
+
+    \ \ }
+
+    \ \ return s7_make_boolean (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_isdir (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \ \ const char* name= "g_isdir";
+
+    \ \ const char* desc= "(g_isdir string) =\<gtr\> boolean";
+
+    \ \ s7_pointer func= s7_make_typed_function (sc, name, f_isdir, 1, 0, false, desc, NULL);
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|path-file?>
 
   <\goldfish-chunk|goldfish/liii/path.scm|true|true>
@@ -1256,6 +2742,58 @@
 
     \;
   </scm-chunk>
+
+  <subparagraph|C++实现>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_isfile (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
+
+    \ \ tb_file_info_t info;
+
+    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
+
+    \ \ if (tb_file_info (dir_c, &info)) {
+
+    \ \ \ \ switch (info.type) {
+
+    \ \ \ \ case TB_FILE_TYPE_FILE:
+
+    \ \ \ \ \ \ ret= true;
+
+    \ \ \ \ }
+
+    \ \ }
+
+    \ \ return s7_make_boolean (sc, ret);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_isfile (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \ \ const char* name= "g_isfile";
+
+    \ \ const char* desc= "(g_isfile string) =\<gtr\> boolean";
+
+    \ \ s7_pointer func= s7_make_typed_function (sc, name, f_isfile, 1, 0, false, desc, NULL);
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <paragraph|path-exists?>
 
@@ -1308,6 +2846,72 @@
 
     \;
   </scm-chunk>
+
+  返回指定路径的文件大小，如果该文件不存在，那么返回-1。
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer
+
+    f_path_getsize (s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
+
+    \ \ tb_file_info_t info;
+
+    \ \ if (tb_file_info (path_c, &info)) {
+
+    \ \ \ \ return s7_make_integer (sc, (int) info.size);
+
+    \ \ }
+
+    \ \ else {
+
+    \ \ \ \ return s7_make_integer (sc, (int) -1);
+
+    \ \ }
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_path_getsize (s7_scheme* sc) {
+
+    \ \ s7_pointer cur_env= s7_curlet (sc);
+
+    \ \ const char* name= "g_path-getsize";
+
+    \ \ const char* desc= "(g_path_getsize string): string =\<gtr\> integer";
+
+    \ \ s7_pointer func= s7_make_typed_function (sc, name, f_path_getsize, 1, 0, false, desc, NULL);
+
+    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|glue_path>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_liii_path (s7_scheme* sc) {
+
+    \ \ glue_isfile (sc);
+
+    \ \ glue_isdir (sc);
+
+    \ \ glue_path_getsize (sc);
+
+    }
+
+    \;
+  </cpp-chunk>
 
   <section|结尾>
 
@@ -1839,47 +3443,11 @@
     \;
   </scm-chunk>
 
-  <part|基础设施>
-
-  <chapter|C++部分>
+  <chapter|C++部分结尾>
 
   <section|许可证>
 
   <\cpp-chunk|src/goldfish.cpp|false|true>
-    //
-
-    // Copyright (C) 2024 The Goldfish Scheme Authors
-
-    //
-
-    // Licensed under the Apache License, Version 2.0 (the "License");
-
-    // you may not use this file except in compliance with the License.
-
-    // You may obtain a copy of the License at
-
-    //
-
-    // http://www.apache.org/licenses/LICENSE-2.0
-
-    //
-
-    // Unless required by applicable law or agreed to in writing, software
-
-    // distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-
-    // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-
-    // License for the specific language governing permissions and limitations
-
-    // under the License.
-
-    //
-
-    \;
-  </cpp-chunk>
-
-  <\cpp-chunk|src/goldfish.hpp|false|true>
     //
 
     // Copyright (C) 2024 The Goldfish Scheme Authors
@@ -1939,1207 +3507,7 @@
     }
   </cpp-chunk>
 
-  <section|实现>
-
-  <paragraph|头文件>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    #include \<less\>algorithm\<gtr\>
-
-    #include \<less\>cstdlib\<gtr\>
-
-    #include \<less\>cstring\<gtr\>
-
-    #include \<less\>iostream\<gtr\>
-
-    #include \<less\>s7.h\<gtr\>
-
-    #include \<less\>string\<gtr\>
-
-    #include \<less\>vector\<gtr\>
-
-    \;
-
-    #include \<less\>tbox/platform/file.h\<gtr\>
-
-    #include \<less\>tbox/platform/path.h\<gtr\>
-
-    #include \<less\>tbox/tbox.h\<gtr\>
-
-    \;
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    #include \<less\>io.h\<gtr\>
-
-    #include \<less\>windows.h\<gtr\>
-
-    #elif TB_CONFIG_OS_MACOSX
-
-    #include \<less\>limits.h\<gtr\>
-
-    #include \<less\>mach-o/dyld.h\<gtr\>
-
-    #else
-
-    #include \<less\>linux/limits.h\<gtr\>
-
-    #endif
-
-    \;
-
-    #if !defined(TB_CONFIG_OS_WINDOWS)
-
-    #include \<less\>errno.h\<gtr\>
-
-    #include \<less\>pwd.h\<gtr\>
-
-    #include \<less\>unistd.h\<gtr\>
-
-    #include \<less\>wordexp.h\<gtr\>
-
-    #endif
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|GOLDFISH_VERSION>
-
-  金鱼Scheme的版本，<todo|后续统一使用<value|goldfish-version>这个在导言区预定义的值>。文学编程的Build Buffer功能暂时不支持展开导言区预定义的值。
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    #define GOLDFISH_VERSION "17.11.0"
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|GOLDFISH_PATH_MAXN>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    #define GOLDFISH_PATH_MAXN TB_PATH_MAXN
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|全局变量>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static std::vector\<less\>std::string\<gtr\> command_args= std::vector\<less\>std::string\<gtr\> ();
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|goldfish命名空间的开始>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    namespace goldfish {
-
-    using std::cerr;
-
-    using std::cout;
-
-    using std::endl;
-
-    using std::string;
-
-    using std::vector;
-
-    \;
-  </cpp-chunk>
-
-  <subsection|胶水代码>
-
-  <subsubsection|公共辅助函数>
-
-  <subparagraph|string_vector_to_s7_vector>
-
-  将<cpp|std::vector>复制为S7的<scm|vector>。
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline s7_pointer
-
-    string_vector_to_s7_vector (s7_scheme* sc, vector\<less\>string\<gtr\> v) {
-
-    \ \ int \ \ \ \ \ \ \ N \ = v.size ();
-
-    \ \ s7_pointer ret= s7_make_vector (sc, N);
-
-    \ \ for (int i= 0; i \<less\> N; i++) {
-
-    \ \ \ \ s7_vector_set (sc, ret, i, s7_make_string (sc, v[i].c_str ()));
-
-    \ \ }
-
-    \ \ return ret;
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <subsubsection|Goldfish基础胶水代码>
-
-  <paragraph|g_version><index|g_version><typehint|=\<gtr\> string?>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_version (s7_scheme* sc, s7_pointer args) {
-
-    \ \ return s7_make_string (sc, GOLDFISH_VERSION);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_delete-file><index|g_delete-file><typehint|((file-name string?)) =\<gtr\> boolean?>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_delete_file (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* path_c= s7_string (s7_car (args));
-
-    \ \ return s7_make_boolean (sc, tb_file_remove (path_c));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|glue_goldfish>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline void
-
-    glue_goldfish (s7_scheme* sc) {
-
-    \ \ s7_pointer cur_env= s7_curlet (sc);
-
-    \;
-
-    \ \ const char* s_version \ \ \ = "version";
-
-    \ \ const char* d_version \ \ \ = "(version) =\<gtr\> string";
-
-    \ \ const char* s_delete_file= "g_delete-file";
-
-    \ \ const char* d_delete_file= "(g_delete-file string) =\<gtr\> boolean";
-
-    \;
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_version),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_version, f_version, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_version, NULL));
-
-    \;
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_delete_file),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_delete_file, f_delete_file, 1, 0,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_delete_file, NULL));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <subsubsection|(scheme time)的胶水代码>
-
-  <paragraph|g_current-second><index|g_current-second><typehint|=\<gtr\> inexact?>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_current_second (s7_scheme* sc, s7_pointer args) {
-
-    \ \ // TODO: use std::chrono::tai_clock::now() when using C++ 20
-
-    \ \ tb_timeval_t tp= {0};
-
-    \ \ tb_gettimeofday (&tp, tb_null);
-
-    \ \ s7_double res= (time_t) tp.tv_sec + (tp.tv_usec / 1000000.0);
-
-    \ \ return s7_make_real (sc, res);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|glue_scheme_time>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline void
-
-    glue_scheme_time (s7_scheme* sc) {
-
-    \ \ s7_pointer cur_env= s7_curlet (sc);
-
-    \;
-
-    \ \ const char* s_current_second= "g_current-second";
-
-    \ \ const char* d_current_second= "(g_current-second): () =\<gtr\> double, return the "
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "current unix timestamp in double";
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_current_second),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_current_second, f_current_second, 0,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0, false, d_current_second, NULL));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <subsubsection|(scheme process-context)的胶水代码>
-
-  <paragraph|g_get-environment-variable><index|g_get-environment-variable>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_get_environment_variable (s7_scheme* sc, s7_pointer args) {
-
-    #ifdef _MSC_VER
-
-    \ \ std::string path_sep= ";";
-
-    #else
-
-    \ \ std::string path_sep= ":";
-
-    #endif
-
-    \ \ std::string \ \ \ \ \ \ \ \ \ ret;
-
-    \ \ tb_size_t \ \ \ \ \ \ \ \ \ \ \ size \ \ \ \ \ \ = 0;
-
-    \ \ const char* \ \ \ \ \ \ \ \ \ key \ \ \ \ \ \ \ = s7_string (s7_car (args));
-
-    \ \ tb_environment_ref_t environment= tb_environment_init ();
-
-    \ \ if (environment) {
-
-    \ \ \ \ size= tb_environment_load (environment, key);
-
-    \ \ \ \ if (size \<gtr\>= 1) {
-
-    \ \ \ \ \ \ tb_for_all_if (tb_char_t const*, value, environment, value) {
-
-    \ \ \ \ \ \ \ \ ret.append (value).append (path_sep);
-
-    \ \ \ \ \ \ }
-
-    \ \ \ \ }
-
-    \ \ }
-
-    \ \ tb_environment_exit (environment);
-
-    \ \ if (size == 0) { // env key not found
-
-    \ \ \ \ return s7_make_boolean (sc, false);
-
-    \ \ }
-
-    \ \ else {
-
-    \ \ \ \ return s7_make_string (sc, ret.substr (0, ret.size () - 1).c_str ());
-
-    \ \ }
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_command-line><index|g_command-line>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_command_line (s7_scheme* sc, s7_pointer args) {
-
-    \ \ s7_pointer ret = s7_nil (sc);
-
-    \ \ int \ \ \ \ \ \ \ size= command_args.size ();
-
-    \ \ for (int i= size - 1; i \<gtr\>= 0; i--) {
-
-    \ \ \ \ ret= s7_cons (sc, s7_make_string (sc, command_args[i].c_str ()), ret);
-
-    \ \ }
-
-    \ \ return ret;
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|glue_scheme_process_context>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_unset_environment_variable (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* env_name= s7_string (s7_car (args));
-
-    \ \ return s7_make_boolean (sc, tb_environment_remove (env_name));
-
-    }
-
-    \;
-
-    inline void
-
-    glue_scheme_process_context (s7_scheme* sc) {
-
-    \ \ s7_pointer cur_env= s7_curlet (sc);
-
-    \;
-
-    \ \ const char* s_get_environment_variable= "g_get-environment-variable";
-
-    \ \ const char* d_get_environment_variable=
-
-    \ \ \ \ \ \ "(g_get-environemt-variable string) =\<gtr\> string";
-
-    \ \ const char* s_command_line= "g_command-line";
-
-    \ \ const char* d_command_line= "(g_command-line) =\<gtr\> string";
-
-    \;
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_get_environment_variable),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_get_environment_variable,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f_get_environment_variable, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_get_environment_variable, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_command_line),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_command_line, f_command_line, 0, 0,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_command_line, NULL));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <subsubsection|(liii sys)的胶水代码>
-
-  <paragraph|g_executable><index|g_executable><label|paragraph:g_executable>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    string
-
-    goldfish_exe () {
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ char buffer[GOLDFISH_PATH_MAXN];
-
-    \ \ GetModuleFileName (NULL, buffer, GOLDFISH_PATH_MAXN);
-
-    \ \ return string (buffer);
-
-    #elif TB_CONFIG_OS_MACOSX
-
-    \ \ char \ \ \ \ \ \ \ buffer[PATH_MAX];
-
-    \ \ uint32_t \ \ \ size= sizeof (buffer);
-
-    \ \ if (_NSGetExecutablePath (buffer, &size) == 0) {
-
-    \ \ \ \ char real_path[GOLDFISH_PATH_MAXN];
-
-    \ \ \ \ if (realpath (buffer, real_path) != NULL) {
-
-    \ \ \ \ \ \ return string (real_path);
-
-    \ \ \ \ }
-
-    \ \ }
-
-    \ \ return "";
-
-    #elif TB_CONFIG_OS_LINUX
-
-    \ \ char \ \ \ buffer[GOLDFISH_PATH_MAXN];
-
-    \ \ ssize_t len= readlink ("/proc/self/exe", buffer, sizeof (buffer) - 1);
-
-    \ \ if (len != -1) {
-
-    \ \ \ \ buffer[len]= '\\0';
-
-    \ \ \ \ return std::string (buffer);
-
-    \ \ }
-
-    \ \ return "";
-
-    #endif
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_executable (s7_scheme* sc, s7_pointer args) {
-
-    \ \ string exe_path= goldfish_exe ();
-
-    \ \ return s7_make_string (sc, exe_path.c_str ());
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|glue_liii_sys>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline void
-
-    glue_liii_sys (s7_scheme* sc) {
-
-    \ \ s7_pointer cur_env= s7_curlet (sc);
-
-    \;
-
-    \ \ const char* s_executable= "g_executable";
-
-    \ \ const char* d_executable= "(g_executable) =\<gtr\> string";
-
-    \;
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_executable),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_executable, f_executable, 0, 0,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_executable, NULL));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <subsubsection|(liii os)的胶水代码>
-
-  <paragraph|g_os-type><index|g_os-type>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_os_type (s7_scheme* sc, s7_pointer args) {
-
-    #ifdef TB_CONFIG_OS_LINUX
-
-    \ \ return s7_make_string (sc, "Linux");
-
-    #endif
-
-    #ifdef TB_CONFIG_OS_MACOSX
-
-    \ \ return s7_make_string (sc, "Darwin");
-
-    #endif
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ return s7_make_string (sc, "Windows");
-
-    #endif
-
-    \ \ return s7_make_boolean (sc, false);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_os-arch><index|g_os-arch>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_os_arch (s7_scheme* sc, s7_pointer args) {
-
-    \ \ return s7_make_string (sc, TB_ARCH_STRING);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_os-call><index|g_os-call>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_os_call (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ \ \ \ cmd_c= s7_string (s7_car (args));
-
-    \ \ tb_process_attr_t attr = {tb_null};
-
-    \ \ attr.flags \ \ \ \ \ \ \ \ \ \ \ \ = TB_PROCESS_FLAG_NO_WINDOW;
-
-    \ \ int ret;
-
-    \;
-
-    #if _MSC_VER
-
-    \ \ ret= (int) std::system (cmd_c);
-
-    #else
-
-    \ \ wordexp_t p;
-
-    \ \ ret= wordexp (cmd_c, &p, 0);
-
-    \ \ if (ret != 0) {
-
-    \ \ \ \ // failed after calling wordexp
-
-    \ \ }
-
-    \ \ else if (p.we_wordc == 0) {
-
-    \ \ \ \ wordfree (&p);
-
-    \ \ \ \ ret= EINVAL;
-
-    \ \ }
-
-    \ \ else {
-
-    \ \ \ \ ret= (int) tb_process_run (p.we_wordv[0], (tb_char_t const**) p.we_wordv,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ &attr);
-
-    \ \ \ \ wordfree (&p);
-
-    \ \ }
-
-    #endif
-
-    \ \ return s7_make_integer (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_system><index|g_system>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_system (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* cmd_c= s7_string (s7_car (args));
-
-    \ \ int \ \ \ \ \ \ \ \ ret \ = (int) std::system (cmd_c);
-
-    \ \ return s7_make_integer (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_os-temp-dir><index|g_os-temp-dir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
-
-    \ \ tb_directory_temporary (path, GOLDFISH_PATH_MAXN);
-
-    \ \ return s7_make_string (sc, path);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_isdir><index|g_isdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_isdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
-
-    \ \ tb_file_info_t info;
-
-    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
-
-    \ \ if (tb_file_info (dir_c, &info)) {
-
-    \ \ \ \ switch (info.type) {
-
-    \ \ \ \ case TB_FILE_TYPE_DIRECTORY:
-
-    \ \ \ \ case TB_FILE_TYPE_DOT:
-
-    \ \ \ \ case TB_FILE_TYPE_DOT2:
-
-    \ \ \ \ \ \ ret= true;
-
-    \ \ \ \ }
-
-    \ \ }
-
-    \ \ return s7_make_boolean (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_isfile><index|g_isfile>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_isfile (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ dir_c= s7_string (s7_car (args));
-
-    \ \ tb_file_info_t info;
-
-    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= false;
-
-    \ \ if (tb_file_info (dir_c, &info)) {
-
-    \ \ \ \ switch (info.type) {
-
-    \ \ \ \ case TB_FILE_TYPE_FILE:
-
-    \ \ \ \ \ \ ret= true;
-
-    \ \ \ \ }
-
-    \ \ }
-
-    \ \ return s7_make_boolean (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_mkdir><index|g_mkdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_mkdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* dir_c= s7_string (s7_car (args));
-
-    \ \ return s7_make_boolean (sc, tb_directory_create (dir_c));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_chdir><index|g_chdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_chdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* dir_c= s7_string (s7_car (args));
-
-    \ \ return s7_make_boolean (sc, tb_directory_current_set (dir_c));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_getcwd><index|g_getcwd>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_getcwd (s7_scheme* sc, s7_pointer args) {
-
-    \ \ tb_char_t path[GOLDFISH_PATH_MAXN];
-
-    \ \ tb_directory_current (path, GOLDFISH_PATH_MAXN);
-
-    \ \ return s7_make_string (sc, path);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_listdir><index|g_listdir>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static tb_long_t
-
-    tb_directory_walk_func (tb_char_t const* path, tb_file_info_t const* info,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tb_cpointer_t priv) {
-
-    \ \ // check
-
-    \ \ tb_assert_and_check_return_val (path && info, TB_DIRECTORY_WALK_CODE_END);
-
-    \;
-
-    \ \ vector\<less\>string\<gtr\>* p_v_result= (vector\<less\>string\<gtr\>*) priv;
-
-    \ \ p_v_result-\<gtr\>push_back (string (path));
-
-    \ \ return TB_DIRECTORY_WALK_CODE_CONTINUE;
-
-    }
-
-    \;
-
-    static s7_pointer
-
-    f_listdir (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
-
-    \ \ vector\<less\>string\<gtr\> entries;
-
-    \ \ s7_pointer \ \ \ \ ret= s7_make_vector (sc, 0);
-
-    \ \ tb_directory_walk (path_c, 0, tb_false, tb_directory_walk_func, &entries);
-
-    \;
-
-    \ \ int \ \ \ entries_N \ \ = entries.size ();
-
-    \ \ string path_s \ \ \ \ \ = string (path_c);
-
-    \ \ int \ \ \ path_N \ \ \ \ \ = path_s.size ();
-
-    \ \ int \ \ \ path_slash_N= path_N;
-
-    \ \ char \ \ last_ch \ \ \ \ = path_s[path_N - 1];
-
-    #if defined(TB_CONFIG_OS_WINDOWS)
-
-    \ \ if (last_ch != '/' && last_ch != '\\\\') {
-
-    \ \ \ \ path_slash_N= path_slash_N + 1;
-
-    \ \ }
-
-    #else
-
-    \ \ if (last_ch != '/') {
-
-    \ \ \ \ path_slash_N= path_slash_N + 1;
-
-    \ \ }
-
-    #endif
-
-    \ \ for (int i= 0; i \<less\> entries_N; i++) {
-
-    \ \ \ \ entries[i]= entries[i].substr (path_slash_N);
-
-    \ \ }
-
-    \ \ return string_vector_to_s7_vector (sc, entries);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_access><index|g_access>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_access (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* path_c= s7_string (s7_car (args));
-
-    \ \ int \ \ \ \ \ \ \ \ mode \ = s7_integer ((s7_cadr (args)));
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ bool ret= (_access (path_c, mode) == 0);
-
-    #else
-
-    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= (access (path_c, mode) == 0);
-
-    #endif
-
-    \ \ return s7_make_boolean (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_getlogin><index|g_getlogin>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_getlogin (s7_scheme* sc, s7_pointer args) {
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ return s7_make_boolean (sc, false);
-
-    #else
-
-    \ \ uid_t \ \ \ \ \ \ \ \ \ uid= getuid ();
-
-    \ \ struct passwd* pwd= getpwuid (uid);
-
-    \ \ return s7_make_string (sc, pwd-\<gtr\>pw_name);
-
-    #endif
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_getpid><index|g_getpid>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_getpid (s7_scheme* sc, s7_pointer args) {
-
-    #ifdef TB_CONFIG_OS_WINDOWS
-
-    \ \ return s7_make_integer (sc, (int) GetCurrentProcessId ());
-
-    #else
-
-    \ \ return s7_make_integer (sc, getpid ());
-
-    #endif
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|g_path-getsize><index|g_path-getsize>
-
-  返回指定路径的文件大小，如果该文件不存在，那么返回-1。
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_path_getsize (s7_scheme* sc, s7_pointer args) {
-
-    \ \ const char* \ \ \ path_c= s7_string (s7_car (args));
-
-    \ \ tb_file_info_t info;
-
-    \ \ if (tb_file_info (path_c, &info)) {
-
-    \ \ \ \ return s7_make_integer (sc, (int) info.size);
-
-    \ \ }
-
-    \ \ else {
-
-    \ \ \ \ return s7_make_integer (sc, (int) -1);
-
-    \ \ }
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|glue_liii_os>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline void
-
-    glue_liii_os (s7_scheme* sc) {
-
-    \ \ s7_pointer cur_env= s7_curlet (sc);
-
-    \;
-  </cpp-chunk>
-
-  <subparagraph|g_os-type>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_os_type= "g_os-type";
-
-    \ \ const char* d_os_type= "(g_os-type) =\<gtr\> string";
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_type),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_type, f_os_type, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_type, NULL));
-
-    \;
-  </cpp-chunk>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_os_arch \ \ \ = "g_os-arch";
-
-    \ \ const char* d_os_arch \ \ \ = "(g_os-arch) =\<gtr\> string";
-
-    \ \ const char* s_os_call \ \ \ = "g_os-call";
-
-    \ \ const char* d_os_call \ \ \ = "(string) =\<gtr\> int";
-
-    \ \ const char* s_system \ \ \ \ = "g_system";
-
-    \ \ const char* d_system \ \ \ \ = "(string) =\<gtr\> int";
-
-    \ \ const char* s_os_temp_dir= "g_os-temp-dir";
-
-    \ \ const char* d_os_temp_dir= "(g_os-temp-dir) =\<gtr\> string";
-
-    \ \ const char* s_isdir \ \ \ \ \ = "g_isdir";
-
-    \ \ const char* d_isdir \ \ \ \ \ = "(g_isdir string) =\<gtr\> boolean";
-
-    \ \ const char* s_isfile \ \ \ \ = "g_isfile";
-
-    \ \ const char* d_isfile \ \ \ \ = "(g_isfile string) =\<gtr\> boolean";
-
-    \ \ const char* s_mkdir \ \ \ \ \ = "g_mkdir";
-
-    \ \ const char* d_mkdir \ \ \ \ \ = "(g_mkdir string) =\<gtr\> boolean";
-
-    \ \ const char* s_chdir \ \ \ \ \ = "g_chdir";
-
-    \ \ const char* d_chdir \ \ \ \ \ = "(g_chdir string) =\<gtr\> boolean";
-
-    \ \ const char* s_listdir \ \ \ = "g_listdir";
-
-    \ \ const char* d_listdir \ \ \ = "(g_listdir) =\<gtr\> vector";
-
-    \ \ const char* s_getcwd \ \ \ \ = "g_getcwd";
-
-    \ \ const char* d_getcwd \ \ \ \ = "(g_getcwd) =\<gtr\> string";
-
-    \ \ const char* s_access \ \ \ \ = "g_access";
-
-    \ \ const char* d_access \ \ \ \ = "(g_access string integer) =\<gtr\> boolean";
-
-    \ \ const char* s_getlogin \ \ = "g_getlogin";
-
-    \ \ const char* d_getlogin \ \ = "(g_getlogin) =\<gtr\> string";
-
-    \ \ const char* s_getpid \ \ \ \ = "g_getpid";
-
-    \ \ const char* d_getpid \ \ \ \ = "(g_getpid) =\<gtr\> integer";
-
-    \;
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_arch, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_call, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_system),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_system, f_system, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_system, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_temp_dir),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_temp_dir, f_os_temp_dir, 0, 0,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_os_call, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_isdir),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_isdir, f_isdir, 1, 0, false, d_isdir,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_isfile),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_isfile, f_isfile, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_isfile, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_mkdir),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_mkdir, f_mkdir, 1, 0, false, d_mkdir,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_chdir),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_chdir, f_chdir, 1, 0, false, d_chdir,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_listdir),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_listdir, f_listdir, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_listdir, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_getcwd),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_getcwd, f_getcwd, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_getcwd, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_access),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_access, f_access, 2, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_access, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_getlogin),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_getlogin, f_getlogin, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_access, NULL));
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_getpid),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_getpid, f_getpid, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_getpid, NULL));
-
-    \;
-  </cpp-chunk>
-
-  <subparagraph|g_unsetenv>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_unsetenv= "g_unsetenv";
-
-    \ \ const char* d_unsetenv= "(g_unsetenv string): string =\<gtr\> boolean";
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_unsetenv),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f_unset_environment_variable, 1, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_unsetenv, NULL));
-
-    \;
-  </cpp-chunk>
-
-  <subparagraph|g_path-getsize>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_path_getsize= "g_path-getsize";
-
-    \ \ const char* d_path_getsize= "(g_path_getsize string): string =\<gtr\> integer";
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_path_getsize),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_unsetenv, f_path_getsize, 1, 0,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ false, d_path_getsize, NULL));
-  </cpp-chunk>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    }
-
-    \;
-  </cpp-chunk>
-
-  <subsubsection|(liii uuid)的胶水代码>
-
-  <scm|(liii uuid)>是通过C++实现的，本节是相关的胶水代码。
-
-  <paragraph|g_uuid4><index|g_uuid4><typehint|=\<gtr\> string?>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    static s7_pointer
-
-    f_uuid4 (s7_scheme* sc, s7_pointer args) {
-
-    \ \ tb_char_t \ \ \ \ \ \ \ uuid[37];
-
-    \ \ const tb_char_t* ret= tb_uuid4_make_cstr (uuid, tb_null);
-
-    \ \ return s7_make_string (sc, ret);
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <paragraph|glue_liii_uuid>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline void
-
-    glue_liii_uuid (s7_scheme* sc) {
-
-    \ \ s7_pointer \ cur_env= s7_curlet (sc);
-
-    \ \ const char* s_uuid4= "g_uuid4";
-
-    \ \ const char* d_uuid4= "(g_uuid4) =\<gtr\> string";
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_uuid4),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_uuid4, f_uuid4, 0, 0, false, d_uuid4,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ NULL));
-
-    }
-
-    \;
-  </cpp-chunk>
-
-  <subsubsection|胶水代码汇总接口>
+  <section|胶水代码汇总接口>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     void
@@ -3156,6 +3524,8 @@
 
     \ \ glue_liii_os (sc);
 
+    \ \ glue_liii_path (sc);
+
     \ \ glue_liii_uuid (sc);
 
     }
@@ -3163,7 +3533,7 @@
     \;
   </cpp-chunk>
 
-  <subsection|命令行>
+  <section|命令行>
 
   <paragraph|显示帮助>
 
@@ -3674,6 +4044,10 @@
   <\cpp-chunk|src/goldfish.hpp|true|false>
     } // namespace goldfish
   </cpp-chunk>
+
+  \;
+
+  \;
 </body>
 
 <\initial>

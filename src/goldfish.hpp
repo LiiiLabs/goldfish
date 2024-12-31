@@ -225,25 +225,6 @@ glue_liii_sys (s7_scheme* sc) {
 }
 
 static s7_pointer
-f_os_type (s7_scheme* sc, s7_pointer args) {
-#ifdef TB_CONFIG_OS_LINUX
-  return s7_make_string (sc, "Linux");
-#endif
-#ifdef TB_CONFIG_OS_MACOSX
-  return s7_make_string (sc, "Darwin");
-#endif
-#ifdef TB_CONFIG_OS_WINDOWS
-  return s7_make_string (sc, "Windows");
-#endif
-  return s7_make_boolean (sc, false);
-}
-
-static s7_pointer
-f_os_arch (s7_scheme* sc, s7_pointer args) {
-  return s7_make_string (sc, TB_ARCH_STRING);
-}
-
-static s7_pointer
 f_os_call (s7_scheme* sc, s7_pointer args) {
   const char*       cmd_c= s7_string (s7_car (args));
   tb_process_attr_t attr = {tb_null};
@@ -279,40 +260,41 @@ f_system (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
+f_access (s7_scheme* sc, s7_pointer args) {
+  const char* path_c= s7_string (s7_car (args));
+  int         mode  = s7_integer ((s7_cadr (args)));
+#ifdef TB_CONFIG_OS_WINDOWS
+  bool ret= (_access (path_c, mode) == 0);
+#else
+  bool           ret= (access (path_c, mode) == 0);
+#endif
+  return s7_make_boolean (sc, ret);
+}
+
+static s7_pointer
+f_os_arch (s7_scheme* sc, s7_pointer args) {
+  return s7_make_string (sc, TB_ARCH_STRING);
+}
+
+static s7_pointer
+f_os_type (s7_scheme* sc, s7_pointer args) {
+#ifdef TB_CONFIG_OS_LINUX
+  return s7_make_string (sc, "Linux");
+#endif
+#ifdef TB_CONFIG_OS_MACOSX
+  return s7_make_string (sc, "Darwin");
+#endif
+#ifdef TB_CONFIG_OS_WINDOWS
+  return s7_make_string (sc, "Windows");
+#endif
+  return s7_make_boolean (sc, false);
+}
+
+static s7_pointer
 f_os_temp_dir (s7_scheme* sc, s7_pointer args) {
   tb_char_t path[GOLDFISH_PATH_MAXN];
   tb_directory_temporary (path, GOLDFISH_PATH_MAXN);
   return s7_make_string (sc, path);
-}
-
-static s7_pointer
-f_isdir (s7_scheme* sc, s7_pointer args) {
-  const char*    dir_c= s7_string (s7_car (args));
-  tb_file_info_t info;
-  bool           ret= false;
-  if (tb_file_info (dir_c, &info)) {
-    switch (info.type) {
-    case TB_FILE_TYPE_DIRECTORY:
-    case TB_FILE_TYPE_DOT:
-    case TB_FILE_TYPE_DOT2:
-      ret= true;
-    }
-  }
-  return s7_make_boolean (sc, ret);
-}
-
-static s7_pointer
-f_isfile (s7_scheme* sc, s7_pointer args) {
-  const char*    dir_c= s7_string (s7_car (args));
-  tb_file_info_t info;
-  bool           ret= false;
-  if (tb_file_info (dir_c, &info)) {
-    switch (info.type) {
-    case TB_FILE_TYPE_FILE:
-      ret= true;
-    }
-  }
-  return s7_make_boolean (sc, ret);
 }
 
 static s7_pointer
@@ -325,13 +307,6 @@ static s7_pointer
 f_chdir (s7_scheme* sc, s7_pointer args) {
   const char* dir_c= s7_string (s7_car (args));
   return s7_make_boolean (sc, tb_directory_current_set (dir_c));
-}
-
-static s7_pointer
-f_getcwd (s7_scheme* sc, s7_pointer args) {
-  tb_char_t path[GOLDFISH_PATH_MAXN];
-  tb_directory_current (path, GOLDFISH_PATH_MAXN);
-  return s7_make_string (sc, path);
 }
 
 static tb_long_t
@@ -373,15 +348,10 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
 }
 
 static s7_pointer
-f_access (s7_scheme* sc, s7_pointer args) {
-  const char* path_c= s7_string (s7_car (args));
-  int         mode  = s7_integer ((s7_cadr (args)));
-#ifdef TB_CONFIG_OS_WINDOWS
-  bool ret= (_access (path_c, mode) == 0);
-#else
-  bool           ret= (access (path_c, mode) == 0);
-#endif
-  return s7_make_boolean (sc, ret);
+f_getcwd (s7_scheme* sc, s7_pointer args) {
+  tb_char_t path[GOLDFISH_PATH_MAXN];
+  tb_directory_current (path, GOLDFISH_PATH_MAXN);
+  return s7_make_string (sc, path);
 }
 
 static s7_pointer
@@ -404,18 +374,6 @@ f_getpid (s7_scheme* sc, s7_pointer args) {
 #endif
 }
 
-static s7_pointer
-f_path_getsize (s7_scheme* sc, s7_pointer args) {
-  const char*    path_c= s7_string (s7_car (args));
-  tb_file_info_t info;
-  if (tb_file_info (path_c, &info)) {
-    return s7_make_integer (sc, (int) info.size);
-  }
-  else {
-    return s7_make_integer (sc, (int) -1);
-  }
-}
-
 inline void
 glue_liii_os (s7_scheme* sc) {
   s7_pointer cur_env= s7_curlet (sc);
@@ -434,10 +392,6 @@ glue_liii_os (s7_scheme* sc) {
   const char* d_system     = "(string) => int";
   const char* s_os_temp_dir= "g_os-temp-dir";
   const char* d_os_temp_dir= "(g_os-temp-dir) => string";
-  const char* s_isdir      = "g_isdir";
-  const char* d_isdir      = "(g_isdir string) => boolean";
-  const char* s_isfile     = "g_isfile";
-  const char* d_isfile     = "(g_isfile string) => boolean";
   const char* s_mkdir      = "g_mkdir";
   const char* d_mkdir      = "(g_mkdir string) => boolean";
   const char* s_chdir      = "g_chdir";
@@ -465,12 +419,6 @@ glue_liii_os (s7_scheme* sc) {
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_temp_dir),
              s7_make_typed_function (sc, s_os_temp_dir, f_os_temp_dir, 0, 0,
                                      false, d_os_call, NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_isdir),
-             s7_make_typed_function (sc, s_isdir, f_isdir, 1, 0, false, d_isdir,
-                                     NULL));
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_isfile),
-             s7_make_typed_function (sc, s_isfile, f_isfile, 1, 0, false,
-                                     d_isfile, NULL));
   s7_define (sc, cur_env, s7_make_symbol (sc, s_mkdir),
              s7_make_typed_function (sc, s_mkdir, f_mkdir, 1, 0, false, d_mkdir,
                                      NULL));
@@ -500,11 +448,6 @@ glue_liii_os (s7_scheme* sc) {
                                      f_unset_environment_variable, 1, 0, false,
                                      d_unsetenv, NULL));
 
-  const char* s_path_getsize= "g_path-getsize";
-  const char* d_path_getsize= "(g_path_getsize string): string => integer";
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_path_getsize),
-             s7_make_typed_function (sc, s_unsetenv, f_path_getsize, 1, 0,
-                                     false, d_path_getsize, NULL));
 }
 
 static s7_pointer
@@ -524,6 +467,82 @@ glue_liii_uuid (s7_scheme* sc) {
                                      NULL));
 }
 
+static s7_pointer
+f_isdir (s7_scheme* sc, s7_pointer args) {
+  const char*    dir_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  bool           ret= false;
+  if (tb_file_info (dir_c, &info)) {
+    switch (info.type) {
+    case TB_FILE_TYPE_DIRECTORY:
+    case TB_FILE_TYPE_DOT:
+    case TB_FILE_TYPE_DOT2:
+      ret= true;
+    }
+  }
+  return s7_make_boolean (sc, ret);
+}
+
+inline void
+glue_isdir (s7_scheme* sc) {
+  s7_pointer cur_env= s7_curlet (sc);
+  const char* name= "g_isdir";
+  const char* desc= "(g_isdir string) => boolean";
+  s7_pointer func= s7_make_typed_function (sc, name, f_isdir, 1, 0, false, desc, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+}
+
+static s7_pointer
+f_isfile (s7_scheme* sc, s7_pointer args) {
+  const char*    dir_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  bool           ret= false;
+  if (tb_file_info (dir_c, &info)) {
+    switch (info.type) {
+    case TB_FILE_TYPE_FILE:
+      ret= true;
+    }
+  }
+  return s7_make_boolean (sc, ret);
+}
+
+inline void
+glue_isfile (s7_scheme* sc) {
+  s7_pointer cur_env= s7_curlet (sc);
+  const char* name= "g_isfile";
+  const char* desc= "(g_isfile string) => boolean";
+  s7_pointer func= s7_make_typed_function (sc, name, f_isfile, 1, 0, false, desc, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+}
+
+static s7_pointer
+f_path_getsize (s7_scheme* sc, s7_pointer args) {
+  const char*    path_c= s7_string (s7_car (args));
+  tb_file_info_t info;
+  if (tb_file_info (path_c, &info)) {
+    return s7_make_integer (sc, (int) info.size);
+  }
+  else {
+    return s7_make_integer (sc, (int) -1);
+  }
+}
+
+inline void
+glue_path_getsize (s7_scheme* sc) {
+  s7_pointer cur_env= s7_curlet (sc);
+  const char* name= "g_path-getsize";
+  const char* desc= "(g_path_getsize string): string => integer";
+  s7_pointer func= s7_make_typed_function (sc, name, f_path_getsize, 1, 0, false, desc, NULL);
+  s7_define (sc, cur_env, s7_make_symbol (sc, name), func);
+}
+
+inline void
+glue_liii_path (s7_scheme* sc) {
+  glue_isfile (sc);
+  glue_isdir (sc);
+  glue_path_getsize (sc);
+}
+
 void
 glue_for_community_edition (s7_scheme* sc) {
   glue_goldfish (sc);
@@ -531,6 +550,7 @@ glue_for_community_edition (s7_scheme* sc) {
   glue_scheme_process_context (sc);
   glue_liii_sys (sc);
   glue_liii_os (sc);
+  glue_liii_path (sc);
   glue_liii_uuid (sc);
 }
 

@@ -53,8 +53,6 @@
              (mkdir "/tmp/test_124")))
     => #t))
 
-(check-false (string-null? (getcwd)))
-
 (when (not (os-windows?))
   (check (> (vector-length (listdir "/usr")) 0) => #t))
 
@@ -86,6 +84,8 @@
 (check (string-null? (getenv "PATH")) => #f)
 (unsetenv "PATH")
 (check (getenv "PATH") => #f)
+
+(check-false (string-null? (getcwd)))
 
 (check-report)
 
