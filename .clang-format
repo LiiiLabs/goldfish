@@ -1,3 +1,4 @@
+ColumnLimit: 120
 SpaceBeforeAssignmentOperators: false
 SpaceBeforeParens: Always
 AlwaysBreakAfterReturnType: TopLevelDefinitions

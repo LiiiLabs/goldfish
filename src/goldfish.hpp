@@ -414,8 +414,8 @@ f_listdir (s7_scheme* sc, s7_pointer args) {
 
 inline void
 glue_listdir (s7_scheme* sc) {
-  const char* name = "g_listdir";
-  const char* desc = "(g_listdir string) => vector, list the contents of a directory";
+  const char* name= "g_listdir";
+  const char* desc= "(g_listdir string) => vector, list the contents of a directory";
   glue_define (sc, name, desc, f_listdir, 1, 0);
 }
 
@@ -426,10 +426,11 @@ f_getcwd (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, path);
 }
 
-inline void glue_getcwd(s7_scheme* sc) {
-  const char* name = "g_getcwd";
-  const char* desc = "(g_getcwd) => string, get the current working directory";
-  glue_define(sc, name, desc, f_getcwd, 0, 0);
+inline void
+glue_getcwd (s7_scheme* sc) {
+  const char* name= "g_getcwd";
+  const char* desc= "(g_getcwd) => string, get the current working directory";
+  glue_define (sc, name, desc, f_getcwd, 0, 0);
 }
 
 static s7_pointer

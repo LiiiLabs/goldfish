@@ -2286,9 +2286,9 @@
 
     glue_listdir (s7_scheme* sc) {
 
-    \ \ const char* name = "g_listdir";
+    \ \ const char* name= "g_listdir";
 
-    \ \ const char* desc = "(g_listdir string) =\<gtr\> vector, list the contents of a directory";
+    \ \ const char* desc= "(g_listdir string) =\<gtr\> vector, list the contents of a directory";
 
     \ \ glue_define (sc, name, desc, f_listdir, 1, 0);
 
@@ -2330,13 +2330,15 @@
   </cpp-chunk>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
-    inline void glue_getcwd(s7_scheme* sc) {
+    inline void
 
-    \ \ const char* name = "g_getcwd";
+    glue_getcwd (s7_scheme* sc) {
 
-    \ \ const char* desc = "(g_getcwd) =\<gtr\> string, get the current working directory";
+    \ \ const char* name= "g_getcwd";
 
-    \ \ glue_define(sc, name, desc, f_getcwd, 0, 0);
+    \ \ const char* desc= "(g_getcwd) =\<gtr\> string, get the current working directory";
+
+    \ \ glue_define (sc, name, desc, f_getcwd, 0, 0);
 
     }
 
@@ -2381,7 +2383,7 @@
     \;
   </cpp-chunk>
 
-  <\cpp-chunk|src/goldfish.hpp|true|false>
+  <\cpp-chunk|src/goldfish.hpp|true|true>
     inline void
 
     glue_getlogin (s7_scheme* sc) {
