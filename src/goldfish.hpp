@@ -236,6 +236,13 @@ f_os_arch (s7_scheme* sc, s7_pointer args) {
   return s7_make_string (sc, TB_ARCH_STRING);
 }
 
+inline void
+glue_os_arch (s7_scheme* sc) {
+  const char* name= "g_os-arch";
+  const char* desc= "(g_os-arch) => string";
+  glue_define (sc, name, desc, f_os_arch, 0, 0);
+}
+
 static s7_pointer
 f_os_type (s7_scheme* sc, s7_pointer args) {
 #ifdef TB_CONFIG_OS_LINUX
@@ -405,13 +412,11 @@ glue_getpid (s7_scheme* sc) {
 inline void
 glue_liii_os (s7_scheme* sc) {
   glue_getpid (sc);
+  glue_os_arch (sc);
   glue_os_type (sc);
   glue_unsetenv (sc);
 
   s7_pointer cur_env= s7_curlet (sc);
-
-  const char* s_os_arch    = "g_os-arch";
-  const char* d_os_arch    = "(g_os-arch) => string";
   const char* s_os_call    = "g_os-call";
   const char* d_os_call    = "(string) => int";
   const char* s_system     = "g_system";
@@ -431,9 +436,6 @@ glue_liii_os (s7_scheme* sc) {
   const char* s_getlogin   = "g_getlogin";
   const char* d_getlogin   = "(g_getlogin) => string";
 
-  s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
-             s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
-                                     d_os_arch, NULL));
   s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
              s7_make_typed_function (sc, s_os_call, f_os_call, 1, 0, false,
                                      d_os_call, NULL));

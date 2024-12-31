@@ -1533,6 +1533,22 @@
     \;
   </cpp-chunk>
 
+  <\cpp-chunk|src/goldfish.hpp|true|false>
+    inline void
+
+    glue_os_arch (s7_scheme* sc) {
+
+    \ \ const char* name= "g_os-arch";
+
+    \ \ const char* desc= "(g_os-arch) =\<gtr\> string";
+
+    \ \ glue_define (sc, name, desc, f_os_arch, 0, 0);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|os-type><goldfish-lang|() =\<gtr\> boolean?>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
@@ -2295,8 +2311,6 @@
     \;
   </cpp-chunk>
 
-  \;
-
   <paragraph|glue_liii_os>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
@@ -2306,6 +2320,8 @@
 
     \ \ glue_getpid (sc);
 
+    \ \ glue_os_arch (sc);
+
     \ \ glue_os_type (sc);
 
     \ \ glue_unsetenv (sc);
@@ -2313,14 +2329,6 @@
     \;
 
     \ \ s7_pointer cur_env= s7_curlet (sc);
-
-    \;
-  </cpp-chunk>
-
-  <\cpp-chunk|src/goldfish.hpp|true|true>
-    \ \ const char* s_os_arch \ \ \ = "g_os-arch";
-
-    \ \ const char* d_os_arch \ \ \ = "(g_os-arch) =\<gtr\> string";
 
     \ \ const char* s_os_call \ \ \ = "g_os-call";
 
@@ -2359,12 +2367,6 @@
     \ \ const char* d_getlogin \ \ = "(g_getlogin) =\<gtr\> string";
 
     \;
-
-    \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_arch),
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ s7_make_typed_function (sc, s_os_arch, f_os_arch, 0, 0, false,
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ d_os_arch, NULL));
 
     \ \ s7_define (sc, cur_env, s7_make_symbol (sc, s_os_call),
 
