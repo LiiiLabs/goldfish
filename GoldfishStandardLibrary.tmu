@@ -1917,13 +1917,97 @@
 
   金鱼Scheme的入口是非常精简的，主要的逻辑在<shell|src/goldfish.hpp>里面。这样做的好处在于方便复用hpp文件中的源代码。
 
-  <\cpp-chunk|src/goldfish.cpp|true|false>
+  <paragraph|头文件>
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
     #include "goldfish.hpp"
 
     #include \<less\>string\<gtr\>
 
     \;
+  </cpp-chunk>
 
+  <paragraph|紧急修复>
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
+    #ifdef _MSC_VER
+
+    \;
+  </cpp-chunk>
+
+  <subparagraph|add_overflow>
+
+  溢出条件：如果 A 和 B 同号，且结果的符号与 A 和 B 不同，则溢出
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
+    static bool add_overflow (s7_int A, s7_int B, s7_int *C) {
+
+    \ \ *C = A + B;
+
+    \ \ return ((A ^ B) \<gtr\>= 0) && ((A ^ *C) \<less\> 0);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
+    static bool
+
+    int32_add_overflow (s7_int A, s7_int B, s7_int *C) {
+
+    \ \ return add_overflow (A, B, C);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
+    static bool
+
+    multiply_overflow (s7_int A, s7_int B, s7_int *C) {
+
+    \ \ *C = A * B; return(false);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
+    static bool
+
+    int32_multiply_overflow (s7_int A, s7_int B, s7_int *C) {
+
+    \ \ return multiply_overflow (A, B, C);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
+    static bool
+
+    subtract_overflow (s7_int A, s7_int B, s7_int *C) {
+
+    \ \ *C = A - B; return(false);
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.cpp|true|true>
+    #endif
+
+    \;
+  </cpp-chunk>
+
+  <paragraph|main>
+
+  <\cpp-chunk|src/goldfish.cpp|true|false>
     int
 
     main (int argc, char** argv) {
@@ -1937,6 +2021,8 @@
     \ \ return goldfish::repl_for_community_edition (sc, argc, argv);
 
     }
+
+    \;
   </cpp-chunk>
 
   <section|实现>

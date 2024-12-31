@@ -1311,7 +1311,7 @@
 
   如果出现整数溢出，默认会在控制台输出溢出提示，整个程序能够正常运行，但是返回码会被设置为非0值，以表示运行中出现了异常。
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (set! (*s7* 'muffle-warnings?) #t)
 
     (check (+ #x7fffffffffffffff 1) =\<gtr\> 9223372036854776000.0)

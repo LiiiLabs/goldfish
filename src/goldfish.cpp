@@ -17,6 +17,35 @@
 #include "goldfish.hpp"
 #include <string>
 
+#ifdef _MSC_VER
+
+static bool add_overflow (s7_int A, s7_int B, s7_int *C) {
+  *C = A + B;
+  return ((A ^ B) >= 0) && ((A ^ *C) < 0);
+}
+
+static bool
+int32_add_overflow (s7_int A, s7_int B, s7_int *C) {
+  return add_overflow (A, B, C);
+}
+
+static bool
+multiply_overflow (s7_int A, s7_int B, s7_int *C) {
+  *C = A * B; return(false);
+}
+
+static bool
+int32_multiply_overflow (s7_int A, s7_int B, s7_int *C) {
+  return multiply_overflow (A, B, C);
+}
+
+static bool
+subtract_overflow (s7_int A, s7_int B, s7_int *C) {
+  *C = A - B; return(false);
+}
+
+#endif
+
 int
 main (int argc, char** argv) {
   std::string      gf_lib_dir  = goldfish::find_goldfish_library ();
@@ -24,3 +53,4 @@ main (int argc, char** argv) {
   s7_scheme* sc= goldfish::init_goldfish_scheme (gf_lib);
   return goldfish::repl_for_community_edition (sc, argc, argv);
 }
+
