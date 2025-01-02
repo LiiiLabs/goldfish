@@ -787,6 +787,68 @@
     \ \ \ \ (check (json-ref* updated-json 'person 'city) =\<gtr\> "Wonderland")))
 
     \;
+
+    (let ((json '(("person" . (("name" . "Alice") ("age" . 25))))))
+
+    \ \ (let ((updated-json (json-push* json "person" "city" "Wonderland")))
+
+    \ \ \ \ (check (json-ref* updated-json "person" "city") =\<gtr\> "Wonderland")))
+
+    \;
+
+    (let ((json '((person . ((name . "Alice") (age . 25) (address . ((city . "Oldland") (zip . "12345"))))))))
+
+    \ \ (let ((updated-json (json-push* json 'person 'address 'street "Main St")))
+
+    \ \ \ \ (check (json-ref* updated-json 'person 'address 'street) =\<gtr\> "Main St")))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：在嵌套数组中添加新元素>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((data . #(1 2 3)))))
+
+    \ \ (let ((updated-json (json-push* json 'data 3 4)))
+
+    \ \ \ \ (check updated-json =\<gtr\> '((data . #(1 2 3 4))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((data . #(#(1 2) #(3 4))))))
+
+    \ \ (let ((updated-json (json-push* json 'data 1 2 5)))
+
+    \ \ \ \ (check updated-json =\<gtr\> '((data . #(#(1 2) #(3 4 5)))))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：键值是数字>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((data . ((0 . "zero") (1 . "one"))))))
+
+    \ \ (let ((updated-json (json-push* json 'data 2 "two")))
+
+    \ \ \ \ (check (json-ref* updated-json 'data 2) =\<gtr\> "two")))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：键值是布尔值>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((flags . ((#t . "true") (#f . "false"))))))
+
+    \ \ (let ((updated-json (json-push* json 'flags #t "yes")))
+
+    \ \ \ \ (check (json-ref* updated-json 'flags #t) =\<gtr\> "yes")))
+
+    \;
   </goldfish-chunk>
 
   <subsection|结尾>
