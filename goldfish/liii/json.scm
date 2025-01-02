@@ -22,13 +22,13 @@
 ;  SOFTWARE.
 
 (define-library (liii json)
-(import (liii chez) (liii alist))
+(import (liii chez) (liii alist) (liii list))
 (export string->json json->string
         json-ref json-ref*
         json-set json-set*
         json-push json-push*
         json-drop json-drop*
-        json-reduce)
+        json-reduce json-reduce*)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -346,6 +346,25 @@
                  (if (equal? (caar x) v)
                      (cons (cons v (p v (cdar x))) (l (cdr x) v p))
                      (cons (car x) (l (cdr x) v p))))))))))
+
+(define (json-reduce* j v1 v2 . rest)
+  (cond
+    ((null? rest) (json-reduce j v1 v2))
+    ((length=? 1 rest)
+     (json-reduce j v1
+       (lambda (x y)
+         (let* ((new-v1 v2)
+                (p (last rest)))
+          (json-reduce y new-v1
+                       (lambda (n m) (p (list x n) m)))))))
+    (else
+     (json-reduce j v1
+       (lambda (x y)
+         (let* ((new-v1 v2)
+                (p (last rest)))
+          (apply json-reduce*
+                 (append (cons y (cons new-v1 (drop-right rest 1)))
+                         (list (lambda (n m) (p (cons x n) m)))))))))))
 
 ) ; end of begin
 ) ; end of define-library

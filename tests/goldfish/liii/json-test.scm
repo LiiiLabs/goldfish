@@ -158,5 +158,16 @@
   (check (json-reduce json 'name (lambda (k v) v))
          => #()))
 
+(let ((json '((person . ((name . "Alice") (age . 25))))))
+  (check (json-reduce* json 'person 'name (lambda (k v) (string-upcase v)))
+         => '((person . ((name . "ALICE") (age . 25))))))
+
+(let1 json '((person . ((name . "Alice")
+                        (age . 25)
+                        (address . ((city . "Wonderland")
+                                    (zip . "12345"))))))
+  (let ((updated-json (json-reduce* json 'person 'address 'city (lambda (x y) (string-upcase y)))))
+    (check (json-ref* updated-json 'person 'address 'city) => "WONDERLAND")))
+
 (check-report)
 

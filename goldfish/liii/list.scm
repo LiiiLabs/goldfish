@@ -46,6 +46,8 @@
 (begin
 
 (define (length=? x scheme-list)
+  (when (not (integer? x))
+    (type-error "length=?: first parameter x must be an integer"))
   (when (< x 0)
     (value-error "length=?: expected non-negative integer x but received ~d" x))
   (cond ((and (= x 0) (null? scheme-list)) #t)

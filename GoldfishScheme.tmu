@@ -1317,6 +1317,28 @@
     \;
   </scm-chunk>
 
+  <value|r7rs><paragraph|max>
+
+  <value|r7rs><paragraph|min>
+
+  <value|r7rs><paragraph|+><index|+>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (+ 1 2) =\<gtr\> 3)
+
+    (check (+ ) =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (+ #x7fffffffffffffff 1) =\<gtr\> #x8000000000000000)
+
+    \;
+  </scm-chunk>
+
   <value|r7rs><paragraph|floor><index|floor><scm|(x) =\<gtr\> integer>
 
   返回最大的不大于<math|x>的整数。如果<math|x>是准确值，那么返回值也是准确值，如果<math|x>不是准确值，那么返回值也不是准确值。
@@ -7229,6 +7251,10 @@
 
   <\scm-chunk|goldfish/liii/list.scm|true|true>
     (define (length=? x scheme-list)
+
+    \ \ (when (not (integer? x))
+
+    \ \ \ \ (type-error "length=?: first parameter x must be an integer"))
 
     \ \ (when (\<less\> x 0)
 
