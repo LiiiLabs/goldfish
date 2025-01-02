@@ -112,7 +112,9 @@
 
     \ \ \ \ \ \ \ \ json-set json-set*
 
-    \ \ \ \ \ \ \ \ json-push json-push*)
+    \ \ \ \ \ \ \ \ json-push json-push*
+
+    \ \ \ \ \ \ \ \ json-drop json-drop*)
 
     (begin
 
@@ -847,6 +849,158 @@
     \ \ (let ((updated-json (json-push* json 'flags #t "yes")))
 
     \ \ \ \ (check (json-ref* updated-json 'flags #t) =\<gtr\> "yes")))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|json-drop>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define json-drop
+
+    \ \ (lambda (x v)
+
+    \ \ \ \ (if (vector? x)
+
+    \ \ \ \ \ \ \ \ (if (zero? (vector-length x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ x
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((procedure? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x)) (v v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (v (caar x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l (cdr x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x)) (v v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l (cdr x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v)))))))))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((procedure? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ (let l ((x x) (v v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (v (caar x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l (cdr x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (car x) (l (cdr x) v))))))
+
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ (let l ((x x) (v v))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l (cdr x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (car x) (l (cdr x) v))))))))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|json-drop*>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define json-drop*
+
+    \ \ (lambda (json key . rest)
+
+    \ \ \ \ (if (null? rest)
+
+    \ \ \ \ \ \ \ \ (json-drop json key)
+
+    \ \ \ \ \ \ \ \ (json-set json key
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda (x) (apply json-drop* (cons x rest)))))))
+
+    \;
+  </goldfish-chunk>
+
+  测试删除单层键
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((name . "Alice") (age . 25))))
+
+    \ \ (let ((updated-json (json-drop json 'age)))
+
+    \ \ \ \ (check (json-ref updated-json 'age) =\<gtr\> '())))
+
+    \;
+  </goldfish-chunk>
+
+  测试删除嵌套键
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((name . "Alice")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (address . ((city . "Wonderland")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (zip . "12345"))))))
+
+    \ \ (let ((updated-json (json-drop* json 'address 'city)))
+
+    \ \ \ \ (check (json-ref* updated-json 'address 'city) =\<gtr\> '())))
+
+    \;
+  </goldfish-chunk>
+
+  测试使用过程作为键
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((name . "Alice")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (address . ((city . "Wonderland")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (zip . "12345"))))))
+
+    \ \ (let1 j1 (json-drop json (lambda (k) (equal? k 'city)))
+
+    \ \ \ \ (check (json-ref* j1 'address 'city) =\<gtr\> "Wonderland"))
+
+    \ \ (let1 j2 (json-drop json (lambda (k) (equal? k 'name)))
+
+    \ \ \ \ (check (json-ref* j2 'name) =\<gtr\> '()))
+
+    \ \ (let1 j3 (json-drop* json 'address (lambda (k) (equal? k 'city)))
+
+    \ \ \ \ (check (json-ref* j3 'address 'city) =\<gtr\> '())))
 
     \;
   </goldfish-chunk>
