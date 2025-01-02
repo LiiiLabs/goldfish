@@ -26,11 +26,11 @@
         (url (r 'url)))
     (cond ((and (>= status-code 400) (< status-code 500))
            (error 'http-error
-             (string-append (integer->string status-code)
+             (string-append (number->string status-code)
                             " Client Error: " reason " for url: " url)))
           ((and (>= status-code 500) (< status-code 600))
            (error 'http-error
-             (string-append (integer->string status-code)
+             (string-append (number->string status-code)
                             " Server Error: " reason " for url: " url)))
           (else #t))))
 
