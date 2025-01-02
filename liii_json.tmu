@@ -17,7 +17,7 @@
 
   <subsection|许可证>
 
-  <\scm-chunk|goldfish/liii/json.scm|false|true>
+  <\goldfish-chunk|goldfish/liii/json.scm|false|true>
     ;; \ MIT License
 
     \;
@@ -63,9 +63,9 @@
     ; \ SOFTWARE.
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|false|true>
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -97,39 +97,47 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <subsection|接口>
 
-  <\scm-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
     (define-library (liii json)
 
-    (import (liii chez))
+    (import (liii chez) (liii alist))
 
-    (export string-\<gtr\>json json-\<gtr\>string json-ref json-ref*)
+    (export string-\<gtr\>json json-\<gtr\>string json-ref json-ref* json-set json-set*)
 
     (begin
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <subsection|测试>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
     (import (liii check)
 
     \ \ \ \ \ \ \ \ (liii json))
 
     \;
+  </goldfish-chunk>
 
+  <subsection|实现>
+
+  <paragraph|string-\<gtr\>json>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
     (check (string-\<gtr\>json "{\\"age\\":18}") =\<gtr\> `(("age" . 18)))
+
+    (check (string-\<gtr\>json "{age:18}") =\<gtr\> `((age . 18)))
+
+    \;
 
     (check (string-\<gtr\>json "{\\"name\\":\\"中文\\"}") =\<gtr\> `(("name" . "中文")))\ 
 
     \;
-  </scm-chunk>
-
-  <subsection|实现>
+  </goldfish-chunk>
 
   <\scm-chunk|goldfish/liii/json.scm|true|true>
     (define (loose-car pair-or-empty)
@@ -307,6 +315,14 @@
 
   <paragraph|json-\<gtr\>string>
 
+  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (check (json-\<gtr\>string '(("age" . 18))) =\<gtr\> "{\\"age\\":18}")
+
+    (check (json-\<gtr\>string #(0 1 2 3)) =\<gtr\> "[0,1,2,3]")
+
+    \;
+  </scm-chunk>
+
   <\scm-chunk|goldfish/liii/json.scm|true|true>
     (define json-\<gtr\>string
 
@@ -383,14 +399,6 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
-    (check (json-\<gtr\>string '(("age" . 18))) =\<gtr\> "{\\"age\\":18}")
-
-    (check (json-\<gtr\>string #(0 1 2 3)) =\<gtr\> "[0,1,2,3]")
-
-    \;
-  </scm-chunk>
-
   <paragraph|json-ref>
 
   <\scm-chunk|goldfish/liii/json.scm|true|true>
@@ -459,11 +467,263 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
     (check (json-ref* `((bob . ((age . 18) (sex . male)))) 'bob 'age) =\<gtr\> 18)
 
     \;
+  </goldfish-chunk>
+
+  <paragraph|json-set><typehint|(input-json verify value) =\<gtr\> return-json>
+
+  <scm|json-set>可以更改json中最外层中的键<scm|verify>对应的值<scm|value>。输入的json数据不会被更改，被修改之后的json数据作为返回值返回。
+
+  <scm|value>可以是一个值或一个函数。当它是一个值时，它将直接替换旧的值。当它是一个函数时，它必须接受一个参数（键的当前值）并返回一个新值来替换旧值。不要使用<scm|#t>，<scm|#f>或者<scm|'()>作为值，应当使用<scm|'true>，<scm|'false>或者<scm|'null>。
+
+  <subparagraph|测试：verify是symbol>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((j0 `((age . 18) (sex . male)))
+
+    \ \ \ \ \ \ \ (j1 (json-set j0 'age 19))
+
+    \ \ \ \ \ \ \ (j2 (json-set j0 'age 'null)))
+
+    \ \ \ \ \ \ (check (json-ref j0 'age) =\<gtr\> 18)
+
+    \ \ \ \ \ \ (check (json-ref j1 'age) =\<gtr\> 19)
+
+    \ \ \ \ \ \ (check (json-ref j2 'age) =\<gtr\> '()))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：verify是字符串>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let1 j `(("age" . 18) ("sex" . male))
+
+    \ \ \ \ \ \ (check (json-ref (json-set j "age" 19) "age") =\<gtr\> 19)
+
+    \ \ \ \ \ \ (check (json-ref j "age") =\<gtr\> 18))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：verify是自然数>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((j0 #(red green blue))
+
+    \ \ \ \ \ \ \ (j1 (json-set j0 0 'black)))
+
+    \ \ (check j0 =\<gtr\> #(red green blue))
+
+    \ \ (check j1 =\<gtr\> #(black green blue)))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：verify是布尔值>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((j0 `((bob . 18) (jack . 16)))
+
+    \ \ \ \ \ \ \ (j1 (json-set j0 #t 3))
+
+    \ \ \ \ \ \ \ (j2 (json-set j0 #t (lambda (x) (+ x 1)))))
+
+    \ \ (check j1 =\<gtr\> `((bob . 3) (jack . 3)))
+
+    \ \ (check j2 =\<gtr\> `((bob . 19) (jack . 17))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/liii/json.scm|true|true>
+    (define json-set
+
+    \ \ (lambda (x v p)
+
+    \ \ \ \ (let ((x x) (v v) (p (if (procedure? p) p (lambda (x) p))))
+
+    \ \ \ \ \ \ (if (vector? x)
+
+    \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (cond\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((boolean? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if v
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x))(p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (p (cdar x)) (l (cdr x) p))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((procedure? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x))(v v)(p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (v (caar x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (p (cdar x)) (l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v p))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x))(v v)(p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (p (cdar x)) (l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v p))))))))
+
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((boolean? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if v
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x x)(p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons (caar x) (p (cdar x)))(l (cdr x) p))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((procedure? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x x)(v v)(p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (v (caar x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons (caar x) (p (cdar x)))(l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (car x) (l (cdr x) v p))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x x)(v v)(p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons v (p (cdar x)))(l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (car x) (l (cdr x) v p)))))))))))
+
+    \;
   </scm-chunk>
+
+  <paragraph|json-set*>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define (json-set* json k0 k1_or_v . ks_and_v)
+
+    \ \ (if (null? ks_and_v)
+
+    \ \ \ \ \ \ (json-set json k0 k1_or_v)
+
+    \ \ \ \ \ \ (json-set json k0
+
+    \ \ \ \ \ \ \ \ (lambda (x)
+
+    \ \ \ \ \ \ \ \ \ \ (apply json-set* (cons x (cons k1_or_v ks_and_v)))))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试单键更新>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((name . "Alice") (age . 25)))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'age 26)))
+
+    \ \ (check (json-ref updated-json 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试多键更新>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((person . ((name . "Alice")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)))))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'age 26)))
+
+    \ \ (check (json-ref* updated-json 'person 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试嵌套多键更新>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((person . ((name . "Alice")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (address . ((city . "Wonderland")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (zip . "12345")))))))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'address 'city "Newland")))
+
+    \ \ (check (json-ref* updated-json 'person 'address 'city) =\<gtr\> "Newland"))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试使用过程作为值>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((name . "Alice") (age . 25)))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'age (lambda (x) (+ x 1)))))
+
+    \ \ (check (json-ref updated-json 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试嵌套使用过程作为值>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((person . ((name . "Alice") (age . 25)))))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'age (lambda (x) (+ x 1)))))
+
+    \ \ (check (json-ref* updated-json 'person 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
 
   <subsection|结尾>
 
