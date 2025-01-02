@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.8>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
 <style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
 
@@ -198,6 +198,8 @@
   <\shell-code>
     xmake config --http=y --yes -vD
 
+    xmake b http
+
     bin/http -l http/tests/chat_demo.scm
   </shell-code>
 
@@ -341,6 +343,8 @@
 
   <\shell-code>
     xmake config --http=y --yes -vD
+
+    xmake b http
 
     bin/http http/tests/http_test.scm
   </shell-code>
@@ -1059,6 +1063,12 @@
     int
 
     main (int argc, char** argv) {
+
+    #ifdef TB_CONFIG_OS_WINDOWS
+
+    \ \ SetConsoleOutputCP (65001);
+
+    #endif
 
     \ \ string \ \ \ \ \ gf_lib_dir \ = find_goldfish_library ();
 
