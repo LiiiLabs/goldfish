@@ -255,6 +255,11 @@
 (check-catch 'wrong-type-arg (even? #t))
 (check-catch 'wrong-type-arg (even? #f))
 
+(check (+ 1 2) => 3)
+(check (+ ) => 0)
+
+(check (+ #x7fffffffffffffff 1) => #x8000000000000000)
+
 (check (floor 1.1) => 1.0)
 (check (floor 1) => 1)
 (check (floor 1/2) => 0)
