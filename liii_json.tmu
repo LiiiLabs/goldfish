@@ -862,7 +862,9 @@
 
     \ \ \ \ (if (vector? x)
 
-    \ \ \ \ \ \ \ \ (if (\<gtr\> (vector-length x) 0)
+    \ \ \ \ \ \ \ \ (if (zero? (vector-length x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ x
 
     \ \ \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector
 
@@ -894,9 +896,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l (cdr x) v)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v))))))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ x) ; 如果向量为空，直接返回
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v)))))))))
 
     \ \ \ \ \ \ \ \ (cond
 
@@ -990,9 +990,17 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (zip . "12345"))))))
 
-    \ \ (let ((updated-json (json-drop json (lambda (k) (equal? k 'city)))))
+    \ \ (let1 j1 (json-drop json (lambda (k) (equal? k 'city)))
 
-    \ \ \ \ (check (json-ref* updated-json 'address 'city) =\<gtr\> "Wonderland")))
+    \ \ \ \ (check (json-ref* j1 'address 'city) =\<gtr\> "Wonderland"))
+
+    \ \ (let1 j2 (json-drop json (lambda (k) (equal? k 'name)))
+
+    \ \ \ \ (check (json-ref* j2 'name) =\<gtr\> '()))
+
+    \ \ (let1 j3 (json-drop* json 'address (lambda (k) (equal? k 'city)))
+
+    \ \ \ \ (check (json-ref* j3 'address 'city) =\<gtr\> '())))
 
     \;
   </goldfish-chunk>

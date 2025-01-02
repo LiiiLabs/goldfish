@@ -256,7 +256,8 @@
 (define json-drop
   (lambda (x v)
     (if (vector? x)
-        (if (> (vector-length x) 0)
+        (if (zero? (vector-length x))
+            x
             (list->vector
              (cond
                ((procedure? v)
@@ -272,8 +273,7 @@
                       '()
                       (if (equal? (caar x) v)
                           (l (cdr x) v)
-                          (cons (cdar x) (l (cdr x) v))))))))
-            x) ; 如果向量为空，直接返回
+                          (cons (cdar x) (l (cdr x) v)))))))))
         (cond
           ((procedure? v)
            (let l ((x x) (v v))

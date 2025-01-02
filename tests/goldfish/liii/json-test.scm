@@ -119,8 +119,12 @@
                (age . 25)
                (address . ((city . "Wonderland")
                            (zip . "12345"))))))
-  (let ((updated-json (json-drop json (lambda (k) (equal? k 'city)))))
-    (check (json-ref* updated-json 'address 'city) => "Wonderland")))
+  (let1 j1 (json-drop json (lambda (k) (equal? k 'city)))
+    (check (json-ref* j1 'address 'city) => "Wonderland"))
+  (let1 j2 (json-drop json (lambda (k) (equal? k 'name)))
+    (check (json-ref* j2 'name) => '()))
+  (let1 j3 (json-drop* json 'address (lambda (k) (equal? k 'city)))
+    (check (json-ref* j3 'address 'city) => '())))
 
 (check-report)
 
