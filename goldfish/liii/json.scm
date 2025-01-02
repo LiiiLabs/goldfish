@@ -22,7 +22,7 @@
 ;  SOFTWARE.
 
 (define-library (liii json)
-(import (liii chez))
+(import (liii chez) (liii alist))
 (export string->json json->string json-ref json-ref* json-set)
 (begin
 

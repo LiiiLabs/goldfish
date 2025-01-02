@@ -38,10 +38,10 @@
       (check (json-ref (json-set j "age" 19) "age") => 19)
       (check (json-ref j "age") => 18))
 
-(let* ((j0 #('red 'green 'blue))
+(let* ((j0 #(red green blue))
        (j1 (json-set j0 0 'black)))
-  (check j0 => #('red 'green 'blue))
-  (check j1 => #('black 'green 'blue)))
+  (check j0 => #(red green blue))
+  (check j1 => #(black green blue)))
 
 (check-report)
 
