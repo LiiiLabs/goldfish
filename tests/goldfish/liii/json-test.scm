@@ -76,5 +76,9 @@
        (updated-json (json-set* json 'person 'age (lambda (x) (+ x 1)))))
   (check (json-ref* updated-json 'person 'age) => 26))
 
+(let ((json '((person . ((name . "Alice") (age . 25))))))
+  (let ((updated-json (json-push* json 'person 'city "Wonderland")))
+    (check (json-ref* updated-json 'person 'city) => "Wonderland")))
+
 (check-report)
 

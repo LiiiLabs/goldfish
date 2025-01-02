@@ -106,7 +106,13 @@
 
     (import (liii chez) (liii alist))
 
-    (export string-\<gtr\>json json-\<gtr\>string json-ref json-ref* json-set json-set*)
+    (export string-\<gtr\>json json-\<gtr\>string
+
+    \ \ \ \ \ \ \ \ json-ref json-ref*
+
+    \ \ \ \ \ \ \ \ json-set json-set*
+
+    \ \ \ \ \ \ \ \ json-push json-push*)
 
     (begin
 
@@ -721,6 +727,64 @@
     \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'age (lambda (x) (+ x 1)))))
 
     \ \ (check (json-ref* updated-json 'person 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|json-push>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define (json-push x k v)
+
+    \ \ (if (vector? x)
+
+    \ \ \ \ \ \ (if (= (vector-length x) 0)
+
+    \ \ \ \ \ \ \ \ \ \ (vector v)
+
+    \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x)) (k k) (v v) (b #f))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if b '() (cons v '()))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) k)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons v (cons (cdar x) (l (cdr x) k v #t)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) k v b)))))))
+
+    \ \ \ \ \ \ (cons (cons k v) x)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|json-push*>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define (json-push* json k0 v0 . rest)
+
+    \ \ (if (null? rest)
+
+    \ \ \ \ \ \ (json-push json k0 v0)
+
+    \ \ \ \ \ \ (json-set json k0
+
+    \ \ \ \ \ \ \ \ (lambda (x) (apply json-push* (cons x (cons v0 rest)))))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：在嵌套对象中添加新键值对>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((person . ((name . "Alice") (age . 25))))))
+
+    \ \ (let ((updated-json (json-push* json 'person 'city "Wonderland")))
+
+    \ \ \ \ (check (json-ref* updated-json 'person 'city) =\<gtr\> "Wonderland")))
 
     \;
   </goldfish-chunk>
