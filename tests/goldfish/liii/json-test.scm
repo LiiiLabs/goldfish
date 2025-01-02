@@ -76,5 +76,33 @@
        (updated-json (json-set* json 'person 'age (lambda (x) (+ x 1)))))
   (check (json-ref* updated-json 'person 'age) => 26))
 
+(let ((json '((person . ((name . "Alice") (age . 25))))))
+  (let ((updated-json (json-push* json 'person 'city "Wonderland")))
+    (check (json-ref* updated-json 'person 'city) => "Wonderland")))
+
+(let ((json '(("person" . (("name" . "Alice") ("age" . 25))))))
+  (let ((updated-json (json-push* json "person" "city" "Wonderland")))
+    (check (json-ref* updated-json "person" "city") => "Wonderland")))
+
+(let ((json '((person . ((name . "Alice") (age . 25) (address . ((city . "Oldland") (zip . "12345"))))))))
+  (let ((updated-json (json-push* json 'person 'address 'street "Main St")))
+    (check (json-ref* updated-json 'person 'address 'street) => "Main St")))
+
+(let ((json '((data . #(1 2 3)))))
+  (let ((updated-json (json-push* json 'data 3 4)))
+    (check updated-json => '((data . #(1 2 3 4))))))
+
+(let ((json '((data . #(#(1 2) #(3 4))))))
+  (let ((updated-json (json-push* json 'data 1 2 5)))
+    (check updated-json => '((data . #(#(1 2) #(3 4 5)))))))
+
+(let ((json '((data . ((0 . "zero") (1 . "one"))))))
+  (let ((updated-json (json-push* json 'data 2 "two")))
+    (check (json-ref* updated-json 'data 2) => "two")))
+
+(let ((json '((flags . ((#t . "true") (#f . "false"))))))
+  (let ((updated-json (json-push* json 'flags #t "yes")))
+    (check (json-ref* updated-json 'flags #t) => "yes")))
+
 (check-report)
 

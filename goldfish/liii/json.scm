@@ -23,7 +23,10 @@
 
 (define-library (liii json)
 (import (liii chez) (liii alist))
-(export string->json json->string json-ref json-ref* json-set json-set*)
+(export string->json json->string
+        json-ref json-ref*
+        json-set json-set*
+        json-push json-push*)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -229,6 +232,25 @@
       (json-set json k0
         (lambda (x)
           (apply json-set* (cons x (cons k1_or_v ks_and_v)))))))
+
+(define (json-push x k v)
+  (if (vector? x)
+      (if (= (vector-length x) 0)
+          (vector v)
+          (list->vector
+            (let l ((x (vector->alist x)) (k k) (v v) (b #f))
+              (if (null? x)
+                  (if b '() (cons v '()))
+                  (if (equal? (caar x) k)
+                      (cons v (cons (cdar x) (l (cdr x) k v #t)))
+                      (cons (cdar x) (l (cdr x) k v b)))))))
+      (cons (cons k v) x)))
+
+(define (json-push* json k0 v0 . rest)
+  (if (null? rest)
+      (json-push json k0 v0)
+      (json-set json k0
+        (lambda (x) (apply json-push* (cons x (cons v0 rest)))))))
 
 ) ; end of begin
 ) ; end of define-library
