@@ -52,5 +52,29 @@
   (check j1 => `((bob . 3) (jack . 3)))
   (check j2 => `((bob . 19) (jack . 17))))
 
+(let* ((json '((name . "Alice") (age . 25)))
+       (updated-json (json-set* json 'age 26)))
+  (check (json-ref updated-json 'age) => 26))
+
+(let* ((json '((person . ((name . "Alice")
+                          (age . 25)))))
+       (updated-json (json-set* json 'person 'age 26)))
+  (check (json-ref* updated-json 'person 'age) => 26))
+
+(let* ((json '((person . ((name . "Alice")
+                          (age . 25)
+                          (address . ((city . "Wonderland")
+                                      (zip . "12345")))))))
+       (updated-json (json-set* json 'person 'address 'city "Newland")))
+  (check (json-ref* updated-json 'person 'address 'city) => "Newland"))
+
+(let* ((json '((name . "Alice") (age . 25)))
+       (updated-json (json-set* json 'age (lambda (x) (+ x 1)))))
+  (check (json-ref updated-json 'age) => 26))
+
+(let* ((json '((person . ((name . "Alice") (age . 25)))))
+       (updated-json (json-set* json 'person 'age (lambda (x) (+ x 1)))))
+  (check (json-ref* updated-json 'person 'age) => 26))
+
 (check-report)
 

@@ -23,7 +23,7 @@
 
 (define-library (liii json)
 (import (liii chez) (liii alist))
-(export string->json json->string json-ref json-ref* json-set)
+(export string->json json->string json-ref json-ref* json-set json-set*)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -222,6 +222,13 @@
                   (if (equal? (caar x) v)
                     (cons (cons v (p (cdar x)))(l (cdr x) v p))
                     (cons (car x) (l (cdr x) v p)))))))))))
+
+(define (json-set* json k0 k1_or_v . ks_and_v)
+  (if (null? ks_and_v)
+      (json-set json k0 k1_or_v)
+      (json-set json k0
+        (lambda (x)
+          (apply json-set* (cons x (cons k1_or_v ks_and_v)))))))
 
 ) ; end of begin
 ) ; end of define-library

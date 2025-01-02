@@ -17,7 +17,7 @@
 
   <subsection|许可证>
 
-  <\scm-chunk|goldfish/liii/json.scm|false|true>
+  <\goldfish-chunk|goldfish/liii/json.scm|false|true>
     ;; \ MIT License
 
     \;
@@ -63,7 +63,7 @@
     ; \ SOFTWARE.
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/json-test.scm|false|true>
     ;
@@ -106,7 +106,7 @@
 
     (import (liii chez) (liii alist))
 
-    (export string-\<gtr\>json json-\<gtr\>string json-ref json-ref* json-set)
+    (export string-\<gtr\>json json-\<gtr\>string json-ref json-ref* json-set json-set*)
 
     (begin
 
@@ -638,6 +638,92 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|json-set*>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define (json-set* json k0 k1_or_v . ks_and_v)
+
+    \ \ (if (null? ks_and_v)
+
+    \ \ \ \ \ \ (json-set json k0 k1_or_v)
+
+    \ \ \ \ \ \ (json-set json k0
+
+    \ \ \ \ \ \ \ \ (lambda (x)
+
+    \ \ \ \ \ \ \ \ \ \ (apply json-set* (cons x (cons k1_or_v ks_and_v)))))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试单键更新>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((name . "Alice") (age . 25)))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'age 26)))
+
+    \ \ (check (json-ref updated-json 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试多键更新>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((person . ((name . "Alice")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)))))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'age 26)))
+
+    \ \ (check (json-ref* updated-json 'person 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试嵌套多键更新>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((person . ((name . "Alice")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (address . ((city . "Wonderland")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (zip . "12345")))))))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'address 'city "Newland")))
+
+    \ \ (check (json-ref* updated-json 'person 'address 'city) =\<gtr\> "Newland"))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试使用过程作为值>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((name . "Alice") (age . 25)))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'age (lambda (x) (+ x 1)))))
+
+    \ \ (check (json-ref updated-json 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试嵌套使用过程作为值>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((json '((person . ((name . "Alice") (age . 25)))))
+
+    \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'age (lambda (x) (+ x 1)))))
+
+    \ \ (check (json-ref* updated-json 'person 'age) =\<gtr\> 26))
+
+    \;
+  </goldfish-chunk>
 
   <subsection|结尾>
 
