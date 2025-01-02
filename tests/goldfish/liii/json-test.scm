@@ -30,9 +30,12 @@
 
 (check (json-ref* `((bob . ((age . 18) (sex . male)))) 'bob 'age) => 18)
 
-(let1 j `((age . 18) (sex . male))
-      (check (json-ref (json-set j 'age 19) 'age) => 19)
-      (check (json-ref j 'age) => 18))
+(let* ((j0 `((age . 18) (sex . male)))
+       (j1 (json-set j0 'age 19))
+       (j2 (json-set j0 'age 'null)))
+      (check (json-ref j0 'age) => 18)
+      (check (json-ref j1 'age) => 19)
+      (check (json-ref j2 'age) => '()))
 
 (let1 j `(("age" . 18) ("sex" . male))
       (check (json-ref (json-set j "age" 19) "age") => 19)

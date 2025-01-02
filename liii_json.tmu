@@ -473,19 +473,31 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|json-set><typehint|(input-json key value) =\<gtr\> return-json>
+  <paragraph|json-set><typehint|(input-json verify value) =\<gtr\> return-json>
 
-  <scm|json-set>可以更改json中最外层中的键key对应的值value。输入的json数据不会被更改，被修改之后的json数据作为返回值返回。
+  <scm|json-set>可以更改json中最外层中的键<scm|verify>对应的值<scm|value>。输入的json数据不会被更改，被修改之后的json数据作为返回值返回。
+
+  <scm|value>可以是一个值或一个函数。当它是一个值时，它将直接替换旧的值。当它是一个函数时，它必须接受一个参数（键的当前值）并返回一个新值来替换旧值。不要使用<scm|#t>，<scm|#f>或者<scm|'()>作为值，应当使用<scm|'true>，<scm|'false>或者<scm|'null>。
+
+  <subparagraph|测试：verify是symbol>
 
   <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
-    (let1 j `((age . 18) (sex . male))
+    (let* ((j0 `((age . 18) (sex . male)))
 
-    \ \ \ \ \ \ (check (json-ref (json-set j 'age 19) 'age) =\<gtr\> 19)
+    \ \ \ \ \ \ \ (j1 (json-set j0 'age 19))
 
-    \ \ \ \ \ \ (check (json-ref j 'age) =\<gtr\> 18))
+    \ \ \ \ \ \ \ (j2 (json-set j0 'age 'null)))
+
+    \ \ \ \ \ \ (check (json-ref j0 'age) =\<gtr\> 18)
+
+    \ \ \ \ \ \ (check (json-ref j1 'age) =\<gtr\> 19)
+
+    \ \ \ \ \ \ (check (json-ref j2 'age) =\<gtr\> '()))
 
     \;
   </goldfish-chunk>
+
+  <subparagraph|测试：verify是字符串>
 
   <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
     (let1 j `(("age" . 18) ("sex" . male))
@@ -496,6 +508,8 @@
 
     \;
   </goldfish-chunk>
+
+  <subparagraph|测试：verify是自然数>
 
   <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
     (let* ((j0 #(red green blue))
