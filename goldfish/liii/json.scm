@@ -26,7 +26,8 @@
 (export string->json json->string
         json-ref json-ref*
         json-set json-set*
-        json-push json-push*)
+        json-push json-push*
+        json-drop json-drop*)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -251,6 +252,50 @@
       (json-push json k0 v0)
       (json-set json k0
         (lambda (x) (apply json-push* (cons x (cons v0 rest)))))))
+
+(define json-drop
+  (lambda (x v)
+    (if (vector? x)
+        (if (> (vector-length x) 0)
+            (list->vector
+             (cond
+               ((procedure? v)
+                (let l ((x (vector->alist x)) (v v))
+                  (if (null? x)
+                      '()
+                      (if (v (caar x))
+                          (l (cdr x) v)
+                          (cons (cdar x) (l (cdr x) v))))))
+               (else
+                (let l ((x (vector->alist x)) (v v))
+                  (if (null? x)
+                      '()
+                      (if (equal? (caar x) v)
+                          (l (cdr x) v)
+                          (cons (cdar x) (l (cdr x) v))))))))
+            x) ; 如果向量为空，直接返回
+        (cond
+          ((procedure? v)
+           (let l ((x x) (v v))
+             (if (null? x)
+                 '()
+                 (if (v (caar x))
+                     (l (cdr x) v)
+                     (cons (car x) (l (cdr x) v))))))
+          (else
+           (let l ((x x) (v v))
+             (if (null? x)
+                 '()
+                 (if (equal? (caar x) v)
+                     (l (cdr x) v)
+                     (cons (car x) (l (cdr x) v))))))))))
+
+(define json-drop*
+  (lambda (json key . rest)
+    (if (null? rest)
+        (json-drop json key)
+        (json-set json key
+                  (lambda (x) (apply json-drop* (cons x rest)))))))
 
 ) ; end of begin
 ) ; end of define-library

@@ -104,5 +104,23 @@
   (let ((updated-json (json-push* json 'flags #t "yes")))
     (check (json-ref* updated-json 'flags #t) => "yes")))
 
+(let* ((json '((name . "Alice") (age . 25))))
+  (let ((updated-json (json-drop json 'age)))
+    (check (json-ref updated-json 'age) => '())))
+
+(let* ((json '((name . "Alice")
+               (age . 25)
+               (address . ((city . "Wonderland")
+                           (zip . "12345"))))))
+  (let ((updated-json (json-drop* json 'address 'city)))
+    (check (json-ref* updated-json 'address 'city) => '())))
+
+(let* ((json '((name . "Alice")
+               (age . 25)
+               (address . ((city . "Wonderland")
+                           (zip . "12345"))))))
+  (let ((updated-json (json-drop json (lambda (k) (equal? k 'city)))))
+    (check (json-ref* updated-json 'address 'city) => "Wonderland")))
+
 (check-report)
 
