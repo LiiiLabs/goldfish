@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.8>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -442,7 +442,7 @@
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (if (\<gtr\> 3 2) 3 2) =\<gtr\> 3)
 
-    (check (if (\< 3 2) 3 2) =\> 2)
+    (check (if (\<less\> 3 2) 3 2) =\<gtr\> 2)
 
     \;
   </scm-chunk>
@@ -452,7 +452,7 @@
   测试 if 语句的真、假分支，使用复杂表达式
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (if (and (\> 3 1) (\< 3 4)) 'true-branch 'false-branch) =\> 'true-branch)
+    (check (if (and (\<gtr\> 3 1) (\<less\> 3 4)) 'true-branch 'false-branch) =\<gtr\> 'true-branch)
 
     (check (if (or (\<gtr\> 3 4) (\<less\> 3 1)) 'true-branch 'false-branch) =\<gtr\> 'false-branch)
 
@@ -595,9 +595,75 @@
 
   <value|r7rs><paragraph|when><index|when>
 
+  测试 when 中条件为真的情况
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <code|<\code*>
+      \;
+
+      (check (when #t 1) =\<gtr\> 1)
+
+      \;
+    </code*>>
+
+    <code|<\code>
+      \;
+    </code>>
+  </goldfish-chunk>
+
+  测试 when 中条件为假的情况
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <code|<\code*>
+      \;
+
+      (check (when #f 1 ) =\<gtr\> #\<less\>unspecified\<gtr\>)
+
+      \;
+    </code*>>
+
+    <code|<\code>
+      \;
+    </code>>
+  </goldfish-chunk>
+
+  \;
+
+  测试when中添加简单条件为真的情况
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <code|<\code*>
+      \;
+
+      (check (when (\<gtr\> 3 1) 1 ) =\<gtr\> 1)
+
+      \;
+    </code*>>
+
+    <code|<\code>
+      \;
+    </code>>
+  </goldfish-chunk>
+
+  测试when中添加简单条件为假的情况
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <code|<\code*>
+      \;
+
+      (check (when (\<gtr\> 1 3) 1 ) =\<gtr\> #\<less\>unspecified\<gtr\>)
+
+      \;
+    </code*>>
+
+    <code|<\code>
+      \;
+    </code>>
+  </goldfish-chunk>
+
   <value|r7rs><paragraph|unless><index|unless>
 
-  <value|r7rs><paragraph|let><index|let>
+  <value|r7rs><paragraph|let><inactive|<index|let>>
 
   <value|r7rs><paragraph|let*><index|let*>
 

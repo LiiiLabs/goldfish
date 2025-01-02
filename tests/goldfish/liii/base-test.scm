@@ -71,6 +71,22 @@
 
 (check (and #t 1) => 1)
 
+
+(check (when #t 1) => 1)
+
+
+
+(check (when #f 1 ) => #<unspecified>)
+
+
+
+(check (when (> 3 1) 1 ) => 1)
+
+
+
+(check (when (> 1 3) 1 ) => #<unspecified>)
+
+
 (define (test-letrec)
   (letrec ((even?
              (lambda (n)
