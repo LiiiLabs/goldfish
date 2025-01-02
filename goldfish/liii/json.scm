@@ -27,7 +27,8 @@
         json-ref json-ref*
         json-set json-set*
         json-push json-push*
-        json-drop json-drop*)
+        json-drop json-drop*
+        json-reduce)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -296,6 +297,55 @@
         (json-drop json key)
         (json-set json key
                   (lambda (x) (apply json-drop* (cons x rest)))))))
+
+(define json-reduce
+  (lambda (x v p)
+    (if (vector? x)
+        (list->vector
+         (cond
+           ((boolean? v)
+            (if v
+                (let l ((x (vector->alist x)) (p p))
+                  (if (null? x)
+                      '()
+                      (cons (p (caar x) (cdar x)) (l (cdr x) p))))
+                x))
+           ((procedure? v)
+            (let l ((x (vector->alist x)) (v v) (p p))
+              (if (null? x)
+                  '()
+                  (if (v (caar x))
+                      (cons (p (caar x) (cdar x)) (l (cdr x) v p))
+                      (cons (cdar x) (l (cdr x) v p))))))
+           (else
+            (let l ((x (vector->alist x)) (v v) (p p))
+              (if (null? x)
+                  '()
+                  (if (equal? (caar x) v)
+                      (cons (p (caar x) (cdar x)) (l (cdr x) v p))
+                      (cons (cdar x) (l (cdr x) v p))))))))
+        (cond
+          ((boolean? v)
+           (if v
+               (let l ((x x) (p p))
+                 (if (null? x)
+                     '()
+                     (cons (cons (caar x) (p (caar x) (cdar x))) (l (cdr x) p))))
+               x))
+          ((procedure? v)
+           (let l ((x x) (v v) (p p))
+             (if (null? x)
+                 '()
+                 (if (v (caar x))
+                     (cons (cons (caar x) (p (caar x) (cdar x))) (l (cdr x) v p))
+                     (cons (car x) (l (cdr x) v p))))))
+          (else
+           (let l ((x x) (v v) (p p))
+             (if (null? x)
+                 '()
+                 (if (equal? (caar x) v)
+                     (cons (cons v (p v (cdar x))) (l (cdr x) v p))
+                     (cons (car x) (l (cdr x) v p))))))))))
 
 ) ; end of begin
 ) ; end of define-library
