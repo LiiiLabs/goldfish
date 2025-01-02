@@ -157,6 +157,9 @@ glue_http (s7_scheme* sc) {
 
 int
 main (int argc, char** argv) {
+#ifdef TB_CONFIG_OS_WINDOWS
+  SetConsoleOutputCP (65001);
+#endif
   string      gf_lib_dir  = find_goldfish_library ();
   const char* gf_lib      = gf_lib_dir.c_str ();
   s7_scheme* sc= init_goldfish_scheme (gf_lib);
