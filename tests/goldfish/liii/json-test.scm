@@ -126,5 +126,48 @@
   (let1 j3 (json-drop* json 'address (lambda (k) (equal? k 'city)))
     (check (json-ref* j3 'address 'city) => '())))
 
+(let ((json '((name . "Alice") (age . 25))))
+  (check (json-reduce json 'name (lambda (k v) (string-upcase v)))
+         => '((name . "ALICE") (age . 25))))
+
+(let ((json '((person . ((name . "Alice") (age . 25))))))
+  (check (json-reduce json 'person (lambda (k v) v))
+         => '((person . ((name . "Alice") (age . 25))))))
+
+(let ((json '((name . "Alice") (age . 25))))
+  (check (json-reduce json (lambda (k) (equal? k 'age)) (lambda (k v) (+ v 1)))
+         => '((name . "Alice") (age . 26))))
+
+(let ((json '((person . ((name . "Alice") (age . 25))))))
+  (check (json-reduce json (lambda (k) (equal? k 'person)) (lambda (k v) v))
+         => '((person . ((name . "Alice") (age . 25))))))
+
+(let ((json '((name . "Alice") (age . 25))))
+  (check (json-reduce json #t (lambda (k v) (if (string? v) (string-upcase v) v)))
+         => '((name . "ALICE") (age . 25))))
+
+(let ((json '((name . "Alice") (age . 25))))
+  (check (json-reduce json #f (lambda (k v) v))
+         => '((name . "Alice") (age . 25))))
+
+(let ((json '()))
+  (check (json-reduce json 'name (lambda (k v) v))
+         => '()))
+
+(let ((json #()))
+  (check (json-reduce json 'name (lambda (k v) v))
+         => #()))
+
+(let ((json '((person . ((name . "Alice") (age . 25))))))
+  (check (json-reduce* json 'person 'name (lambda (k v) (string-upcase v)))
+         => '((person . ((name . "ALICE") (age . 25))))))
+
+(let1 json '((person . ((name . "Alice")
+                        (age . 25)
+                        (address . ((city . "Wonderland")
+                                    (zip . "12345"))))))
+  (let ((updated-json (json-reduce* json 'person 'address 'city (lambda (x y) (string-upcase y)))))
+    (check (json-ref* updated-json 'person 'address 'city) => "WONDERLAND")))
+
 (check-report)
 

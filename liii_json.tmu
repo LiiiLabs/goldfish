@@ -104,7 +104,7 @@
   <\goldfish-chunk|goldfish/liii/json.scm|true|true>
     (define-library (liii json)
 
-    (import (liii chez) (liii alist))
+    (import (liii chez) (liii alist) (liii list))
 
     (export string-\<gtr\>json json-\<gtr\>string
 
@@ -114,7 +114,9 @@
 
     \ \ \ \ \ \ \ \ json-push json-push*
 
-    \ \ \ \ \ \ \ \ json-drop json-drop*)
+    \ \ \ \ \ \ \ \ json-drop json-drop*
+
+    \ \ \ \ \ \ \ \ json-reduce json-reduce*)
 
     (begin
 
@@ -1001,6 +1003,258 @@
     \ \ (let1 j3 (json-drop* json 'address (lambda (k) (equal? k 'city)))
 
     \ \ \ \ (check (json-ref* j3 'address 'city) =\<gtr\> '())))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|json-reduce>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define json-reduce
+
+    \ \ (lambda (x v p)
+
+    \ \ \ \ (if (vector? x)
+
+    \ \ \ \ \ \ \ \ (list-\<gtr\>vector
+
+    \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ ((boolean? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (if v
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x)) (p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (p (caar x) (cdar x)) (l (cdr x) p))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((procedure? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x)) (v v) (p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (v (caar x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (p (caar x) (cdar x)) (l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v p))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x (vector-\<gtr\>alist x)) (v v) (p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (p (caar x) (cdar x)) (l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cdar x) (l (cdr x) v p))))))))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((boolean? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ (if v
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let l ((x x) (p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons (caar x) (p (caar x) (cdar x))) (l (cdr x) p))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ x))
+
+    \ \ \ \ \ \ \ \ \ \ ((procedure? v)
+
+    \ \ \ \ \ \ \ \ \ \ \ (let l ((x x) (v v) (p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (v (caar x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons (caar x) (p (caar x) (cdar x))) (l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (car x) (l (cdr x) v p))))))
+
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ (let l ((x x) (v v) (p p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (equal? (caar x) v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons v (p v (cdar x))) (l (cdr x) v p))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (car x) (l (cdr x) v p))))))))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：单层或者嵌套JSON数据，直接值键>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((name . "Alice") (age . 25))))
+
+    \ \ (check (json-reduce json 'name (lambda (k v) (string-upcase v)))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '((name . "ALICE") (age . 25))))
+
+    \;
+
+    (let ((json '((person . ((name . "Alice") (age . 25))))))
+
+    \ \ (check (json-reduce json 'person (lambda (k v) v))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '((person . ((name . "Alice") (age . 25))))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：单层 JSON 数据，过程条件>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((name . "Alice") (age . 25))))
+
+    \ \ (check (json-reduce json (lambda (k) (equal? k 'age)) (lambda (k v) (+ v 1)))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '((name . "Alice") (age . 26))))
+
+    \;
+
+    (let ((json '((person . ((name . "Alice") (age . 25))))))
+
+    \ \ (check (json-reduce json (lambda (k) (equal? k 'person)) (lambda (k v) v))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '((person . ((name . "Alice") (age . 25))))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：单层 JSON 数据，布尔值条件（true，对所有键值对操作）>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((name . "Alice") (age . 25))))
+
+    \ \ (check (json-reduce json #t (lambda (k v) (if (string? v) (string-upcase v) v)))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '((name . "ALICE") (age . 25))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|测试：单层 JSON 数据，布尔值条件（false，不操作）>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((name . "Alice") (age . 25))))
+
+    \ \ (check (json-reduce json #f (lambda (k v) v))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '((name . "Alice") (age . 25))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试：边界情况>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '()))
+
+    \ \ (check (json-reduce json 'name (lambda (k v) v))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '()))
+
+    \;
+
+    (let ((json #()))
+
+    \ \ (check (json-reduce json 'name (lambda (k v) v))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> #()))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|json-reduce*>
+
+  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+    (define (json-reduce* j v1 v2 . rest)
+
+    \ \ (cond
+
+    \ \ \ \ ((null? rest) (json-reduce j v1 v2))
+
+    \ \ \ \ ((length=? 1 rest)
+
+    \ \ \ \ \ (json-reduce j v1
+
+    \ \ \ \ \ \ \ (lambda (x y)
+
+    \ \ \ \ \ \ \ \ \ (let* ((new-v1 v2)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (p (last rest)))
+
+    \ \ \ \ \ \ \ \ \ \ (json-reduce y new-v1
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda (n m) (p (list x n) m)))))))
+
+    \ \ \ \ (else
+
+    \ \ \ \ \ (json-reduce j v1
+
+    \ \ \ \ \ \ \ (lambda (x y)
+
+    \ \ \ \ \ \ \ \ \ (let* ((new-v1 v2)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (p (last rest)))
+
+    \ \ \ \ \ \ \ \ \ \ (apply json-reduce*
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (append (cons y (cons new-v1 (drop-right rest 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list (lambda (n m) (p (cons x n) m)))))))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let ((json '((person . ((name . "Alice") (age . 25))))))
+
+    \ \ (check (json-reduce* json 'person 'name (lambda (k v) (string-upcase v)))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> '((person . ((name . "ALICE") (age . 25))))))
+
+    \;
+
+    (let1 json '((person . ((name . "Alice")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (address . ((city . "Wonderland")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (zip . "12345"))))))
+
+    \ \ (let ((updated-json (json-reduce* json 'person 'address 'city (lambda (x y) (string-upcase y)))))
+
+    \ \ \ \ (check (json-ref* updated-json 'person 'address 'city) =\<gtr\> "WONDERLAND")))
 
     \;
   </goldfish-chunk>
