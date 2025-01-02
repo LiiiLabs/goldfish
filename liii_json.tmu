@@ -523,6 +523,20 @@
     \;
   </goldfish-chunk>
 
+  <subparagraph|测试：verify是布尔值>
+
+  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+    (let* ((j0 `((bob . 18) (jack . 16)))
+
+    \ \ \ \ \ \ \ (j1 (json-set j0 #t 3)))
+
+    \ \ (check j1 =\<gtr\> `((bob . 3) (jack . 3))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|实现>
+
   <\scm-chunk|goldfish/liii/json.scm|true|true>
     (define json-set
 
