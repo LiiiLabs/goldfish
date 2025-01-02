@@ -37,7 +37,7 @@
     \;
   </goldfish-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|false|true>
+  <\goldfish-chunk|tests/goldfish/liii/alist-test.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -69,7 +69,7 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   \;
 
@@ -86,7 +86,7 @@
 
     \ \ \ \ \ \ \ \ (scheme case-lambda))
 
-    (export alist? alist-cons alist-ref alist-ref/default)
+    (export alist? alist-cons alist-ref alist-ref/default vector-\<gtr\>alist)
 
     (begin
 
@@ -239,13 +239,69 @@
     \;
   </goldfish-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/alist-test.scm|true|true>
     (check (alist-ref/default '((a . 1)) 'b 2) =\<gtr\> 2)
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
-  \;
+  <paragraph|vector-\<gtr\>alist>
+
+  <\goldfish-chunk|goldfish/liii/alist.scm|true|true>
+    ; MIT License
+
+    ; Copyright guenchi (c) 2018 - 2019
+
+    (define vector-\<gtr\>alist
+
+    \ \ (typed-lambda ((x vector?))
+
+    \ \ \ \ (if (zero? (length x)) '()
+
+    \ \ \ \ \ \ \ \ (let loop ((x (vector-\<gtr\>list x)) (n 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons n (car x))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? (cdr x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr x) (+ n 1))))))))
+
+    \ \ \ \ 
+  </goldfish-chunk>
+
+  <subparagraph|测试空向量>
+
+  <\goldfish-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+    (check (vector-\<gtr\>alist #()) =\<gtr\> '())
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试单个元素向量>
+
+  <\goldfish-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+    (check (vector-\<gtr\>alist #(42)) =\<gtr\> '((0 . 42)))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试多个元素的向量>
+
+  <\goldfish-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+    (check (vector-\<gtr\>alist #("a" "b" "c")) =\<gtr\> '((0 . "a") (1 . "b") (2 . "c")))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试嵌套向量>
+
+  <\goldfish-chunk|tests/goldfish/liii/alist-test.scm|true|true>
+    (check (vector-\<gtr\>alist #(#(1 2) #(3 4))) =\<gtr\> '((0 . #(1 2)) (1 . #(3 4))))
+
+    \;
+  </goldfish-chunk>
 
   <section|结束>
 

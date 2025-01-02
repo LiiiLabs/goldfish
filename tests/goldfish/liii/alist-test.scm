@@ -36,5 +36,13 @@
 
 (check (alist-ref/default '((a . 1)) 'b 2) => 2)
 
+(check (vector->alist #()) => '())
+
+(check (vector->alist #(42)) => '((0 . 42)))
+
+(check (vector->alist #("a" "b" "c")) => '((0 . "a") (1 . "b") (2 . "c")))
+
+(check (vector->alist #(#(1 2) #(3 4))) => '((0 . #(1 2)) (1 . #(3 4))))
+
 (check-report)
 

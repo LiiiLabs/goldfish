@@ -18,6 +18,8 @@
         (liii json))
 
 (check (string->json "{\"age\":18}") => `(("age" . 18)))
+(check (string->json "{age:18}") => `((age . 18)))
+
 (check (string->json "{\"name\":\"中文\"}") => `(("name" . "中文"))) 
 
 (check (json->string '(("age" . 18))) => "{\"age\":18}")
@@ -27,6 +29,19 @@
 (check (json-ref #(0 1 2 3) 0) => 0)
 
 (check (json-ref* `((bob . ((age . 18) (sex . male)))) 'bob 'age) => 18)
+
+(let1 j `((age . 18) (sex . male))
+      (check (json-ref (json-set j 'age 19) 'age) => 19)
+      (check (json-ref j 'age) => 18))
+
+(let1 j `(("age" . 18) ("sex" . male))
+      (check (json-ref (json-set j "age" 19) "age") => 19)
+      (check (json-ref j "age") => 18))
+
+(let* ((j0 #('red 'green 'blue))
+       (j1 (json-set j0 0 'black)))
+  (check j0 => #('red 'green 'blue))
+  (check j1 => #('black 'green 'blue)))
 
 (check-report)
 

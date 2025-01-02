@@ -23,7 +23,7 @@
 
 (define-library (liii json)
 (import (liii chez))
-(export string->json json->string json-ref json-ref*)
+(export string->json json->string json-ref json-ref* json-set)
 (begin
 
 (define (loose-car pair-or-empty)
@@ -174,6 +174,54 @@
     (if (null? keys)
         expr
         (loop (json-ref expr (car keys)) (cdr keys)))))
+
+(define json-set
+  (lambda (x v p)
+    (let ((x x) (v v) (p (if (procedure? p) p (lambda (x) p))))
+      (if (vector? x)
+          (list->vector
+            (cond 
+              ((boolean? v)
+                (if v
+                  (let l ((x (vector->alist x))(p p))
+                    (if (null? x)
+                      '()
+                      (cons (p (cdar x)) (l (cdr x) p))))))
+              ((procedure? v)
+                (let l ((x (vector->alist x))(v v)(p p))
+                  (if (null? x)
+                    '()
+                    (if (v (caar x))
+                      (cons (p (cdar x)) (l (cdr x) v p))
+                      (cons (cdar x) (l (cdr x) v p))))))
+              (else
+                (let l ((x (vector->alist x))(v v)(p p))
+                  (if (null? x)
+                    '()
+                    (if (equal? (caar x) v)
+                      (cons (p (cdar x)) (l (cdr x) v p))
+                      (cons (cdar x) (l (cdr x) v p))))))))
+          (cond
+            ((boolean? v)
+              (if v
+                (let l ((x x)(p p))
+                  (if (null? x)
+                    '()
+                    (cons (cons (caar x) (p (cdar x)))(l (cdr x) p))))))
+            ((procedure? v)
+              (let l ((x x)(v v)(p p))
+                (if (null? x)
+                  '()
+                  (if (v (caar x))
+                    (cons (cons (caar x) (p (cdar x)))(l (cdr x) v p))
+                    (cons (car x) (l (cdr x) v p))))))
+            (else
+              (let l ((x x)(v v)(p p))
+                (if (null? x)
+                  '()
+                  (if (equal? (caar x) v)
+                    (cons (cons v (p (cdar x)))(l (cdr x) v p))
+                    (cons (car x) (l (cdr x) v p)))))))))))
 
 ) ; end of begin
 ) ; end of define-library
