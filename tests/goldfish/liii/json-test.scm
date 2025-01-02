@@ -47,8 +47,10 @@
   (check j1 => #(black green blue)))
 
 (let* ((j0 `((bob . 18) (jack . 16)))
-       (j1 (json-set j0 #t 3)))
-  (check j1 => `((bob . 3) (jack . 3))))
+       (j1 (json-set j0 #t 3))
+       (j2 (json-set j0 #t (lambda (x) (+ x 1)))))
+  (check j1 => `((bob . 3) (jack . 3)))
+  (check j2 => `((bob . 19) (jack . 17))))
 
 (check-report)
 
