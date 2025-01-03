@@ -20,7 +20,7 @@
   path->string
   path-dir? path-file? path-exists? path-getsize
 )
-(import (liii error) (liii vector) (liii string))
+(import (liii error) (liii vector) (liii string) (liii list))
 (begin
 
 (define-record-type :path
@@ -30,11 +30,28 @@
   (type path-type)
   (drive path-drive))
 
+(define (%check-posix-parts parts)
+  (when (vector-empty? parts)
+    (value-error "make-path: parts must not be emtpy for posix path"))
+  (let1 N (vector-length parts)
+    (let loop ((i 0))
+      (when (< i N)
+            (when (string-null? (parts i))
+                  (value-error "make-path: part of path must not be empty string, index" i))
+            (loop (+ i 1))))
+    (let loop ((i 1))
+      (when (< i N)
+            (when (string-index (parts i) #\/)
+                  (value-error "make-path: non-first part of path must not contains /"))
+            (loop (+ i 1))))))
+
 (define* (make-path parts (type 'posix) (drive ""))
   (when (not (vector? parts))
     (type-error "make-path: parts must be a vector"))
-  (when (and (vector-empty? parts) (== type 'posix))
-    (value-error "make-path: parts must not be emtpy for posix path"))
+
+  (case type
+    ((posix) (%check-posix-parts parts)))
+  
   (case type
     ((posix)
      (%make-path parts type drive))
