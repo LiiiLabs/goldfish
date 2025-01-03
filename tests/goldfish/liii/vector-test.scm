@@ -94,6 +94,28 @@
 (check (vector-fold string-append "" #("a" "b" "c")) => "cba")
 (check (vector-fold (lambda (x acc) (and acc x)) #t #(#t #t #f)) => #f)
 
+;; 测试 vector-fold-right
+(check (vector-fold-right + 0 #(1 2 3 4)) => 10)  ; 4 + 3 + 2 + 1 = 10
+(check (vector-fold-right * 1 #(1 2 3 4)) => 24)  ; 4 * 3 * 2 * 1 = 24
+(check (vector-fold-right (lambda (x acc) (cons x acc)) '() #(1 2 3)) => '(1 2 3))  ; 保持顺序
+(check (vector-fold-right (lambda (x acc) (+ acc (if (even? x) 1 0))) 0 #(1 2 3 4)) => 2)  ; 统计偶数个数
+
+;; 测试空向量
+(check (vector-fold-right + 0 #()) => 0)
+(check (vector-fold-right * 1 #()) => 1)
+
+;; 测试单个元素的向量
+(check (vector-fold-right + 0 #(5)) => 5)
+(check (vector-fold-right * 1 #(5)) => 5)
+
+;; 测试不同类型的向量
+(check (vector-fold-right string-append "" #("a" "b" "c")) => "abc")
+(check (vector-fold-right (lambda (x acc) (and acc x)) #t #(#t #t #f)) => #f)
+
+;; 测试与 vector-fold 的区别
+(check (vector-fold (lambda (x acc) (cons x acc)) '() #(1 2 3)) => '(3 2 1))  ; vector-fold 反转向量
+(check (vector-fold-right (lambda (x acc) (cons x acc)) '() #(1 2 3)) => '(1 2 3))  ; vector-fold-right 保持顺序
+
 (check
   (let ((lst (make-list 5)))
     (vector-for-each

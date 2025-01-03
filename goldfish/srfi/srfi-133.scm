@@ -18,7 +18,7 @@
 (import (liii base))
 (export
   vector-empty?
-  vector-fold
+  vector-fold vector-fold-right
   vector-count
   vector-any vector-every vector-copy vector-copy!
   vector-index vector-index-right vector-partition
@@ -54,6 +54,12 @@
   (let loop ((i 0) (acc initial))
     (if (< i (vector-length vec))
         (loop (+ i 1) (f (vector-ref vec i) acc))
+        acc)))
+
+(define (vector-fold-right f initial vec)
+  (let loop ((i (- (vector-length vec) 1)) (acc initial))
+    (if (>= i 0)
+        (loop (- i 1) (f (vector-ref vec i) acc))
         acc)))
 
 ; TODO optional parameters

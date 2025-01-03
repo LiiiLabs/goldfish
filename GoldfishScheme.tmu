@@ -10686,7 +10686,7 @@
 
     \ \ vector-empty?
 
-    \ \ vector-fold
+    \ \ vector-fold vector-fold-right
 
     \ \ vector-count
 
@@ -10726,7 +10726,7 @@
 
     \ \ vector-empty?
 
-    \ \ vector-fold
+    \ \ vector-fold vector-fold-right
 
     \ \ vector-count
 
@@ -11189,7 +11189,67 @@
     \;
   </scm-chunk>
 
-  \;
+  <paragraph|vector-fold-right><index|vector-fold-right>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|false>
+    (define (vector-fold-right f initial vec)
+
+    \ \ (let loop ((i (- (vector-length vec) 1)) (acc initial))
+
+    \ \ \ \ (if (\<gtr\>= i 0)
+
+    \ \ \ \ \ \ \ \ (loop (- i 1) (f (vector-ref vec i) acc))
+
+    \ \ \ \ \ \ \ \ acc)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|false>
+    ;; 测试 vector-fold-right
+
+    (check (vector-fold-right + 0 #(1 2 3 4)) =\<gtr\> 10) \ ; 4 + 3 + 2 + 1 = 10
+
+    (check (vector-fold-right * 1 #(1 2 3 4)) =\<gtr\> 24) \ ; 4 * 3 * 2 * 1 = 24
+
+    (check (vector-fold-right (lambda (x acc) (cons x acc)) '() #(1 2 3)) =\<gtr\> '(1 2 3)) \ ; 保持顺序
+
+    (check (vector-fold-right (lambda (x acc) (+ acc (if (even? x) 1 0))) 0 #(1 2 3 4)) =\<gtr\> 2) \ ; 统计偶数个数
+
+    \;
+
+    ;; 测试空向量
+
+    (check (vector-fold-right + 0 #()) =\<gtr\> 0)
+
+    (check (vector-fold-right * 1 #()) =\<gtr\> 1)
+
+    \;
+
+    ;; 测试单个元素的向量
+
+    (check (vector-fold-right + 0 #(5)) =\<gtr\> 5)
+
+    (check (vector-fold-right * 1 #(5)) =\<gtr\> 5)
+
+    \;
+
+    ;; 测试不同类型的向量
+
+    (check (vector-fold-right string-append "" #("a" "b" "c")) =\<gtr\> "abc")
+
+    (check (vector-fold-right (lambda (x acc) (and acc x)) #t #(#t #t #f)) =\<gtr\> #f)
+
+    \;
+
+    ;; 测试与 vector-fold 的区别
+
+    (check (vector-fold (lambda (x acc) (cons x acc)) '() #(1 2 3)) =\<gtr\> '(3 2 1)) \ ; vector-fold 反转向量
+
+    (check (vector-fold-right (lambda (x acc) (cons x acc)) '() #(1 2 3)) =\<gtr\> '(1 2 3)) \ ; vector-fold-right 保持顺序
+
+    \;
+  </scm-chunk>
 
   <r7rs><paragraph|vector-map><index|vector-map>
 
