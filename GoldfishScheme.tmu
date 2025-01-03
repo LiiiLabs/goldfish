@@ -10573,7 +10573,7 @@
 
   <section|许可证>
 
-  <\scm-chunk|goldfish/srfi/srfi-133.scm|false|true>
+  <\goldfish-chunk|goldfish/srfi/srfi-133.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -10605,7 +10605,7 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <\scm-chunk|goldfish/liii/vector.scm|false|true>
     ;
@@ -10641,7 +10641,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/vector-test.scm|false|true>
+  <\goldfish-chunk|tests/goldfish/liii/vector-test.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -10673,11 +10673,11 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <section|接口>
 
-  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+  <\goldfish-chunk|goldfish/srfi/srfi-133.scm|true|true>
     (define-library (srfi srfi-133)
 
     (import (liii base))
@@ -10701,7 +10701,7 @@
     (begin
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <\scm-chunk|goldfish/liii/vector.scm|true|true>
     (define-library (liii vector)
@@ -10745,7 +10745,7 @@
 
   <section|测试>
 
-  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/vector-test.scm|true|true>
     (import (liii list)
 
     \ \ \ \ \ \ \ \ (liii check)
@@ -10777,7 +10777,7 @@
     \ \ \ vector=))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <section|实现>
 
@@ -10787,7 +10787,7 @@
 
   返回长度为k的向量，如果提供了fill，则采用fill作为每一个元素的初始值，否则每一个元素的初始值是未指定。
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (make-vector 1 1) =\<gtr\> (vector 1))
 
     (check (make-vector 3 'a) =\<gtr\> (vector 'a 'a 'a))
@@ -10799,7 +10799,7 @@
     (check (vector-ref (make-vector 1) 0) =\<gtr\> #\<less\>unspecified\<gtr\>)
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <r7rs><paragraph|vector><scm|(obj1 obj2 ...) =\<gtr\> vector><index|vector>
 
@@ -11601,7 +11601,7 @@
 
   测试 vector-skip
 
-  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|false>
+  <\goldfish-chunk|tests/goldfish/liii/vector-test.scm|true|true>
     (check (vector-skip even? #(1 2 3 4)) =\<gtr\> 0) \ ; 第一个元素 1 不满足 even?
 
     (check (vector-skip odd? #(1 3 5 7)) =\<gtr\> #f) \ ; 所有元素都满足 odd?
@@ -11611,11 +11611,11 @@
     (check (vector-skip (lambda (x) (char=? x #\\a)) #(#\\a #\\a #\\b #\\c)) =\<gtr\> 2) \ ; 第一个不满足谓词的元素是 #\\b
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   测试空向量
 
-  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
     (check (vector-skip even? #()) =\<gtr\> #f) \ ; 空向量没有元素，返回 #f
 
     \;
@@ -11623,7 +11623,7 @@
 
   测试单个元素的向量
 
-  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
     (check (vector-skip even? #(1)) =\<gtr\> 0) \ ; 第一个元素 1 不满足 even?
 
     (check (vector-skip odd? #(2)) =\<gtr\> 0) \ ; 第一个元素 2 满足 even?
@@ -11633,7 +11633,7 @@
 
   测试不同类型的向量
 
-  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
     (check (vector-skip (lambda (x) (string=? x "a")) #("a" "a" "b" "c")) =\<gtr\> 2) \ ; 第一个不满足谓词的元素是 "b"
 
     (check (vector-skip (lambda (x) (eq? x #t)) #(#t #t #f #t)) =\<gtr\> 2) \ ; 第一个不满足谓词的元素是 #f
