@@ -51,8 +51,10 @@
   (typed-lambda ((path path?))
     (case (path-type path)
       ((posix)
-       (string-append (string #\/)
-         (string-trim (string-join (vector->list (path-parts path)) (string #\/)) #\/)))
+       (let1 s (string-join (vector->list (path-parts path)) (string #\/))
+         (if (string-starts? s "//")
+             (string-drop s 1)
+             s)))
       (else (value-error "path->string: invalid type of path" (path-type path))))))
 
 (define (path-dir? path)

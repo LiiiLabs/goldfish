@@ -2798,9 +2798,13 @@
 
     \ \ \ \ \ \ ((posix)
 
-    \ \ \ \ \ \ \ (string-append (string #\\/)
+    \ \ \ \ \ \ \ (let1 s (string-join (vector-\<gtr\>list (path-parts path)) (string #\\/))
 
-    \ \ \ \ \ \ \ \ \ (string-trim (string-join (vector-\<gtr\>list (path-parts path)) (string #\\/)) #\\/)))
+    \ \ \ \ \ \ \ \ \ (if (string-starts? s "//")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (string-drop s 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ s)))
 
     \ \ \ \ \ \ (else (value-error "path-\<gtr\>string: invalid type of path" (path-type path))))))
 
@@ -2840,6 +2844,14 @@
       p.is_absolute()
     <|unfolded-io>
       True
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      p.parts
+    <|unfolded-io>
+      ('/', 'etc', 'passwd')
     </unfolded-io>
 
     <\input>
