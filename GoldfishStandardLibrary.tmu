@@ -2817,50 +2817,6 @@
     \;
   </scm-chunk>
 
-  <\session|python|default>
-    <\output>
-      Python 3.11.2 [/usr/bin/python3]
-
-      Python plugin for TeXmacs.
-
-      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
-    </output>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      from pathlib import Path
-    </input>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      p = Path("/") / Path("/") / Path("etc") / Path("passwd")
-    </input>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      p.is_absolute()
-    <|unfolded-io>
-      True
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|unfolded-io>
-      p.parts
-    <|unfolded-io>
-      ('/', 'etc', 'passwd')
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\<gtr\>\<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
-
   <paragraph|path-dir?>
 
   <\goldfish-chunk|goldfish/liii/path.scm|true|true>
