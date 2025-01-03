@@ -177,45 +177,35 @@
 (check (vector-index-right even? #(1 3 5 7 9)) => #f)
 (check (vector-index-right even? #(1 3 4 7 8)) => 4)
 
-;; 测试 vector-skip
 (check (vector-skip even? #(1 2 3 4)) => 0)  ; 第一个元素 1 不满足 even?
 (check (vector-skip odd? #(1 3 5 7)) => #f)  ; 所有元素都满足 odd?
 (check (vector-skip (lambda (x) (< x 5)) #(1 2 3 4 5)) => 4)  ; 第一个不满足谓词的元素是 5
 (check (vector-skip (lambda (x) (char=? x #\a)) #(#\a #\a #\b #\c)) => 2)  ; 第一个不满足谓词的元素是 #\b
 
-;; 测试空向量
 (check (vector-skip even? #()) => #f)  ; 空向量没有元素，返回 #f
 
-;; 测试单个元素的向量
 (check (vector-skip even? #(1)) => 0)  ; 第一个元素 1 不满足 even?
 (check (vector-skip odd? #(2)) => 0)  ; 第一个元素 2 满足 even?
 
-;; 测试不同类型的向量
 (check (vector-skip (lambda (x) (string=? x "a")) #("a" "a" "b" "c")) => 2)  ; 第一个不满足谓词的元素是 "b"
 (check (vector-skip (lambda (x) (eq? x #t)) #(#t #t #f #t)) => 2)  ; 第一个不满足谓词的元素是 #f
 
-;; 测试所有元素都满足谓词的情况
 (check (vector-skip (lambda (x) (> x 0)) #(1 2 3 4)) => #f)  ; 所有元素都满足谓词
 (check (vector-skip (lambda (x) (char-alphabetic? x)) #(#\a #\b #\c)) => #f)  ; 所有元素都满足谓词
 
-;; 测试 vector-skip-right
 (check (vector-skip-right even? #(1 2 3 4)) => 2)  ; 从右开始，第一个不满足 even? 的元素是 3
 (check (vector-skip-right odd? #(1 3 5 7)) => #f)  ; 所有元素都满足 odd?
 (check (vector-skip-right (lambda (x) (< x 5)) #(1 2 3 4 5)) => 4)  ; 从右开始，第一个不满足谓词的元素是 5
 (check (vector-skip-right (lambda (x) (char=? x #\a)) #(#\a #\a #\b #\c)) => 3)  ; 从右开始，第一个不满足谓词的元素是 #\c
 
-;; 测试空向量
 (check (vector-skip-right even? #()) => #f)  ; 空向量没有元素，返回 #f
 
-;; 测试单个元素的向量
 (check (vector-skip-right even? #(1)) => 0)  ; 第一个元素 1 不满足 even?
 (check (vector-skip-right odd? #(2)) => 0)  ; 第一个元素 2 满足 even?
 
-;; 测试不同类型的向量
 (check (vector-skip-right (lambda (x) (string=? x "a")) #("a" "a" "b" "c")) => 3)  ; 从右开始，第一个不满足谓词的元素是 "c"
 (check (vector-skip-right (lambda (x) (eq? x #t)) #(#t #t #f #t)) => 2)  ; 从右开始，第一个不满足谓词的元素是 #f
 
-;; 测试所有元素都满足谓词的情况
 (check (vector-skip-right (lambda (x) (> x 0)) #(1 2 3 4)) => #f)  ; 所有元素都满足谓词
 (check (vector-skip-right (lambda (x) (char-alphabetic? x)) #(#\a #\b #\c)) => #f)  ; 所有元素都满足谓词
 
