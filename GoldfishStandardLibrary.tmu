@@ -2818,6 +2818,8 @@
 
     (check-true (path-absolute? (make-path #("/" "tmp"))))
 
+    (check-false (path-absolute? (make-path #("tmp"))))
+
     \;
   </scm-chunk>
 

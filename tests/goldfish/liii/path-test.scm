@@ -22,6 +22,7 @@
 
 (check-true (path-absolute? (make-path #("/"))))
 (check-true (path-absolute? (make-path #("/" "tmp"))))
+(check-false (path-absolute? (make-path #("tmp"))))
 
 (check (path->string (make-path #("/" "etc" "passwd"))) => "/etc/passwd")
 
