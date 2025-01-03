@@ -25,6 +25,7 @@
 (check-false (path-absolute? (make-path #("tmp"))))
 
 (check (path->string (make-path #("/" "etc" "passwd"))) => "/etc/passwd")
+(check (path->string (make-path #("/" "tmp" ""))) => "/tmp/")
 
 (check (path-dir? ".") => #t)
 (check (path-dir? "..") => #t)

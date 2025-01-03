@@ -35,7 +35,7 @@
     (value-error "make-path: parts must not be emtpy for posix path"))
   (let1 N (vector-length parts)
     (let loop ((i 0))
-      (when (< i N)
+      (when (< i (- N 1))
             (when (string-null? (parts i))
                   (value-error "make-path: part of path must not be empty string, index" i))
             (loop (+ i 1))))

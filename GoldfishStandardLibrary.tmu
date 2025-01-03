@@ -2750,7 +2750,7 @@
 
     \ \ \ \ (let loop ((i 0))
 
-    \ \ \ \ \ \ (when (\<less\> i N)
+    \ \ \ \ \ \ (when (\<less\> i (- N 1))
 
     \ \ \ \ \ \ \ \ \ \ \ \ (when (string-null? (parts i))
 
@@ -2849,6 +2849,8 @@
 
   <\scm-chunk|tests/goldfish/liii/path-test.scm|true|true>
     (check (path-\<gtr\>string (make-path #("/" "etc" "passwd"))) =\<gtr\> "/etc/passwd")
+
+    (check (path-\<gtr\>string (make-path #("/" "tmp" ""))) =\<gtr\> "/tmp/")
 
     \;
   </scm-chunk>
