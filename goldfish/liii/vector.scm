@@ -25,6 +25,7 @@
   vector-map vector-for-each
   ; from (srfi srfi-133)
   vector-empty?
+  vector-fold vector-fold-right
   vector-count
   vector-any vector-every vector-copy vector-copy!
   vector-index vector-index-right vector-partition
