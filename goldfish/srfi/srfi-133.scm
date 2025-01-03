@@ -18,6 +18,7 @@
 (import (liii base))
 (export
   vector-empty?
+  vector-fold
   vector-count
   vector-any vector-every vector-copy vector-copy!
   vector-index vector-index-right vector-partition
@@ -49,6 +50,12 @@
                (if (null? vrest) #t
                    (loop vec2 (car vrest) (cdr vrest)))
                #f)))))
+(define (vector-fold f initial vec)
+  (let loop ((i 0) (acc initial))
+    (if (< i (vector-length vec))
+        (loop (+ i 1) (f (vector-ref vec i) acc))
+        acc)))
+
 ; TODO optional parameters
 (define (vector-count pred v)
   (let loop ((i 0) (count 0))

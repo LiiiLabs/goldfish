@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -10686,6 +10686,8 @@
 
     \ \ vector-empty?
 
+    \ \ vector-fold
+
     \ \ vector-count
 
     \ \ vector-any vector-every vector-copy vector-copy!
@@ -10723,6 +10725,8 @@
     \ \ ; from (srfi srfi-133)
 
     \ \ vector-empty?
+
+    \ \ vector-fold
 
     \ \ vector-count
 
@@ -11114,6 +11118,78 @@
   </scm-chunk>
 
   <subsection|迭代>
+
+  <paragraph|vector-fold><index|vector-fold>
+
+  <\scm-chunk|goldfish/srfi/srfi-133.scm|true|true>
+    (define (vector-fold f initial vec)
+
+    \ \ (let loop ((i 0) (acc initial))
+
+    \ \ \ \ (if (\<less\> i (vector-length vec))
+
+    \ \ \ \ \ \ \ \ (loop (+ i 1) (f (vector-ref vec i) acc))
+
+    \ \ \ \ \ \ \ \ acc)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-fold + 0 #(1 2 3 4)) =\<gtr\> 10) \ ; 1 + 2 + 3 + 4 = 10
+
+    (check (vector-fold * 1 #(1 2 3 4)) =\<gtr\> 24) \ ; 1 * 2 * 3 * 4 = 24
+
+    \;
+  </scm-chunk>
+
+  反转向量
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-fold (lambda (x acc) (cons x acc)) '() #(1 2 3)) =\<gtr\> '(3 2 1))
+
+    \;
+  </scm-chunk>
+
+  统计偶数个数
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-fold (lambda (x acc) (+ acc (if (even? x) 1 0))) 0 #(1 2 3 4)) =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  测试空向量
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-fold + 0 #()) =\<gtr\> 0)
+
+    (check (vector-fold * 1 #()) =\<gtr\> 1)
+
+    \;
+  </scm-chunk>
+
+  测试单个元素的向量
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-fold + 0 #(5)) =\<gtr\> 5)
+
+    (check (vector-fold * 1 #(5)) =\<gtr\> 5)
+
+    \;
+  </scm-chunk>
+
+  测试不同类型的向量
+
+  <\scm-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (check (vector-fold string-append "" #("a" "b" "c")) =\<gtr\> "cba")
+
+    (check (vector-fold (lambda (x acc) (and acc x)) #t #(#t #t #f)) =\<gtr\> #f)
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <r7rs><paragraph|vector-map><index|vector-map>
 

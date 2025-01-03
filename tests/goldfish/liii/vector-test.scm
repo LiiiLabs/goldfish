@@ -78,6 +78,22 @@
 ; complex cases in srfi-133
 (check-true (vector= equal? (vector (vector 'a)) (vector (vector 'a))))
 (check-false (vector= eq? (vector (vector 'a)) (vector (vector 'a))))
+(check (vector-fold + 0 #(1 2 3 4)) => 10)  ; 1 + 2 + 3 + 4 = 10
+(check (vector-fold * 1 #(1 2 3 4)) => 24)  ; 1 * 2 * 3 * 4 = 24
+
+(check (vector-fold (lambda (x acc) (cons x acc)) '() #(1 2 3)) => '(3 2 1))
+
+(check (vector-fold (lambda (x acc) (+ acc (if (even? x) 1 0))) 0 #(1 2 3 4)) => 2)
+
+(check (vector-fold + 0 #()) => 0)
+(check (vector-fold * 1 #()) => 1)
+
+(check (vector-fold + 0 #(5)) => 5)
+(check (vector-fold * 1 #(5)) => 5)
+
+(check (vector-fold string-append "" #("a" "b" "c")) => "cba")
+(check (vector-fold (lambda (x acc) (and acc x)) #t #(#t #t #f)) => #f)
+
 (check
   (let ((lst (make-list 5)))
     (vector-for-each
