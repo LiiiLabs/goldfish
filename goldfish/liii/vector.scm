@@ -28,7 +28,7 @@
   vector-fold vector-fold-right
   vector-count
   vector-any vector-every vector-copy vector-copy!
-  vector-index vector-index-right vector-partition
+  vector-index vector-index-right vector-skip vector-skip-right vector-partition
   vector-swap! vector-cumulate reverse-list->vector
   vector=)
 (begin
