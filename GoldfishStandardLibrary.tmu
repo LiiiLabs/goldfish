@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -2688,13 +2688,33 @@
 
     (export
 
+    \ \ make-path path-parts path-absolute?
+
+    \ \ path-\<gtr\>string
+
     \ \ path-dir? path-file? path-exists? path-getsize
 
     )
 
-    (import (liii error))
+    (import (liii error) (liii vector) (liii string))
 
     (begin
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define-record-type :path
+
+    \ \ (%make-path parts type drive)
+
+    \ \ path?
+
+    \ \ (parts path-parts)
+
+    \ \ (type path-type)
+
+    \ \ (drive path-drive))
 
     \;
   </goldfish-chunk>
@@ -2716,6 +2736,118 @@
   </scm-chunk>
 
   <section|实现>
+
+  <paragraph|make-path>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define* (make-path parts (type 'posix) (drive ""))
+
+    \ \ (when (not (vector? parts))
+
+    \ \ \ \ (type-error "make-path: parts must be a vector"))
+
+    \ \ (when (and (vector-empty? parts) (== type 'posix))
+
+    \ \ \ \ (value-error "make-path: parts must not be emtpy for posix path"))
+
+    \ \ (case type
+
+    \ \ \ \ ((posix)
+
+    \ \ \ \ \ (%make-path parts type drive))
+
+    \ \ \ \ (else (value-error "make-path: invalid type" type))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|path-absolute?>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define path-absolute?
+
+    \ \ (typed-lambda ((path path?))
+
+    \ \ \ \ (case (path-type path)
+
+    \ \ \ \ \ \ ((posix)
+
+    \ \ \ \ \ \ \ (string-starts? ((path-parts path) 0) "/"))
+
+    \ \ \ \ \ \ (else (value-error "path-absolute?: invalid type of path" (path-type path))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|true>
+    (check-true (path-absolute? (make-path #("/"))))
+
+    (check-true (path-absolute? (make-path #("/" "tmp"))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|path-\<gtr\>string>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define path-\<gtr\>string
+
+    \ \ (typed-lambda ((path path?))
+
+    \ \ \ \ (case (path-type path)
+
+    \ \ \ \ \ \ ((posix)
+
+    \ \ \ \ \ \ \ (string-append (string #\\/)
+
+    \ \ \ \ \ \ \ \ \ (string-trim (string-join (vector-\<gtr\>list (path-parts path)) (string #\\/)) #\\/)))
+
+    \ \ \ \ \ \ (else (value-error "path-\<gtr\>string: invalid type of path" (path-type path))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|true>
+    (check (path-\<gtr\>string (make-path #("/" "etc" "passwd"))) =\<gtr\> "/etc/passwd")
+
+    \;
+  </scm-chunk>
+
+  <\session|python|default>
+    <\output>
+      Python 3.11.2 [/usr/bin/python3]
+
+      Python plugin for TeXmacs.
+
+      Please see the documentation in Help -\<gtr\> Plugins -\<gtr\> Python
+    </output>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      from pathlib import Path
+    </input>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      p = Path("/") / Path("/") / Path("etc") / Path("passwd")
+    </input>
+
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      p.is_absolute()
+    <|unfolded-io>
+      True
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
 
   <paragraph|path-dir?>
 

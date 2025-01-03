@@ -20,6 +20,11 @@
 
 (check-set-mode! 'report-failed)
 
+(check-true (path-absolute? (make-path #("/"))))
+(check-true (path-absolute? (make-path #("/" "tmp"))))
+
+(check (path->string (make-path #("/" "etc" "passwd"))) => "/etc/passwd")
+
 (check (path-dir? ".") => #t)
 (check (path-dir? "..") => #t)
 
