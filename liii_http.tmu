@@ -276,7 +276,7 @@
 
     \ \ `(
 
-    \ \ \ \ ("model" . "Qwen/Qwen2.5-7B-Instruct")
+    \ \ \ \ ("model" . "Qwen/Qwen2.5-Coder-7B-Instruct")
 
     \ \ \ \ ("messages" . #())
 
