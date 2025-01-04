@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.8>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -1388,6 +1388,68 @@
   </scm-chunk>
 
   <value|r7rs><paragraph|max>
+
+  测试 max 函数的基本功能 一个参数 两个参数 三个参数
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (max 1) =\<gtr\> 1)
+
+    (check (max 1 2) =\<gtr\> 2)
+
+    (check (max 1 2 3) =\<gtr\> 3)
+
+    (check (max 3 2 1) =\<gtr\> 3)
+
+    (check (max -1 -2 -3) =\<gtr\> -1)
+
+    (check (max 0 0 0) =\<gtr\> 0)
+
+    (check (max 1.5 2.5 3.5) =\<gtr\> 3.5)
+
+    (check (max 1/2 3/4 1/4) =\<gtr\> 3/4)
+
+    \;
+  </scm-chunk>
+
+  测试 max 函数在没有参数时的情况
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-number-of-args (max))
+
+    \;
+  </scm-chunk>
+
+  测试 max 函数在参数类型不正确时的情况
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (max 1 "2" 3))
+
+    (check-catch 'wrong-type-arg (max 1 #\\a 3))
+
+    (check-catch 'wrong-type-arg (max 1 'symbol 3))
+
+    \;
+  </scm-chunk>
+
+  测试 max 函数在参数为布尔值时的情况
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (max #t #f))
+
+    (check-catch 'wrong-type-arg (max 1 #t 3))
+
+    \;
+  </scm-chunk>
+
+  测试 max 函数在参数为列表时的情况
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-catch 'wrong-type-arg (max 1 '(2) 3))
+
+    (check-catch 'wrong-type-arg (max '(1 2 3) '(4 5 6)))
+
+    \;
+  </scm-chunk>
 
   <value|r7rs><paragraph|min>
 

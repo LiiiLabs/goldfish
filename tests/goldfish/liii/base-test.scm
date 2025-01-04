@@ -255,6 +255,27 @@
 (check-catch 'wrong-type-arg (even? #t))
 (check-catch 'wrong-type-arg (even? #f))
 
+(check (max 1) => 1)
+(check (max 1 2) => 2)
+(check (max 1 2 3) => 3)
+(check (max 3 2 1) => 3)
+(check (max -1 -2 -3) => -1)
+(check (max 0 0 0) => 0)
+(check (max 1.5 2.5 3.5) => 3.5)
+(check (max 1/2 3/4 1/4) => 3/4)
+
+(check-catch 'wrong-number-of-args (max))
+
+(check-catch 'wrong-type-arg (max 1 "2" 3))
+(check-catch 'wrong-type-arg (max 1 #\a 3))
+(check-catch 'wrong-type-arg (max 1 'symbol 3))
+
+(check-catch 'wrong-type-arg (max #t #f))
+(check-catch 'wrong-type-arg (max 1 #t 3))
+
+(check-catch 'wrong-type-arg (max 1 '(2) 3))
+(check-catch 'wrong-type-arg (max '(1 2 3) '(4 5 6)))
+
 (check (+ 1 2) => 3)
 (check (+ ) => 0)
 
