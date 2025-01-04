@@ -34,7 +34,7 @@
 
 (define payload
   `(
-    ("model" . "Qwen/Qwen2.5-7B-Instruct")
+    ("model" . "Qwen/Qwen2.5-Coder-7B-Instruct")
     ("messages" . #())
     ("max_tokens" . 512)
    )
