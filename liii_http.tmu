@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
 
@@ -304,7 +304,15 @@
 
     \;
 
-    (define questions (vector "硅基的拼音是什么？" "上一个问题是什么"))
+    (define questions
+
+    \ \ #("唐宋八大家是哪八位"
+
+    \ \ \ \ "请按照顺序返回上一个回答中的第五位"
+
+    \ \ \ \ "上一个问题的回答一共几个汉字？"
+
+    \ \ \ \ "介绍他的生平和作品"))
 
     \;
 
@@ -316,21 +324,67 @@
 
     \;
 
+    (define (json-escape-string str)
+
+    \ \ (define (escape-char c)
+
+    \ \ \ \ (case c
+
+    \ \ \ \ \ \ ((#\\\\) "\\\\\\\\") \ ; 反斜杠
+
+    \ \ \ \ \ \ ((#\\") "\\\\\\"") \ ; 双引号
+
+    \ \ \ \ \ \ ((#\\newline) "\\\\n") \ ; 换行符
+
+    \ \ \ \ \ \ ((#\\tab) "\\\\t") \ ; 制表符
+
+    \ \ \ \ \ \ ((#\\return) "\\\\r") \ ; 回车符
+
+    \ \ \ \ \ \ ((#\\backspace) "\\\\b") \ ; 退格符
+
+    \ \ \ \ \ \ ((#\\formfeed) "\\\\f") \ ; 换页符
+
+    \ \ \ \ \ \ (else (string c)))) \ ; 其他字符保持不变
+
+    \;
+
+    \ \ (let loop ((chars (string-\<gtr\>list str)) \ ; 将字符串转换为字符列表
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (result "")) \ ; 初始化结果字符串
+
+    \ \ \ \ (if (null? chars)
+
+    \ \ \ \ \ \ \ \ result \ ; 如果字符列表为空，返回结果
+
+    \ \ \ \ \ \ \ \ (loop (cdr chars) \ ; 递归处理剩余的字符
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append result (escape-char (car chars))))))) \ ; 转义当前字符并追加到结果中
+
+    \;
+
     (let loop ((i 0) (payload payload) (tokens 0))
 
     \ \ (if (\<less\> i (length questions))
 
     \ \ \ \ \ \ (let* ((q (json-push* payload "messages" i (message (questions i))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (a (chat q))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (r (chat q))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (j (string-\<gtr\>json a)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (j (string-\<gtr\>json r))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (a (json-ref* j "choices" 0 "message" "content")))
 
     \ \ \ \ \ \ \ \ \ \ (display* "Q: " (questions i) "\\n")
 
-    \ \ \ \ \ \ \ \ \ \ (display* "A: " (json-ref* j "choices" 0 "message" "content") "\\n")
+    \ \ \ \ \ \ \ \ \ \ (display* "A: " a "\\n")
 
-    \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) q (+ tokens (json-ref* j "usage" "total_tokens"))))
+    \ \ \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (json-set* q "messages" i "content" (lambda (y) (json-escape-string (string-append y "\\n回答：" a))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ tokens (json-ref* j "usage" "total_tokens"))))
 
     \ \ \ \ \ \ (display* "Total tokens: " tokens "\\n")))
 
