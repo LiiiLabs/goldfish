@@ -106,17 +106,13 @@
 
     (import (liii chez) (liii alist) (liii list))
 
-    (export string-\<gtr\>json json-\<gtr\>string
+    (export\ 
 
-    \ \ \ \ \ \ \ \ json-ref json-ref*
+    \ \ json-string-escape json-string-unescape string-\<gtr\>json json-\<gtr\>string
 
-    \ \ \ \ \ \ \ \ json-set json-set*
+    \ \ json-ref json-ref*
 
-    \ \ \ \ \ \ \ \ json-push json-push*
-
-    \ \ \ \ \ \ \ \ json-drop json-drop*
-
-    \ \ \ \ \ \ \ \ json-reduce json-reduce*)
+    \ \ json-set json-set* json-push json-push* json-drop json-drop* json-reduce json-reduce*)
 
     (begin
 
@@ -138,6 +134,64 @@
   </goldfish-chunk>
 
   <subsection|实现>
+
+  <paragraph|json-string-escape>
+
+  <\goldfish-chunk|json/liii/json.scm|true|true>
+    (define (json-string-escape str)
+
+    \ \ (define (escape-char c)
+
+    \ \ \ \ (case c
+
+    \ \ \ \ \ \ ((#\\") "\\\\\\"")
+
+    \ \ \ \ \ \ ((#\\\\) "\\\\\\\\")
+
+    \ \ \ \ \ \ ((#\\/) "\\\\/")
+
+    \ \ \ \ \ \ ((#\\backspace) "\\\\b")
+
+    \ \ \ \ \ \ ((#\\formfeed) "\\\\f")
+
+    \ \ \ \ \ \ ((#\\newline) "\\\\n")
+
+    \ \ \ \ \ \ ((#\\return) "\\\\r")
+
+    \ \ \ \ \ \ ((#\\tab) "\\\\t")
+
+    \ \ \ \ \ \ (else c)))
+
+    \ \ \ \ \ \ \ \ 
+
+    \ \ (let ((escaped (string-map escape-char str)))
+
+    \ \ \ \ (string-append "\\"" escaped "\\"")))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
+    (check (json-string-escape "hello") =\<gtr\> "\\"hello\\"")
+
+    (check (json-string-escape "hello\\"world") =\<gtr\> "\\"hello\\\\\\"world\\"")
+
+    (check (json-string-escape "hello\\\\world") =\<gtr\> "\\"hello\\\\\\\\world\\"")
+
+    (check (json-string-escape "hello/world") =\<gtr\> "\\"hello\\\\/world\\"")
+
+    (check (json-string-escape "hello\\bworld") =\<gtr\> "\\"hello\\\\bworld\\"")
+
+    (check (json-string-escape "hello\\fworld") =\<gtr\> "\\"hello\\\\fworld\\"")
+
+    (check (json-string-escape "hello\\nworld") =\<gtr\> "\\"hello\\\\nworld\\"")
+
+    (check (json-string-escape "hello\\rworld") =\<gtr\> "\\"hello\\\\rworld\\"")
+
+    (check (json-string-escape "hello\\tworld") =\<gtr\> "\\"hello\\\\tworld\\"")
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|string-\<gtr\>json>
 

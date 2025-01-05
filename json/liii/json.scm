@@ -23,13 +23,27 @@
 
 (define-library (liii json)
 (import (liii chez) (liii alist) (liii list))
-(export string->json json->string
-        json-ref json-ref*
-        json-set json-set*
-        json-push json-push*
-        json-drop json-drop*
-        json-reduce json-reduce*)
+(export 
+  json-string-escape json-string-unescape string->json json->string
+  json-ref json-ref*
+  json-set json-set* json-push json-push* json-drop json-drop* json-reduce json-reduce*)
 (begin
+
+(define (json-string-escape str)
+  (define (escape-char c)
+    (case c
+      ((#\") "\\\"")
+      ((#\\) "\\\\")
+      ((#\/) "\\/")
+      ((#\backspace) "\\b")
+      ((#\formfeed) "\\f")
+      ((#\newline) "\\n")
+      ((#\return) "\\r")
+      ((#\tab) "\\t")
+      (else c)))
+        
+  (let ((escaped (string-map escape-char str)))
+    (string-append "\"" escaped "\"")))
 
 (define (loose-car pair-or-empty)
   (if (eq? '() pair-or-empty)
