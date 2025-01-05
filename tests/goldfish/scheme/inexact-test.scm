@@ -18,4 +18,13 @@
         (scheme inexact))
 
 (check-set-mode! 'report-failed)
+(check (nan? +nan.0) => #t)
+(check (nan? +nan.0+5.0i) => #t)
+       
+(check (nan? 32) => #f)
+(check (nan? 3.14) => #f)
+(check (nan? 1+2i) => #f)
+(check (nan? +inf.0) => #f)
+(check (nan? -inf.0) => #f)
+       
 (check-report)
