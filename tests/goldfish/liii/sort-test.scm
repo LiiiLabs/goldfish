@@ -35,16 +35,19 @@
 (check-true (list-sorted? pair-< (list-merge pair-< '((1 . 1) (1 . 2) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
 (check (list-merge pair-< '((1 . 1) (1 . 2) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
        => '((1 . 1) (1 . 2) (1 . 3) (2 . 1) (3 . 1) (3 . 2) (4 . 1)))
-(check-true (list-sorted? pair-full-< (list-merge pair-full-< '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+(check-true (list-sorted? pair-full-<
+                          (list-merge pair-full-< '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
 (check (list-merge pair-full-< '((1 . 2) (1 . 1) (3 . 1)) '((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
        => '((1 . 3) (1 . 2) (1 . 1) (2 . 1) (3 . 2) (3 . 1) (4 . 1)))
 
 (check-true (vector-sorted? < (vector-sort < #(1 5 1 0 -1 9 2 4 3))))
 (check-true (vector-sorted? < (vector-stable-sort < #(1 5 1 0 -1 9 2 4 3))))
-(check-true (vector-sorted? pair-< (vector-merge pair-< #((1 . 1) (1 . 2) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+(check-true (vector-sorted? pair-<
+                            (vector-merge pair-< #((1 . 1) (1 . 2) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
 (check (vector-merge pair-< #((1 . 1) (1 . 2) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
        => #((1 . 1) (1 . 2) (1 . 3) (2 . 1) (3 . 1) (3 . 2) (4 . 1)))
-(check-true (vector-sorted? pair-full-< (vector-merge pair-full-< #((1 . 2) (1 . 1) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
+(check-true (vector-sorted? pair-full-<
+                            (vector-merge pair-full-< #((1 . 2) (1 . 1) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
 (check (vector-merge pair-full-< #((1 . 2) (1 . 1) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
        => #((1 . 3) (1 . 2) (1 . 1) (2 . 1) (3 . 2) (3 . 1) (4 . 1)))
 
