@@ -281,6 +281,28 @@
 (check-catch 'wrong-type-arg (max 1 '(2) 3))
 (check-catch 'wrong-type-arg (max '(1 2 3) '(4 5 6)))
 
+(check (min 7) => 7)
+(check (min 7 3) => 3)
+(check (min -1 0 1 7 -5 3) => -5)
+(check (min -5 -10 -7 -3) => -10)
+
+(check (min +inf.0 7) => 7)
+(check (min -inf.0 7) => -inf.0)
+
+(check-catch 'wrong-number-of-args (min))
+
+(check-catch 'wrong-type-arg (min 'hello 7))
+
+(check-catch 'wrong-type-arg (min "world" 7))
+
+(check-catch 'wrong-type-arg (min #t 7))
+(check-catch 'wrong-type-arg (min #f 7))
+
+(check-catch 'wrong-type-arg (min '(1 3 5) 7))
+(check-catch 'wrong-type-arg (min '() 7))
+
+(check-catch 'wrong-type-arg (min 1+2i 2))
+
 (check (+ 1 2) => 3)
 (check (+ ) => 0)
 
