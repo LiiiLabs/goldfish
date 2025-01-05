@@ -301,17 +301,12 @@
     lst)
   => '())
 
-;; 测试 string-fold
-;; 1. 计算字符串中字符的数量
 (check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello") => 5)
 
-;; 2. 将字符串中的字符反转
 (check (string-fold (lambda (c acc) (cons c acc)) '() "hello") => '(#\o #\l #\l #\e #\h))
 
-;; 3. 将字符串中的字符连接成一个新字符串
 (check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello") => "olleh")
 
-;; 4. 计算字符串中特定字符的数量
 (check (string-fold (lambda (c acc)
                       (if (char=? c #\l)
                           (+ acc 1)
@@ -320,20 +315,17 @@
                     "hello")
        => 2)
 
-;; 5. 测试空字符串
 (check (string-fold (lambda (c acc) (+ acc 1)) 0 "") => 0)
 
-;; 6. 测试 start 和 end 参数
-(check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 1 4) => 3)  ;; 从索引 1 到 4
-(check (string-fold (lambda (c acc) (cons c acc)) '() "hello" 1 4) => '(#\l #\l #\e))  ;; 从索引 1 到 4
-(check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello" 1 4) => "lle")  ;; 从索引 1 到 4
-
-;; 7. 测试错误处理
 (check-catch 'type-error (string-fold 1 0 "hello"))  ;; 第一个参数不是过程
 (check-catch 'type-error (string-fold (lambda (c acc) (+ acc 1)) 0 123))  ;; 第二个参数不是字符串
 (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" -1 5))  ;; start 超出范围
 (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 0 6))  ;; end 超出范围
 (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 3 2))  ;; start > end
+
+(check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 1 4) => 3)
+(check (string-fold (lambda (c acc) (cons c acc)) '() "hello" 1 4) => '(#\l #\l #\e))
+(check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello" 1 4) => "lle") 
 
 (check (string-tokenize "1 22 333") => '("1" "22" "333"))
 (check (string-tokenize "1 22 333" #\2) => '("1 " " 333"))
