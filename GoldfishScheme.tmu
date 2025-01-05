@@ -15211,7 +15211,31 @@
 
   <value|r7rs><paragraph|nan?><index|nan?>
 
-  \;
+  检测一个数值是否为 NaN (Not a Number)。+nan.0，复数。
+
+  <\scm-chunk|tests/goldfish/scheme/inexact-test.scm|true|true>
+    (check (nan? +nan.0) =\<gtr\> #t)
+
+    (check (nan? +nan.0+5.0i) =\<gtr\> #t)
+
+    \ \ \ \ \ \ \ 
+  </scm-chunk>
+
+  测试错误及异常情况。整数，有限实数，复数，无穷。
+
+  <\scm-chunk|tests/goldfish/scheme/inexact-test.scm|true|true>
+    (check (nan? 32) =\<gtr\> #f)
+
+    (check (nan? 3.14) =\<gtr\> #f)
+
+    (check (nan? 1+2i) =\<gtr\> #f)
+
+    (check (nan? +inf.0) =\<gtr\> #f)
+
+    (check (nan? -inf.0) =\<gtr\> #f)
+
+    \ \ \ \ \ \ \ 
+  </scm-chunk>
 
   <value|r7rs><paragraph|exp><index|acos>
 
