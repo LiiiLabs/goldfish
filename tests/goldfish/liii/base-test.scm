@@ -26,6 +26,15 @@
 (check (if (and (> 3 1) (< 3 4)) 'true-branch 'false-branch) => 'true-branch)
 (check (if (or (> 3 4) (< 3 1)) 'true-branch 'false-branch) => 'false-branch)
 
+(check (cond ((> 3 2) 3) (else 2)) => 3)
+(check (cond ((< 3 2) 3) (else 2)) => 2)
+(check (cond ((and (> 3 1) (< 3 4)) 'true-branch) (else 'false-branch)) => 'true-branch)
+(check (cond ((or (> 3 4) (< 3 1)) 'true-branch) (else 'false-branch)) => 'false-branch)
+
+(check (cond (2 => (lambda (n) (* n 2)))) => 4)
+(check (cond (#f => (lambda (n) (* n 2))) (else 'no-match)) => 'no-match)
+(check (cond (3 => (lambda (n) (* n 2))) (else 'no-match)) => 6)
+
 (check (case '+
          ((+ -) 'p0)
          ((* /) 'p1))

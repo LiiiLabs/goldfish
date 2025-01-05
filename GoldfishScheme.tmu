@@ -475,6 +475,32 @@
 
   <paragraph|cond>
 
+  验证cond表达式的行为
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (cond ((\<gtr\> 3 2) 3) (else 2)) =\<gtr\> 3)
+
+    (check (cond ((\<less\> 3 2) 3) (else 2)) =\<gtr\> 2)
+
+    (check (cond ((and (\<gtr\> 3 1) (\<less\> 3 4)) 'true-branch) (else 'false-branch)) =\<gtr\> 'true-branch)
+
+    (check (cond ((or (\<gtr\> 3 4) (\<less\> 3 1)) 'true-branch) (else 'false-branch)) =\<gtr\> 'false-branch)
+
+    \;
+  </scm-chunk>
+
+  测试cond与lambda结合
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (cond (2 =\<gtr\> (lambda (n) (* n 2)))) =\<gtr\> 4)
+
+    (check (cond (#f =\<gtr\> (lambda (n) (* n 2))) (else 'no-match)) =\<gtr\> 'no-match)
+
+    (check (cond (3 =\<gtr\> (lambda (n) (* n 2))) (else 'no-match)) =\<gtr\> 6)
+
+    \;
+  </scm-chunk>
+
   <value|r7rs><paragraph|case><index|case>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
