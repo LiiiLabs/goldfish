@@ -104,7 +104,7 @@
   <\goldfish-chunk|json/liii/json.scm|true|true>
     (define-library (liii json)
 
-    (import (liii chez) (liii alist) (liii list))
+    (import (liii chez) (liii alist) (liii list) (liii string))
 
     (export\ 
 
@@ -152,7 +152,7 @@
 
     \ \ \ \ \ \ ((#\\backspace) "\\\\b")
 
-    \ \ \ \ \ \ ((#\\formfeed) "\\\\f")
+    \ \ \ \ \ \ ((#\\xc) "\\\\f")
 
     \ \ \ \ \ \ ((#\\newline) "\\\\n")
 
@@ -160,11 +160,11 @@
 
     \ \ \ \ \ \ ((#\\tab) "\\\\t")
 
-    \ \ \ \ \ \ (else c)))
+    \ \ \ \ \ \ (else (string c))))
 
     \ \ \ \ \ \ \ \ 
 
-    \ \ (let ((escaped (string-map escape-char str)))
+    \ \ (let ((escaped (string-fold (lambda (ch result) (string-append result (escape-char ch))) "" str)))
 
     \ \ \ \ (string-append "\\"" escaped "\\"")))
 

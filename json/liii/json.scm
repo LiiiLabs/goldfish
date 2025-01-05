@@ -22,7 +22,7 @@
 ;  SOFTWARE.
 
 (define-library (liii json)
-(import (liii chez) (liii alist) (liii list))
+(import (liii chez) (liii alist) (liii list) (liii string))
 (export 
   json-string-escape json-string-unescape string->json json->string
   json-ref json-ref*
@@ -36,13 +36,13 @@
       ((#\\) "\\\\")
       ((#\/) "\\/")
       ((#\backspace) "\\b")
-      ((#\formfeed) "\\f")
+      ((#\xc) "\\f")
       ((#\newline) "\\n")
       ((#\return) "\\r")
       ((#\tab) "\\t")
-      (else c)))
+      (else (string c))))
         
-  (let ((escaped (string-map escape-char str)))
+  (let ((escaped (string-fold (lambda (ch result) (string-append result (escape-char ch))) "" str)))
     (string-append "\"" escaped "\"")))
 
 (define (loose-car pair-or-empty)
