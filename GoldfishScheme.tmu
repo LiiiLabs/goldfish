@@ -8744,6 +8744,8 @@
 
     \ \ string-upcase string-downcase
 
+    \ \ string-fold string-fold-right
+
     \ \ string-reverse
 
     \ \ string-tokenize
@@ -8795,6 +8797,8 @@
     \ \ \ \ string-contains string-count
 
     \ \ \ \ string-upcase string-downcase
+
+    \ \ \ \ string-fold string-fold-right
 
     \ \ \ \ string-reverse
 
@@ -10333,6 +10337,178 @@
     \ \ \ \ lst)
 
     \ \ =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-fold>
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-fold kons knil s . rest)
+
+    \ \ (when (not (procedure? kons))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold: first argument must be a procedure"))
+
+    \ \ (when (not (string? s))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold: second argument must be a string"))
+
+    \;
+
+    \ \ (let ((substr (%string-from-range s rest)))
+
+    \ \ \ \ (let loop ((i 0)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (result knil))
+
+    \ \ \ \ \ \ (if (= i (string-length substr))
+
+    \ \ \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (kons (string-ref substr i) result))))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试：计算字符串中字符的数量>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello") =\<gtr\> 5)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试：将字符串中的字符反转>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold (lambda (c acc) (cons c acc)) '() "hello") =\<gtr\> '(#\\o #\\l #\\l #\\e #\\h))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试：将字符串中的字符连接成一个新字符串>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello") =\<gtr\> "olleh")
+
+    \;
+  </scm-chunk>
+
+  <\subparagraph>
+    测试：计算字符串中特定字符的数量
+  </subparagraph>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold (lambda (c acc)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (char=? c #\\l)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ acc 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ acc))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "hello")
+
+    \ \ \ \ \ \ \ =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试：空字符串>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold (lambda (c acc) (+ acc 1)) 0 "") =\<gtr\> 0)
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试：错误处理>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-catch 'type-error (string-fold 1 0 "hello")) \ ;; 第一个参数不是过程
+
+    (check-catch 'type-error (string-fold (lambda (c acc) (+ acc 1)) 0 123)) \ ;; 第二个参数不是字符串
+
+    (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" -1 5)) \ ;; start 超出范围
+
+    (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 0 6)) \ ;; end 超出范围
+
+    (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 3 2)) \ ;; start \<gtr\> end
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试：start 和 end 参数>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 1 4) =\<gtr\> 3)
+
+    (check (string-fold (lambda (c acc) (cons c acc)) '() "hello" 1 4) =\<gtr\> '(#\\l #\\l #\\e))
+
+    (check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello" 1 4) =\<gtr\> "lle")\ 
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-fold-right>
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-fold-right kons knil s . rest)
+
+    \ \ (when (not (procedure? kons))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold-right: first argument must be a procedure"))
+
+    \ \ (when (not (string? s))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold-right: second argument must be a string"))
+
+    \;
+
+    \ \ (let ((substr (%string-from-range s rest)))
+
+    \ \ \ \ (let loop ((i (- (string-length substr) 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (result knil))
+
+    \ \ \ \ \ \ (if (\<less\> i 0)
+
+    \ \ \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ \ \ (loop (- i 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (kons (string-ref substr i) result))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold-right cons '() "abc") =\<gtr\> '(#\\a #\\b #\\c))
+
+    (check (string-fold-right (lambda (char result) (cons (char-\<gtr\>integer char) result)) '() "abc") =\<gtr\> '(97 98 99))
+
+    (check (string-fold-right (lambda (char result) (+ result (char-\<gtr\>integer char))) 0 "abc") =\<gtr\> 294)
+
+    (check (string-fold-right (lambda (char result) (string-append result (string char))) "" "abc") =\<gtr\> "cba")
+
+    (check (string-fold-right (lambda (char result) (cons char result)) '() "") =\<gtr\> '())
+
+    (check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1) =\<gtr\> '(#\\b #\\c))
+
+    (check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1 2) =\<gtr\> '(#\\b))
+
+    (check-catch 'type-error (string-fold-right 1 '() "abc"))
+
+    (check-catch 'type-error (string-fold-right cons '() 123))
+
+    (check-catch 'out-of-range (string-fold-right cons '() "abc" 4))
+
+    (check-catch 'out-of-range (string-fold-right cons '() "abc" 1 4))
 
     \;
   </scm-chunk>

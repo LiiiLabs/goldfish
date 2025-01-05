@@ -301,6 +301,44 @@
     lst)
   => '())
 
+(check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello") => 5)
+
+(check (string-fold (lambda (c acc) (cons c acc)) '() "hello") => '(#\o #\l #\l #\e #\h))
+
+(check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello") => "olleh")
+
+(check (string-fold (lambda (c acc)
+                      (if (char=? c #\l)
+                          (+ acc 1)
+                          acc))
+                    0
+                    "hello")
+       => 2)
+
+(check (string-fold (lambda (c acc) (+ acc 1)) 0 "") => 0)
+
+(check-catch 'type-error (string-fold 1 0 "hello"))  ;; 第一个参数不是过程
+(check-catch 'type-error (string-fold (lambda (c acc) (+ acc 1)) 0 123))  ;; 第二个参数不是字符串
+(check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" -1 5))  ;; start 超出范围
+(check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 0 6))  ;; end 超出范围
+(check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 3 2))  ;; start > end
+
+(check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 1 4) => 3)
+(check (string-fold (lambda (c acc) (cons c acc)) '() "hello" 1 4) => '(#\l #\l #\e))
+(check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello" 1 4) => "lle") 
+
+(check (string-fold-right cons '() "abc") => '(#\a #\b #\c))
+(check (string-fold-right (lambda (char result) (cons (char->integer char) result)) '() "abc") => '(97 98 99))
+(check (string-fold-right (lambda (char result) (+ result (char->integer char))) 0 "abc") => 294)
+(check (string-fold-right (lambda (char result) (string-append result (string char))) "" "abc") => "cba")
+(check (string-fold-right (lambda (char result) (cons char result)) '() "") => '())
+(check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1) => '(#\b #\c))
+(check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1 2) => '(#\b))
+(check-catch 'type-error (string-fold-right 1 '() "abc"))
+(check-catch 'type-error (string-fold-right cons '() 123))
+(check-catch 'out-of-range (string-fold-right cons '() "abc" 4))
+(check-catch 'out-of-range (string-fold-right cons '() "abc" 1 4))
+
 (check (string-tokenize "1 22 333") => '("1" "22" "333"))
 (check (string-tokenize "1 22 333" #\2) => '("1 " " 333"))
 (check (string-tokenize "1 22 333" #\  2) => `("22" "333"))

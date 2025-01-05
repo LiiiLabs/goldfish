@@ -29,6 +29,7 @@
   string-index string-index-right
   string-contains string-count
   string-upcase string-downcase
+  string-fold string-fold-right
   string-reverse
   string-tokenize
   ; Liii extras
