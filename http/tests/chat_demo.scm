@@ -35,7 +35,7 @@
 
 (define payload
   `(
-    ("model" . "Qwen/Qwen2.5-Coder-7B-Instruct")
+    ("model" . "deepseek-ai/DeepSeek-V2.5")
     ("messages" . #())
     ("max_tokens" . 512)
    )
@@ -49,19 +49,21 @@
         (r 'text)
         (r 'status-code))))
 
-(define questions
-  #("唐宋八大家是哪八位"
-    "请按照顺序返回上一个回答中的第五位"
-    "上一个问题的回答一共几个汉字？"
-    "介绍他的生平和作品"))
+(define (message role content)
+  `(("role" . ,role) ("content" . ,content)))
 
-(define (message text)
-  (let1 msg `(("role" . "user") ("content" . ""))
-        (json-set msg "content" text)))
+(define (append-message q msg)
+  (json-set q "messages" (lambda (v) (vector-append v (vector msg)))))
+
+(define questions
+  #("唐宋八大家是哪八位（简短回答）"
+    "请按照顺序返回上一个回答中的第五位"
+    "用双引号引用上一个问题的回答（包含标点符号），并告诉我一共多少个汉字？"
+    "介绍他的生平和作品（简短回答）"))
 
 (let loop ((i 0) (payload payload) (tokens 0))
   (if (< i (length questions))
-      (let* ((q (json-push* payload "messages" i (message (questions i))))
+      (let* ((q (append-message payload (message "user" (questions i))))
              (r (chat q))
              (j (string->json r))
              (a (json-ref* j "choices" 0 "message" "content")))
@@ -69,7 +71,7 @@
           (display* "A: " a "\n")
           (newline)
           (loop (+ i 1)
-                (json-set* q "messages" i "content" (lambda (y) (string-append y "\n回答：" a)))
+                (append-message q (message "assistant" a))
                 (+ tokens (json-ref* j "usage" "total_tokens"))))
-      (display* "Total tokens: " tokens "\n")))
+      (display* "Total tokens: " tokens)))
 
