@@ -167,6 +167,12 @@
     \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
 
     \;
+
+    \ \ \ \ \ \ - name: run json tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish json/tests/json-test.scm
+
+    \;
   </verbatim-chunk>
 
   <subsection|Github平台Windows系统>
@@ -283,6 +289,10 @@
     \ \ \ \ \ \ - name: test
 
     \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \ \ \ \ \ \ - name: run json tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish json/tests/json-test.scm
 
     \;
   </verbatim-chunk>
@@ -432,17 +442,17 @@
 
     \ \ \ \ \ \ \ \ run: xmake config -vD --policies=build.ccache -o tmp/build -m releasedbg --yes
 
-    \;
-
     \ \ \ \ \ \ - name: build
 
     \ \ \ \ \ \ \ \ run: xmake build --yes -vD goldfish
 
-    \;
-
     \ \ \ \ \ \ - name: run tests
 
     \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \ \ \ \ \ \ - name: run json tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish json/tests/json-test.scm
 
     \;
   </verbatim-chunk>
@@ -593,6 +603,10 @@
     \ \ \ \ \ \ - name: run tests
 
     \ \ \ \ \ \ \ \ run: bin/goldfish -l tests/test_all.scm
+
+    \ \ \ \ \ \ - name: run json tests
+
+    \ \ \ \ \ \ \ \ run: bin/goldfish json/tests/json-test.scm
 
     \;
   </verbatim-chunk>

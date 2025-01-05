@@ -131,6 +131,10 @@
     \ \ \ \ \ \ \ \ (liii json))
 
     \;
+
+    (check-set-mode! 'report-failed)
+
+    \;
   </goldfish-chunk>
 
   <subsection|实现>
