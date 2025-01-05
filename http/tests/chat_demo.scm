@@ -59,25 +59,6 @@
   (let1 msg `(("role" . "user") ("content" . ""))
         (json-set msg "content" text)))
 
-(define (json-escape-string str)
-  (define (escape-char c)
-    (case c
-      ((#\\) "\\\\")  ; 反斜杠
-      ((#\") "\\\"")  ; 双引号
-      ((#\newline) "\\n")  ; 换行符
-      ((#\tab) "\\t")  ; 制表符
-      ((#\return) "\\r")  ; 回车符
-      ((#\backspace) "\\b")  ; 退格符
-      ((#\formfeed) "\\f")  ; 换页符
-      (else (string c))))  ; 其他字符保持不变
-
-  (let loop ((chars (string->list str))  ; 将字符串转换为字符列表
-             (result ""))  ; 初始化结果字符串
-    (if (null? chars)
-        result  ; 如果字符列表为空，返回结果
-        (loop (cdr chars)  ; 递归处理剩余的字符
-              (string-append result (escape-char (car chars)))))))  ; 转义当前字符并追加到结果中
-
 (let loop ((i 0) (payload payload) (tokens 0))
   (if (< i (length questions))
       (let* ((q (json-push* payload "messages" i (message (questions i))))
@@ -88,7 +69,7 @@
           (display* "A: " a "\n")
           (newline)
           (loop (+ i 1)
-                (json-set* q "messages" i "content" (lambda (y) (json-escape-string (string-append y "\n回答：" a))))
+                (json-set* q "messages" i "content" (lambda (y) (string-append y "\n回答：" a)))
                 (+ tokens (json-ref* j "usage" "total_tokens"))))
       (display* "Total tokens: " tokens "\n")))
 

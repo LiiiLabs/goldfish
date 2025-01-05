@@ -136,7 +136,7 @@
     (define f
       (lambda (x)
         (cond                           
-          ((string? x) (string-append "\"" x "\""))                        
+          ((string? x) (json-string-escape x))                        
           ((number? x) (number->string x))                             
           ((symbol? x) (symbol->string x)))))
     (define c
