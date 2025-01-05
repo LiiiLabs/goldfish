@@ -28,7 +28,7 @@
     string-index string-index-right
     string-contains string-count
     string-upcase string-downcase
-    string-fold
+    string-fold string-fold-right
     string-reverse
     string-tokenize)
 (begin
@@ -320,12 +320,25 @@
         (type-error "string-fold: second argument must be a string"))
 
   (let ((substr (%string-from-range s rest)))
-    ;; 主逻辑
     (let loop ((i 0)
                (result knil))
       (if (= i (string-length substr))
           result
           (loop (+ i 1)
+                (kons (string-ref substr i) result))))))
+
+(define (string-fold-right kons knil s . rest)
+  (when (not (procedure? kons))
+        (type-error "string-fold-right: first argument must be a procedure"))
+  (when (not (string? s))
+        (type-error "string-fold-right: second argument must be a string"))
+
+  (let ((substr (%string-from-range s rest)))
+    (let loop ((i (- (string-length substr) 1))
+               (result knil))
+      (if (< i 0)
+          result
+          (loop (- i 1)
                 (kons (string-ref substr i) result))))))
 
 (define (string-tokenize str . char+start+end)

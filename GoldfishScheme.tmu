@@ -8744,7 +8744,7 @@
 
     \ \ string-upcase string-downcase
 
-    \ \ string-fold
+    \ \ string-fold string-fold-right
 
     \ \ string-reverse
 
@@ -8798,7 +8798,7 @@
 
     \ \ \ \ string-upcase string-downcase
 
-    \ \ \ \ string-fold
+    \ \ \ \ string-fold string-fold-right
 
     \ \ \ \ string-reverse
 
@@ -10358,8 +10358,6 @@
 
     \ \ (let ((substr (%string-from-range s rest)))
 
-    \ \ \ \ ;; 主逻辑
-
     \ \ \ \ (let loop ((i 0)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (result knil))
@@ -10423,7 +10421,7 @@
 
   <subparagraph|测试：空字符串>
 
-  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
     (check (string-fold (lambda (c acc) (+ acc 1)) 0 "") =\<gtr\> 0)
 
     \;
@@ -10453,6 +10451,64 @@
     (check (string-fold (lambda (c acc) (cons c acc)) '() "hello" 1 4) =\<gtr\> '(#\\l #\\l #\\e))
 
     (check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello" 1 4) =\<gtr\> "lle")\ 
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-fold-right>
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-fold-right kons knil s . rest)
+
+    \ \ (when (not (procedure? kons))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold-right: first argument must be a procedure"))
+
+    \ \ (when (not (string? s))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold-right: second argument must be a string"))
+
+    \;
+
+    \ \ (let ((substr (%string-from-range s rest)))
+
+    \ \ \ \ (let loop ((i (- (string-length substr) 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (result knil))
+
+    \ \ \ \ \ \ (if (\<less\> i 0)
+
+    \ \ \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ \ \ (loop (- i 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (kons (string-ref substr i) result))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check (string-fold-right cons '() "abc") =\<gtr\> '(#\\a #\\b #\\c))
+
+    (check (string-fold-right (lambda (char result) (cons (char-\<gtr\>integer char) result)) '() "abc") =\<gtr\> '(97 98 99))
+
+    (check (string-fold-right (lambda (char result) (+ result (char-\<gtr\>integer char))) 0 "abc") =\<gtr\> 294)
+
+    (check (string-fold-right (lambda (char result) (string-append result (string char))) "" "abc") =\<gtr\> "cba")
+
+    (check (string-fold-right (lambda (char result) (cons char result)) '() "") =\<gtr\> '())
+
+    (check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1) =\<gtr\> '(#\\b #\\c))
+
+    (check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1 2) =\<gtr\> '(#\\b))
+
+    (check-catch 'type-error (string-fold-right 1 '() "abc"))
+
+    (check-catch 'type-error (string-fold-right cons '() 123))
+
+    (check-catch 'out-of-range (string-fold-right cons '() "abc" 4))
+
+    (check-catch 'out-of-range (string-fold-right cons '() "abc" 1 4))
 
     \;
   </scm-chunk>

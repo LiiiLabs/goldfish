@@ -327,6 +327,18 @@
 (check (string-fold (lambda (c acc) (cons c acc)) '() "hello" 1 4) => '(#\l #\l #\e))
 (check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello" 1 4) => "lle") 
 
+(check (string-fold-right cons '() "abc") => '(#\a #\b #\c))
+(check (string-fold-right (lambda (char result) (cons (char->integer char) result)) '() "abc") => '(97 98 99))
+(check (string-fold-right (lambda (char result) (+ result (char->integer char))) 0 "abc") => 294)
+(check (string-fold-right (lambda (char result) (string-append result (string char))) "" "abc") => "cba")
+(check (string-fold-right (lambda (char result) (cons char result)) '() "") => '())
+(check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1) => '(#\b #\c))
+(check (string-fold-right (lambda (char result) (cons char result)) '() "abc" 1 2) => '(#\b))
+(check-catch 'type-error (string-fold-right 1 '() "abc"))
+(check-catch 'type-error (string-fold-right cons '() 123))
+(check-catch 'out-of-range (string-fold-right cons '() "abc" 4))
+(check-catch 'out-of-range (string-fold-right cons '() "abc" 1 4))
+
 (check (string-tokenize "1 22 333") => '("1" "22" "333"))
 (check (string-tokenize "1 22 333" #\2) => '("1 " " 333"))
 (check (string-tokenize "1 22 333" #\  2) => `("22" "333"))
