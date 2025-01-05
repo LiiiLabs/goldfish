@@ -278,7 +278,7 @@
 
     \ \ `(
 
-    \ \ \ \ ("model" . "Qwen/Qwen2.5-Coder-7B-Instruct")
+    \ \ \ \ ("model" . "deepseek-ai/DeepSeek-V2.5")
 
     \ \ \ \ ("messages" . #())
 
@@ -308,21 +308,25 @@
 
     (define questions
 
-    \ \ #("唐宋八大家是哪八位"
+    \ \ #("唐宋八大家是哪八位（简短回答）"
 
     \ \ \ \ "请按照顺序返回上一个回答中的第五位"
 
-    \ \ \ \ "上一个问题的回答一共几个汉字？"
+    \ \ \ \ "用双引号引用上一个问题的回答，并告诉我一共多少个汉字？"
 
-    \ \ \ \ "介绍他的生平和作品"))
+    \ \ \ \ "介绍他的生平和作品（简短回答）"))
 
     \;
 
-    (define (message text)
+    (define (message role content)
 
-    \ \ (let1 msg `(("role" . "user") ("content" . ""))
+    \ \ `(("role" . ,role) ("content" . ,content)))
 
-    \ \ \ \ \ \ \ \ (json-set msg "content" text)))
+    \;
+
+    (define (append-message q msg)
+
+    \ \ (json-set q "messages" (lambda (v) (vector-append v (vector msg)))))
 
     \;
 
@@ -330,7 +334,7 @@
 
     \ \ (if (\<less\> i (length questions))
 
-    \ \ \ \ \ \ (let* ((q (json-push* payload "messages" i (message (questions i))))
+    \ \ \ \ \ \ (let* ((q (append-message payload (message "user" (questions i))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (r (chat q))
 
@@ -344,13 +348,19 @@
 
     \ \ \ \ \ \ \ \ \ \ (newline)
 
+    \ \ \ \ \ \ \ \ \ \ ; (display* "发送给服务端的JSON：\\n" (json-\<gtr\>string q))
+
+    \ \ \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ \ \ (newline)
+
     \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (json-set* q "messages" i "content" (lambda (y) (string-append y "\\n回答：" a)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (append-message q (message "assistant" a))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ tokens (json-ref* j "usage" "total_tokens"))))
 
-    \ \ \ \ \ \ (display* "Total tokens: " tokens "\\n")))
+    \ \ \ \ \ \ (display* "Total tokens: " tokens "\\n" payload)))
 
     \;
   </goldfish-chunk>
