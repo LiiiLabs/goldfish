@@ -1,4 +1,5 @@
 (set! *load-path* (cons "http" *load-path*))
+(set! *load-path* (cons "json" *load-path*))
 
 (import (liii check)
         (liii http)

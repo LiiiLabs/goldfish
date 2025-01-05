@@ -17,7 +17,7 @@
 
   <subsection|许可证>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|false|true>
+  <\goldfish-chunk|json/liii/json.scm|false|true>
     ;; \ MIT License
 
     \;
@@ -65,7 +65,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|false|true>
+  <\goldfish-chunk|json/tests/json-test.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -101,7 +101,7 @@
 
   <subsection|接口>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define-library (liii json)
 
     (import (liii chez) (liii alist) (liii list))
@@ -125,7 +125,11 @@
 
   <subsection|测试>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
+    (set! *load-path* (cons "json" *load-path*))
+
+    \;
+
     (import (liii check)
 
     \ \ \ \ \ \ \ \ (liii json))
@@ -137,7 +141,7 @@
 
   <paragraph|string-\<gtr\>json>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (check (string-\<gtr\>json "{\\"age\\":18}") =\<gtr\> `(("age" . 18)))
 
     (check (string-\<gtr\>json "{age:18}") =\<gtr\> `((age . 18)))
@@ -149,7 +153,7 @@
     \;
   </goldfish-chunk>
 
-  <\scm-chunk|goldfish/liii/json.scm|true|true>
+  <\scm-chunk|json/liii/json.scm|true|true>
     (define (loose-car pair-or-empty)
 
     \ \ (if (eq? '() pair-or-empty)
@@ -325,7 +329,7 @@
 
   <paragraph|json-\<gtr\>string>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\scm-chunk|json/tests/json-test.scm|true|true>
     (check (json-\<gtr\>string '(("age" . 18))) =\<gtr\> "{\\"age\\":18}")
 
     (check (json-\<gtr\>string #(0 1 2 3)) =\<gtr\> "[0,1,2,3]")
@@ -333,7 +337,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/liii/json.scm|true|true>
+  <\scm-chunk|json/liii/json.scm|true|true>
     (define json-\<gtr\>string
 
     \ \ (lambda (lst)
@@ -411,7 +415,7 @@
 
   <paragraph|json-ref>
 
-  <\scm-chunk|goldfish/liii/json.scm|true|true>
+  <\scm-chunk|json/liii/json.scm|true|true>
     (define json-ref
 
     \ \ (lambda (x k)
@@ -453,7 +457,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\scm-chunk|json/tests/json-test.scm|true|true>
     (check (json-ref '(("age" . 18)) "age") =\<gtr\> 18)
 
     (check (json-ref #(0 1 2 3) 0) =\<gtr\> 0)
@@ -463,7 +467,7 @@
 
   <paragraph|json-ref*>
 
-  <\scm-chunk|goldfish/liii/json.scm|true|true>
+  <\scm-chunk|json/liii/json.scm|true|true>
     (define (json-ref* j . keys)
 
     \ \ (let loop ((expr j) (keys keys))
@@ -477,7 +481,7 @@
     \;
   </scm-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (check (json-ref* `((bob . ((age . 18) (sex . male)))) 'bob 'age) =\<gtr\> 18)
 
     \;
@@ -491,7 +495,7 @@
 
   <subparagraph|测试：verify是symbol>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((j0 `((age . 18) (sex . male)))
 
     \ \ \ \ \ \ \ (j1 (json-set j0 'age 19))
@@ -509,7 +513,7 @@
 
   <subparagraph|测试：verify是字符串>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let1 j `(("age" . 18) ("sex" . male))
 
     \ \ \ \ \ \ (check (json-ref (json-set j "age" 19) "age") =\<gtr\> 19)
@@ -521,7 +525,7 @@
 
   <subparagraph|测试：verify是自然数>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((j0 #(red green blue))
 
     \ \ \ \ \ \ \ (j1 (json-set j0 0 'black)))
@@ -535,7 +539,7 @@
 
   <subparagraph|测试：verify是布尔值>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((j0 `((bob . 18) (jack . 16)))
 
     \ \ \ \ \ \ \ (j1 (json-set j0 #t 3))
@@ -551,7 +555,7 @@
 
   <subparagraph|实现>
 
-  <\scm-chunk|goldfish/liii/json.scm|true|true>
+  <\scm-chunk|json/liii/json.scm|true|true>
     (define json-set
 
     \ \ (lambda (x v p)
@@ -651,7 +655,7 @@
 
   <paragraph|json-set*>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define (json-set* json k0 k1_or_v . ks_and_v)
 
     \ \ (if (null? ks_and_v)
@@ -669,7 +673,7 @@
 
   <subparagraph|测试单键更新>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((name . "Alice") (age . 25)))
 
     \ \ \ \ \ \ \ (updated-json (json-set* json 'age 26)))
@@ -681,7 +685,7 @@
 
   <subparagraph|测试多键更新>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((person . ((name . "Alice")
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)))))
@@ -695,7 +699,7 @@
 
   <subparagraph|测试嵌套多键更新>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((person . ((name . "Alice")
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
@@ -713,7 +717,7 @@
 
   <subparagraph|测试使用过程作为值>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((name . "Alice") (age . 25)))
 
     \ \ \ \ \ \ \ (updated-json (json-set* json 'age (lambda (x) (+ x 1)))))
@@ -725,7 +729,7 @@
 
   <subparagraph|测试嵌套使用过程作为值>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((person . ((name . "Alice") (age . 25)))))
 
     \ \ \ \ \ \ \ (updated-json (json-set* json 'person 'age (lambda (x) (+ x 1)))))
@@ -737,7 +741,7 @@
 
   <paragraph|json-push>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define (json-push x k v)
 
     \ \ (if (vector? x)
@@ -767,7 +771,7 @@
 
   <paragraph|json-push*>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define (json-push* json k0 v0 . rest)
 
     \ \ (if (null? rest)
@@ -783,7 +787,7 @@
 
   <subparagraph|测试：在嵌套对象中添加新键值对>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((person . ((name . "Alice") (age . 25))))))
 
     \ \ (let ((updated-json (json-push* json 'person 'city "Wonderland")))
@@ -811,7 +815,7 @@
 
   <subparagraph|测试：在嵌套数组中添加新元素>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((data . #(1 2 3)))))
 
     \ \ (let ((updated-json (json-push* json 'data 3 4)))
@@ -821,7 +825,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((data . #(#(1 2) #(3 4))))))
 
     \ \ (let ((updated-json (json-push* json 'data 1 2 5)))
@@ -833,7 +837,7 @@
 
   <subparagraph|测试：键值是数字>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((data . ((0 . "zero") (1 . "one"))))))
 
     \ \ (let ((updated-json (json-push* json 'data 2 "two")))
@@ -845,7 +849,7 @@
 
   <subparagraph|测试：键值是布尔值>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((flags . ((#t . "true") (#f . "false"))))))
 
     \ \ (let ((updated-json (json-push* json 'flags #t "yes")))
@@ -857,7 +861,7 @@
 
   <paragraph|json-drop>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define json-drop
 
     \ \ (lambda (x v)
@@ -935,7 +939,7 @@
 
   <paragraph|json-drop*>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define json-drop*
 
     \ \ (lambda (json key . rest)
@@ -953,7 +957,7 @@
 
   测试删除单层键
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((name . "Alice") (age . 25))))
 
     \ \ (let ((updated-json (json-drop json 'age)))
@@ -965,7 +969,7 @@
 
   测试删除嵌套键
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((name . "Alice")
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
@@ -983,7 +987,7 @@
 
   测试使用过程作为键
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let* ((json '((name . "Alice")
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (age . 25)
@@ -1009,7 +1013,7 @@
 
   <paragraph|json-reduce>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define json-reduce
 
     \ \ (lambda (x v p)
@@ -1111,7 +1115,7 @@
 
   <subparagraph|测试：单层或者嵌套JSON数据，直接值键>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((name . "Alice") (age . 25))))
 
     \ \ (check (json-reduce json 'name (lambda (k v) (string-upcase v)))
@@ -1131,7 +1135,7 @@
 
   <subparagraph|测试：单层 JSON 数据，过程条件>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((name . "Alice") (age . 25))))
 
     \ \ (check (json-reduce json (lambda (k) (equal? k 'age)) (lambda (k v) (+ v 1)))
@@ -1151,7 +1155,7 @@
 
   <subparagraph|测试：单层 JSON 数据，布尔值条件（true，对所有键值对操作）>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((name . "Alice") (age . 25))))
 
     \ \ (check (json-reduce json #t (lambda (k v) (if (string? v) (string-upcase v) v)))
@@ -1163,7 +1167,7 @@
 
   <paragraph|测试：单层 JSON 数据，布尔值条件（false，不操作）>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((name . "Alice") (age . 25))))
 
     \ \ (check (json-reduce json #f (lambda (k v) v))
@@ -1175,7 +1179,7 @@
 
   <subparagraph|测试：边界情况>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '()))
 
     \ \ (check (json-reduce json 'name (lambda (k v) v))
@@ -1195,7 +1199,7 @@
 
   <paragraph|json-reduce*>
 
-  <\goldfish-chunk|goldfish/liii/json.scm|true|true>
+  <\goldfish-chunk|json/liii/json.scm|true|true>
     (define (json-reduce* j v1 v2 . rest)
 
     \ \ (cond
@@ -1235,7 +1239,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/json-test.scm|true|true>
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (let ((json '((person . ((name . "Alice") (age . 25))))))
 
     \ \ (check (json-reduce* json 'person 'name (lambda (k v) (string-upcase v)))
@@ -1261,13 +1265,13 @@
 
   <subsection|结尾>
 
-  <\scm-chunk|tests/goldfish/liii/json-test.scm|true|false>
+  <\scm-chunk|json/tests/json-test.scm|true|false>
     (check-report)
 
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/liii/json.scm|true|false>
+  <\scm-chunk|json/liii/json.scm|true|false>
     ) ; end of begin
 
     ) ; end of define-library

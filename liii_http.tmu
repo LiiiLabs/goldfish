@@ -206,6 +206,8 @@
   <\goldfish-chunk|http/tests/chat_demo.scm|false|false>
     (set! *load-path* (cons "http" *load-path*))
 
+    (set! *load-path* (cons "json" *load-path*))
+
     \;
 
     (import (liii http)
@@ -405,6 +407,8 @@
 
   <\goldfish-chunk|http/tests/http_test.scm|false|true>
     (set! *load-path* (cons "http" *load-path*))
+
+    (set! *load-path* (cons "json" *load-path*))
 
     \;
 
