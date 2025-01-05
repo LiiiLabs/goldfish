@@ -14,6 +14,8 @@
 ; under the License.
 ;
 
+(set! *load-path* (cons "json" *load-path*))
+
 (import (liii check)
         (liii json))
 
