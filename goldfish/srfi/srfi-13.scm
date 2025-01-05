@@ -28,6 +28,7 @@
     string-index string-index-right
     string-contains string-count
     string-upcase string-downcase
+    string-fold
     string-reverse
     string-tokenize)
 (begin
@@ -311,6 +312,21 @@
                           (reverse (substring str start end))
                           (substring str end))))
         (else (error 'wrong-number-of-args "string-reverse"))))
+
+(define (string-fold kons knil s . rest)
+  (when (not (procedure? kons))
+        (type-error "string-fold: first argument must be a procedure"))
+  (when (not (string? s))
+        (type-error "string-fold: second argument must be a string"))
+
+  (let ((substr (%string-from-range s rest)))
+    ;; 主逻辑
+    (let loop ((i 0)
+               (result knil))
+      (if (= i (string-length substr))
+          result
+          (loop (+ i 1)
+                (kons (string-ref substr i) result))))))
 
 (define (string-tokenize str . char+start+end)
   

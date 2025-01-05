@@ -8744,6 +8744,8 @@
 
     \ \ string-upcase string-downcase
 
+    \ \ string-fold
+
     \ \ string-reverse
 
     \ \ string-tokenize
@@ -8795,6 +8797,8 @@
     \ \ \ \ string-contains string-count
 
     \ \ \ \ string-upcase string-downcase
+
+    \ \ \ \ string-fold
 
     \ \ \ \ string-reverse
 
@@ -10333,6 +10337,110 @@
     \ \ \ \ lst)
 
     \ \ =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-fold>
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-fold kons knil s . rest)
+
+    \ \ (when (not (procedure? kons))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold: first argument must be a procedure"))
+
+    \ \ (when (not (string? s))
+
+    \ \ \ \ \ \ \ \ (type-error "string-fold: second argument must be a string"))
+
+    \;
+
+    \ \ (let ((substr (%string-from-range s rest)))
+
+    \ \ \ \ ;; 主逻辑
+
+    \ \ \ \ (let loop ((i 0)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (result knil))
+
+    \ \ \ \ \ \ (if (= i (string-length substr))
+
+    \ \ \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (kons (string-ref substr i) result))))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    ;; 测试 string-fold
+
+    ;; 1. 计算字符串中字符的数量
+
+    (check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello") =\<gtr\> 5)
+
+    \;
+
+    ;; 2. 将字符串中的字符反转
+
+    (check (string-fold (lambda (c acc) (cons c acc)) '() "hello") =\<gtr\> '(#\\o #\\l #\\l #\\e #\\h))
+
+    \;
+
+    ;; 3. 将字符串中的字符连接成一个新字符串
+
+    (check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello") =\<gtr\> "olleh")
+
+    \;
+
+    ;; 4. 计算字符串中特定字符的数量
+
+    (check (string-fold (lambda (c acc)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (char=? c #\\l)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ acc 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ acc))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "hello")
+
+    \ \ \ \ \ \ \ =\<gtr\> 2)
+
+    \;
+
+    ;; 5. 测试空字符串
+
+    (check (string-fold (lambda (c acc) (+ acc 1)) 0 "") =\<gtr\> 0)
+
+    \;
+
+    ;; 6. 测试 start 和 end 参数
+
+    (check (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 1 4) =\<gtr\> 3) \ ;; 从索引 1 到 4
+
+    (check (string-fold (lambda (c acc) (cons c acc)) '() "hello" 1 4) =\<gtr\> '(#\\l #\\l #\\e)) \ ;; 从索引 1 到 4
+
+    (check (string-fold (lambda (c acc) (string-append (string c) acc)) "" "hello" 1 4) =\<gtr\> "lle") \ ;; 从索引 1 到 4
+
+    \;
+
+    ;; 7. 测试错误处理
+
+    (check-catch 'type-error (string-fold 1 0 "hello")) \ ;; 第一个参数不是过程
+
+    (check-catch 'type-error (string-fold (lambda (c acc) (+ acc 1)) 0 123)) \ ;; 第二个参数不是字符串
+
+    (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" -1 5)) \ ;; start 超出范围
+
+    (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 0 6)) \ ;; end 超出范围
+
+    (check-catch 'out-of-range (string-fold (lambda (c acc) (+ acc 1)) 0 "hello" 3 2)) \ ;; start \<gtr\> end
 
     \;
   </scm-chunk>
