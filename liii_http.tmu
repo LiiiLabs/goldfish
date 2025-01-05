@@ -203,7 +203,7 @@
     bin/http -l http/tests/chat_demo.scm
   </shell-code>
 
-  <\goldfish-chunk|http/tests/chat_demo.scm|false|false>
+  <\goldfish-chunk|http/tests/chat_demo.scm|false|true>
     (set! *load-path* (cons "http" *load-path*))
 
     (set! *load-path* (cons "json" *load-path*))
@@ -259,7 +259,11 @@
     \ \ \ \ \ \ \ \ "请填入硅基流动的API密钥")))
 
     \;
+  </goldfish-chunk>
 
+  向硅基流动发起HTTP Post请求的核心代码，这里默认使用DeepSeek-V2.5这个付费模型，因为实测该模型的效果比较好，价格比较低。
+
+  <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
     (define headers
 
     \ \ `(
@@ -305,28 +309,40 @@
     \ \ \ \ \ \ \ \ (r 'status-code))))
 
     \;
+  </goldfish-chunk>
 
+  构建文本对话的单个消息体，其中role只能是"user", "assistant"和"system"，<todo|这里在构造的时候，暂时不做校验>。
+
+  <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
+    (define (message role content)
+
+    \ \ `(("role" . ,role) ("content" . ,content)))
+
+    \;
+  </goldfish-chunk>
+
+  将消息体添加到JSON对象q的尾部。q对象的结构就是上面定义的payload函数中的JSON，这里是在更改messages字段的值。
+
+  <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
+    (define (append-message q msg)
+
+    \ \ (json-set q "messages" (lambda (v) (vector-append v (vector msg)))))
+
+    \;
+  </goldfish-chunk>
+
+  按照提供的问题列表，和大模型对话，打印每次对话（在前面加上<verbatim|Q: >和<verbatim|A: >），最后输出一下token的用量。
+
+  <\goldfish-chunk|http/tests/chat_demo.scm|true|false>
     (define questions
 
     \ \ #("唐宋八大家是哪八位（简短回答）"
 
     \ \ \ \ "请按照顺序返回上一个回答中的第五位"
 
-    \ \ \ \ "用双引号引用上一个问题的回答，并告诉我一共多少个汉字？"
+    \ \ \ \ "用双引号引用上一个问题的回答（包含标点符号），并告诉我一共多少个汉字？"
 
     \ \ \ \ "介绍他的生平和作品（简短回答）"))
-
-    \;
-
-    (define (message role content)
-
-    \ \ `(("role" . ,role) ("content" . ,content)))
-
-    \;
-
-    (define (append-message q msg)
-
-    \ \ (json-set q "messages" (lambda (v) (vector-append v (vector msg)))))
 
     \;
 
@@ -348,19 +364,13 @@
 
     \ \ \ \ \ \ \ \ \ \ (newline)
 
-    \ \ \ \ \ \ \ \ \ \ ; (display* "发送给服务端的JSON：\\n" (json-\<gtr\>string q))
-
-    \ \ \ \ \ \ \ \ \ \ (newline)
-
-    \ \ \ \ \ \ \ \ \ \ (newline)
-
     \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (append-message q (message "assistant" a))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ tokens (json-ref* j "usage" "total_tokens"))))
 
-    \ \ \ \ \ \ (display* "Total tokens: " tokens "\\n" payload)))
+    \ \ \ \ \ \ (display* "Total tokens: " tokens)))
 
     \;
   </goldfish-chunk>

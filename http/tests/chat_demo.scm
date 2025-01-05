@@ -49,17 +49,17 @@
         (r 'text)
         (r 'status-code))))
 
-(define questions
-  #("唐宋八大家是哪八位（简短回答）"
-    "请按照顺序返回上一个回答中的第五位"
-    "用双引号引用上一个问题的回答，并告诉我一共多少个汉字？"
-    "介绍他的生平和作品（简短回答）"))
-
 (define (message role content)
   `(("role" . ,role) ("content" . ,content)))
 
 (define (append-message q msg)
   (json-set q "messages" (lambda (v) (vector-append v (vector msg)))))
+
+(define questions
+  #("唐宋八大家是哪八位（简短回答）"
+    "请按照顺序返回上一个回答中的第五位"
+    "用双引号引用上一个问题的回答（包含标点符号），并告诉我一共多少个汉字？"
+    "介绍他的生平和作品（简短回答）"))
 
 (let loop ((i 0) (payload payload) (tokens 0))
   (if (< i (length questions))
@@ -70,11 +70,8 @@
           (display* "Q: " (questions i) "\n")
           (display* "A: " a "\n")
           (newline)
-          ; (display* "发送给服务端的JSON：\n" (json->string q))
-          (newline)
-          (newline)
           (loop (+ i 1)
                 (append-message q (message "assistant" a))
                 (+ tokens (json-ref* j "usage" "total_tokens"))))
-      (display* "Total tokens: " tokens "\n" payload)))
+      (display* "Total tokens: " tokens)))
 
