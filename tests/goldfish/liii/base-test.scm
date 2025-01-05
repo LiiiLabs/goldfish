@@ -71,21 +71,26 @@
 
 (check (and #t 1) => 1)
 
-
 (check (when #t 1) => 1)
-
-
 
 (check (when #f 1 ) => #<unspecified>)
 
-
-
 (check (when (> 3 1) 1 ) => 1)
-
-
 
 (check (when (> 1 3) 1 ) => #<unspecified>)
 
+(check (let ((x 1)) x) => 1)
+
+(check (let ((x 1) (y 2)) (+ x y)) => 3)
+
+(check (let ((x 1))
+         (let ((x 2))
+           x)) => 2)
+
+(check (let ((x 1))
+         (if (> x 0)
+             x
+             -x)) => 1)
 
 (define (test-letrec)
   (letrec ((even?
