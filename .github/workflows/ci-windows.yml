@@ -51,4 +51,6 @@ jobs:
         run: xmake build --yes -vD goldfish
       - name: test
         run: bin/goldfish -l tests/test_all.scm
+      - name: run json tests
+        run: bin/goldfish json/tests/json-test.scm
 

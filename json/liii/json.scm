@@ -22,14 +22,28 @@
 ;  SOFTWARE.
 
 (define-library (liii json)
-(import (liii chez) (liii alist) (liii list))
-(export string->json json->string
-        json-ref json-ref*
-        json-set json-set*
-        json-push json-push*
-        json-drop json-drop*
-        json-reduce json-reduce*)
+(import (liii chez) (liii alist) (liii list) (liii string))
+(export 
+  json-string-escape json-string-unescape string->json json->string
+  json-ref json-ref*
+  json-set json-set* json-push json-push* json-drop json-drop* json-reduce json-reduce*)
 (begin
+
+(define (json-string-escape str)
+  (define (escape-char c)
+    (case c
+      ((#\") "\\\"")
+      ((#\\) "\\\\")
+      ((#\/) "\\/")
+      ((#\backspace) "\\b")
+      ((#\xc) "\\f")
+      ((#\newline) "\\n")
+      ((#\return) "\\r")
+      ((#\tab) "\\t")
+      (else (string c))))
+        
+  (let ((escaped (string-fold (lambda (ch result) (string-append result (escape-char ch))) "" str)))
+    (string-append "\"" escaped "\"")))
 
 (define (loose-car pair-or-empty)
   (if (eq? '() pair-or-empty)
@@ -122,7 +136,7 @@
     (define f
       (lambda (x)
         (cond                           
-          ((string? x) (string-append "\"" x "\""))                        
+          ((string? x) (json-string-escape x))                        
           ((number? x) (number->string x))                             
           ((symbol? x) (symbol->string x)))))
     (define c

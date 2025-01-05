@@ -19,6 +19,18 @@
 (import (liii check)
         (liii json))
 
+(check-set-mode! 'report-failed)
+
+(check (json-string-escape "hello") => "\"hello\"")
+(check (json-string-escape "hello\"world") => "\"hello\\\"world\"")
+(check (json-string-escape "hello\\world") => "\"hello\\\\world\"")
+(check (json-string-escape "hello/world") => "\"hello\\/world\"")
+(check (json-string-escape "hello\bworld") => "\"hello\\bworld\"")
+(check (json-string-escape "hello\fworld") => "\"hello\\fworld\"")
+(check (json-string-escape "hello\nworld") => "\"hello\\nworld\"")
+(check (json-string-escape "hello\rworld") => "\"hello\\rworld\"")
+(check (json-string-escape "hello\tworld") => "\"hello\\tworld\"")
+
 (check (string->json "{\"age\":18}") => `(("age" . 18)))
 (check (string->json "{age:18}") => `((age . 18)))
 
