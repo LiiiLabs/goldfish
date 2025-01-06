@@ -281,13 +281,62 @@
 (check-catch 'wrong-type-arg (max 1 '(2) 3))
 (check-catch 'wrong-type-arg (max '(1 2 3) '(4 5 6)))
 
+(define s7-min min)
+
+(define (min2 x y)
+  (cond
+    ((eqv? x +inf.0) (if (inexact? y) y (inexact y)))
+    ((eqv? y +inf.0) (if (inexact? x) x (inexact x)))
+    ((eqv? x -inf.0) (if (inexact? x) x (inexact x)))
+    ((eqv? y -inf.0) (if (inexact? y) y (inexact y)))
+    ((and (inexact? x) (exact? y))
+     (inexact (s7-min (exact x) y)))
+    ((and (exact? x) (inexact? y))
+     (inexact (s7-min x (exact y))))
+    ((and (inexact? x) (inexact? y))
+     (inexact (s7-min (exact x) (exact y))))
+    (else (s7-min x y))))
+
+(define (min . args)
+  (cond
+    ((null? args) (error 'wrong-number-of-args "min requires at least one argument"))
+    ((null? (cdr args)) (car args))
+    ((null? (cddr args)) (min2 (car args) (cadr args)))
+    (else
+     (apply min (cons (min (car args) (cadr args)) (cddr args))))))
+
 (check (min 7) => 7)
 (check (min 7 3) => 3)
 (check (min -1 0 1 7 -5 3) => -5)
 (check (min -5 -10 -7 -3) => -10)
 
-(check (min +inf.0 7) => 7)
+(check (min 3.0 7.0) => 3.0)
+(check (min 3 7.0) => 3.0)
+(check (min 3.0 7) => 3.0)
+
+(check (min -3.0 -7.0) => -7.0)
+(check (min -3 -7.0) => -7.0)
+(check (min -3.0 -7) => -7.0)
+
+(check (min 3.0 7.0 9.0) => 3.0)
+(check (min 3 7.0 9) => 3.0)
+(check (min 3 7 9.0) => 3.0)
+(check (min 3 7.0 9.0) => 3.0)
+
+(check (min +inf.0 7) => 7.0)
 (check (min -inf.0 7) => -inf.0)
+(check (min 7 +inf.0) => 7.0)
+(check (min 7 -inf.0) => -inf.0)
+(check (min +inf.0 -inf.0) => -inf.0)
+
+(check (min +inf.0 7 9) => 7.0)
+(check (min -inf.0 7 9.0) => -inf.0)
+(check (min 7 +inf.0 9) => 7.0)
+(check (min 7 -inf.0 9) => -inf.0)
+(check (min 7 9 +inf.0) => 7.0)
+(check (min 7 9.0 -inf.0) => -inf.0)
+
+(check (min +inf.0 +inf.0 -inf.0) => -inf.0)
 
 (check-catch 'wrong-number-of-args (min))
 

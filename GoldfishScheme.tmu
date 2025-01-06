@@ -1463,7 +1463,61 @@
 
   <value|r7rs><paragraph|min>
 
+  返回参数中的最小值。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define s7-min min)
+
+    \;
+
+    (define (min2 x y)
+
+    \ \ (cond
+
+    \ \ \ \ ((eqv? x +inf.0) (if (inexact? y) y (inexact y)))
+
+    \ \ \ \ ((eqv? y +inf.0) (if (inexact? x) x (inexact x)))
+
+    \ \ \ \ ((eqv? x -inf.0) (if (inexact? x) x (inexact x)))
+
+    \ \ \ \ ((eqv? y -inf.0) (if (inexact? y) y (inexact y)))
+
+    \ \ \ \ ((and (inexact? x) (exact? y))
+
+    \ \ \ \ \ (inexact (s7-min (exact x) y)))
+
+    \ \ \ \ ((and (exact? x) (inexact? y))
+
+    \ \ \ \ \ (inexact (s7-min x (exact y))))
+
+    \ \ \ \ ((and (inexact? x) (inexact? y))
+
+    \ \ \ \ \ (inexact (s7-min (exact x) (exact y))))
+
+    \ \ \ \ (else (s7-min x y))))
+
+    \;
+
+    (define (min . args)
+
+    \ \ (cond
+
+    \ \ \ \ ((null? args) (error 'wrong-number-of-args "min requires at least one argument"))
+
+    \ \ \ \ ((null? (cdr args)) (car args))
+
+    \ \ \ \ ((null? (cddr args)) (min2 (car args) (cadr args)))
+
+    \ \ \ \ (else
+
+    \ \ \ \ \ (apply min (cons (min (car args) (cadr args)) (cddr args))))))
+
+    \;
+  </scm-chunk>
+
   测试 min 函数基本功能。单个实参：正数；两个实参：正数；多个实参：有负数、有正数，全为负数。
+
+  测试 min 函数整数情况。所有参数全为整数精确格式，则返回值为整数精确格式。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check (min 7) =\<gtr\> 7)
@@ -1477,12 +1531,66 @@
     \;
   </scm-chunk>
 
-  测试 min 函数边界情况。
+  测试 min 函数浮点数情况。任一参数为浮点数不精确格式，则返回值为浮点数不精确格式。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (min +inf.0 7) =\<gtr\> 7)
+    (check (min 3.0 7.0) =\<gtr\> 3.0)
+
+    (check (min 3 7.0) =\<gtr\> 3.0)
+
+    (check (min 3.0 7) =\<gtr\> 3.0)
+
+    \;
+
+    (check (min -3.0 -7.0) =\<gtr\> -7.0)
+
+    (check (min -3 -7.0) =\<gtr\> -7.0)
+
+    (check (min -3.0 -7) =\<gtr\> -7.0)
+
+    \;
+
+    (check (min 3.0 7.0 9.0) =\<gtr\> 3.0)
+
+    (check (min 3 7.0 9) =\<gtr\> 3.0)
+
+    (check (min 3 7 9.0) =\<gtr\> 3.0)
+
+    (check (min 3 7.0 9.0) =\<gtr\> 3.0)
+
+    \;
+  </scm-chunk>
+
+  测试 min 函数无穷大情况。任一参数为无穷大格式，则返回值为浮点数不精确格式。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (min +inf.0 7) =\<gtr\> 7.0)
 
     (check (min -inf.0 7) =\<gtr\> -inf.0)
+
+    (check (min 7 +inf.0) =\<gtr\> 7.0)
+
+    (check (min 7 -inf.0) =\<gtr\> -inf.0)
+
+    (check (min +inf.0 -inf.0) =\> -inf.0)
+
+    \;
+
+    (check (min +inf.0 7 9) =\<gtr\> 7.0)
+
+    (check (min -inf.0 7 9.0) =\<gtr\> -inf.0)
+
+    (check (min 7 +inf.0 9) =\<gtr\> 7.0)
+
+    (check (min 7 -inf.0 9) =\<gtr\> -inf.0)
+
+    (check (min 7 9 +inf.0) =\<gtr\> 7.0)
+
+    (check (min 7 9.0 -inf.0) =\<gtr\> -inf.0)
+
+    \;
+
+    (check (min +inf.0 +inf.0 -inf.0) =\> -inf.0)
 
     \;
   </scm-chunk>
