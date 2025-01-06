@@ -294,16 +294,12 @@
 
 (define (min2 x y)
   (cond
-    ((eqv? x +inf.0) (if (inexact? y) y (inexact y)))
-    ((eqv? y +inf.0) (if (inexact? x) x (inexact x)))
-    ((eqv? x -inf.0) (if (inexact? x) x (inexact x)))
-    ((eqv? y -inf.0) (if (inexact? y) y (inexact y)))
     ((and (inexact? x) (exact? y))
-     (inexact (s7-min (exact x) y)))
+     (inexact (s7-min x y)))
     ((and (exact? x) (inexact? y))
-     (inexact (s7-min x (exact y))))
+     (inexact (s7-min x y)))
     ((and (inexact? x) (inexact? y))
-     (inexact (s7-min (exact x) (exact y))))
+     (inexact (s7-min x y)))
     (else (s7-min x y))))
 
 (define (min . args)
