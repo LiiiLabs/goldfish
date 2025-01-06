@@ -3136,7 +3136,7 @@
 
     \ \ (define temp-dir (os-temp-dir))
 
-    \ \ (define file-path (string-append temp-dir "/" file-name))
+    \ \ (define file-path (string-append temp-dir (string (os-sep)) file-name))
 
     \ \ (path-write-text file-path file-content)
 
