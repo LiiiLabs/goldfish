@@ -2692,7 +2692,9 @@
 
     \ \ path-\<gtr\>string
 
-    \ \ path-dir? path-file? path-exists? path-getsize
+    \ \ path-dir? path-file? path-exists?
+
+    \ \ path-getsize path-read-text
 
     )
 
@@ -3109,6 +3111,104 @@
     \;
   </cpp-chunk>
 
+  <paragraph|path-read-text>
+
+  <\goldfish-chunk|goldfish/liii/path.scm|true|true>
+    (define path-read-text
+
+    \ \ (typed-lambda ((path string?))
+
+    \ \ \ \ (if (not (file-exists? path))
+
+    \ \ \ \ \ \ (file-not-found-error
+
+    \ \ \ \ \ \ \ \ (string-append "No such file or directory: '" path "'"))
+
+    \ \ \ \ \ \ (g_path-read-text path))))
+
+    \;
+  </goldfish-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    static s7_pointer f_path_read_text(s7_scheme* sc, s7_pointer args) {
+
+    \ \ const char* path = s7_string (s7_car (args));
+
+    \ \ if (!path) {
+
+    \ \ \ \ return s7_make_boolean(sc, false); // 路径无效
+
+    \ \ }
+
+    \;
+
+    \ \ tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_RO);
+
+    \ \ if (file == tb_null) {
+
+    \ \ \ \ // TODO: warning on the tb_file_init failure
+
+    \ \ \ \ return s7_make_boolean(sc, false);
+
+    \ \ }
+
+    \;
+
+    \ \ tb_file_sync (file);
+
+    \;
+
+    \ \ tb_size_t size = tb_file_size(file);
+
+    \ \ if (size == 0) {
+
+    \ \ \ \ tb_file_exit (file);
+
+    \ \ \ \ return s7_make_string (sc, "");
+
+    \ \ }
+
+    \;
+
+    \ \ tb_byte_t* buffer = new tb_byte_t[size + 1];
+
+    \ \ tb_size_t real_size = tb_file_read (file, buffer, size);
+
+    \ \ buffer[real_size] = '\\0';
+
+    \;
+
+    \ \ tb_file_exit(file);
+
+    \ \ std::string content (reinterpret_cast\<less\>char*\<gtr\>(buffer), real_size);
+
+    \ \ delete[] buffer;
+
+    \;
+
+    \ \ return s7_make_string(sc, content.c_str());
+
+    }
+
+    \;
+  </cpp-chunk>
+
+  <\cpp-chunk|src/goldfish.hpp|true|true>
+    inline void
+
+    glue_path_read_text(s7_scheme* sc) {
+
+    \ \ const char* name = "g_path-read-text";
+
+    \ \ const char* desc = "(g_path-read-text path) =\<gtr\> string, read the content of the file at the given path";
+
+    \ \ s7_define_function(sc, name, f_path_read_text, 1, 0, false, desc);
+
+    }
+
+    \;
+  </cpp-chunk>
+
   <paragraph|glue_path>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
@@ -3121,6 +3221,8 @@
     \ \ glue_isdir (sc);
 
     \ \ glue_path_getsize (sc);
+
+    \ \ glue_path_read_text (sc);
 
     }
 

@@ -566,11 +566,50 @@ glue_path_getsize (s7_scheme* sc) {
   glue_define (sc, name, desc, f_path_getsize, 1, 0);
 }
 
+static s7_pointer f_path_read_text(s7_scheme* sc, s7_pointer args) {
+  const char* path = s7_string (s7_car (args));
+  if (!path) {
+    return s7_make_boolean(sc, false); // 路径无效
+  }
+
+  tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_RO);
+  if (file == tb_null) {
+    // TODO: warning on the tb_file_init failure
+    return s7_make_boolean(sc, false);
+  }
+
+  tb_file_sync (file);
+
+  tb_size_t size = tb_file_size(file);
+  if (size == 0) {
+    tb_file_exit (file);
+    return s7_make_string (sc, "");
+  }
+
+  tb_byte_t* buffer = new tb_byte_t[size + 1];
+  tb_size_t real_size = tb_file_read (file, buffer, size);
+  buffer[real_size] = '\0';
+
+  tb_file_exit(file);
+  std::string content (reinterpret_cast<char*>(buffer), real_size);
+  delete[] buffer;
+
+  return s7_make_string(sc, content.c_str());
+}
+
+inline void
+glue_path_read_text(s7_scheme* sc) {
+  const char* name = "g_path-read-text";
+  const char* desc = "(g_path-read-text path) => string, read the content of the file at the given path";
+  s7_define_function(sc, name, f_path_read_text, 1, 0, false, desc);
+}
+
 inline void
 glue_liii_path (s7_scheme* sc) {
   glue_isfile (sc);
   glue_isdir (sc);
   glue_path_getsize (sc);
+  glue_path_read_text (sc);
 }
 
 void
