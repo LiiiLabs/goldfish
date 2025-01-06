@@ -118,7 +118,7 @@
            (fast-string-list-append (reverse rst)))
           ((and quts? (char=? (string-ref s end) #\\))
            (let-values (((escaped-char new-end) (handle-escape-char s end len)))
-             (loop s new-end new-end (cons escaped-char rst) len quts? lst)))
+             (loop s bgn new-end (cons escaped-char rst) len quts? lst)))
           ((and quts? (not (char=? (string-ref s end) #\")))
            (loop s bgn (+ 1 end) rst len quts? lst))
           (else
