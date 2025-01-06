@@ -293,50 +293,72 @@
 (define s7-min min)
 
 (define (min2 x y)
-  (if (or (inexact? x) (inexact? y))
-      (inexact (s7-min x y))
-      (s7-min x y)))
+    (if (or (inexact? x) (inexact? y))
+        (inexact (s7-min x y))
+    (s7-min x y)))
 
-(define (min . args)
-  (cond
-    ((null? args) (error 'wrong-number-of-args "min requires at least one argument"))
-    ((null? (cdr args)) (car args))
-    ((null? (cddr args)) (min2 (car args) (cadr args)))
-    (else
-     (apply min (cons (min (car args) (cadr args)) (cddr args))))))
+(define (min x . xs)
+  (let loop ((current-min x) (remaining xs))
+    (if (null? remaining)
+        current-min
+        (loop (min2 current-min (car remaining))
+              (cdr remaining)))))
+
 
 (check (min 7) => 7)
+(check (min 3.5) => 3.5)
+(check (min 1/3) => 1/3)
+(check (min +inf.0) => +inf.0)
+(check (min -inf.0) => -inf.0)
+(check (nan? (min +nan.0)) => #t)
+
 (check (min 7 3) => 3)
-(check (min -1 0 1 7 -5 3) => -5)
-(check (min -5 -10 -7 -3) => -10)
 
 (check (min 3.0 7.0) => 3.0)
+
 (check (min 3 7.0) => 3.0)
-(check (min 3.0 7) => 3.0)
+(check (min 7.0 3) => 3.0)
 
-(check (min -3.0 -7.0) => -7.0)
-(check (min -3 -7.0) => -7.0)
-(check (min -3.0 -7) => -7.0)
-
-(check (min 3.0 7.0 9.0) => 3.0)
-(check (min 3 7.0 9) => 3.0)
-(check (min 3 7 9.0) => 3.0)
-(check (min 3 7.0 9.0) => 3.0)
+(check (min 1/2 1/3) => 1/3)
+(check (min 1/3 2/3) => 1/3)
 
 (check (min +inf.0 7) => 7.0)
-(check (min -inf.0 7) => -inf.0)
 (check (min 7 +inf.0) => 7.0)
+(check (min -inf.0 7) => -inf.0)
 (check (min 7 -inf.0) => -inf.0)
-(check (min +inf.0 -inf.0) => -inf.0)
 
-(check (min +inf.0 7 9) => 7.0)
-(check (min -inf.0 7 9.0) => -inf.0)
-(check (min 7 +inf.0 9) => 7.0)
-(check (min 7 -inf.0 9) => -inf.0)
-(check (min 7 9 +inf.0) => 7.0)
-(check (min 7 9.0 -inf.0) => -inf.0)
+(check (nan? (min +nan.0 7)) => #t)
+(check (nan? (min 7 +nan.0)) => #t)
 
-(check (min +inf.0 +inf.0 -inf.0) => -inf.0)
+(check (min 7 3 5) => 3)
+
+(check (min 3.0 7.0 2.0) => 2.0)
+
+(check (min 7 3.0 5) => 3.0)
+
+(check (min 1/2 1/3 2/3) => 1/3)
+
+(check (min +inf.0 7 3) => 3.0)
+(check (min -inf.0 7 3) => -inf.0)
+
+(check (nan? (min +nan.0 7 3)) => #t)
+(check (nan? (min 7 +nan.0 3)) => #t)
+(check (nan? (min +nan.0 +inf.0 -inf.0)) => #t)
+
+(check (min 7 3 5) => 3)
+
+(check (min 3.0 7.0 2.0) => 2.0)
+
+(check (min 7 3.0 5) => 3.0)
+
+(check (min 1/2 1/3 2/3) => 1/3)
+
+(check (min +inf.0 7 3) => 3.0)
+(check (min -inf.0 7 3) => -inf.0)
+
+(check (nan? (min +nan.0 7 3)) => #t)
+(check (nan? (min 7 +nan.0 3)) => #t)
+(check (nan? (min +nan.0 +inf.0 -inf.0)) => #t)
 
 (check-catch 'wrong-number-of-args (min))
 
