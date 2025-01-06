@@ -19,7 +19,7 @@
   make-path path-parts path-absolute?
   path->string
   path-dir? path-file? path-exists?
-  path-getsize path-read-text
+  path-getsize path-read-text path-write-text
 )
 (import (liii error) (liii vector) (liii string) (liii list))
 (begin
@@ -97,6 +97,13 @@
       (file-not-found-error
         (string-append "No such file or directory: '" path "'"))
       (g_path-read-text path))))
+
+(define path-write-text
+  (typed-lambda ((path string?) (content string?))
+    (if (not (file-exists? path))
+      (file-not-found-error
+        (string-append "No such file or directory: '" path "'"))
+      (g_path-write-text path content))))
 
 ) ; end of begin
 ) ; end of define-library
