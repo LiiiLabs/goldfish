@@ -280,30 +280,15 @@
 
 (check-catch 'wrong-number-of-args (max))
 
-(check-catch 'wrong-type-arg (max 1 "2" 3))
-(check-catch 'wrong-type-arg (max 1 #\a 3))
-(check-catch 'wrong-type-arg (max 1 'symbol 3))
+(check-catch 'type-error (max 1 "2" 3))
+(check-catch 'type-error (max 1 #\a 3))
+(check-catch 'type-error (max 1 'symbol 3))
 
-(check-catch 'wrong-type-arg (max #t #f))
-(check-catch 'wrong-type-arg (max 1 #t 3))
+(check-catch 'type-error (max #t #f))
+(check-catch 'type-error (max 1 #t 3))
 
-(check-catch 'wrong-type-arg (max 1 '(2) 3))
-(check-catch 'wrong-type-arg (max '(1 2 3) '(4 5 6)))
-
-(define s7-min min)
-
-(define (min2 x y)
-    (if (or (inexact? x) (inexact? y))
-        (inexact (s7-min x y))
-    (s7-min x y)))
-
-(define (min x . xs)
-  (let loop ((current-min x) (remaining xs))
-    (if (null? remaining)
-        current-min
-        (loop (min2 current-min (car remaining))
-              (cdr remaining)))))
-
+(check-catch 'type-error (max 1 '(2) 3))
+(check-catch 'type-error (max '(1 2 3) '(4 5 6)))
 
 (check (min 7) => 7)
 (check (min 3.5) => 3.5)
@@ -362,17 +347,17 @@
 
 (check-catch 'wrong-number-of-args (min))
 
-(check-catch 'wrong-type-arg (min 'hello 7))
+(check-catch 'type-error (min 'hello 7))
 
-(check-catch 'wrong-type-arg (min "world" 7))
+(check-catch 'type-error (min "world" 7))
 
-(check-catch 'wrong-type-arg (min #t 7))
-(check-catch 'wrong-type-arg (min #f 7))
+(check-catch 'type-error (min #t 7))
+(check-catch 'type-error (min #f 7))
 
-(check-catch 'wrong-type-arg (min '(1 3 5) 7))
-(check-catch 'wrong-type-arg (min '() 7))
+(check-catch 'type-error (min '(1 3 5) 7))
+(check-catch 'type-error (min '() 7))
 
-(check-catch 'wrong-type-arg (min 1+2i 2))
+(check-catch 'type-error (min 1+2i 2))
 
 (check (+ 1 2) => 3)
 (check (+ ) => 0)
