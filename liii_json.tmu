@@ -141,6 +141,8 @@
 
   <paragraph|json-string-escape>
 
+  下面的实现同样适用于输入字符串是UTF-8的情况。
+
   <\goldfish-chunk|json/liii/json.scm|true|true>
     (define (json-string-escape str)
 
@@ -199,17 +201,67 @@
 
   <paragraph|string-\<gtr\>json>
 
+  <subparagraph|测试>
+
   <\goldfish-chunk|json/tests/json-test.scm|true|true>
     (check (string-\<gtr\>json "{\\"age\\":18}") =\<gtr\> `(("age" . 18)))
 
     (check (string-\<gtr\>json "{age:18}") =\<gtr\> `((age . 18)))
 
-    \;
-
     (check (string-\<gtr\>json "{\\"name\\":\\"中文\\"}") =\<gtr\> `(("name" . "中文")))\ 
 
     \;
   </goldfish-chunk>
+
+  <\session|python|default>
+    <\unfolded-io>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|unfolded-io>
+      json.loads("{\\"name\\":\\"中文\\"}")
+    <|unfolded-io>
+      {'name': '\<less\>#4E2D\<gtr\>\<less\>#6587\<gtr\>'}
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\<gtr\>\<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  测试边界情况
+
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
+    (check (string-\<gtr\>json "\\"\\"") =\<gtr\> "")
+
+    \;
+  </goldfish-chunk>
+
+  测试转义字符
+
+  <\goldfish-chunk|json/tests/json-test.scm|true|true>
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\nBob\\"}") =\<gtr\> '(("name" . "Alice\\nBob")))
+
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\tBob\\"}") =\<gtr\> '(("name" . "Alice\\tBob")))
+
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\rBob\\"}") =\<gtr\> '(("name" . "Alice\\rBob")))
+
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\bBob\\"}") =\<gtr\> '(("name" . "Alice\\bBob")))
+
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\fBob\\"}") =\<gtr\> '(("name" . "Alice\\fBob")))
+
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\\\\\Bob\\"}") =\<gtr\> '(("name" . "Alice\\\\Bob")))
+
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\\\/Bob\\"}") =\<gtr\> '(("name" . "Alice/Bob")))
+
+    (check (string-\<gtr\>json "{\\"name\\":\\"Alice\\\\\\"Bob\\"}") =\<gtr\> '(("name" . "Alice\\"Bob")))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <subparagraph|实现>
 
   <\scm-chunk|json/liii/json.scm|true|true>
     (define (loose-car pair-or-empty)
@@ -286,6 +338,52 @@
 
     \;
 
+    (define (handle-escape-char s end len)
+
+    \ \ (let ((next-char (if (\<less\> (+ end 1) len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-ref s (+ end 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #f)))
+
+    \ \ \ \ (case next-char
+
+    \ \ \ \ \ \ ((#\\")
+
+    \ \ \ \ \ \ \ (values "\\"" (+ end 2)))
+
+    \ \ \ \ \ \ ((#\\\\)
+
+    \ \ \ \ \ \ \ (values "\\\\" (+ end 2)))
+
+    \ \ \ \ \ \ ((#\\/)
+
+    \ \ \ \ \ \ \ (values "/" (+ end 2)))
+
+    \ \ \ \ \ \ ((#\\b)
+
+    \ \ \ \ \ \ \ (values "\\b" (+ end 2)))
+
+    \ \ \ \ \ \ ((#\\f)
+
+    \ \ \ \ \ \ \ (values "\\f" (+ end 2)))
+
+    \ \ \ \ \ \ ((#\\n)
+
+    \ \ \ \ \ \ \ (values "\\n" (+ end 2)))
+
+    \ \ \ \ \ \ ((#\\r)
+
+    \ \ \ \ \ \ \ (values "\\r" (+ end 2)))
+
+    \ \ \ \ \ \ ((#\\t)
+
+    \ \ \ \ \ \ \ (values "\\t" (+ end 2)))
+
+    \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ (values (string (string-ref s end) next-char) (+ end 2))))))
+
     \;
 
     (define string-\<gtr\>json
@@ -294,93 +392,103 @@
 
     \ \ \ \ (read (open-input-string
 
-    \ \ \ \ \ \ (let l
+    \ \ \ \ \ \ (let loop
 
-    \ \ \ \ \ \ \ \ ((s s)(bgn 0)(end 0)(rst '())(len (string-length s))(quts? #f)(lst '(#t)))
+    \ \ \ \ \ \ \ \ ((s s) (bgn 0) (end 0) (rst '()) (len (string-length s)) (quts? #f) (lst '(#t)))
 
     \ \ \ \ \ \ \ \ (cond
 
+    \ \ \ \ \ \ \ \ \ \ ((and (= len 2) (string=? s "\\"\\""))
+
+    \ \ \ \ \ \ \ \ \ \ \ "\\"\\"")
+
     \ \ \ \ \ \ \ \ \ \ ((= end len)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (fast-string-list-append (reverse rst)))
+    \ \ \ \ \ \ \ \ \ \ \ (fast-string-list-append (reverse rst)))
+
+    \ \ \ \ \ \ \ \ \ \ ((and quts? (char=? (string-ref s end) #\\\\))
+
+    \ \ \ \ \ \ \ \ \ \ \ (let-values (((escaped-char new-end) (handle-escape-char s end len)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s bgn new-end rst len quts? lst)))
 
     \ \ \ \ \ \ \ \ \ \ ((and quts? (not (char=? (string-ref s end) #\\")))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (l s bgn (+ 1 end) rst len quts? lst))
+    \ \ \ \ \ \ \ \ \ \ \ (loop s bgn (+ 1 end) rst len quts? lst))
 
     \ \ \ \ \ \ \ \ \ \ (else
 
     \ \ \ \ \ \ \ \ \ \ \ \ (case (string-ref s end)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((#\\{)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\\{)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s (+ 1 end) (+ 1 end)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s (+ 1 end) (+ 1 end)\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) "((" ) rst) len quts? (cons #t lst)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) "((" ) rst) len quts? (cons #t lst)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((#\\})
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\\})
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s (+ 1 end) (+ 1 end)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s (+ 1 end) (+ 1 end)\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) "))") rst) len quts? (loose-cdr lst)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) "))") rst) len quts? (loose-cdr lst)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((#\\[)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\\[)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s (+ 1 end) (+ 1 end)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s (+ 1 end) (+ 1 end)\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) "#(") rst) len quts? (cons #f lst)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) "#(") rst) len quts? (cons #f lst)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((#\\])
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\\])
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s (+ 1 end) (+ 1 end)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s (+ 1 end) (+ 1 end)\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) ")") rst) len quts? (loose-cdr lst)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) ")") rst) len quts? (loose-cdr lst)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((#\\:)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\\:)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s (+ 1 end) (+ 1 end)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s (+ 1 end) (+ 1 end)\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) " . ") rst) len quts? lst))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end) " . ") rst) len quts? lst))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((#\\,)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\\,)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s (+ 1 end) (+ 1 end)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s (+ 1 end) (+ 1 end)\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end)\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s bgn end)\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (loose-car lst) ")(" " ")) rst) len quts? lst))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (loose-car lst) ")(" " ")) rst) len quts? lst))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((#\\")
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\\")
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s bgn (+ 1 end) rst len (not quts?) lst))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s bgn (+ 1 end) rst len (not quts?) lst))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l s bgn (+ 1 end) rst len quts? lst))))))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s bgn (+ 1 end) rst len quts? lst))))))))))
 
     \;
   </scm-chunk>
@@ -416,7 +524,7 @@
 
     \ \ \ \ \ \ (lambda (x)
 
-    \ \ \ \ \ \ \ \ (if (= x 0) "" ",")))
+    \ \ \ \ \ \ \ \ (if (zero? x) "" ",")))
 
     \ \ \ \ (let l ((lst lst)(x (if (vector? lst) "[" "{")))
 
@@ -450,7 +558,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ (string-append x "\\"" (caar lst) "\\":"
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cond\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cond
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((list? k)(l k "{"))
 
