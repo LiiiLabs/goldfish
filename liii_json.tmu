@@ -408,7 +408,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ (let-values (((escaped-char new-end) (handle-escape-char s end len)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s bgn new-end (cons escaped-char rst) len quts? lst)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (loop s bgn new-end rst len quts? lst)))
 
     \ \ \ \ \ \ \ \ \ \ ((and quts? (not (char=? (string-ref s end) #\\")))
 
