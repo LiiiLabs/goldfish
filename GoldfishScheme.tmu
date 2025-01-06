@@ -266,7 +266,7 @@
 
     \ \ ; R7RS 6.2: Numbers
 
-    \ \ square exact inexact floor s7-floor ceiling s7-ceiling truncate s7-truncate
+    \ \ square exact inexact max min floor s7-floor ceiling s7-ceiling truncate s7-truncate
 
     \ \ round s7-round floor-quotient gcd lcm s7-lcm boolean=?
 
@@ -340,7 +340,7 @@
 
     \ \ ; R7RS 6.2: Numbers
 
-    \ \ square exact inexact floor s7-floor ceiling s7-ceiling truncate s7-truncate
+    \ \ square exact inexact max min floor s7-floor ceiling s7-ceiling truncate s7-truncate
 
     \ \ round s7-round floor-quotient gcd lcm s7-lcm
 
@@ -1427,6 +1427,42 @@
 
   <value|r7rs><paragraph|max>
 
+  max是求一个或者多个实数的最大值，如果参数中存在不精确值，那么返回结果也是不精确的，否则，返回结果是精确的。
+
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
+    (define s7-max max)
+
+    \;
+
+    (define (max2 x y)
+
+    \ \ (when (or (not (real? x)) (not (real? y)))
+
+    \ \ \ \ (error 'type-error "max: parameter must be real number"))
+
+    \ \ (if (or (inexact? x) (inexact? y))
+
+    \ \ \ \ \ \ (inexact (s7-max x y))
+
+    \ \ \ \ \ \ (s7-max x y)))
+
+    \;
+
+    (define (max x . xs)
+
+    \ \ (let loop ((current-max x) (remaining xs))
+
+    \ \ \ \ (if (null? remaining)
+
+    \ \ \ \ \ \ \ \ current-max
+
+    \ \ \ \ \ \ \ \ (loop (max2 current-max (car remaining))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr remaining)))))
+
+    \;
+  </scm-chunk>
+
   测试 max 函数的基本功能 一个参数 两个参数 三个参数
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
@@ -1460,11 +1496,11 @@
   测试 max 函数在参数类型不正确时的情况
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check-catch 'wrong-type-arg (max 1 "2" 3))
+    (check-catch 'type-error (max 1 "2" 3))
 
-    (check-catch 'wrong-type-arg (max 1 #\\a 3))
+    (check-catch 'type-error (max 1 #\\a 3))
 
-    (check-catch 'wrong-type-arg (max 1 'symbol 3))
+    (check-catch 'type-error (max 1 'symbol 3))
 
     \;
   </scm-chunk>
@@ -1472,9 +1508,9 @@
   测试 max 函数在参数为布尔值时的情况
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check-catch 'wrong-type-arg (max #t #f))
+    (check-catch 'type-error (max #t #f))
 
-    (check-catch 'wrong-type-arg (max 1 #t 3))
+    (check-catch 'type-error (max 1 #t 3))
 
     \;
   </scm-chunk>
@@ -1482,29 +1518,33 @@
   测试 max 函数在参数为列表时的情况
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check-catch 'wrong-type-arg (max 1 '(2) 3))
+    (check-catch 'type-error (max 1 '(2) 3))
 
-    (check-catch 'wrong-type-arg (max '(1 2 3) '(4 5 6)))
+    (check-catch 'type-error (max '(1 2 3) '(4 5 6)))
 
     \;
   </scm-chunk>
 
   <value|r7rs><paragraph|min>
 
-  min 是求一个或者多个实数的最小值，如果参数中存在不精确值，那么返回结果也是不精确的，否则，返回结果是精确的。
+  min是求一个或者多个实数的最小值，如果参数中存在不精确值，那么返回结果也是不精确的，否则，返回结果是精确的。
 
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+  <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define s7-min min)
 
     \;
 
     (define (min2 x y)
 
-    \ \ \ \ (if (or (inexact? x) (inexact? y))
+    \ \ (when (or (not (real? x)) (not (real? y)))
 
-    \ \ \ \ \ \ \ \ (inexact (s7-min x y))
+    \ \ \ \ (error 'type-error "min: parameter must be real number"))
 
-    \ \ \ \ (s7-min x y)))
+    \ \ (if (or (inexact? x) (inexact? y))
+
+    \ \ \ \ \ \ (inexact (s7-min x y))
+
+    \ \ \ \ \ \ (s7-min x y)))
 
     \;
 
@@ -1519,8 +1559,6 @@
     \ \ \ \ \ \ \ \ (loop (min2 current-min (car remaining))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr remaining)))))
-
-    \;
 
     \;
   </scm-chunk>
@@ -1662,27 +1700,27 @@
 
     \;
 
-    (check-catch 'wrong-type-arg (min 'hello 7))
+    (check-catch 'type-error (min 'hello 7))
 
     \;
 
-    (check-catch 'wrong-type-arg (min "world" 7))
+    (check-catch 'type-error (min "world" 7))
 
     \;
 
-    (check-catch 'wrong-type-arg (min #t 7))
+    (check-catch 'type-error (min #t 7))
 
-    (check-catch 'wrong-type-arg (min #f 7))
-
-    \;
-
-    (check-catch 'wrong-type-arg (min '(1 3 5) 7))
-
-    (check-catch 'wrong-type-arg (min '() 7))
+    (check-catch 'type-error (min #f 7))
 
     \;
 
-    (check-catch 'wrong-type-arg (min 1+2i 2))
+    (check-catch 'type-error (min '(1 3 5) 7))
+
+    (check-catch 'type-error (min '() 7))
+
+    \;
+
+    (check-catch 'type-error (min 1+2i 2))
 
     \;
   </scm-chunk>
