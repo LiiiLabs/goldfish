@@ -315,11 +315,14 @@ static s7_pointer
 f_access (s7_scheme* sc, s7_pointer args) {
   const char* path_c= s7_string (s7_car (args));
   int         mode  = s7_integer ((s7_cadr (args)));
-#ifdef TB_CONFIG_OS_WINDOWS
-  bool ret= (_access (path_c, mode) == 0);
-#else
-  bool           ret= (access (path_c, mode) == 0);
-#endif
+  bool ret= false;
+  if (mode == 0) {
+    tb_file_info_t info;
+    ret= tb_file_info (path_c, &info);
+  } else {
+    ret= tb_file_access (path_c, mode);
+  }
+  
   return s7_make_boolean (sc, ret);
 }
 
@@ -566,11 +569,96 @@ glue_path_getsize (s7_scheme* sc) {
   glue_define (sc, name, desc, f_path_getsize, 1, 0);
 }
 
+static s7_pointer f_path_read_text(s7_scheme* sc, s7_pointer args) {
+  const char* path = s7_string (s7_car (args));
+  if (!path) {
+    return s7_make_boolean(sc, false);
+  }
+
+  tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_RO);
+  if (file == tb_null) {
+    // TODO: warning on the tb_file_init failure
+    return s7_make_boolean(sc, false);
+  }
+
+  tb_file_sync (file);
+
+  tb_size_t size = tb_file_size(file);
+  if (size == 0) {
+    tb_file_exit (file);
+    return s7_make_string (sc, "");
+  }
+
+  tb_byte_t* buffer = new tb_byte_t[size + 1];
+  tb_size_t real_size = tb_file_read (file, buffer, size);
+  buffer[real_size] = '\0';
+
+  tb_file_exit(file);
+  std::string content (reinterpret_cast<char*>(buffer), real_size);
+  delete[] buffer;
+
+  return s7_make_string(sc, content.c_str());
+}
+
+inline void
+glue_path_read_text(s7_scheme* sc) {
+  const char* name = "g_path-read-text";
+  const char* desc = "(g_path-read-text path) => string, read the content of the file at the given path";
+  s7_define_function(sc, name, f_path_read_text, 1, 0, false, desc);
+}
+
+static s7_pointer
+f_path_write_text (s7_scheme* sc, s7_pointer args) {
+  const char* path = s7_string (s7_car (args));
+  if (!path) {
+    return s7_make_integer(sc, -1);
+  }
+
+  const char* content= s7_string (s7_cadr (args));
+  if (!content) {
+    return s7_make_integer(sc, -1);
+  }
+
+  tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_WO | TB_FILE_MODE_CREAT | TB_FILE_MODE_TRUNC);
+  if (file == tb_null) {
+    return s7_make_integer(sc, -1);
+  }
+
+  tb_filelock_ref_t lock = tb_filelock_init(file);
+  if (tb_filelock_enter(lock, TB_FILELOCK_MODE_EX) == tb_false) {
+    tb_filelock_exit(lock);
+    tb_file_exit(file);
+    return s7_make_integer(sc, -1);
+  }
+
+  tb_size_t content_size= strlen(content);
+  tb_size_t written_size= tb_file_writ(file, reinterpret_cast<const tb_byte_t*>(content), content_size);
+
+  bool release_success= tb_filelock_leave (lock);
+  tb_filelock_exit (lock);
+  bool exit_success= tb_file_exit(file);
+
+  if (written_size == content_size && release_success && exit_success) {
+    return s7_make_integer(sc, written_size);
+  } else {
+    return s7_make_integer(sc, -1);
+  }
+}
+
+inline void glue_path_write_text(s7_scheme* sc) {
+  const char* name = "g_path-write-text";
+  const char* desc = "(g_path-write-text path content) => integer,\
+write content to the file at the given path and return the number of bytes written, or -1 on failure";
+  s7_define_function(sc, name, f_path_write_text, 2, 0, false, desc);
+}
+
 inline void
 glue_liii_path (s7_scheme* sc) {
   glue_isfile (sc);
   glue_isdir (sc);
   glue_path_getsize (sc);
+  glue_path_read_text (sc);
+  glue_path_write_text (sc);
 }
 
 void

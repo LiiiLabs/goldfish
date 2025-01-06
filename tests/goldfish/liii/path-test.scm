@@ -54,5 +54,13 @@
   (check-true (> (path-getsize "C:/Windows") 0))
   (check-true (> (path-getsize "C:\\Windows\\System32\\drivers\\etc\\hosts") 0)))
 
+(let ((file-name "中文文件名.txt")
+      (file-content "你好，世界！"))
+  (define temp-dir (os-temp-dir))
+  (define file-path (string-append temp-dir (string (os-sep)) file-name))
+  (path-write-text file-path file-content)
+  (check (path-read-text file-path) => file-content)
+  (delete-file file-path))
+
 (check-report)
 

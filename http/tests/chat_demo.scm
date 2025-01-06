@@ -5,17 +5,11 @@
         (liii json)
         (liii list)
         (liii os)
-        (liii string))
+        (liii string)
+        (liii path))
 
-;; 定义一个函数来读取文件内容并移除行末的回车符
 (define (read-and-clean-file file-path)
-  (call-with-input-file file-path
-    (lambda (port)
-      (let loop ((line (read-line port))
-                 (content ""))
-        (if (eof-object? line)
-            (string-trim-right content #\newline) ; 移除行末的回车符
-            (loop (read-line port) (string-append content line)))))))
+  (string-trim-right (path-read-text file-path) #\newline))
 
 (define (load-silicon-cloud-api-key)
   (let* ((home (if (os-windows?)
