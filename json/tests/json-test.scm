@@ -19,7 +19,7 @@
 (import (liii check)
         (liii json))
 
-(check-set-mode! 'report-failed)
+;(check-set-mode! 'report-failed)
 
 (check (json-string-escape "hello") => "\"hello\"")
 (check (json-string-escape "hello\"world") => "\"hello\\\"world\"")
@@ -33,8 +33,18 @@
 
 (check (string->json "{\"age\":18}") => `(("age" . 18)))
 (check (string->json "{age:18}") => `((age . 18)))
-
 (check (string->json "{\"name\":\"中文\"}") => `(("name" . "中文"))) 
+
+(check (string->json "\"\"") => "")
+
+(check (string->json "{\"name\":\"Alice\\nBob\"}") => '(("name" . "Alice\nBob")))
+(check (string->json "{\"name\":\"Alice\\tBob\"}") => '(("name" . "Alice\tBob")))
+(check (string->json "{\"name\":\"Alice\\rBob\"}") => '(("name" . "Alice\rBob")))
+(check (string->json "{\"name\":\"Alice\\bBob\"}") => '(("name" . "Alice\bBob")))
+(check (string->json "{\"name\":\"Alice\\fBob\"}") => '(("name" . "Alice\fBob")))
+(check (string->json "{\"name\":\"Alice\\\\Bob\"}") => '(("name" . "Alice\\Bob")))
+(check (string->json "{\"name\":\"Alice\\\/Bob\"}") => '(("name" . "Alice/Bob")))
+(check (string->json "{\"name\":\"Alice\\\"Bob\"}") => '(("name" . "Alice\"Bob")))
 
 (check (json->string '(("age" . 18))) => "{\"age\":18}")
 (check (json->string #(0 1 2 3)) => "[0,1,2,3]")

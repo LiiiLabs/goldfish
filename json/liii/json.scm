@@ -82,54 +82,82 @@
                    (inner (+ i 1))))))
         (outer (cdr rest)))))))
 
+(define (handle-escape-char s end len)
+  (let ((next-char (if (< (+ end 1) len)
+                       (string-ref s (+ end 1))
+                       #f)))
+    (case next-char
+      ((#\")
+       (values "\"" (+ end 2)))
+      ((#\\)
+       (values "\\" (+ end 2)))
+      ((#\/)
+       (values "/" (+ end 2)))
+      ((#\b)
+       (values "\b" (+ end 2)))
+      ((#\f)
+       (values "\f" (+ end 2)))
+      ((#\n)
+       (values "\n" (+ end 2)))
+      ((#\r)
+       (values "\r" (+ end 2)))
+      ((#\t)
+       (values "\t" (+ end 2)))
+      (else
+       (values (string (string-ref s end) next-char) (+ end 2))))))
 
 (define string->json
   (lambda (s)
     (read (open-input-string
-      (let l
-        ((s s)(bgn 0)(end 0)(rst '())(len (string-length s))(quts? #f)(lst '(#t)))
+      (let loop
+        ((s s) (bgn 0) (end 0) (rst '()) (len (string-length s)) (quts? #f) (lst '(#t)))
         (cond
+          ((and (= len 2) (string=? s "\"\""))
+           "\"\"")
           ((= end len)
-            (fast-string-list-append (reverse rst)))
+           (fast-string-list-append (reverse rst)))
+          ((and quts? (char=? (string-ref s end) #\\))
+           (let-values (((escaped-char new-end) (handle-escape-char s end len)))
+             (loop s new-end new-end (cons escaped-char rst) len quts? lst)))
           ((and quts? (not (char=? (string-ref s end) #\")))
-            (l s bgn (+ 1 end) rst len quts? lst))
+           (loop s bgn (+ 1 end) rst len quts? lst))
           (else
             (case (string-ref s end)
-            ((#\{)
-              (l s (+ 1 end) (+ 1 end) 
-                (cons 
-                  (string-append 
-                    (substring s bgn end) "((" ) rst) len quts? (cons #t lst)))
-            ((#\})
-              (l s (+ 1 end) (+ 1 end) 
-                (cons 
-                  (string-append 
-                    (substring s bgn end) "))") rst) len quts? (loose-cdr lst)))
-            ((#\[)
-              (l s (+ 1 end) (+ 1 end) 
-                (cons
-                  (string-append 
-                    (substring s bgn end) "#(") rst) len quts? (cons #f lst)))
-            ((#\])
-              (l s (+ 1 end) (+ 1 end) 
-                (cons 
-                  (string-append 
-                    (substring s bgn end) ")") rst) len quts? (loose-cdr lst)))
-            ((#\:)
-              (l s (+ 1 end) (+ 1 end) 
-                (cons 
-                  (string-append 
-                    (substring s bgn end) " . ") rst) len quts? lst))
-            ((#\,)
-              (l s (+ 1 end) (+ 1 end) 
-                (cons 
-                  (string-append 
-                    (substring s bgn end) 
-                    (if (loose-car lst) ")(" " ")) rst) len quts? lst))
-            ((#\")
-              (l s bgn (+ 1 end) rst len (not quts?) lst))
-            (else
-              (l s bgn (+ 1 end) rst len quts? lst))))))))))
+              ((#\{)
+               (loop s (+ 1 end) (+ 1 end) 
+                 (cons 
+                   (string-append 
+                     (substring s bgn end) "((" ) rst) len quts? (cons #t lst)))
+              ((#\})
+               (loop s (+ 1 end) (+ 1 end) 
+                 (cons 
+                   (string-append 
+                     (substring s bgn end) "))") rst) len quts? (loose-cdr lst)))
+              ((#\[)
+               (loop s (+ 1 end) (+ 1 end) 
+                  (cons
+                    (string-append 
+                      (substring s bgn end) "#(") rst) len quts? (cons #f lst)))
+              ((#\])
+               (loop s (+ 1 end) (+ 1 end) 
+                 (cons 
+                   (string-append 
+                     (substring s bgn end) ")") rst) len quts? (loose-cdr lst)))
+              ((#\:)
+               (loop s (+ 1 end) (+ 1 end) 
+                 (cons 
+                   (string-append 
+                     (substring s bgn end) " . ") rst) len quts? lst))
+              ((#\,)
+               (loop s (+ 1 end) (+ 1 end) 
+                 (cons 
+                   (string-append 
+                     (substring s bgn end) 
+                     (if (loose-car lst) ")(" " ")) rst) len quts? lst))
+              ((#\")
+               (loop s bgn (+ 1 end) rst len (not quts?) lst))
+              (else
+               (loop s bgn (+ 1 end) rst len quts? lst))))))))))
 
 (define json->string
   (lambda (lst)
