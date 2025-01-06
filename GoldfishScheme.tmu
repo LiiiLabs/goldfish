@@ -1500,21 +1500,11 @@
 
     (define (min2 x y)
 
-    \ \ (cond
+    \ \ (if (or (inexact? x) (inexact? y))
 
-    \ \ \ \ ((and (inexact? x) (exact? y))
+    \ \ \ \ \ \ (inexact (s7-min x y))
 
-    \ \ \ \ \ (inexact (s7-min x y)))
-
-    \ \ \ \ ((and (exact? x) (inexact? y))
-
-    \ \ \ \ \ (inexact (s7-min x y)))
-
-    \ \ \ \ ((and (inexact? x) (inexact? y))
-
-    \ \ \ \ \ (inexact (s7-min x y)))
-
-    \ \ \ \ (else (s7-min x y))))
+    \ \ \ \ \ \ (s7-min x y)))
 
     \;
 

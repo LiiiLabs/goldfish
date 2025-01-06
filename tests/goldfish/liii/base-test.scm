@@ -293,14 +293,9 @@
 (define s7-min min)
 
 (define (min2 x y)
-  (cond
-    ((and (inexact? x) (exact? y))
-     (inexact (s7-min x y)))
-    ((and (exact? x) (inexact? y))
-     (inexact (s7-min x y)))
-    ((and (inexact? x) (inexact? y))
-     (inexact (s7-min x y)))
-    (else (s7-min x y))))
+  (if (or (inexact? x) (inexact? y))
+      (inexact (s7-min x y))
+      (s7-min x y)))
 
 (define (min . args)
   (cond
