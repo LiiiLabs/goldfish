@@ -290,13 +290,75 @@
 (check-catch 'wrong-type-arg (max 1 '(2) 3))
 (check-catch 'wrong-type-arg (max '(1 2 3) '(4 5 6)))
 
-(check (min 7) => 7)
-(check (min 7 3) => 3)
-(check (min -1 0 1 7 -5 3) => -5)
-(check (min -5 -10 -7 -3) => -10)
+(define s7-min min)
 
-(check (min +inf.0 7) => 7)
+(define (min2 x y)
+    (if (or (inexact? x) (inexact? y))
+        (inexact (s7-min x y))
+    (s7-min x y)))
+
+(define (min x . xs)
+  (let loop ((current-min x) (remaining xs))
+    (if (null? remaining)
+        current-min
+        (loop (min2 current-min (car remaining))
+              (cdr remaining)))))
+
+
+(check (min 7) => 7)
+(check (min 3.5) => 3.5)
+(check (min 1/3) => 1/3)
+(check (min +inf.0) => +inf.0)
+(check (min -inf.0) => -inf.0)
+(check (nan? (min +nan.0)) => #t)
+
+(check (min 7 3) => 3)
+
+(check (min 3.0 7.0) => 3.0)
+
+(check (min 3 7.0) => 3.0)
+(check (min 7.0 3) => 3.0)
+
+(check (min 1/2 1/3) => 1/3)
+(check (min 1/3 2/3) => 1/3)
+
+(check (min +inf.0 7) => 7.0)
+(check (min 7 +inf.0) => 7.0)
 (check (min -inf.0 7) => -inf.0)
+(check (min 7 -inf.0) => -inf.0)
+
+(check (nan? (min +nan.0 7)) => #t)
+(check (nan? (min 7 +nan.0)) => #t)
+
+(check (min 7 3 5) => 3)
+
+(check (min 3.0 7.0 2.0) => 2.0)
+
+(check (min 7 3.0 5) => 3.0)
+
+(check (min 1/2 1/3 2/3) => 1/3)
+
+(check (min +inf.0 7 3) => 3.0)
+(check (min -inf.0 7 3) => -inf.0)
+
+(check (nan? (min +nan.0 7 3)) => #t)
+(check (nan? (min 7 +nan.0 3)) => #t)
+(check (nan? (min +nan.0 +inf.0 -inf.0)) => #t)
+
+(check (min 7 3 5) => 3)
+
+(check (min 3.0 7.0 2.0) => 2.0)
+
+(check (min 7 3.0 5) => 3.0)
+
+(check (min 1/2 1/3 2/3) => 1/3)
+
+(check (min +inf.0 7 3) => 3.0)
+(check (min -inf.0 7 3) => -inf.0)
+
+(check (nan? (min +nan.0 7 3)) => #t)
+(check (nan? (min 7 +nan.0 3)) => #t)
+(check (nan? (min +nan.0 +inf.0 -inf.0)) => #t)
 
 (check-catch 'wrong-number-of-args (min))
 

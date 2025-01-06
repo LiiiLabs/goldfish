@@ -1491,31 +1491,169 @@
 
   <value|r7rs><paragraph|min>
 
-  测试 min 函数基本功能。单个实参：正数；两个实参：正数；多个实参：有负数、有正数，全为负数。
+  min 是求一个或者多个实数的最小值，如果参数中存在不精确值，那么返回结果也是不精确的，否则，返回结果是精确的。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (min 7) =\<gtr\> 7)
+    (define s7-min min)
 
-    (check (min 7 3) =\<gtr\> 3)
+    \;
 
-    (check (min -1 0 1 7 -5 3) =\<gtr\> -5)
+    (define (min2 x y)
 
-    (check (min -5 -10 -7 -3) =\<gtr\> -10)
+    \ \ \ \ (if (or (inexact? x) (inexact? y))
+
+    \ \ \ \ \ \ \ \ (inexact (s7-min x y))
+
+    \ \ \ \ (s7-min x y)))
+
+    \;
+
+    (define (min x . xs)
+
+    \ \ (let loop ((current-min x) (remaining xs))
+
+    \ \ \ \ (if (null? remaining)
+
+    \ \ \ \ \ \ \ \ current-min
+
+    \ \ \ \ \ \ \ \ (loop (min2 current-min (car remaining))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr remaining)))))
+
+    \;
 
     \;
   </scm-chunk>
 
-  测试 min 函数边界情况。
+  测试 min 函数基本功能。整数，浮点数，有理数，无穷大，NaN。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (min +inf.0 7) =\<gtr\> 7)
+    (check (min 7) =\<gtr\> 7)
 
-    (check (min -inf.0 7) =\<gtr\> -inf.0)
+    (check (min 3.5) =\<gtr\> 3.5)
+
+    (check (min 1/3) =\<gtr\> 1/3)
+
+    (check (min +inf.0) =\<gtr\> +inf.0)
+
+    (check (min -inf.0) =\<gtr\> -inf.0)
+
+    (check (nan? (min +nan.0)) =\<gtr\> #t)
 
     \;
   </scm-chunk>
 
   \;
+
+  测试 min 函数两个参数情况。整数，浮点数，整数与浮点数，有理数，无穷大，NaN。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (min 7 3) =\<gtr\> 3)
+
+    \;
+
+    (check (min 3.0 7.0) =\<gtr\> 3.0)
+
+    \;
+
+    (check (min 3 7.0) =\<gtr\> 3.0)
+
+    (check (min 7.0 3) =\<gtr\> 3.0)
+
+    \;
+
+    (check (min 1/2 1/3) =\<gtr\> 1/3)
+
+    (check (min 1/3 2/3) =\<gtr\> 1/3)
+
+    \;
+
+    (check (min +inf.0 7) =\<gtr\> 7.0)
+
+    (check (min 7 +inf.0) =\<gtr\> 7.0)
+
+    (check (min -inf.0 7) =\<gtr\> -inf.0)
+
+    (check (min 7 -inf.0) =\<gtr\> -inf.0)
+
+    \;
+
+    (check (nan? (min +nan.0 7)) =\<gtr\> #t)
+
+    (check (nan? (min 7 +nan.0)) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  测试 min 函数多参数情况。整数，浮点数，整数与浮点数，有理数，无穷大，NaN。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (min 7 3 5) =\<gtr\> 3)
+
+    \;
+
+    (check (min 3.0 7.0 2.0) =\<gtr\> 2.0)
+
+    \;
+
+    (check (min 7 3.0 5) =\<gtr\> 3.0)
+
+    \;
+
+    (check (min 1/2 1/3 2/3) =\<gtr\> 1/3)
+
+    \;
+
+    (check (min +inf.0 7 3) =\<gtr\> 3.0)
+
+    (check (min -inf.0 7 3) =\<gtr\> -inf.0)
+
+    \;
+
+    (check (nan? (min +nan.0 7 3)) =\<gtr\> #t)
+
+    (check (nan? (min 7 +nan.0 3)) =\<gtr\> #t)
+
+    (check (nan? (min +nan.0 +inf.0 -inf.0)) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
+
+  测试 min 函数混合参数情况。整数，浮点数，整数与浮点数，有理数，无穷大，NaN。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (min 7 3 5) =\<gtr\> 3)
+
+    \;
+
+    (check (min 3.0 7.0 2.0) =\<gtr\> 2.0)
+
+    \;
+
+    (check (min 7 3.0 5) =\<gtr\> 3.0)
+
+    \;
+
+    (check (min 1/2 1/3 2/3) =\<gtr\> 1/3)
+
+    \;
+
+    (check (min +inf.0 7 3) =\<gtr\> 3.0)
+
+    (check (min -inf.0 7 3) =\<gtr\> -inf.0)
+
+    \;
+
+    (check (nan? (min +nan.0 7 3)) =\<gtr\> #t)
+
+    (check (nan? (min 7 +nan.0 3)) =\<gtr\> #t)
+
+    (check (nan? (min +nan.0 +inf.0 -inf.0)) =\<gtr\> #t)
+
+    \;
+  </scm-chunk>
 
   测试 min 函数异常及错误情况。无实参；符号；字符串；布尔；列表；复数。
 
