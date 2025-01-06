@@ -130,7 +130,7 @@
                      (substring s bgn end) "((" ) rst) len quts? (cons #t lst)))
               ((#\})
                (loop s (+ 1 end) (+ 1 end) 
-                 (cons 
+                 (cons
                    (string-append 
                      (substring s bgn end) "))") rst) len quts? (loose-cdr lst)))
               ((#\[)
