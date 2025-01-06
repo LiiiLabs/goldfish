@@ -1868,7 +1868,7 @@
   </goldfish-chunk>
 
   <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
-    (when (os-linux?)
+    (when (and (os-linux?) (not (string=? "root" (getlogin))))
 
     \ \ (check-true (access "/root" 'F_OK))
 

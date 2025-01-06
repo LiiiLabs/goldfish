@@ -37,7 +37,7 @@
     (let ((t2 (current-second)))
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
-(when (os-linux?)
+(when (and (os-linux?) (not (string=? "root" (getlogin))))
   (check-true (access "/root" 'F_OK))
   (check-false (access "/root" 'R_OK))
   (check-false (access "/root" 'W_OK))
