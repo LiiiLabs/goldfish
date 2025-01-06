@@ -315,11 +315,14 @@ static s7_pointer
 f_access (s7_scheme* sc, s7_pointer args) {
   const char* path_c= s7_string (s7_car (args));
   int         mode  = s7_integer ((s7_cadr (args)));
-#ifdef TB_CONFIG_OS_WINDOWS
-  bool ret= (_access (path_c, mode) == 0);
-#else
-  bool           ret= (access (path_c, mode) == 0);
-#endif
+  bool ret= false;
+  if (mode == 0) {
+    tb_file_info_t info;
+    ret= tb_file_info (path_c, &info);
+  } else {
+    ret= tb_file_access (path_c, mode);
+  }
+  
   return s7_make_boolean (sc, ret);
 }
 

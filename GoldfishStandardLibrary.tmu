@@ -250,7 +250,7 @@
 
     \ \ \ \ \ \ #f
 
-    \ \ \ \ \ \ (if (g_access path 4) ; R_OK
+    \ \ \ \ \ \ (if (g_access path 1) ; R_OK
 
     \ \ \ \ \ \ \ \ \ \ #t
 
@@ -1856,16 +1856,30 @@
 
     \ \ (cond ((eq? mode 'F_OK) (g_access path 0))
 
-    \ \ \ \ \ \ \ \ ((eq? mode 'X_OK) (g_access path 1))
+    \ \ \ \ \ \ \ \ ((eq? mode 'X_OK) (g_access path 128))
 
     \ \ \ \ \ \ \ \ ((eq? mode 'W_OK) (g_access path 2))
 
-    \ \ \ \ \ \ \ \ ((eq? mode 'R_OK) (g_access path 4))
+    \ \ \ \ \ \ \ \ ((eq? mode 'R_OK) (g_access path 1))
 
     \ \ \ \ \ \ \ \ (else (error 'value-error "Allowed mode 'F_OK, 'X_OK,'W_OK, 'R_OK"))))
 
     \;
   </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/os-test.scm|true|true>
+    (when (os-linux?)
+
+    \ \ (check-true (access "/root" 'F_OK))
+
+    \ \ (check-false (access "/root" 'R_OK))
+
+    \ \ (check-false (access "/root" 'W_OK))
+
+    \ \ (check-true (access "bin/goldfish" 'X_OK)))
+
+    \;
+  </scm-chunk>
 
   <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer
@@ -1876,15 +1890,21 @@
 
     \ \ int \ \ \ \ \ \ \ \ mode \ = s7_integer ((s7_cadr (args)));
 
-    #ifdef TB_CONFIG_OS_WINDOWS
+    \ \ bool ret= false;
 
-    \ \ bool ret= (_access (path_c, mode) == 0);
+    \ \ if (mode == 0) {
 
-    #else
+    \ \ \ \ tb_file_info_t info;
 
-    \ \ bool \ \ \ \ \ \ \ \ \ \ ret= (access (path_c, mode) == 0);
+    \ \ \ \ ret= tb_file_info (path_c, &info);
 
-    #endif
+    \ \ } else {
+
+    \ \ \ \ ret= tb_file_access (path_c, mode);
+
+    \ \ }
+
+    \ \ 
 
     \ \ return s7_make_boolean (sc, ret);
 

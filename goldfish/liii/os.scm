@@ -71,9 +71,9 @@
 
 (define (access path mode)
   (cond ((eq? mode 'F_OK) (g_access path 0))
-        ((eq? mode 'X_OK) (g_access path 1))
+        ((eq? mode 'X_OK) (g_access path 128))
         ((eq? mode 'W_OK) (g_access path 2))
-        ((eq? mode 'R_OK) (g_access path 4))
+        ((eq? mode 'R_OK) (g_access path 1))
         (else (error 'value-error "Allowed mode 'F_OK, 'X_OK,'W_OK, 'R_OK"))))
 
 (define (getenv key)

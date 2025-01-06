@@ -37,6 +37,12 @@
     (let ((t2 (current-second)))
       (check (>= (ceiling (- t2 t1)) 1) => #t))))
 
+(when (os-linux?)
+  (check-true (access "/root" 'F_OK))
+  (check-false (access "/root" 'R_OK))
+  (check-false (access "/root" 'W_OK))
+  (check-true (access "bin/goldfish" 'X_OK)))
+
 (check (string-null? (getenv "PATH")) => #f)
 (unsetenv "PATH")
 (check (getenv "PATH") => #f)
