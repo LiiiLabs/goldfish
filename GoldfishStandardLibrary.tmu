@@ -3129,6 +3129,34 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/path-test.scm|true|false>
+    (let ()
+
+    \ \ (define file-name "中文文件名.txt")
+
+    \ \ (define file-content "你好，世界！")
+
+    \;
+
+    \ \ (define temp-dir (os-temp-dir))
+
+    \ \ (define file-path (string-append temp-dir "/" file-name))
+
+    \;
+
+    \ \ (with-output-to-file file-path
+
+    \ \ \ \ (lambda ()
+
+    \ \ \ \ \ \ (display file-content)))
+
+    \ \ 
+
+    \ \ (check (path-read-text file-path) =\<gtr\> file-content))
+
+    \;
+  </scm-chunk>
+
   <\cpp-chunk|src/goldfish.hpp|true|true>
     static s7_pointer f_path_read_text(s7_scheme* sc, s7_pointer args) {
 
