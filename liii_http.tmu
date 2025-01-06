@@ -358,6 +358,12 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (a (json-ref* j "choices" 0 "message" "content")))
 
+    \ \ \ \ \ \ \ \ \ \ (display* "payload: " (json-\<gtr\>string q))
+
+    \ \ \ \ \ \ \ \ \ \ (newline)
+
+    \ \ \ \ \ \ \ \ \ \ (newline)
+
     \ \ \ \ \ \ \ \ \ \ (display* "Q: " (questions i) "\\n")
 
     \ \ \ \ \ \ \ \ \ \ (display* "A: " a "\\n")
