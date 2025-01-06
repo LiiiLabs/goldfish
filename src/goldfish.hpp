@@ -569,7 +569,7 @@ glue_path_getsize (s7_scheme* sc) {
 static s7_pointer f_path_read_text(s7_scheme* sc, s7_pointer args) {
   const char* path = s7_string (s7_car (args));
   if (!path) {
-    return s7_make_boolean(sc, false); // 路径无效
+    return s7_make_boolean(sc, false);
   }
 
   tb_file_ref_t file = tb_file_init(path, TB_FILE_MODE_RO);
@@ -604,13 +604,14 @@ glue_path_read_text(s7_scheme* sc) {
   s7_define_function(sc, name, f_path_read_text, 1, 0, false, desc);
 }
 
-static s7_pointer f_path_write_text(s7_scheme* sc, s7_pointer args) {
-  const char* path = s7_string(s7_car(args));
+static s7_pointer
+f_path_write_text (s7_scheme* sc, s7_pointer args) {
+  const char* path = s7_string (s7_car (args));
   if (!path) {
     return s7_make_integer(sc, -1);
   }
 
-  const char* content = s7_string(s7_cadr (args));
+  const char* content= s7_string (s7_cadr (args));
   if (!content) {
     return s7_make_integer(sc, -1);
   }
@@ -627,18 +628,17 @@ static s7_pointer f_path_write_text(s7_scheme* sc, s7_pointer args) {
     return s7_make_integer(sc, -1);
   }
 
-  tb_size_t content_size = strlen(content);
-  tb_size_t written_size = tb_file_writ(file, reinterpret_cast<const tb_byte_t*>(content), content_size);
+  tb_size_t content_size= strlen(content);
+  tb_size_t written_size= tb_file_writ(file, reinterpret_cast<const tb_byte_t*>(content), content_size);
 
-  bool release_success = tb_filelock_leave(lock);
-  tb_filelock_exit(lock);
-  bool exit_success = tb_file_exit(file);
+  bool release_success= tb_filelock_leave (lock);
+  tb_filelock_exit (lock);
+  bool exit_success= tb_file_exit(file);
 
-  // 检查写入是否成功
   if (written_size == content_size && release_success && exit_success) {
-    return s7_make_integer(sc, written_size); // 返回实际写入的字节数
+    return s7_make_integer(sc, written_size);
   } else {
-    return s7_make_integer(sc, -1); // 写入失败，返回 -1
+    return s7_make_integer(sc, -1);
   }
 }
 
@@ -655,7 +655,7 @@ glue_liii_path (s7_scheme* sc) {
   glue_isdir (sc);
   glue_path_getsize (sc);
   glue_path_read_text (sc);
-  glue_path_write_text(sc);
+  glue_path_write_text (sc);
 }
 
 void

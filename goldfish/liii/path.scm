@@ -100,10 +100,7 @@
 
 (define path-write-text
   (typed-lambda ((path string?) (content string?))
-    (if (not (file-exists? path))
-      (file-not-found-error
-        (string-append "No such file or directory: '" path "'"))
-      (g_path-write-text path content))))
+    (g_path-write-text path content)))
 
 ) ; end of begin
 ) ; end of define-library

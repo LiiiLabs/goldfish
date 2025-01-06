@@ -59,7 +59,8 @@
   (define temp-dir (os-temp-dir))
   (define file-path (string-append temp-dir "/" file-name))
   (path-write-text file-path file-content)
-  (check (path-read-text file-path) => file-content))
+  (check (path-read-text file-path) => file-content)
+  (delete-file file-path))
 
 (check-report)
 
