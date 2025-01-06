@@ -169,7 +169,7 @@
           ((symbol? x) (symbol->string x)))))
     (define c
       (lambda (x)
-        (if (= x 0) "" ",")))
+        (if (zero? x) "" ",")))
     (let l ((lst lst)(x (if (vector? lst) "[" "{")))
       (if (vector? lst)
         (string-append x 
@@ -186,7 +186,7 @@
         (let ((k (cdar lst)))
           (if (null? (cdr lst))
             (string-append x "\"" (caar lst) "\":"
-              (cond 
+              (cond
                 ((list? k)(l k "{"))
                 ((vector? k)(l k "["))
                 (else (f k))) "}")

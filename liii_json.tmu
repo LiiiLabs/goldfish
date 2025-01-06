@@ -132,7 +132,7 @@
 
     \;
 
-    ;(check-set-mode! 'report-failed)
+    (check-set-mode! 'report-failed)
 
     \;
   </goldfish-chunk>
@@ -140,6 +140,8 @@
   <subsection|实现>
 
   <paragraph|json-string-escape>
+
+  下面的实现同样适用于输入字符串是UTF-8的情况。
 
   <\goldfish-chunk|json/liii/json.scm|true|true>
     (define (json-string-escape str)
@@ -522,7 +524,7 @@
 
     \ \ \ \ \ \ (lambda (x)
 
-    \ \ \ \ \ \ \ \ (if (= x 0) "" ",")))
+    \ \ \ \ \ \ \ \ (if (zero? x) "" ",")))
 
     \ \ \ \ (let l ((lst lst)(x (if (vector? lst) "[" "{")))
 
@@ -556,7 +558,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ (string-append x "\\"" (caar lst) "\\":"
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cond\ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cond
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((list? k)(l k "{"))
 

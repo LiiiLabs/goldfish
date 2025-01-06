@@ -19,7 +19,7 @@
 (import (liii check)
         (liii json))
 
-;(check-set-mode! 'report-failed)
+(check-set-mode! 'report-failed)
 
 (check (json-string-escape "hello") => "\"hello\"")
 (check (json-string-escape "hello\"world") => "\"hello\\\"world\"")
