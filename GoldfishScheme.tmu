@@ -5193,6 +5193,24 @@
     \;
   </scm-chunk>
 
+  <paragraph|define-case-class>
+
+  <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
+    (define-case-class person ((name "Bob") (age 21)))
+
+    \;
+
+    (let1 bob (person :name "Bob" :age 21)
+
+    \ \ (check (bob 'name) =\<gtr\> "Bob")
+
+    \ \ (check (bob 'age) =\<gtr\> 21)
+
+    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello"))
+
+    \;
+  </scm-chunk>
+
   <paragraph|case*><index|case*>
 
   <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
