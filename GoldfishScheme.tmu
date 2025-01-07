@@ -665,6 +665,50 @@
 
   <value|r7rs><paragraph|let> <index|let>
 
+  let 是 Scheme 中用于局部变量绑定的语法结构。它允许在某个作用域内定义一组局部变量，并在该作用域内使用这些变量。let 表达式的特点是所有变量的初始值表达式是并行计算的，因此变量之间不能相互引用。
+
+  let 的语法：
+
+  \;
+
+  (let ((var1 init1) (var2 init2) ...)
+
+  \ \ body)
+
+  \;
+
+  <\itemize-minus>
+    <item>var1, var2, ... ：局部变量的名称。
+
+    <item>init1, init2, ... ：每个变量的初始值表达式。
+
+    <item>body：let 表达式的主体部分，可以包含多个表达式。body 中的表达式会按顺序执行，最后一个表达式的值作为整个 let 表达式的返回值
+  </itemize-minus>
+
+  \;
+
+  let 的特点：
+
+  <\enumerate>
+    <item>并行绑定：
+
+    所有变量的初始值表达式是并行计算的。
+
+    变量的初始值表达式不能引用其他在 let 中定义的变量。
+
+    <item>作用域：
+
+    变量的作用域仅限于 let 表达式的 body 部分。
+
+    在 body 中，变量可以被多次使用或修改。
+
+    <item>返回值：
+
+    let 表达式的返回值是 body 中最后一个表达式的值。
+  </enumerate>
+
+  \;
+
   测试基本的let绑定
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
@@ -706,6 +750,68 @@
 
     \;
   </scm-chunk>
+
+  named let 是 Scheme 中的一种特殊形式的 let，它允许在 let 表达式中定义一个递归函数。named let 的语法如下：
+
+  \;
+
+  (let name ((var1 init1) (var2 init2) ...)
+
+  \ \ body)
+
+  \;
+
+  测试 named let 的基本功能
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (let loop ((n 5) (acc 0))
+
+    \ \ \ \ \ \ \ \ \ (if (zero? n)
+
+    \ \ \ \ \ \ \ \ \ \ \ acc
+
+    \ \ \ \ \ \ \ \ \ \ \ (loop (- n 1) (+ acc n)))) =\<gtr\> 15)
+
+    \;
+  </scm-chunk>
+
+  测试 named let 的递归功能
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (let factorial ((n 5))
+
+    \ \ \ \ \ \ \ \ \ (if (= n 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ 1
+
+    \ \ \ \ \ \ \ \ \ \ \ (* n (factorial (- n 1))))) =\<gtr\> 120)
+
+    \;
+  </scm-chunk>
+
+  测试 named let 的多参数情况
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (let sum ((a 3) (b 4))
+
+    \ \ \ \ \ \ \ \ \ (+ a b)) =\<gtr\> 7)
+
+    \;
+  </scm-chunk>
+
+  测试 named let 的嵌套使用
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (let outer ((x 2))
+
+    \ \ \ \ \ \ \ \ \ (let inner ((y 3))
+
+    \ \ \ \ \ \ \ \ \ \ \ (+ x y))) =\<gtr\> 5)
+
+    \;
+  </scm-chunk>
+
+  \;
 
   <value|r7rs><paragraph|let*><index|let*>
 

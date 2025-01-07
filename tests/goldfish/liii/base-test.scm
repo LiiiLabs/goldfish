@@ -101,6 +101,23 @@
              x
              -x)) => 1)
 
+(check (let loop ((n 5) (acc 0))
+         (if (zero? n)
+           acc
+           (loop (- n 1) (+ acc n)))) => 15)
+
+(check (let factorial ((n 5))
+         (if (= n 1)
+           1
+           (* n (factorial (- n 1))))) => 120)
+
+(check (let sum ((a 3) (b 4))
+         (+ a b)) => 7)
+
+(check (let outer ((x 2))
+         (let inner ((y 3))
+           (+ x y))) => 5)
+
 (define (test-letrec)
   (letrec ((even?
              (lambda (n)
