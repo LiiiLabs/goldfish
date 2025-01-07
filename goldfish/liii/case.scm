@@ -15,8 +15,36 @@
 ;
 
 (define-library (liii case)
-(export case*)
+(export case* define-case-class)
 (begin
+
+(define-macro (define-case-class class-name fields)
+  (let ((constructor (string->symbol (string-append (symbol->string class-name))))
+        (key-fields (map (lambda (field)
+                           (string->symbol (string-append ":" (symbol->string (car field)))))
+                         fields)))
+    `(begin
+       ;; 定义构造函数
+       (define* (,constructor ,@(map (lambda (field)
+                                       `(,(car field) ,(cadr field)))
+                                     fields))
+         (lambda (msg . args)
+           (cond
+             ;; 字段访问
+             ,@(map (lambda (field)
+                      `((eq? msg ',(car field)) ,(car field)))
+                    fields)
+             ;; 字段更新
+             ,@(map (lambda (field key-field)
+                      `((eq? msg ,key-field)
+                        (,constructor ,@(map (lambda (f)
+                                               (if (eq? (car f) (car field))
+                                                   '(car args)
+                                                   (car f)))
+                                             fields))))
+                    fields key-fields)
+             ;; 未知消息
+             (else (error "Unknown message"))))))))
 
 ; 0 clause BSD, from S7 repo case.scm
 (define case* 

@@ -3,6 +3,13 @@
 
 (check-set-mode! 'report-failed)
 
+(define-case-class person ((name "Bob") (age 21)))
+
+(let1 bob (person :name "Bob" :age 21)
+  (check (bob 'name) => "Bob")
+  (check (bob 'age) => 21)
+  (check ((bob :name "hello") 'name) => "hello"))
+
 ; 0 clause BSD, from S7 repo s7test.scm
 (define (scase x)
   (case* x
