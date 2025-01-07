@@ -3673,7 +3673,7 @@
 
   <paragraph|typed-define>
 
-  <\goldfish-chunk|goldfish/liii/base.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/base.scm|true|true>
     (define-macro (typed-define name-and-params body)
 
     \ \ (let* ((name (car name-and-params))
@@ -3717,7 +3717,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|false>
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (typed-define (person (name string? "Bob") (age integer?))
 
     \ \ (string-append name " is " (number-\<gtr\>string age) " years old"))
