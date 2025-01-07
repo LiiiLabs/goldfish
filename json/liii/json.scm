@@ -45,16 +45,6 @@
   (let ((escaped (string-fold (lambda (ch result) (string-append result (escape-char ch))) "" str)))
     (string-append "\"" escaped "\"")))
 
-(define (loose-car pair-or-empty)
-  (if (eq? '() pair-or-empty)
-      '()
-      (car pair-or-empty)))
-
-(define (loose-cdr pair-or-empty)
-  (if (eq? '() pair-or-empty)
-      '()
-      (cdr pair-or-empty)))
-
 (define (string-length-sum strings)
   (let loop ((o 0)
              (rest strings))

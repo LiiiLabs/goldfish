@@ -19,8 +19,10 @@
 (export case* define-case-class)
 (begin
 
-(define-macro (define-case-class class-name fields)
+(define-macro (define-case-class class-name fields . extra-operations)
   (let ((constructor (string->symbol (string-append (symbol->string class-name))))
+        (type-pred (string->symbol (string-append (symbol->string class-name) "?")))
+        (equality-pred (string->symbol (string-append (symbol->string class-name) "=?")))
         (key-fields (map (lambda (field)
                            (string->symbol (string-append ":" (symbol->string (car field)))))
                          fields)))
@@ -28,9 +30,12 @@
        (typed-define ,(cons class-name fields)
          (lambda (msg . args)
            (cond
+             ((eq? msg 'type) ',class-name)
+
              ,@(map (lambda (field)
                       `((eq? msg ',(car field)) ,(car field)))
                     fields)
+
              ,@(map (lambda (field key-field)
                       `((eq? msg ,key-field)
                         (,constructor ,@(map (lambda (f)
@@ -39,7 +44,23 @@
                                                    (car f)))
                                              fields))))
                     fields key-fields)
-             (else (value-error "Unknown message" msg))))))))
+            
+             ,@(map (lambda (op)
+                      `((eq? msg ',(car op)) (apply ,(cadr op) args)))
+                    (loose-car extra-operations))
+
+             (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
+
+        (define (,type-pred obj)
+          (and (procedure? obj)
+               (eq? (obj 'type) ',class-name)))
+
+        (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
+          (and ,@(map (lambda (field)
+                        `(equal? (p1 ',(car field)) (p2 ',(car field))))
+                        fields)))
+               
+               )))
 
 ; 0 clause BSD, from S7 repo case.scm
 (define case* 

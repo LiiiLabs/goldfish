@@ -220,7 +220,9 @@
 
     \ \ \ \ \ \ \ \ (liii string)
 
-    \ \ \ \ \ \ \ \ (liii path))
+    \ \ \ \ \ \ \ \ (liii path)
+
+    \ \ \ \ \ \ \ \ (liii case))
 
     \;
 
@@ -249,6 +251,54 @@
     \;
   </goldfish-chunk>
 
+  构建文本对话的单个消息体，其中role只能是"user", "assistant"和"system"，<todo|这里在构造的时候，暂时不做校验>。
+
+  <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
+    (define-case-class message
+
+    \ \ ((role string?)
+
+    \ \ \ (content string?))
+
+    \;
+
+    \ \ ((to-json
+
+    \ \ \ \ (lambda () `(("role" . ,role) ("content" . ,content))))))
+
+    \;
+  </goldfish-chunk>
+
+  将消息体添加到JSON对象q的尾部。q对象的结构就是上面定义的payload函数中的JSON，这里是在更改messages字段的值。
+
+  <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
+    (define-case-class payload
+
+    \ \ ((messages vector? #()))
+
+    \;
+
+    \ \ ((to-json-string
+
+    \ \ \ \ (lambda ()
+
+    \ \ \ \ \ \ (json-\<gtr\>string
+
+    \ \ \ \ \ \ \ \ `(("model" . "deepseek-ai/DeepSeek-V2.5")
+
+    \ \ \ \ \ \ \ \ \ \ ("messages" . ,(vector-map (lambda (x) (x 'to-json)) messages))
+
+    \ \ \ \ \ \ \ \ \ \ ("max_tokens" . 512)))))
+
+    \ \ \ (append
+
+    \ \ \ \ (typed-lambda ((msg message?))
+
+    \ \ \ \ \ \ (payload :messages (vector-append messages (vector msg)))))))
+
+    \;
+  </goldfish-chunk>
+
   向硅基流动发起HTTP Post请求的核心代码，这里默认使用DeepSeek-V2.5这个付费模型，因为实测该模型的效果比较好，价格比较低。
 
   <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
@@ -266,27 +316,11 @@
 
     \;
 
-    (define payload
-
-    \ \ `(
-
-    \ \ \ \ ("model" . "deepseek-ai/DeepSeek-V2.5")
-
-    \ \ \ \ ("messages" . #())
-
-    \ \ \ \ ("max_tokens" . 512)
-
-    \ \ \ )
-
-    )
-
-    \;
-
     (define (chat payload)
 
     \ \ (let* ((r (http-post "https://api.siliconflow.cn/v1/chat/completions"
 
-    \ \ \ \ \ \ \ \ \ \ \ \ :data (json-\<gtr\>string payload)
+    \ \ \ \ \ \ \ \ \ \ \ \ :data (payload 'to-json-string)
 
     \ \ \ \ \ \ \ \ \ \ \ \ :headers headers)))
 
@@ -295,26 +329,6 @@
     \ \ \ \ \ \ \ \ (r 'text)
 
     \ \ \ \ \ \ \ \ (r 'status-code))))
-
-    \;
-  </goldfish-chunk>
-
-  构建文本对话的单个消息体，其中role只能是"user", "assistant"和"system"，<todo|这里在构造的时候，暂时不做校验>。
-
-  <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
-    (define (message role content)
-
-    \ \ `(("role" . ,role) ("content" . ,content)))
-
-    \;
-  </goldfish-chunk>
-
-  将消息体添加到JSON对象q的尾部。q对象的结构就是上面定义的payload函数中的JSON，这里是在更改messages字段的值。
-
-  <\goldfish-chunk|http/tests/chat_demo.scm|true|true>
-    (define (append-message q msg)
-
-    \ \ (json-set q "messages" (lambda (v) (vector-append v (vector msg)))))
 
     \;
   </goldfish-chunk>
@@ -334,11 +348,11 @@
 
     \;
 
-    (let loop ((i 0) (payload payload) (tokens 0))
+    (let loop ((i 0) (p (payload #())) (tokens 0))
 
     \ \ (if (\<less\> i (length questions))
 
-    \ \ \ \ \ \ (let* ((q (append-message payload (message "user" (questions i))))
+    \ \ \ \ \ \ (let* ((q (p 'append (message "user" (questions i))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (r (chat q))
 
@@ -346,7 +360,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (a (json-ref* j "choices" 0 "message" "content")))
 
-    \ \ \ \ \ \ \ \ \ \ (display* "payload: " (json-\<gtr\>string q))
+    \ \ \ \ \ \ \ \ \ \ (display* "payload: " (q 'to-json-string))
 
     \ \ \ \ \ \ \ \ \ \ (newline)
 
@@ -360,7 +374,7 @@
 
     \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (append-message q (message "assistant" a))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (q 'append (message "assistant" a))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ tokens (json-ref* j "usage" "total_tokens"))))
 

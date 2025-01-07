@@ -56,7 +56,7 @@
   ; SRFI-8
   receive
   ; Extra routines for (liii base)
-  == != display* in? let1 compose identity typed-lambda typed-define
+  == != loose-car loose-cdr display* in? let1 compose identity typed-lambda typed-define
 )
 (begin
 
@@ -67,6 +67,16 @@
 
 (define (!= left right)
   (not (equal? left right)))
+
+(define (loose-car pair-or-empty)
+  (if (eq? '() pair-or-empty)
+      '()
+      (car pair-or-empty)))
+
+(define (loose-cdr pair-or-empty)
+  (if (eq? '() pair-or-empty)
+      '()
+      (cdr pair-or-empty)))
 
 (define (display* . params)
   (for-each display params))

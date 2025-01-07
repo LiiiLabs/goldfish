@@ -404,7 +404,7 @@
 
     \ \ ; Extra routines for (liii base)
 
-    \ \ == != display* in? let1 compose identity typed-lambda typed-define
+    \ \ == != loose-car loose-cdr display* in? let1 compose identity typed-lambda typed-define
 
     )
 
@@ -3447,7 +3447,33 @@
     \;
   </scm-chunk>
 
-  \;
+  <paragraph|loose-car>
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (loose-car pair-or-empty)
+
+    \ \ (if (eq? '() pair-or-empty)
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (car pair-or-empty)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|loose-cdr>
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (loose-cdr pair-or-empty)
+
+    \ \ (if (eq? '() pair-or-empty)
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (cdr pair-or-empty)))
+
+    \;
+  </scm-chunk>
 
   <paragraph|display*><index|display*><scm|(x y z ...) =\<gtr\> \<less\>#unspecified\<gtr\>>
 
@@ -5258,7 +5284,11 @@
   <paragraph|define-case-class>
 
   <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
-    (define-case-class person ((name string? "Bob") (age integer?)))
+    (define-case-class person
+
+    \ \ ((name string? "Bob")
+
+    \ \ \ (age integer?)))
 
     \;
 
@@ -5268,11 +5298,43 @@
 
     \ \ (check (bob 'age) =\<gtr\> 21)
 
-    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello"))
+    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello")
+
+    \ \ (check-catch 'value-error (bob 'sex))
+
+    \ \ (check-true (person? bob)))
+
+    \;
+
+    (check-true (person=? (person "Bob" 21) (person "Bob" 21)))
+
+    (check-false (person=? (person "Bob" 21) (person "Bob" 20)))
 
     \;
 
     (check-catch 'type-error (person 1 21))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
+    (define-case-class jerson
+
+    \ \ ((name string?)
+
+    \ \ \ (age integer?))
+
+    \ \ ((to-json (lambda () `((name . ,name) (age . ,age))))
+
+    \ \ \ (greet (lambda (x) (string-append "Hi " x ", I am " name " " (number-\<gtr\>string age) " years old")))))
+
+    \;
+
+    (let1 bob (jerson "Bob" 21)
+
+    \ \ (check (bob 'to-json) =\<gtr\> `((name . "Bob") (age . 21)))
+
+    \ \ (check (bob 'greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old"))
 
     \;
   </scm-chunk>
