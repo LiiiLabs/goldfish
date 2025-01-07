@@ -21,6 +21,7 @@
 
 (define-macro (define-case-class class-name fields)
   (let ((constructor (string->symbol (string-append (symbol->string class-name))))
+        (type-pred (string->symbol (string-append (symbol->string class-name) "?")))
         (key-fields (map (lambda (field)
                            (string->symbol (string-append ":" (symbol->string (car field)))))
                          fields)))
@@ -28,6 +29,7 @@
        (typed-define ,(cons class-name fields)
          (lambda (msg . args)
            (cond
+             ((eq? msg 'type) ',class-name)
              ,@(map (lambda (field)
                       `((eq? msg ',(car field)) ,(car field)))
                     fields)
@@ -39,7 +41,11 @@
                                                    (car f)))
                                              fields))))
                     fields key-fields)
-             (else (value-error "No such field " msg " in case class " ,class-name))))))))
+             (else (value-error "No such field " msg " in case class " ,class-name)))))
+
+        (define (,type-pred obj)
+          (and (procedure? obj)
+               (eq? (obj 'type) ',class-name))))))
 
 ; 0 clause BSD, from S7 repo case.scm
 (define case* 

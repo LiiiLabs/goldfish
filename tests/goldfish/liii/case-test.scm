@@ -9,7 +9,8 @@
   (check (bob 'name) => "Bob")
   (check (bob 'age) => 21)
   (check ((bob :name "hello") 'name) => "hello")
-  (check-catch 'value-error (bob 'sex)))
+  (check-catch 'value-error (bob 'sex))
+  (check-true (person? bob)))
 
 (check-catch 'type-error (person 1 21))
 

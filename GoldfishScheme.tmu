@@ -5268,7 +5268,11 @@
 
     \ \ (check (bob 'age) =\<gtr\> 21)
 
-    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello"))
+    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello")
+
+    \ \ (check-catch 'value-error (bob 'sex))
+
+    \ \ (check-true (person? bob)))
 
     \;
 
