@@ -56,7 +56,7 @@
   ; SRFI-8
   receive
   ; Extra routines for (liii base)
-  == != display* in? let1 compose identity typed-lambda
+  == != display* in? let1 compose identity typed-lambda typed-define
 )
 (begin
 
@@ -132,7 +132,7 @@
                 (let ((param-name (car param))
                       (type-pred (cadr param)))
                   `(unless (,type-pred ,param-name)
-                     (type-error (string-append "Invalid type for " (symbol->string ',param-name))))))
+                     (error 'type-error (string-append "Invalid type for " (symbol->string ',param-name))))))
               params)
 
        ,body)))

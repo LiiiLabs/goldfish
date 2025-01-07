@@ -15,6 +15,7 @@
 ;
 
 (define-library (liii case)
+(import (liii base))
 (export case* define-case-class)
 (begin
 
@@ -24,21 +25,7 @@
                            (string->symbol (string-append ":" (symbol->string (car field)))))
                          fields)))
     `(begin
-       (define* (,constructor ,@(map (lambda (field)
-                                       (let ((field-name (car field))
-                                             (default-value (cddr field)))
-                                         (if (null? default-value)
-                                             field-name
-                                             `(,field-name ,(car default-value)))))
-                                     fields))
-
-         ,@(map (lambda (field)
-                  (let ((field-name (car field))
-                        (type-pred (cadr field)))
-                    `(unless (,type-pred ,field-name)
-                             (type-error (string-append "Invalid type for " (symbol->string ',field-name))))))
-                fields)
-
+       (typed-define ,(cons class-name fields)
          (lambda (msg . args)
            (cond
              ,@(map (lambda (field)

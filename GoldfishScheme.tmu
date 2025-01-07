@@ -147,7 +147,7 @@
 
   <section|许可证>
 
-  <\scm-chunk|goldfish/scheme/base.scm|false|true>
+  <\goldfish-chunk|goldfish/scheme/base.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -179,9 +179,9 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
-  <\scm-chunk|goldfish/liii/base.scm|false|true>
+  <\goldfish-chunk|goldfish/liii/base.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -213,7 +213,7 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   \;
 
@@ -319,7 +319,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/liii/base.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/base.scm|true|true>
     (define-library (liii base)
 
     (import (scheme base)
@@ -404,14 +404,14 @@
 
     \ \ ; Extra routines for (liii base)
 
-    \ \ == != display* in? let1 compose identity typed-lambda
+    \ \ == != display* in? let1 compose identity typed-lambda typed-define
 
     )
 
     (begin
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <section|测试>
 
@@ -3706,7 +3706,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(unless (,type-pred ,param-name)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-error (string-append "Invalid type for " (symbol-\<gtr\>string ',param-name))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (error 'type-error (string-append "Invalid type for " (symbol-\<gtr\>string ',param-name))))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ params)
 
@@ -3724,7 +3724,7 @@
 
     \;
 
-    (check (person) =\<gtr\> "Bob is 21 years old")
+    (check (person :age 21) =\<gtr\> "Bob is 21 years old")
 
     (check (person :name "Alice" :age 25) =\<gtr\> "Alice is 25 years old")
 
