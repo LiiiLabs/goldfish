@@ -6,7 +6,8 @@
         (liii list)
         (liii os)
         (liii string)
-        (liii path))
+        (liii path)
+        (liii case))
 
 (define (read-and-clean-file file-path)
   (string-trim-right (path-read-text file-path) #\newline))
@@ -20,6 +21,26 @@
         (read-and-clean-file file-path)
         "请填入硅基流动的API密钥")))
 
+(define-case-class message
+  ((role string?)
+   (content string?))
+
+  ((to-json
+    (lambda () `(("role" . ,role) ("content" . ,content))))))
+
+(define-case-class payload
+  ((messages vector? #()))
+
+  ((to-json-string
+    (lambda ()
+      (json->string
+        `(("model" . "deepseek-ai/DeepSeek-V2.5")
+          ("messages" . ,(vector-map (lambda (x) (x 'to-json)) messages))
+          ("max_tokens" . 512)))))
+   (append
+    (typed-lambda ((msg message?))
+      (payload :messages (vector-append messages (vector msg)))))))
+
 (define headers
   `(
      ("Authorization" . ,(string-append "Bearer " (load-silicon-cloud-api-key)))
@@ -27,27 +48,13 @@
    )
 )
 
-(define payload
-  `(
-    ("model" . "deepseek-ai/DeepSeek-V2.5")
-    ("messages" . #())
-    ("max_tokens" . 512)
-   )
-)
-
 (define (chat payload)
   (let* ((r (http-post "https://api.siliconflow.cn/v1/chat/completions"
-            :data (json->string payload)
+            :data (payload 'to-json-string)
             :headers headers)))
     (if (http-ok? r)
         (r 'text)
         (r 'status-code))))
-
-(define (message role content)
-  `(("role" . ,role) ("content" . ,content)))
-
-(define (append-message q msg)
-  (json-set q "messages" (lambda (v) (vector-append v (vector msg)))))
 
 (define questions
   #("唐宋八大家是哪八位（简短回答）"
@@ -55,20 +62,20 @@
     "用双引号引用上一个问题的回答（包含标点符号），并告诉我一共多少个汉字？"
     "介绍他的生平和作品（简短回答）"))
 
-(let loop ((i 0) (payload payload) (tokens 0))
+(let loop ((i 0) (p (payload #())) (tokens 0))
   (if (< i (length questions))
-      (let* ((q (append-message payload (message "user" (questions i))))
+      (let* ((q (p 'append (message "user" (questions i))))
              (r (chat q))
              (j (string->json r))
              (a (json-ref* j "choices" 0 "message" "content")))
-          (display* "payload: " (json->string q))
+          (display* "payload: " (q 'to-json-string))
           (newline)
           (newline)
           (display* "Q: " (questions i) "\n")
           (display* "A: " a "\n")
           (newline)
           (loop (+ i 1)
-                (append-message q (message "assistant" a))
+                (q 'append (message "assistant" a))
                 (+ tokens (json-ref* j "usage" "total_tokens"))))
       (display* "Total tokens: " tokens)))
 
