@@ -19,6 +19,14 @@
 
 (check-catch 'type-error (person 1 21))
 
+(let ((bob (person "Bob" 21))
+      (get-name (lambda (x)
+                 (case* x
+                   ((#<person?>) (x 'name))
+                   (else (???))))))
+  (check (get-name bob) => "Bob")
+  (check-catch 'not-implemented-error (get-name 1)))
+
 (define-case-class jerson
   ((name string?)
    (age integer?))

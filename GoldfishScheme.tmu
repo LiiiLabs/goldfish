@@ -3054,15 +3054,15 @@
   但是S7 Scheme里面没有define-syntax和syntax-rule，在墨干中的实现是这样的：
 
   <\session|goldfish|default>
-    <\unfolded-io>
+    <\folded-io>
       \<gtr\>\ 
-    <|unfolded-io>
+    <|folded-io>
       (define-macro (receive vars vals . body)
 
       \ \ `((lambda ,vars ,@body) ,vals)) ; GPL
-    <|unfolded-io>
+    <|folded-io>
       receive
-    </unfolded-io>
+    </folded-io>
 
     <\folded-io>
       \<gtr\>\ 
@@ -4065,11 +4065,11 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/error-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/error-test.scm|true|true>
     (check-catch 'not-implemented-error (???))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <section|结尾>
 
@@ -5283,7 +5283,9 @@
 
   <paragraph|define-case-class>
 
-  <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
+  不带伴生函数的样本类person：
+
+  <\goldfish-chunk|tests/goldfish/liii/case-test.scm|true|true>
     (define-case-class person
 
     \ \ ((name string? "Bob")
@@ -5315,7 +5317,25 @@
     (check-catch 'type-error (person 1 21))
 
     \;
-  </scm-chunk>
+
+    (let ((bob (person "Bob" 21))
+
+    \ \ \ \ \ \ (get-name (lambda (x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case* x
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\<less\>person?\<gtr\>) (x 'name))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (???))))))
+
+    \ \ (check (get-name bob) =\<gtr\> "Bob")
+
+    \ \ (check-catch 'not-implemented-error (get-name 1)))
+
+    \;
+  </goldfish-chunk>
+
+  带伴生函数的样本类jerson：
 
   <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
     (define-case-class jerson
