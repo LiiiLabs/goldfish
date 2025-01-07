@@ -126,7 +126,7 @@
                   args)
            ,@body))))
 
-(define-macro (typed-define name-and-params body)
+(define-macro (typed-define name-and-params x . xs)
   (let* ((name (car name-and-params))
          (params (cdr name-and-params)))
     `(define* (,name ,@(map (lambda (param)
@@ -134,8 +134,8 @@
                                     (type-pred (cadr param))
                                     (default-value (cddr param)))
                                 (if (null? default-value)
-                                    param-name ; 无默认值时直接使用参数名
-                                    `(,param-name ,(car default-value))))) ; 有默认值时使用默认值
+                                    param-name
+                                    `(,param-name ,(car default-value)))))
                             params))
 
        ,@(map (lambda (param)
@@ -144,8 +144,8 @@
                   `(unless (,type-pred ,param-name)
                      (error 'type-error (string-append "Invalid type for " (symbol->string ',param-name))))))
               params)
-
-       ,body)))
+       ,x
+       ,@xs)))
 
 ) ; end of begin
 ) ; end of define-library

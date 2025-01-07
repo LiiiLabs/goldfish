@@ -262,9 +262,9 @@
 
     \;
 
-    \ \ ((to-json
+    \ \ (define (to-json)
 
-    \ \ \ \ (lambda () `(("role" . ,role) ("content" . ,content))))))
+    \ \ \ \ `(("role" . ,role) ("content" . ,content))))
 
     \;
   </goldfish-chunk>
@@ -276,25 +276,27 @@
 
     \ \ ((messages vector? #()))
 
-    \;
+    \ \ 
 
-    \ \ ((to-json-string
+    \ \ (define (to-json)
 
-    \ \ \ \ (lambda ()
-
-    \ \ \ \ \ \ (json-\<gtr\>string
-
-    \ \ \ \ \ \ \ \ `(("model" . "deepseek-ai/DeepSeek-V2.5")
+    \ \ \ \ `(("model" . "deepseek-ai/DeepSeek-V2.5")
 
     \ \ \ \ \ \ \ \ \ \ ("messages" . ,(vector-map (lambda (x) (x 'to-json)) messages))
 
-    \ \ \ \ \ \ \ \ \ \ ("max_tokens" . 512)))))
+    \ \ \ \ \ \ \ \ \ \ ("max_tokens" . 512)))
 
-    \ \ \ (append
+    \ \ 
 
-    \ \ \ \ (typed-lambda ((msg message?))
+    \ \ (define (to-json-string)
 
-    \ \ \ \ \ \ (payload :messages (vector-append messages (vector msg)))))))
+    \ \ \ \ (json-\<gtr\>string (to-json)))
+
+    \ \ 
+
+    \ \ (typed-define (append (msg message?))
+
+    \ \ \ \ (payload :messages (vector-append messages (vector msg)))))
 
     \;
   </goldfish-chunk>

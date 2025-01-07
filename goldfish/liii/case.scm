@@ -28,6 +28,7 @@
                          fields)))
     `(begin
        (typed-define ,(cons class-name fields)
+         ,@extra-operations
          (lambda (msg . args)
            (cond
              ((eq? msg 'type) ',class-name)
@@ -46,8 +47,8 @@
                     fields key-fields)
             
              ,@(map (lambda (op)
-                      `((eq? msg ',(car op)) (apply ,(cadr op) args)))
-                    (loose-car extra-operations))
+                      `((eq? msg ',(caadr op)) (apply ,(caadr op) args)))
+                    extra-operations)
 
              (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
 

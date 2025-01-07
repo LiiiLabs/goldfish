@@ -25,21 +25,22 @@
   ((role string?)
    (content string?))
 
-  ((to-json
-    (lambda () `(("role" . ,role) ("content" . ,content))))))
+  (define (to-json)
+    `(("role" . ,role) ("content" . ,content))))
 
 (define-case-class payload
   ((messages vector? #()))
-
-  ((to-json-string
-    (lambda ()
-      (json->string
-        `(("model" . "deepseek-ai/DeepSeek-V2.5")
+  
+  (define (to-json)
+    `(("model" . "deepseek-ai/DeepSeek-V2.5")
           ("messages" . ,(vector-map (lambda (x) (x 'to-json)) messages))
-          ("max_tokens" . 512)))))
-   (append
-    (typed-lambda ((msg message?))
-      (payload :messages (vector-append messages (vector msg)))))))
+          ("max_tokens" . 512)))
+  
+  (define (to-json-string)
+    (json->string (to-json)))
+  
+  (typed-define (append (msg message?))
+    (payload :messages (vector-append messages (vector msg)))))
 
 (define headers
   `(
