@@ -3700,7 +3700,7 @@
   <paragraph|typed-define>
 
   <\goldfish-chunk|goldfish/liii/base.scm|true|true>
-    (define-macro (typed-define name-and-params body)
+    (define-macro (typed-define name-and-params x . xs)
 
     \ \ (let* ((name (car name-and-params))
 
@@ -3716,9 +3716,9 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? default-value)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ param-name ; 无默认值时直接使用参数名
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ param-name
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(,param-name ,(car default-value))))) ; 有默认值时使用默认值
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(,param-name ,(car default-value)))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ params))
 
@@ -3736,9 +3736,9 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ params)
 
-    \;
+    \ \ \ \ \ \ \ ,x
 
-    \ \ \ \ \ \ \ ,body)))
+    \ \ \ \ \ \ \ ,@xs)))
 
     \;
   </goldfish-chunk>
@@ -5324,17 +5324,25 @@
 
     \ \ \ (age integer?))
 
-    \ \ ((to-json (lambda () `((name . ,name) (age . ,age))))
+    \ \ 
 
-    \ \ \ (greet (lambda (x) (string-append "Hi " x ", I am " name " " (number-\<gtr\>string age) " years old")))))
+    \ \ (define (to-string)
+
+    \ \ \ \ (string-append "I am " name " " (number-\<gtr\>string age) " years old!"))
+
+    \ \ (define (greet x)
+
+    \ \ \ \ (string-append "Hi " x ", " (to-string)))
+
+    )
 
     \;
 
     (let1 bob (jerson "Bob" 21)
 
-    \ \ (check (bob 'to-json) =\<gtr\> `((name . "Bob") (age . 21)))
+    \ \ (check (bob 'to-string) =\<gtr\> "I am Bob 21 years old!")
 
-    \ \ (check (bob 'greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old"))
+    \ \ (check (bob 'greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old!"))
 
     \;
   </scm-chunk>

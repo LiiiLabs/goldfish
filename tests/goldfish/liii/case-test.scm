@@ -22,12 +22,16 @@
 (define-case-class jerson
   ((name string?)
    (age integer?))
-  ((to-json (lambda () `((name . ,name) (age . ,age))))
-   (greet (lambda (x) (string-append "Hi " x ", I am " name " " (number->string age) " years old")))))
+  
+  (define (to-string)
+    (string-append "I am " name " " (number->string age) " years old!"))
+  (define (greet x)
+    (string-append "Hi " x ", " (to-string)))
+)
 
 (let1 bob (jerson "Bob" 21)
-  (check (bob 'to-json) => `((name . "Bob") (age . 21)))
-  (check (bob 'greet "Alice") => "Hi Alice, I am Bob 21 years old"))
+  (check (bob 'to-string) => "I am Bob 21 years old!")
+  (check (bob 'greet "Alice") => "Hi Alice, I am Bob 21 years old!"))
 
 ; 0 clause BSD, from S7 repo s7test.scm
 (define (scase x)
