@@ -12,6 +12,9 @@
   (check-catch 'value-error (bob 'sex))
   (check-true (person? bob)))
 
+(check-true (person=? (person "Bob" 21) (person "Bob" 21)))
+(check-false (person=? (person "Bob" 21) (person "Bob" 20)))
+
 (check-catch 'type-error (person 1 21))
 
 ; 0 clause BSD, from S7 repo s7test.scm

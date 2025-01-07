@@ -22,6 +22,7 @@
 (define-macro (define-case-class class-name fields)
   (let ((constructor (string->symbol (string-append (symbol->string class-name))))
         (type-pred (string->symbol (string-append (symbol->string class-name) "?")))
+        (equality-pred (string->symbol (string-append (symbol->string class-name) "=?")))
         (key-fields (map (lambda (field)
                            (string->symbol (string-append ":" (symbol->string (car field)))))
                          fields)))
@@ -45,7 +46,14 @@
 
         (define (,type-pred obj)
           (and (procedure? obj)
-               (eq? (obj 'type) ',class-name))))))
+               (eq? (obj 'type) ',class-name)))
+
+        (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
+          (and ,@(map (lambda (field)
+                        `(equal? (p1 ',(car field)) (p2 ',(car field))))
+                        fields)))
+               
+               )))
 
 ; 0 clause BSD, from S7 repo case.scm
 (define case* 

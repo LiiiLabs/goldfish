@@ -5276,6 +5276,12 @@
 
     \;
 
+    (check-true (person=? (person "Bob" 21) (person "Bob" 21)))
+
+    (check-false (person=? (person "Bob" 21) (person "Bob" 20)))
+
+    \;
+
     (check-catch 'type-error (person 1 21))
 
     \;
