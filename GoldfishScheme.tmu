@@ -3671,6 +3671,68 @@
     \;
   </scm-chunk>
 
+  <paragraph|typed-define>
+
+  <\goldfish-chunk|goldfish/liii/base.scm|true|false>
+    (define-macro (typed-define name-and-params body)
+
+    \ \ (let* ((name (car name-and-params))
+
+    \ \ \ \ \ \ \ \ \ (params (cdr name-and-params)))
+
+    \ \ \ \ `(define* (,name ,@(map (lambda (param)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((param-name (car param))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-pred (cadr param))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (default-value (cddr param)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? default-value)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ param-name ; 无默认值时直接使用参数名
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(,param-name ,(car default-value))))) ; 有默认值时使用默认值
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ params))
+
+    \;
+
+    \ \ \ \ \ \ \ ,@(map (lambda (param)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((param-name (car param))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-pred (cadr param)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(unless (,type-pred ,param-name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-error (string-append "Invalid type for " (symbol-\<gtr\>string ',param-name))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ params)
+
+    \;
+
+    \ \ \ \ \ \ \ ,body)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (typed-define (person (name string? "Bob") (age integer?))
+
+    \ \ (string-append name " is " (number-\<gtr\>string age) " years old"))
+
+    \;
+
+    (check (person) =\<gtr\> "Bob is 21 years old")
+
+    (check (person :name "Alice" :age 25) =\<gtr\> "Alice is 25 years old")
+
+    (check-catch 'type-error (person :name 123 :age 25))
+
+    \;
+  </goldfish-chunk>
+
   \;
 
   <section|结尾>
