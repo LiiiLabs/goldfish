@@ -413,7 +413,7 @@
 
   <value|r7rs><paragraph|import><index|import>
 
-  <\scm-chunk|goldfish/scheme/boot.scm|true|false>
+  <\scm-chunk|goldfish/scheme/boot.scm|true|true>
     (define-macro (import . libs)
 
     \ \ `(begin
@@ -520,6 +520,34 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|loose-car>
+
+  <\goldfish-chunk|goldfish/scheme/boot.scm|true|true>
+    (define (loose-car pair-or-empty)
+
+    \ \ (if (eq? '() pair-or-empty)
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (car pair-or-empty)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|loose-cdr>
+
+  <\goldfish-chunk|goldfish/scheme/boot.scm|true|false>
+    (define (loose-cdr pair-or-empty)
+
+    \ \ (if (eq? '() pair-or-empty)
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (cdr pair-or-empty)))
+
+    \;
+  </goldfish-chunk>
 
   <chapter|(scheme time)>
 

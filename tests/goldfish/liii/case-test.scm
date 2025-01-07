@@ -3,7 +3,9 @@
 
 (check-set-mode! 'report-failed)
 
-(define-case-class person ((name string? "Bob") (age integer?)))
+(define-case-class person
+  ((name string? "Bob")
+   (age integer?)))
 
 (let1 bob (person :name "Bob" :age 21)
   (check (bob 'name) => "Bob")
@@ -16,6 +18,16 @@
 (check-false (person=? (person "Bob" 21) (person "Bob" 20)))
 
 (check-catch 'type-error (person 1 21))
+
+(define-case-class jerson
+  ((name string?)
+   (age integer?))
+  ((to-json (lambda () `((name . ,name) (age . ,age))))
+   (greet (lambda (x) (string-append "Hi " x ", I am " name " " (number->string age) " years old")))))
+
+(let1 bob (jerson "Bob" 21)
+  (check (bob 'to-json) => `((name . "Bob") (age . 21)))
+  (check (bob 'greet "Alice") => "Hi Alice, I am Bob 21 years old"))
 
 ; 0 clause BSD, from S7 repo s7test.scm
 (define (scase x)

@@ -19,7 +19,7 @@
 (export case* define-case-class)
 (begin
 
-(define-macro (define-case-class class-name fields)
+(define-macro (define-case-class class-name fields . extra-operations)
   (let ((constructor (string->symbol (string-append (symbol->string class-name))))
         (type-pred (string->symbol (string-append (symbol->string class-name) "?")))
         (equality-pred (string->symbol (string-append (symbol->string class-name) "=?")))
@@ -31,9 +31,11 @@
          (lambda (msg . args)
            (cond
              ((eq? msg 'type) ',class-name)
+
              ,@(map (lambda (field)
                       `((eq? msg ',(car field)) ,(car field)))
                     fields)
+
              ,@(map (lambda (field key-field)
                       `((eq? msg ,key-field)
                         (,constructor ,@(map (lambda (f)
@@ -42,7 +44,12 @@
                                                    (car f)))
                                              fields))))
                     fields key-fields)
-             (else (value-error "No such field " msg " in case class " ,class-name)))))
+            
+             ,@(map (lambda (op)
+                      `((eq? msg ',(car op)) (apply ,(cadr op) args)))
+                    (loose-car extra-operations))
+
+             (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
 
         (define (,type-pred obj)
           (and (procedure? obj)

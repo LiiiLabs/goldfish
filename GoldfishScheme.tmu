@@ -5258,7 +5258,11 @@
   <paragraph|define-case-class>
 
   <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
-    (define-case-class person ((name string? "Bob") (age integer?)))
+    (define-case-class person
+
+    \ \ ((name string? "Bob")
+
+    \ \ \ (age integer?)))
 
     \;
 
@@ -5283,6 +5287,28 @@
     \;
 
     (check-catch 'type-error (person 1 21))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
+    (define-case-class jerson
+
+    \ \ ((name string?)
+
+    \ \ \ (age integer?))
+
+    \ \ ((to-json (lambda () `((name . ,name) (age . ,age))))
+
+    \ \ \ (greet (lambda (x) (string-append "Hi " x ", I am " name " " (number-\<gtr\>string age) " years old")))))
+
+    \;
+
+    (let1 bob (jerson "Bob" 21)
+
+    \ \ (check (bob 'to-json) =\<gtr\> `((name . "Bob") (age . 21)))
+
+    \ \ (check (bob 'greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old"))
 
     \;
   </scm-chunk>

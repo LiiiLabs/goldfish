@@ -264,26 +264,6 @@
   <subparagraph|实现>
 
   <\scm-chunk|json/liii/json.scm|true|true>
-    (define (loose-car pair-or-empty)
-
-    \ \ (if (eq? '() pair-or-empty)
-
-    \ \ \ \ \ \ '()
-
-    \ \ \ \ \ \ (car pair-or-empty)))
-
-    \;
-
-    (define (loose-cdr pair-or-empty)
-
-    \ \ (if (eq? '() pair-or-empty)
-
-    \ \ \ \ \ \ '()
-
-    \ \ \ \ \ \ (cdr pair-or-empty)))
-
-    \;
-
     (define (string-length-sum strings)
 
     \ \ (let loop ((o 0)
