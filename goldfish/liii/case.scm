@@ -39,7 +39,7 @@
                                                    (car f)))
                                              fields))))
                     fields key-fields)
-             (else (value-error "Unknown message" msg))))))))
+             (else (value-error "No such field " msg " in case class " ,class-name))))))))
 
 ; 0 clause BSD, from S7 repo case.scm
 (define case* 
