@@ -5196,7 +5196,7 @@
   <paragraph|define-case-class>
 
   <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
-    (define-case-class person ((name "Bob") (age 21)))
+    (define-case-class person ((name string? "Bob") (age integer?)))
 
     \;
 
@@ -5207,6 +5207,10 @@
     \ \ (check (bob 'age) =\<gtr\> 21)
 
     \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello"))
+
+    \;
+
+    (check-catch 'type-error (person 1 21))
 
     \;
   </scm-chunk>
