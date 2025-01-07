@@ -404,7 +404,7 @@
 
     \ \ ; Extra routines for (liii base)
 
-    \ \ == != display* in? let1 compose identity typed-lambda typed-define
+    \ \ == != loose-car loose-cdr display* in? let1 compose identity typed-lambda typed-define
 
     )
 
@@ -3447,7 +3447,33 @@
     \;
   </scm-chunk>
 
-  \;
+  <paragraph|loose-car>
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (loose-car pair-or-empty)
+
+    \ \ (if (eq? '() pair-or-empty)
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (car pair-or-empty)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|loose-cdr>
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (loose-cdr pair-or-empty)
+
+    \ \ (if (eq? '() pair-or-empty)
+
+    \ \ \ \ \ \ '()
+
+    \ \ \ \ \ \ (cdr pair-or-empty)))
+
+    \;
+  </scm-chunk>
 
   <paragraph|display*><index|display*><scm|(x y z ...) =\<gtr\> \<less\>#unspecified\<gtr\>>
 

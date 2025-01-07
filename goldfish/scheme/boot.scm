@@ -103,13 +103,3 @@
                           (symbol->value sym))))))
               libs))))
 
-(define (loose-car pair-or-empty)
-  (if (eq? '() pair-or-empty)
-      '()
-      (car pair-or-empty)))
-
-(define (loose-cdr pair-or-empty)
-  (if (eq? '() pair-or-empty)
-      '()
-      (cdr pair-or-empty)))
-
