@@ -9286,7 +9286,7 @@
 
     \ \ string-upcase string-downcase
 
-    \ \ string-fold string-fold-right
+    \ \ string-fold string-fold-right string-for-each-index
 
     \ \ string-reverse
 
@@ -9340,7 +9340,7 @@
 
     \ \ \ \ string-upcase string-downcase
 
-    \ \ \ \ string-fold string-fold-right
+    \ \ \ \ string-fold string-fold-right string-for-each-index
 
     \ \ \ \ string-reverse
 
@@ -11051,6 +11051,182 @@
     (check-catch 'out-of-range (string-fold-right cons '() "abc" 4))
 
     (check-catch 'out-of-range (string-fold-right cons '() "abc" 1 4))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|string-for-each-index>
+
+  它用于按顺序遍历字符串的每个索引。这个过程可以接受可选的参数对来限制循环的起始和结束点。这是一种保证安全和正确的遍历字符串的方法。
+
+  例：
+
+  \;
+
+  (let* ((len (string-length s))
+
+  \ \ \ \ \ \ \ (ans (make-string len)))
+
+  \ \ (string-for-each-index
+
+  \ \ \ \ \ \ (lambda (i c) (string-set! ans (- len i 1) c))
+
+  \ \ \ \ \ \ s)
+
+  \ \ ans)
+
+  \;
+
+  实现
+
+  <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
+    (define (string-for-each-index proc str . start+end)
+
+    \ \ (when (not (procedure? proc))
+
+    \ \ \ \ (error 'type-error "string-for-each-index: first argument must be a procedure"))
+
+    \ \ (when (not (string? str))
+
+    \ \ \ \ (error 'type-error "string-for-each-index: expected a string"))
+
+    \ \ (let ((substr (%string-from-range str start+end)))
+
+    \ \ \ \ (let loop ((i 0) (len (string-length substr)) (acc '()))
+
+    \ \ \ \ \ \ (if (\<less\> i len)
+
+    \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) len (proc i (string-ref substr i) acc))
+
+    \ \ \ \ \ \ \ \ \ \ (reverse acc)))))
+
+    \;
+  </scm-chunk>
+
+  测试
+
+  \;
+
+  测试 string-for-each-index 的基本功能
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-for-each-index
+
+    \ \ \ \ (lambda (i c acc)
+
+    \ \ \ \ \ \ (cons (list i c) acc))
+
+    \ \ \ \ "hello")
+
+    \ \ =\<gtr\> '((0 #\\h) (1 #\\e) (2 #\\l) (3 #\\l) (4 #\\o)))
+
+    \;
+  </scm-chunk>
+
+  测试 string-for-each-index 处理子字符串
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-for-each-index
+
+    \ \ \ \ (lambda (i c acc)
+
+    \ \ \ \ \ \ (cons (list i c) acc))
+
+    \ \ \ \ (substring "hello" 1 4))
+
+    \ \ =\<gtr\> '((0 #\\e) (1 #\\l) (2 #\\l)))
+
+    \;
+  </scm-chunk>
+
+  测试 string-for-each-index 反转字符串
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (list-\<gtr\>string
+
+    \ \ \ \ (reverse
+
+    \ \ \ \ \ \ (string-for-each-index
+
+    \ \ \ \ \ \ \ \ (lambda (i c acc)
+
+    \ \ \ \ \ \ \ \ \ \ (cons c acc))
+
+    \ \ \ \ \ \ \ \ "hello")))
+
+    \ \ =\<gtr\> "olleh")
+
+    \;
+  </scm-chunk>
+
+  测试 string-for-each-index 处理空字符串
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check
+
+    \ \ (string-for-each-index
+
+    \ \ \ \ (lambda (i c acc)
+
+    \ \ \ \ \ \ (cons (list i c) acc))
+
+    \ \ \ \ "")
+
+    \ \ =\<gtr\> '())
+
+    \;
+  </scm-chunk>
+
+  测试 string-for-each-index 处理边界条件
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-catch 'out-of-range
+
+    \ \ (string-for-each-index
+
+    \ \ \ (lambda (i c) (display c))
+
+    \ \ \ "hello" 6))
+
+    \;
+
+    (check-catch 'out-of-range
+
+    \ \ (string-for-each-index
+
+    \ \ \ (lambda (i c) (display c))
+
+    \ \ \ "hello" 0 6))
+
+    \;
+
+    (check-catch 'out-of-range
+
+    \ \ (string-for-each-index
+
+    \ \ \ (lambda (i c) (display c))
+
+    \ \ \ "hello" 3 2))
+
+    \;
+  </scm-chunk>
+
+  测试 string-for-each-index 处理非字符串参数
+
+  <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
+    (check-catch 'type-error
+
+    \ \ (string-for-each-index
+
+    \ \ \ (lambda (i c) (display c))
+
+    \ \ \ 123))
 
     \;
   </scm-chunk>
@@ -16150,7 +16326,6 @@
     <associate|page-width|auto>
     <associate|par-columns|1>
     <associate|par-par-sep|0.3333fn>
-    <associate|project-flag|true>
     <associate|save-aux|false>
   </collection>
 </initial>

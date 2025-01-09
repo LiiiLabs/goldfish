@@ -28,7 +28,7 @@
     string-index string-index-right
     string-contains string-count
     string-upcase string-downcase
-    string-fold string-fold-right
+    string-fold string-fold-right string-for-each-index
     string-reverse
     string-tokenize)
 (begin
@@ -340,6 +340,17 @@
           result
           (loop (- i 1)
                 (kons (string-ref substr i) result))))))
+
+(define (string-for-each-index proc str . start+end)
+  (when (not (procedure? proc))
+    (error 'type-error "string-for-each-index: first argument must be a procedure"))
+  (when (not (string? str))
+    (error 'type-error "string-for-each-index: expected a string"))
+  (let ((substr (%string-from-range str start+end)))
+    (let loop ((i 0) (len (string-length substr)) (acc '()))
+      (if (< i len)
+          (loop (+ i 1) len (proc i (string-ref substr i) acc))
+          (reverse acc)))))
 
 (define (string-tokenize str . char+start+end)
   

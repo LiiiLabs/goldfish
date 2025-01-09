@@ -339,6 +339,56 @@
 (check-catch 'out-of-range (string-fold-right cons '() "abc" 4))
 (check-catch 'out-of-range (string-fold-right cons '() "abc" 1 4))
 
+(check
+  (string-for-each-index
+    (lambda (i c acc)
+      (cons (list i c) acc))
+    "hello")
+  => '((0 #\h) (1 #\e) (2 #\l) (3 #\l) (4 #\o)))
+
+(check
+  (string-for-each-index
+    (lambda (i c acc)
+      (cons (list i c) acc))
+    (substring "hello" 1 4))
+  => '((0 #\e) (1 #\l) (2 #\l)))
+
+(check
+  (list->string
+    (reverse
+      (string-for-each-index
+        (lambda (i c acc)
+          (cons c acc))
+        "hello")))
+  => "olleh")
+
+(check
+  (string-for-each-index
+    (lambda (i c acc)
+      (cons (list i c) acc))
+    "")
+  => '())
+
+(check-catch 'out-of-range
+  (string-for-each-index
+   (lambda (i c) (display c))
+   "hello" 6))
+
+(check-catch 'out-of-range
+  (string-for-each-index
+   (lambda (i c) (display c))
+   "hello" 0 6))
+
+(check-catch 'out-of-range
+  (string-for-each-index
+   (lambda (i c) (display c))
+   "hello" 3 2))
+
+(check-catch 'type-error
+  (string-for-each-index
+   (lambda (i c) (display c))
+   123))
+
 (check (string-tokenize "1 22 333") => '("1" "22" "333"))
 (check (string-tokenize "1 22 333" #\2) => '("1 " " 333"))
 (check (string-tokenize "1 22 333" #\  2) => `("22" "333"))
