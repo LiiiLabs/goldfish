@@ -167,6 +167,14 @@
 
 (check (count even? '(3 1 4 1 5 9 2 5 6)) => 3)
 
+(check (zip '(1 2 3) '(a b c)) => '((1 a) (2 b) (3 c)))
+(check (zip '(1 2) '(a b c)) => '((1 a) (2 b)))
+(check (zip '(1 2 3) '(a b)) => '((1 a) (2 b)))
+(check (zip '(1) '(a) '(x)) => '((1 a x)))
+(check (zip '() '(a b)) => '())
+
+(check (zip '(1 2) '(a b)) => '((1 a) (2 b)))
+
 (check (fold + 0 '(1 2 3 4)) => 10)
 (check (fold + 0 '()) => 0)
 

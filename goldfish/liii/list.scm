@@ -26,8 +26,10 @@
   first second third fourth fifth sixth seventh eighth ninth tenth
   take drop take-right drop-right split-at
   last-pair last
+  ; SRFI 1: Miscellaneous: length, append, concatenate, reverse, zip & count
+  zip count
   ; SRFI 1: fold, unfold & map
-  count fold fold-right reduce reduce-right
+  fold fold-right reduce reduce-right
   filter partition remove append-map
   ; SRFI 1: Searching
   find any every list-index
