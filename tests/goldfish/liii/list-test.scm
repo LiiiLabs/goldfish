@@ -16,6 +16,7 @@
 
 (import (liii list)
         (liii check)
+        (liii cut)
         (only (srfi srfi-1) delete-duplicates))
 
 (check-set-mode! 'report-failed)
@@ -375,21 +376,11 @@
 (check-false (length>=? '(1 2 . 3) 3))
 (check-true (length>=? '(1 2 . 3) 2))
 
-(check ((list-view (list 1 2 3))) => (list 1 2 3))
-
-(check (((list-view (list 1 2 3))
-        map (lambda (x) (+ x 1)))) => (list 2 3 4))
-
-(check (((list-view (list 1 2 3))
-        map (lambda (x) (+ x 1))
-        map (lambda (x) (* x x))))
-       => (list 4 9 16))
-
-(check (flatmap (lambda (x) (list x x))
-                (list 1 2 3))
+(check (flat-map (lambda (x) (list x x))
+                 (list 1 2 3))
   => (list 1 1 2 2 3 3))
 
-(check-catch 'type-error (flatmap 1 (list 1 2 3)))
+(check-catch 'type-error (flat-map 1 (list 1 2 3)))
 
 (check (not-null-list? (list 1)) => #t)
 (check (list-not-null? (list 1)) => #t)
@@ -445,6 +436,9 @@
 ; error depth flatten
 (check-catch 'type-error (flatten '((a) () (b ()) () (c)) 'a))
 (check-catch 'type-error (flatten '((a) () (b ()) () (c)) (make-vector 1 1)))
+
+(check ((case-list (list 1 2 3)) :count) => 3)
+(check ((case-list (list 1 2 3)) :count (cut > <> 1)) => 2)
 
 (check-report)
 

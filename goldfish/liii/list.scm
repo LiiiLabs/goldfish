@@ -39,12 +39,14 @@
   ; SRFI 1: Association List
   assoc assq assv alist-cons
   ; Liii List extensions
-  list-view flatmap
+  flat-map
   list-null? list-not-null? not-null-list?
   length=? length>? length>=? flatten
+  case-list case-list? case-list=?
 )
 (import (srfi srfi-1)
-        (liii error))
+        (liii error)
+        (liii case))
 (begin
 
 (define (length=? x scheme-list)
@@ -70,28 +72,7 @@
           ((pair? lst) (loop (cdr lst) (+ cnt 1)))
           (else (<= len cnt)))))
 
-(define (list-view scheme-list)
-  (define (f-inner-reducer scheme-list filter filter-func rest-funcs)
-    (cond ((null? rest-funcs) (list-view (filter filter-func scheme-list)))
-          (else
-           (f-inner-reducer (filter filter-func scheme-list)
-                            (car rest-funcs)
-                            (cadr rest-funcs)
-                            (cddr rest-funcs)))))
-  (define (f-inner . funcs)
-    (cond ((null? funcs) scheme-list)
-          ((length=? 2 funcs)
-           (list-view ((car funcs) (cadr funcs) scheme-list)))
-          ((even? (length funcs))
-           (f-inner-reducer scheme-list
-                            (car funcs)
-                            (cadr funcs)
-                            (cddr funcs)))
-          (else (error 'wrong-number-of-args
-                       "list-view only accepts even number of args"))))
-  f-inner)
-
-(define flatmap append-map)
+(define flat-map append-map)
 
 (define (not-null-list? l)
   (cond ((pair? l)
@@ -163,6 +144,30 @@
             "`deepest' or a integer, which will be uesd as depth,"
             " but got a ~A") depth)))
   ) ; end of (define* (flatten))
+
+(define-case-class case-list ((data list?))
+  (define (%collect) data)
+
+  (define (%map x . xs)
+    (let1 r (case-list (map x data))
+      (if (null? xs) r (apply r xs))))
+  
+  (define (%flat-map x . xs)
+    (let1 r (case-list (flat-map x data))
+      (if (null? xs) r (apply r xs))))
+  
+  (define (%filter x . xs)
+    (let1 r (case-list (filter x data))
+      (if (null? xs) r (apply r xs))))
+
+  (define (%for-each x)
+    (for-each x data))
+  
+  (define (%count . xs)
+    (cond ((null? xs) (length data))
+          ((length=? 1 xs) (count (car xs) data))
+          (else (error 'wrong-number-of-args "case-list%count" xs))))
+)
 
 ) ; end of begin
 ) ; end of library

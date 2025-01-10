@@ -5780,17 +5780,21 @@
 
     \ \ ; Liii List extensions
 
-    \ \ list-view flatmap
+    \ \ flat-map
 
     \ \ list-null? list-not-null? not-null-list?
 
     \ \ length=? length\<gtr\>? length\<gtr\>=? flatten
 
+    \ \ case-list case-list? case-list=?
+
     )
 
     (import (srfi srfi-1)
 
-    \ \ \ \ \ \ \ \ (liii error))
+    \ \ \ \ \ \ \ \ (liii error)
+
+    \ \ \ \ \ \ \ \ (liii case))
 
     (begin
 
@@ -5851,6 +5855,8 @@
     (import (liii list)
 
     \ \ \ \ \ \ \ \ (liii check)
+
+    \ \ \ \ \ \ \ \ (liii cut)
 
     \ \ \ \ \ \ \ \ (only (srfi srfi-1) delete-duplicates))
 
@@ -8129,158 +8135,24 @@
     \;
   </scm-chunk>
 
-  <paragraph|list-view><index|list-view>
-
-  由于Scheme的List和数据的流向是相反的：
-
-  <\scm-code>
-    (map (lambda (x) (* x x))
-
-    \ \ \ \ \ (map (lambda (x) (+ x 1))
-
-    \ \ \ \ \ \ \ \ \ \ (list 1 2 3)))
-  </scm-code>
-
-  \;
-
-  所以我们实现了<scm|list-view>，采用和Scala的List类似的语法来处理数据：
-
-  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
-    (check ((list-view (list 1 2 3))) =\<gtr\> (list 1 2 3))
-
-    \;
-
-    (check (((list-view (list 1 2 3))
-
-    \ \ \ \ \ \ \ \ map (lambda (x) (+ x 1)))) =\<gtr\> (list 2 3 4))
-
-    \;
-
-    (check (((list-view (list 1 2 3))
-
-    \ \ \ \ \ \ \ \ map (lambda (x) (+ x 1))
-
-    \ \ \ \ \ \ \ \ map (lambda (x) (* x x))))
-
-    \ \ \ \ \ \ \ =\<gtr\> (list 4 9 16))
-
-    \;
-  </scm-chunk>
-
-  <scm|(list-view 1 2 3)>得到的是函数，需要在外面再加一层括号才能得到<scm|(list 1 2 3)>。
-
-  <\big-figure|<wide-tabular|<tformat|<table|<row|<\cell>
-    <\scm-code>
-      (map (lambda (x) (* x x))
-
-      \ \ \ \ \ (map (lambda (x) (+ x 1))
-
-      \ \ \ \ \ \ \ \ \ \ (list 1 2 3)))
-    </scm-code>
-  </cell>|<\cell>
-    <\scm-code>
-      (((list-view 1 2 3)
-
-      \ \ \ \ \ \ \ \ map (lambda (x) (+ x 1))
-
-      \ \ \ \ \ \ \ \ map (lambda (x) (* x x))))
-    </scm-code>
-  </cell>>>>>>
-    使用list处理数据和使用list-view处理数据的对比
-  </big-figure>
-
-  实现list-view时需要考虑三种情况和一种例外情况。
-
-  <\description>
-    <item*|无参数>也就是直接在list-view得到的结果外面添加括号，此时得到的是list-view对应的list
-
-    <item*|有两个参数>这里举例说明，<scm|((list-view 1 2 3) map (lambda (x) (+ x 1)))>实际的计算过程是：
-
-    <\enumerate>
-      <item>计算并得到结果<scm|(map (lambda (x) (+ x 1)) (list 1 2 3)) =\<gtr\> (list 2 3 4)>
-
-      <item>将计算结果包装到 <scm|list-view> 里面，这里使用了<scm|apply>这个内置函数
-    </enumerate>
-
-    其实也是树的转换：
-
-    <\big-figure|<scm|<tree|(list-view 1 2 3)|map|(lambda (x) (+ x 1))>><space|2em><math|\<Rightarrow\>><space|2em><scm|<tree|map|(lambda (x) (+ x 1))|(list 1 2 3)>>>
-      原理的可视化
-    </big-figure>
-
-    <item*|偶数个参数>在上述两个递归退出条件写好的情况下，在思考这种一般的情况。
-
-    需要计算<scm|((list-view 1 2 3) hf1 f1 hf2 f2 ... hfn fn)>，其中hf指的是high-order function，也就是高阶函数。也就是需要计算：
-
-    <\scm>
-      ((((list-view 1 2 3) hf1 f1) hf2 f2) ... hfn fn)
-    </scm>
-
-    \;
-  </description>
+  <paragraph|flat-map><index|flat-map>
 
   <\scm-chunk|goldfish/liii/list.scm|true|true>
-    (define (list-view scheme-list)
-
-    \ \ (define (f-inner-reducer scheme-list filter filter-func rest-funcs)
-
-    \ \ \ \ (cond ((null? rest-funcs) (list-view (filter filter-func scheme-list)))
-
-    \ \ \ \ \ \ \ \ \ \ (else
-
-    \ \ \ \ \ \ \ \ \ \ \ (f-inner-reducer (filter filter-func scheme-list)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car rest-funcs)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cadr rest-funcs)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr rest-funcs)))))
-
-    \ \ (define (f-inner . funcs)
-
-    \ \ \ \ (cond ((null? funcs) scheme-list)
-
-    \ \ \ \ \ \ \ \ \ \ ((length=? 2 funcs)
-
-    \ \ \ \ \ \ \ \ \ \ \ (list-view ((car funcs) (cadr funcs) scheme-list)))
-
-    \ \ \ \ \ \ \ \ \ \ ((even? (length funcs))
-
-    \ \ \ \ \ \ \ \ \ \ \ (f-inner-reducer scheme-list
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car funcs)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cadr funcs)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cddr funcs)))
-
-    \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "list-view only accepts even number of args"))))
-
-    \ \ f-inner)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|flatmap><index|flatmap>
-
-  <\scm-chunk|goldfish/liii/list.scm|true|true>
-    (define flatmap append-map)
+    (define flat-map append-map)
 
     \;
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
-    (check (flatmap (lambda (x) (list x x))
+    (check (flat-map (lambda (x) (list x x))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list 1 2 3))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list 1 2 3))
 
     \ \ =\<gtr\> (list 1 1 2 2 3 3))
 
     \;
 
-    (check-catch 'type-error (flatmap 1 (list 1 2 3)))
+    (check-catch 'type-error (flat-map 1 (list 1 2 3)))
 
     \;
   </scm-chunk>
@@ -8589,6 +8461,66 @@
     (check-catch 'type-error (flatten '((a) () (b ()) () (c)) 'a))
 
     (check-catch 'type-error (flatten '((a) () (b ()) () (c)) (make-vector 1 1)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-list>
+
+  <\goldfish-chunk|goldfish/liii/list.scm|true|true>
+    (define-case-class case-list ((data list?))
+
+    \ \ (define (%collect) data)
+
+    \;
+
+    \ \ (define (%map x . xs)
+
+    \ \ \ \ (let1 r (case-list (map x data))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \ \ 
+
+    \ \ (define (%flat-map x . xs)
+
+    \ \ \ \ (let1 r (case-list (flat-map x data))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \ \ 
+
+    \ \ (define (%filter x . xs)
+
+    \ \ \ \ (let1 r (case-list (filter x data))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+
+    \ \ (define (%for-each x)
+
+    \ \ \ \ (for-each x data))
+
+    \ \ 
+
+    \ \ (define (%count . xs)
+
+    \ \ \ \ (cond ((null? xs) (length data))
+
+    \ \ \ \ \ \ \ \ \ \ ((length=? 1 xs) (count (car xs) data))
+
+    \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args "case-list%count" xs))))
+
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check ((case-list (list 1 2 3)) :count) =\<gtr\> 3)
+
+    (check ((case-list (list 1 2 3)) :count (cut \<gtr\> \<less\>\<gtr\> 1)) =\<gtr\> 2)
 
     \;
   </scm-chunk>

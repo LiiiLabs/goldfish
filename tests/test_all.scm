@@ -25,11 +25,12 @@
 
 ; (display (listdir2 "tests"))
 (define (all-tests)
-  (((list-view (listdir2 "tests/goldfish"))
-    filter path-dir?
-    flatmap listdir2
-    filter (lambda (x) (path-file? x))
-    filter (lambda (x) (not (string-ends? x "srfi-78-test.scm"))))))
+  ((case-list (listdir2 "tests/goldfish"))
+    :filter path-dir?
+    :flat-map listdir2
+    :filter (lambda (x) (path-file? x))
+    :filter (lambda (x) (not (string-ends? x "srfi-78-test.scm")))
+    :collect))
 
 (define (goldfish-cmd)
   (if (os-windows?)
