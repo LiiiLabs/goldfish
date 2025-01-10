@@ -56,7 +56,7 @@
   ; SRFI-8
   receive
   ; Extra routines
-  == != loose-car loose-cdr display* in? compose identity
+  == != loose-car loose-cdr display* in? compose identity any?
   ; Extra structure
   let1  typed-lambda typed-define define-case-class
 )
@@ -104,6 +104,8 @@
       (lambda (x)
         ((car fs) ((apply compose (cdr fs)) x)))))
   
+(define (any? x) #t)
+
 (define-macro (let1 name1 value1 . body)
   `(let ((,name1 ,value1))
      ,@body))

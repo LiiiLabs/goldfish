@@ -404,7 +404,7 @@
 
     \ \ ; Extra routines
 
-    \ \ == != loose-car loose-cdr display* in? compose identity
+    \ \ == != loose-car loose-cdr display* in? compose identity any?
 
     \ \ ; Extra structure
 
@@ -3704,6 +3704,16 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|any?>
+
+  任意类型的参数传入，都会返回真值。
+
+  <\goldfish-chunk|goldfish/liii/base.scm|true|true>
+    (define (any? x) #t)
+
+    \;
+  </goldfish-chunk>
 
   <section|增补结构>
 

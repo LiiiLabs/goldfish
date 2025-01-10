@@ -20,6 +20,48 @@
 
 (check-set-mode! 'report-failed)
 
+(let ((opt1 (option 42))
+      (opt2 (option '())))
+
+  (check (opt1 :map (lambda (x) (+ x 1))
+               :map (lambda (x) (* x 2))
+               :get) => 86)
+  (check (opt2 :map (lambda (x) (+ x 1))
+               :map (lambda (x) (* x 2))
+               :empty?) => #t)
+
+  (check (opt1 :flat-map (lambda (x) (option (+ x 1)))
+               :flat-map (lambda (x) (option (* x 2)))
+               :get) => 86)
+  (check (opt2 :flat-map (lambda (x) (option (+ x 1)))
+               :flat-map (lambda (x) (option (* x 2)))
+               :empty?) => #t)
+
+  (check (opt1 :filter (lambda (x) (> x 40))
+               :filter (lambda (x) (< x 50))
+               :get) => 42)
+  (check (opt1 :filter (lambda (x) (> x 50))
+               :filter (lambda (x) (< x 60))
+               :empty?) => #t)
+  (check (opt2 :filter (lambda (x) (> x 40))
+               :filter (lambda (x) (< x 50))
+               :empty?) => #t)
+
+  (check (opt1 :defined?) => #t)
+  (check (opt1 :empty?) => #f)
+  (check (opt2 :defined?) => #f)
+  (check (opt2 :empty?) => #t)
+
+  (check (opt1 :get) => 42)
+  (check-catch 'value-error (opt2 :get))
+
+  (check (opt1 :get-or-else 0) => 42)
+  (check (opt2 :get-or-else 0) => 0)
+
+  (check (opt1 :get-or-else (lambda () 0)) => 42)
+  (check (opt2 :get-or-else (lambda () 0)) => 0)
+)
+
 (let ((lst (case-list '(1 2 3 4 5))))
   (check (lst :take -1 :collect) => '())
   (check (lst :take 0 :collect) => '())

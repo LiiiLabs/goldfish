@@ -94,6 +94,8 @@
 
     (export
 
+    \ \ option option? option=?
+
     \ \ case-list case-list? case-list=?
 
     \ \ case-vector case-vector? case-vector=?)
@@ -120,6 +122,162 @@
   </scm-chunk>
 
   <section|实现>
+
+  <paragraph|option>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define-case-class option ((value any?))
+
+    \ \ (define (%map f . xs)
+
+    \ \ \ \ (let1 r (if (null? value)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option (f value)))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+
+    \ \ (define (%flat-map f . xs)
+
+    \ \ \ \ (let1 r (if (null? value)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f value))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+
+    \ \ (define (%filter pred . xs)
+
+    \ \ \ \ (let1 r (if (or (null? value) (not (pred value)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option value))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \ \ 
+
+    \ \ (define (%defined?) (not (null? value)))
+
+    \;
+
+    \ \ (define (%empty?) (null? value))
+
+    \;
+
+    \ \ (define (%get)
+
+    \ \ \ \ (if (null? value)
+
+    \ \ \ \ \ \ \ \ (value-error "option is empty, cannot get value")
+
+    \ \ \ \ \ \ \ \ value))
+
+    \;
+
+    \ \ (define (%get-or-else default)
+
+    \ \ \ \ (if (null? value)
+
+    \ \ \ \ \ \ \ \ (if (procedure? default) (default) default)
+
+    \ \ \ \ \ \ \ \ value))
+
+    )
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let ((opt1 (option 42))
+
+    \ \ \ \ \ \ (opt2 (option '())))
+
+    \;
+
+    \ \ (check (opt1 :map (lambda (x) (+ x 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :map (lambda (x) (* x 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :get) =\<gtr\> 86)
+
+    \ \ (check (opt2 :map (lambda (x) (+ x 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :map (lambda (x) (* x 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check (opt1 :flat-map (lambda (x) (option (+ x 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :flat-map (lambda (x) (option (* x 2)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :get) =\<gtr\> 86)
+
+    \ \ (check (opt2 :flat-map (lambda (x) (option (+ x 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :flat-map (lambda (x) (option (* x 2)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check (opt1 :filter (lambda (x) (\<gtr\> x 40))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :filter (lambda (x) (\<less\> x 50))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :get) =\<gtr\> 42)
+
+    \ \ (check (opt1 :filter (lambda (x) (\<gtr\> x 50))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :filter (lambda (x) (\<less\> x 60))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :empty?) =\<gtr\> #t)
+
+    \ \ (check (opt2 :filter (lambda (x) (\<gtr\> x 40))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :filter (lambda (x) (\<less\> x 50))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check (opt1 :defined?) =\<gtr\> #t)
+
+    \ \ (check (opt1 :empty?) =\<gtr\> #f)
+
+    \ \ (check (opt2 :defined?) =\<gtr\> #f)
+
+    \ \ (check (opt2 :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check (opt1 :get) =\<gtr\> 42)
+
+    \ \ (check-catch 'value-error (opt2 :get))
+
+    \;
+
+    \ \ (check (opt1 :get-or-else 0) =\<gtr\> 42)
+
+    \ \ (check (opt2 :get-or-else 0) =\<gtr\> 0)
+
+    \;
+
+    \ \ (check (opt1 :get-or-else (lambda () 0)) =\<gtr\> 42)
+
+    \ \ (check (opt2 :get-or-else (lambda () 0)) =\<gtr\> 0)
+
+    )
+
+    \;
+  </scm-chunk>
 
   <paragraph|case-list>
 

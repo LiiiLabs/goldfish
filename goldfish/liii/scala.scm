@@ -17,10 +17,44 @@
 (define-library (liii scala)
 (import (liii string) (liii vector) (liii list))
 (export
+  option option? option=?
   case-list case-list? case-list=?
   case-vector case-vector? case-vector=?)
 (begin
 
+(define-case-class option ((value any?))
+  (define (%map f . xs)
+    (let1 r (if (null? value)
+                (option '())
+                (option (f value)))
+      (if (null? xs) r (apply r xs))))
+
+  (define (%flat-map f . xs)
+    (let1 r (if (null? value)
+                (option '())
+                (f value))
+      (if (null? xs) r (apply r xs))))
+
+  (define (%filter pred . xs)
+    (let1 r (if (or (null? value) (not (pred value)))
+               (option '())
+               (option value))
+      (if (null? xs) r (apply r xs))))
+  
+  (define (%defined?) (not (null? value)))
+
+  (define (%empty?) (null? value))
+
+  (define (%get)
+    (if (null? value)
+        (value-error "option is empty, cannot get value")
+        value))
+
+  (define (%get-or-else default)
+    (if (null? value)
+        (if (procedure? default) (default) default)
+        value))
+)
 (define-case-class case-list ((data list?))
   (define (%collect) data)
 
