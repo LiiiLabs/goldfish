@@ -17,6 +17,7 @@
 (import (liii list)
         (liii check)
         (liii vector)
+        (liii cut)
         (only (scheme base) let-values))
 
 (check-set-mode! 'report-failed)
@@ -304,6 +305,25 @@
 (check (string->vector "0123" 1 2) => (vector #\1))
 
 (check-catch 'out-of-range (string->vector "0123" 2 10))
+
+(check (vector-filter even? #(1 2 3 4 5 6)) => #(2 4 6))
+(check (vector-filter (lambda (x) (> x 3)) #(1 2 3 4 5 6)) => #(4 5 6))
+(check (vector-filter (lambda (x) (string? x)) #(1 "a" 2 "b" 3)) => #("a" "b"))
+(check (vector-filter (lambda (x) #t) #()) => #())
+(check (vector-filter (lambda (x) #f) #(1 2 3)) => #())
+
+(let1 v (case-vector #(1 2 3))
+  (check (v :count) => 3)
+  (check (v :count (cut > <> 1)) => 2)
+  (check (v :make-string) => "123")
+  (check (v :make-string " ") => "1 2 3")
+  (check (v :make-string "[" "," "]") => "[1,2,3]")
+  
+  (check-catch 'wrong-number-of-args (v :make-string "[" ","))
+  (check-catch 'type-error (v :make-string 123 "," "]"))
+  (check-catch 'type-error (v :make-string "[" 123 "]"))
+  (check-catch 'type-error (v :make-string "[" "," 123))
+)
 
 (check-report)
 
