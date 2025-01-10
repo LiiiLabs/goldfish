@@ -45,6 +45,7 @@
   case-list case-list? case-list=?
 )
 (import (srfi srfi-1)
+        (srfi srfi-13)
         (liii error)
         (liii case))
 (begin
@@ -162,11 +163,35 @@
 
   (define (%for-each x)
     (for-each x data))
-  
+
   (define (%count . xs)
     (cond ((null? xs) (length data))
           ((length=? 1 xs) (count (car xs) data))
           (else (error 'wrong-number-of-args "case-list%count" xs))))
+
+  (define (%make-string . xs)
+    (define (parse-args xs)
+      (cond
+        ((null? xs) (values "" "" ""))
+        ((length=? 1 xs)
+         (let1 sep (car xs)
+           (if (string? sep)
+               (values "" sep "")
+               (type-error "case-list%make-string: separator must be a string" sep))))
+        ((length=? 2 xs)
+         (error 'wrong-number-of-args "case-list%make-string: expected 0, 1, or 3 arguments, but got 2" xs))
+        ((length=? 3 xs)
+         (let ((start (car xs))
+               (sep (cadr xs))
+               (end (caddr xs)))
+           (if (and (string? start) (string? sep) (string? end))
+               (values start sep end)
+               (error 'type-error "case-list%make-string: prefix, separator, and suffix must be strings" xs))))
+        (else (error 'wrong-number-of-args "case-list%make-string: expected 0, 1, or 3 arguments" xs))))
+
+    (receive (start sep end) (parse-args xs)
+      (string-append start (string-join (map object->string data) sep) end)))
+
 )
 
 ) ; end of begin

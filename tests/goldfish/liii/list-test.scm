@@ -440,5 +440,16 @@
 (check ((case-list (list 1 2 3)) :count) => 3)
 (check ((case-list (list 1 2 3)) :count (cut > <> 1)) => 2)
 
+(let1 l (case-list (list 1 2 3))
+  (check (l :make-string) => "123")
+  (check (l :make-string " ") => "1 2 3")
+  (check (l :make-string "[" "," "]") => "[1,2,3]")
+  
+  (check-catch 'wrong-number-of-args (l :make-string "[" ","))
+  (check-catch 'type-error (l :make-string 123 "," "]"))
+  (check-catch 'type-error (l :make-string "[" 123 "]"))
+  (check-catch 'type-error (l :make-string "[" "," 123))
+)
+
 (check-report)
 
