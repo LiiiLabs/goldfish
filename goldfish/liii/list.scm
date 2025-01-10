@@ -164,6 +164,24 @@
   (define (%for-each x)
     (for-each x data))
 
+  (define (%take x . xs)
+    (typed-define (scala-take (data list?) (n integer?))
+      (cond ((< n 0) '())
+            ((>= n (length data)) data)
+            (else (take data n))))
+
+    (let1 r (case-list (scala-take data x))
+      (if (null? xs) r (apply r xs))))
+
+  (define (%take-right x . xs)
+    (typed-define (scala-take-right (data list?) (n integer?))
+      (cond ((< n 0) '())
+            ((>= n (length data)) data)
+            (else (take-right data n))))
+
+    (let1 r (case-list (scala-take-right data x))
+      (if (null? xs) r (apply r xs))))
+
   (define (%count . xs)
     (cond ((null? xs) (length data))
           ((length=? 1 xs) (count (car xs) data))

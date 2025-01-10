@@ -8559,7 +8559,87 @@
     \;
   </scm-chunk>
 
-  <subparagraph|count>
+  <paragraph|case-list%take>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (define (%take x . xs)
+
+    \ \ \ \ (typed-define (scala-take (data list?) (n integer?))
+
+    \ \ \ \ \ \ (cond ((\<less\> n 0) '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= n (length data)) data)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (take data n))))
+
+    \;
+
+    \ \ \ \ (let1 r (case-list (scala-take data x))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (let ((lst (case-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :take -1 :collect) =\<gtr\> '())
+
+    \ \ (check (lst :take 0 :collect) =\<gtr\> '())
+
+    \ \ (check (lst :take 3 :collect) =\<gtr\> '(1 2 3))
+
+    \ \ (check (lst :take 5 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    \ \ (check (lst :take 10 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    )
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-list%take-right>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (define (%take-right x . xs)
+
+    \ \ \ \ (typed-define (scala-take-right (data list?) (n integer?))
+
+    \ \ \ \ \ \ (cond ((\<less\> n 0) '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= n (length data)) data)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (take-right data n))))
+
+    \;
+
+    \ \ \ \ (let1 r (case-list (scala-take-right data x))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (let ((lst (case-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :take-right -1 :collect) =\<gtr\> '())
+
+    \ \ (check (lst :take-right 0 :collect) =\<gtr\> '())
+
+    \ \ (check (lst :take-right 3 :collect) =\<gtr\> '(3 4 5))
+
+    \ \ (check (lst :take-right 5 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    \ \ (check (lst :take-right 10 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    )
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-list%count>
 
   <\goldfish-chunk|goldfish/liii/list.scm|true|true>
     \ \ (define (%count . xs)

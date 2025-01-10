@@ -437,6 +437,22 @@
 (check-catch 'type-error (flatten '((a) () (b ()) () (c)) 'a))
 (check-catch 'type-error (flatten '((a) () (b ()) () (c)) (make-vector 1 1)))
 
+(let ((lst (case-list '(1 2 3 4 5))))
+  (check (lst :take -1 :collect) => '())
+  (check (lst :take 0 :collect) => '())
+  (check (lst :take 3 :collect) => '(1 2 3))
+  (check (lst :take 5 :collect) => '(1 2 3 4 5))
+  (check (lst :take 10 :collect) => '(1 2 3 4 5))
+)
+
+(let ((lst (case-list '(1 2 3 4 5))))
+  (check (lst :take-right -1 :collect) => '())
+  (check (lst :take-right 0 :collect) => '())
+  (check (lst :take-right 3 :collect) => '(3 4 5))
+  (check (lst :take-right 5 :collect) => '(1 2 3 4 5))
+  (check (lst :take-right 10 :collect) => '(1 2 3 4 5))
+)
+
 (check ((case-list (list 1 2 3)) :count) => 3)
 (check ((case-list (list 1 2 3)) :count (cut > <> 1)) => 2)
 
