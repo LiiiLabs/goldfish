@@ -402,9 +402,13 @@
 
     \ \ receive
 
-    \ \ ; Extra routines for (liii base)
+    \ \ ; Extra routines
 
-    \ \ == != loose-car loose-cdr display* in? let1 compose identity typed-lambda typed-define
+    \ \ == != loose-car loose-cdr display* in? compose identity
+
+    \ \ ; Extra structure
+
+    \ \ let1 \ typed-lambda typed-define define-case-class
 
     )
 
@@ -420,7 +424,9 @@
 
     \ \ \ \ \ \ \ \ (liii base)
 
-    \ \ \ \ \ \ \ \ (liii list))
+    \ \ \ \ \ \ \ \ (liii list)
+
+    \ \ \ \ \ \ \ \ (liii case))
 
     \;
 
@@ -3511,7 +3517,7 @@
 
   <section|系统接口>
 
-  <section|三鲤扩展函数>
+  <section|增补函数>
 
   <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
 
@@ -3667,28 +3673,6 @@
     \;
   </scm-chunk>
 
-  <paragraph|let1><index|let1>
-
-  let的语法嵌套层次太多了，故而引入let1，作为let的单参数版本，简化语法。
-
-  <\scm-chunk|goldfish/liii/base.scm|true|true>
-    (define-macro (let1 name1 value1 . body)
-
-    \ \ `(let ((,name1 ,value1))
-
-    \ \ \ \ \ ,@body))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (let1 x 1 x) =\<gtr\> 1)
-
-    (check (let1 x 1 (+ x 1)) =\<gtr\> 2)
-
-    \;
-  </scm-chunk>
-
   <paragraph|identity><index|identity><scm|(x) =\<gtr\> x>
 
   <\scm-chunk|goldfish/liii/base.scm|true|true>
@@ -3717,6 +3701,30 @@
     (check-true ((compose not zero?) 1))
 
     (check-false ((compose not zero?) 0))
+
+    \;
+  </scm-chunk>
+
+  <section|增补结构>
+
+  <paragraph|let1><index|let1>
+
+  let的语法嵌套层次太多了，故而引入let1，作为let的单参数版本，简化语法。
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define-macro (let1 name1 value1 . body)
+
+    \ \ `(let ((,name1 ,value1))
+
+    \ \ \ \ \ ,@body))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (let1 x 1 x) =\<gtr\> 1)
+
+    (check (let1 x 1 (+ x 1)) =\<gtr\> 2)
 
     \;
   </scm-chunk>
@@ -3864,6 +3872,180 @@
 
     \;
   </goldfish-chunk>
+
+  <paragraph|define-case-class><index|define-case-class>
+
+  <\goldfish-chunk|goldfish/liii/base.scm|true|true>
+    (define-macro (define-case-class class-name fields . extra-operations)
+
+    \ \ (let ((constructor (string-\<gtr\>symbol (string-append (symbol-\<gtr\>string class-name))))
+
+    \ \ \ \ \ \ \ \ (type-pred (string-\<gtr\>symbol (string-append (symbol-\<gtr\>string class-name) "?")))
+
+    \ \ \ \ \ \ \ \ (equality-pred (string-\<gtr\>symbol (string-append (symbol-\<gtr\>string class-name) "=?")))
+
+    \ \ \ \ \ \ \ \ (key-fields (map (lambda (field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-\<gtr\>symbol (string-append ":" (symbol-\<gtr\>string (car field)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)))
+
+    \ \ \ \ ‘(begin
+
+    \ \ \ \ \ \ \ (typed-define ,(cons class-name fields)
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ ,@extra-operations
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ (lambda (msg . args)
+
+    \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg 'type) ',class-name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((eq? msg ',(car field)) ,(car field)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field key-field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((eq? msg ,key-field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,constructor ,@(map (lambda (f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (eq? (car f) (car field))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '(car args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car f)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields)
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (op)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((eq? msg ,(string-\<gtr\>symbol (string-append ":" (substring (symbol-\<gtr\>string (caadr op)) 1))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply ,(caadr op) args)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ extra-operations)
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
+
+    \;
+
+    \ \ \ \ \ \ \ (define (,type-pred obj)
+
+    \ \ \ \ \ \ \ \ \ (and (procedure? obj)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (eq? (obj 'type) ',class-name)))
+
+    \;
+
+    \ \ \ \ \ \ \ (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
+
+    \ \ \ \ \ \ \ \ \ (and ,@(map (lambda (field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(equal? (p1 ',(car field)) (p2 ',(car field))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))))
+
+    \;
+  </goldfish-chunk>
+
+  测试：不带伴生函数的样本类person
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define-case-class person
+
+    \ \ ((name string? "Bob")
+
+    \ \ \ (age integer?)))
+
+    \;
+
+    (let1 bob (person :name "Bob" :age 21)
+
+    \ \ (check (bob 'name) =\<gtr\> "Bob")
+
+    \ \ (check (bob 'age) =\<gtr\> 21)
+
+    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello")
+
+    \ \ (check-catch 'value-error (bob 'sex))
+
+    \ \ (check-true (person? bob)))
+
+    \;
+
+    (check-true (person=? (person "Bob" 21) (person "Bob" 21)))
+
+    (check-false (person=? (person "Bob" 21) (person "Bob" 20)))
+
+    \;
+
+    (check-catch 'type-error (person 1 21))
+
+    \;
+
+    (let ((bob (person "Bob" 21))
+
+    \ \ \ \ \ \ (get-name (lambda (x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case* x
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\<less\>person?\<gtr\>) (x 'name))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (???))))))
+
+    \ \ (check (get-name bob) =\<gtr\> "Bob")
+
+    \ \ (check-catch 'not-implemented-error (get-name 1)))
+
+    \;
+  </goldfish-chunk>
+
+  测试：带伴生函数的样本类jerson
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define-case-class jerson
+
+    \ \ ((name string?)
+
+    \ \ \ (age integer?))
+
+    \ \ 
+
+    \ \ (define (%to-string)
+
+    \ \ \ \ (string-append "I am " name " " (number-\<gtr\>string age) " years old!"))
+
+    \ \ (define (%greet x)
+
+    \ \ \ \ (string-append "Hi " x ", " (%to-string)))
+
+    )
+
+    \;
+
+    (let1 bob (jerson "Bob" 21)
+
+    \ \ (check (bob :to-string) =\<gtr\> "I am Bob 21 years old!")
+
+    \ \ (check (bob :greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old!"))
+
+    \;
+  </scm-chunk>
 
   \;
 
@@ -5383,136 +5565,6 @@
     \;
 
     (check-set-mode! 'report-failed)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|define-case-class>
-
-  不带伴生函数的样本类person：
-
-  <\goldfish-chunk|tests/goldfish/liii/case-test.scm|true|true>
-    (define-case-class person
-
-    \ \ ((name string? "Bob")
-
-    \ \ \ (age integer?)))
-
-    \;
-
-    (let1 bob (person :name "Bob" :age 21)
-
-    \ \ (check (bob 'name) =\<gtr\> "Bob")
-
-    \ \ (check (bob 'age) =\<gtr\> 21)
-
-    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello")
-
-    \ \ (check-catch 'value-error (bob 'sex))
-
-    \ \ (check-true (person? bob)))
-
-    \;
-
-    (check-true (person=? (person "Bob" 21) (person "Bob" 21)))
-
-    (check-false (person=? (person "Bob" 21) (person "Bob" 20)))
-
-    \;
-
-    (check-catch 'type-error (person 1 21))
-
-    \;
-
-    (let ((bob (person "Bob" 21))
-
-    \ \ \ \ \ \ (get-name (lambda (x)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case* x
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\<less\>person?\<gtr\>) (x 'name))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (???))))))
-
-    \ \ (check (get-name bob) =\<gtr\> "Bob")
-
-    \ \ (check-catch 'not-implemented-error (get-name 1)))
-
-    \;
-  </goldfish-chunk>
-
-  带伴生函数的样本类jerson：
-
-  <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
-    (define-case-class jerson
-
-    \ \ ((name string?)
-
-    \ \ \ (age integer?))
-
-    \ \ 
-
-    \ \ (define (%to-string)
-
-    \ \ \ \ (string-append "I am " name " " (number-\<gtr\>string age) " years old!"))
-
-    \ \ (define (%greet x)
-
-    \ \ \ \ (string-append "Hi " x ", " (%to-string)))
-
-    )
-
-    \;
-
-    (let1 bob (jerson "Bob" 21)
-
-    \ \ (check (bob :to-string) =\<gtr\> "I am Bob 21 years old!")
-
-    \ \ (check (bob :greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old!"))
-
-    \;
-  </scm-chunk>
-
-  利用define-case-class支持类似Scala中的函数式编程语法：
-
-  <\scm-chunk|tests/goldfish/liii/case-test.scm|true|true>
-    (define-case-class case-list ((data list?))
-
-    \ \ (define (%map x . xs)
-
-    \ \ \ \ (let1 r (case-list (map x data))
-
-    \ \ \ \ \ \ (if (null? xs)
-
-    \ \ \ \ \ \ \ \ \ \ r
-
-    \ \ \ \ \ \ \ \ \ \ (apply r xs))))
-
-    \ \ (define (%collect)
-
-    \ \ \ \ data))
-
-    \;
-
-    (check ((case-list (list 1 2 3))
-
-    \ \ \ \ \ \ \ \ \ :map (lambda (x) (+ x 1))
-
-    \ \ \ \ \ \ \ \ \ :collect)
-
-    \ \ \ \ \ \ \ =\<gtr\> (list 2 3 4))
-
-    \;
-
-    (check ((case-list (list 1 2 3))
-
-    \ \ \ \ \ \ \ \ \ :map (lambda (x) (* x x))
-
-    \ \ \ \ \ \ \ \ \ :map (lambda (x) (+ x 1))
-
-    \ \ \ \ \ \ \ \ \ :collect)
-
-    \ \ \ \ \ \ \ =\<gtr\> (list 2 5 10))
 
     \;
   </scm-chunk>

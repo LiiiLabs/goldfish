@@ -16,7 +16,8 @@
 
 (import (liii check)
         (liii base)
-        (liii list))
+        (liii list)
+        (liii case))
 
 (check-set-mode! 'report-failed)
 
@@ -675,11 +676,11 @@
 (check (in? 1 (vector 3 2 1)) => #t)
 (check-catch 'type-error (in? 1 "123"))
 
-(check (let1 x 1 x) => 1)
-(check (let1 x 1 (+ x 1)) => 2)
-
 (check-true ((compose not zero?) 1))
 (check-false ((compose not zero?) 0))
+
+(check (let1 x 1 x) => 1)
+(check (let1 x 1 (+ x 1)) => 2)
 
 (let1 add1/add (lambda* (x (y 1)) (+ x y))
   (check (add1/add 1) => 2)
@@ -700,6 +701,44 @@
 (check (person :age 21) => "Bob is 21 years old")
 (check (person :name "Alice" :age 25) => "Alice is 25 years old")
 (check-catch 'type-error (person :name 123 :age 25))
+
+(define-case-class person
+  ((name string? "Bob")
+   (age integer?)))
+
+(let1 bob (person :name "Bob" :age 21)
+  (check (bob 'name) => "Bob")
+  (check (bob 'age) => 21)
+  (check ((bob :name "hello") 'name) => "hello")
+  (check-catch 'value-error (bob 'sex))
+  (check-true (person? bob)))
+
+(check-true (person=? (person "Bob" 21) (person "Bob" 21)))
+(check-false (person=? (person "Bob" 21) (person "Bob" 20)))
+
+(check-catch 'type-error (person 1 21))
+
+(let ((bob (person "Bob" 21))
+      (get-name (lambda (x)
+                 (case* x
+                   ((#<person?>) (x 'name))
+                   (else (???))))))
+  (check (get-name bob) => "Bob")
+  (check-catch 'not-implemented-error (get-name 1)))
+
+(define-case-class jerson
+  ((name string?)
+   (age integer?))
+  
+  (define (%to-string)
+    (string-append "I am " name " " (number->string age) " years old!"))
+  (define (%greet x)
+    (string-append "Hi " x ", " (%to-string)))
+)
+
+(let1 bob (jerson "Bob" 21)
+  (check (bob :to-string) => "I am Bob 21 years old!")
+  (check (bob :greet "Alice") => "Hi Alice, I am Bob 21 years old!"))
 
 (check-report)
 

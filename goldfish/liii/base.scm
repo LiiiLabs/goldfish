@@ -55,8 +55,10 @@
   and-let*
   ; SRFI-8
   receive
-  ; Extra routines for (liii base)
-  == != loose-car loose-cdr display* in? let1 compose identity typed-lambda typed-define
+  ; Extra routines
+  == != loose-car loose-cdr display* in? compose identity
+  ; Extra structure
+  let1  typed-lambda typed-define define-case-class
 )
 (begin
 
@@ -94,10 +96,6 @@
          (in? elem (string->list l)))
         (else (error 'type-error "type mismatch"))))
 
-(define-macro (let1 name1 value1 . body)
-  `(let ((,name1 ,value1))
-     ,@body))
-
 (define identity (lambda (x) x))
 
 (define (compose . fs)
@@ -106,6 +104,10 @@
       (lambda (x)
         ((car fs) ((apply compose (cdr fs)) x)))))
   
+(define-macro (let1 name1 value1 . body)
+  `(let ((,name1 ,value1))
+     ,@body))
+
 ; 0 clause BSD, from S7 repo stuff.scm
 (define-macro (typed-lambda args . body)
   ; (typed-lambda ((var [type])...) ...)
@@ -146,6 +148,49 @@
               params)
        ,x
        ,@xs)))
+
+(define-macro (define-case-class class-name fields . extra-operations)
+  (let ((constructor (string->symbol (string-append (symbol->string class-name))))
+        (type-pred (string->symbol (string-append (symbol->string class-name) "?")))
+        (equality-pred (string->symbol (string-append (symbol->string class-name) "=?")))
+        (key-fields (map (lambda (field)
+                           (string->symbol (string-append ":" (symbol->string (car field)))))
+                         fields)))
+    `(begin
+       (typed-define ,(cons class-name fields)
+
+         ,@extra-operations
+
+         (lambda (msg . args)
+           (cond
+             ((eq? msg 'type) ',class-name)
+             ,@(map (lambda (field)
+                      `((eq? msg ',(car field)) ,(car field)))
+                    fields)
+             ,@(map (lambda (field key-field)
+                      `((eq? msg ,key-field)
+                        (,constructor ,@(map (lambda (f)
+                                               (if (eq? (car f) (car field))
+                                                   '(car args)
+                                                   (car f)))
+                                             fields))))
+                    fields key-fields)
+
+             ,@(map (lambda (op)
+                      `((eq? msg ,(string->symbol (string-append ":" (substring (symbol->string (caadr op)) 1))))
+                        (apply ,(caadr op) args)))
+                    extra-operations)
+
+             (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
+
+       (define (,type-pred obj)
+         (and (procedure? obj)
+              (eq? (obj 'type) ',class-name)))
+
+       (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
+         (and ,@(map (lambda (field)
+                       `(equal? (p1 ',(car field)) (p2 ',(car field))))
+                     fields))))))
 
 ) ; end of begin
 ) ; end of define-library
