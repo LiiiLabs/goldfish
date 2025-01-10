@@ -72,6 +72,36 @@
           ((length=? 1 xs) (vector-count (car xs) data))
           (else (error 'wrong-number-of-args "case-vector%count" xs))))
 
+  (define (%take x . xs)
+    (typed-define (scala-take (data vector?) (n integer?))
+      (cond
+        ((< n 0) (vector))
+        ((>= n (vector-length data)) data)
+        (else
+          (let ((new-vec (make-vector n)))
+            (do ((i 0 (+ i 1)))
+                ((>= i n) new-vec)
+              (vector-set! new-vec i (vector-ref data i)))))))
+
+    (let1 r (case-vector (scala-take data x))
+      (if (null? xs) r (apply r xs))))
+
+  (define (%take-right x . xs)
+    (typed-define (scala-take-right (data vector?) (n integer?))
+      (let ((len (vector-length data)))
+        (cond
+          ((< n 0) (vector))
+          ((>= n len) data)
+          (else
+            (let ((new-vec (make-vector n)))
+              (do ((i (- len n) (+ i 1))
+                   (j 0 (+ j 1)))
+                  ((>= j n) new-vec)
+                (vector-set! new-vec j (vector-ref data i))))))))
+
+    (let1 r (case-vector (scala-take-right data x))
+      (if (null? xs) r (apply r xs))))
+
   (define (%fold initial f)
     (vector-fold f initial data))
 

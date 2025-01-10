@@ -13627,7 +13627,111 @@
     \;
   </scm-chunk>
 
-  <subparagraph|fold>
+  <paragraph|case-vector%take>
+
+  <\scm-chunk|goldfish/liii/vector.scm|true|true>
+    \ \ (define (%take x . xs)
+
+    \ \ \ \ (typed-define (scala-take (data vector?) (n integer?))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((\<less\> n 0) (vector))
+
+    \ \ \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) data)
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ (let ((new-vec (make-vector n)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (do ((i 0 (+ i 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= i n) new-vec)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-vec i (vector-ref data i)))))))
+
+    \;
+
+    \ \ \ \ (let1 r (case-vector (scala-take data x))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </scm-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (let ((vec (case-vector #(1 2 3 4 5))))
+
+    \ \ (check (vec :take -1 :collect) =\<gtr\> #())
+
+    \ \ (check (vec :take 0 :collect) =\<gtr\> #())
+
+    \ \ (check (vec :take 3 :collect) =\<gtr\> #(1 2 3))
+
+    \ \ (check (vec :take 5 :collect) =\<gtr\> #(1 2 3 4 5))
+
+    \ \ (check (vec :take 10 :collect) =\<gtr\> #(1 2 3 4 5))
+
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-vector%take-right>
+
+  <\scm-chunk|goldfish/liii/vector.scm|true|true>
+    \ \ (define (%take-right x . xs)
+
+    \ \ \ \ (typed-define (scala-take-right (data vector?) (n integer?))
+
+    \ \ \ \ \ \ (let ((len (vector-length data)))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ ((\<less\> n 0) (vector))
+
+    \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= n len) data)
+
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let ((new-vec (make-vector n)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (do ((i (- len n) (+ i 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (j 0 (+ j 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= j n) new-vec)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-vec j (vector-ref data i))))))))
+
+    \;
+
+    \ \ \ \ (let1 r (case-vector (scala-take-right data x))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </scm-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (let ((vec (case-vector #(1 2 3 4 5))))
+
+    \ \ (check (vec :take-right -1 :collect) =\<gtr\> #())
+
+    \ \ (check (vec :take-right 0 :collect) =\<gtr\> #())
+
+    \ \ (check (vec :take-right 3 :collect) =\<gtr\> #(3 4 5))
+
+    \ \ (check (vec :take-right 5 :collect) =\<gtr\> #(1 2 3 4 5))
+
+    \ \ (check (vec :take-right 10 :collect) =\<gtr\> #(1 2 3 4 5))
+
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-vector%fold>
 
   <\scm-chunk|goldfish/liii/vector.scm|true|true>
     \ \ (define (%fold initial f)
@@ -13661,7 +13765,7 @@
     \;
   </goldfish-chunk>
 
-  <subparagraph|make-string>
+  <paragraph|case-vector%make-string>
 
   <\scm-chunk|goldfish/liii/vector.scm|true|true>
     \ \ (define (%make-string . xs)
