@@ -440,6 +440,14 @@
 (check ((case-list (list 1 2 3)) :count) => 3)
 (check ((case-list (list 1 2 3)) :count (cut > <> 1)) => 2)
 
+(let ((lst (case-list '(1 2 3 4 5))))
+  (check (lst :fold 0 +) => 15)
+  (check (lst :fold '() (lambda (x acc) (cons x acc))) => '(5 4 3 2 1))
+
+  (check (lst :fold-right 0 +) => 15)
+  (check (lst :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
+)
+
 (let1 l (case-list (list 1 2 3))
   (check (l :make-string) => "123")
   (check (l :make-string " ") => "1 2 3")

@@ -8581,6 +8581,40 @@
     \;
   </scm-chunk>
 
+  <subparagraph|fold>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (define (%fold initial f)
+
+    \ \ \ \ (fold f initial data))
+
+    \;
+
+    \ \ (define (%fold-right initial f)
+
+    \ \ \ \ (fold-right f initial data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (let ((lst (case-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :fold 0 +) =\<gtr\> 15)
+
+    \ \ (check (lst :fold '() (lambda (x acc) (cons x acc))) =\<gtr\> '(5 4 3 2 1))
+
+    \;
+
+    \ \ (check (lst :fold-right 0 +) =\<gtr\> 15)
+
+    \ \ (check (lst :fold-right '() (lambda (x acc) (cons x acc))) =\<gtr\> '(1 2 3 4 5))
+
+    )
+
+    \;
+  </scm-chunk>
+
   <subparagraph|make-string>
 
   <\scm-chunk|goldfish/liii/list.scm|true|true>
