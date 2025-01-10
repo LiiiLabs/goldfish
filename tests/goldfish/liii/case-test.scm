@@ -31,15 +31,35 @@
   ((name string?)
    (age integer?))
   
-  (define (to-string)
+  (define (%to-string)
     (string-append "I am " name " " (number->string age) " years old!"))
-  (define (greet x)
-    (string-append "Hi " x ", " (to-string)))
+  (define (%greet x)
+    (string-append "Hi " x ", " (%to-string)))
 )
 
 (let1 bob (jerson "Bob" 21)
-  (check (bob 'to-string) => "I am Bob 21 years old!")
-  (check (bob 'greet "Alice") => "Hi Alice, I am Bob 21 years old!"))
+  (check (bob :to-string) => "I am Bob 21 years old!")
+  (check (bob :greet "Alice") => "Hi Alice, I am Bob 21 years old!"))
+
+(define-case-class case-list ((data list?))
+  (define (%map x . xs)
+    (let1 r (case-list (map x data))
+      (if (null? xs)
+          r
+          (apply r xs))))
+  (define (%collect)
+    data))
+
+(check ((case-list (list 1 2 3))
+         :map (lambda (x) (+ x 1))
+         :collect)
+       => (list 2 3 4))
+
+(check ((case-list (list 1 2 3))
+         :map (lambda (x) (* x x))
+         :map (lambda (x) (+ x 1))
+         :collect)
+       => (list 2 5 10))
 
 ; 0 clause BSD, from S7 repo s7test.scm
 (define (scase x)

@@ -15,7 +15,7 @@
 ;
 
 (define-library (liii case)
-(import (liii base))
+(import (liii base) (liii string))
 (export case* define-case-class)
 (begin
 
@@ -28,15 +28,15 @@
                          fields)))
     `(begin
        (typed-define ,(cons class-name fields)
+
          ,@extra-operations
+
          (lambda (msg . args)
            (cond
              ((eq? msg 'type) ',class-name)
-
              ,@(map (lambda (field)
                       `((eq? msg ',(car field)) ,(car field)))
                     fields)
-
              ,@(map (lambda (field key-field)
                       `((eq? msg ,key-field)
                         (,constructor ,@(map (lambda (f)
@@ -45,23 +45,22 @@
                                                    (car f)))
                                              fields))))
                     fields key-fields)
-            
+
              ,@(map (lambda (op)
-                      `((eq? msg ',(caadr op)) (apply ,(caadr op) args)))
+                      `((eq? msg ,(string->symbol (string-append ":" (string-drop (symbol->string (caadr op)) 1))))
+                        (apply ,(caadr op) args)))
                     extra-operations)
 
              (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
 
-        (define (,type-pred obj)
-          (and (procedure? obj)
-               (eq? (obj 'type) ',class-name)))
+       (define (,type-pred obj)
+         (and (procedure? obj)
+              (eq? (obj 'type) ',class-name)))
 
-        (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
-          (and ,@(map (lambda (field)
-                        `(equal? (p1 ',(car field)) (p2 ',(car field))))
-                        fields)))
-               
-               )))
+       (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
+         (and ,@(map (lambda (field)
+                       `(equal? (p1 ',(car field)) (p2 ',(car field))))
+                     fields))))))
 
 ; 0 clause BSD, from S7 repo case.scm
 (define case* 

@@ -25,21 +25,21 @@
   ((role string?)
    (content string?))
 
-  (define (to-json)
+  (define (%to-json)
     `(("role" . ,role) ("content" . ,content))))
 
 (define-case-class payload
   ((messages vector? #()))
   
-  (define (to-json)
+  (define (%to-json)
     `(("model" . "deepseek-ai/DeepSeek-V2.5")
-          ("messages" . ,(vector-map (lambda (x) (x 'to-json)) messages))
+          ("messages" . ,(vector-map (lambda (x) (x :to-json)) messages))
           ("max_tokens" . 512)))
   
-  (define (to-json-string)
-    (json->string (to-json)))
+  (define (%to-json-string)
+    (json->string (%to-json)))
   
-  (typed-define (append (msg message?))
+  (typed-define (%append (msg message?))
     (payload :messages (vector-append messages (vector msg)))))
 
 (define headers
@@ -51,7 +51,7 @@
 
 (define (chat payload)
   (let* ((r (http-post "https://api.siliconflow.cn/v1/chat/completions"
-            :data (payload 'to-json-string)
+            :data (payload :to-json-string)
             :headers headers)))
     (if (http-ok? r)
         (r 'text)
@@ -65,18 +65,18 @@
 
 (let loop ((i 0) (p (payload #())) (tokens 0))
   (if (< i (length questions))
-      (let* ((q (p 'append (message "user" (questions i))))
+      (let* ((q (p :append (message "user" (questions i))))
              (r (chat q))
              (j (string->json r))
              (a (json-ref* j "choices" 0 "message" "content")))
-          (display* "payload: " (q 'to-json-string))
+          (display* "payload: " (q :to-json-string))
           (newline)
           (newline)
           (display* "Q: " (questions i) "\n")
           (display* "A: " a "\n")
           (newline)
           (loop (+ i 1)
-                (q 'append (message "assistant" a))
+                (q :append (message "assistant" a))
                 (+ tokens (json-ref* j "usage" "total_tokens"))))
       (display* "Total tokens: " tokens)))
 

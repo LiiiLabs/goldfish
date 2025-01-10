@@ -262,7 +262,7 @@
 
     \;
 
-    \ \ (define (to-json)
+    \ \ (define (%to-json)
 
     \ \ \ \ `(("role" . ,role) ("content" . ,content))))
 
@@ -278,23 +278,23 @@
 
     \ \ 
 
-    \ \ (define (to-json)
+    \ \ (define (%to-json)
 
     \ \ \ \ `(("model" . "deepseek-ai/DeepSeek-V2.5")
 
-    \ \ \ \ \ \ \ \ \ \ ("messages" . ,(vector-map (lambda (x) (x 'to-json)) messages))
+    \ \ \ \ \ \ \ \ \ \ ("messages" . ,(vector-map (lambda (x) (x :to-json)) messages))
 
     \ \ \ \ \ \ \ \ \ \ ("max_tokens" . 512)))
 
     \ \ 
 
-    \ \ (define (to-json-string)
+    \ \ (define (%to-json-string)
 
-    \ \ \ \ (json-\<gtr\>string (to-json)))
+    \ \ \ \ (json-\<gtr\>string (%to-json)))
 
     \ \ 
 
-    \ \ (typed-define (append (msg message?))
+    \ \ (typed-define (%append (msg message?))
 
     \ \ \ \ (payload :messages (vector-append messages (vector msg)))))
 
@@ -322,7 +322,7 @@
 
     \ \ (let* ((r (http-post "https://api.siliconflow.cn/v1/chat/completions"
 
-    \ \ \ \ \ \ \ \ \ \ \ \ :data (payload 'to-json-string)
+    \ \ \ \ \ \ \ \ \ \ \ \ :data (payload :to-json-string)
 
     \ \ \ \ \ \ \ \ \ \ \ \ :headers headers)))
 
@@ -354,7 +354,7 @@
 
     \ \ (if (\<less\> i (length questions))
 
-    \ \ \ \ \ \ (let* ((q (p 'append (message "user" (questions i))))
+    \ \ \ \ \ \ (let* ((q (p :append (message "user" (questions i))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (r (chat q))
 
@@ -362,7 +362,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (a (json-ref* j "choices" 0 "message" "content")))
 
-    \ \ \ \ \ \ \ \ \ \ (display* "payload: " (q 'to-json-string))
+    \ \ \ \ \ \ \ \ \ \ (display* "payload: " (q :to-json-string))
 
     \ \ \ \ \ \ \ \ \ \ (newline)
 
@@ -376,7 +376,7 @@
 
     \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (q 'append (message "assistant" a))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (q :append (message "assistant" a))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ tokens (json-ref* j "usage" "total_tokens"))))
 
