@@ -17,7 +17,8 @@
 (import (liii list)
         (liii string)
         (liii os)
-        (liii path))
+        (liii path)
+        (liii scala))
 
 (define (listdir2 dir)
   (map (lambda (x) (string-append dir "/" x))

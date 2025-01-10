@@ -42,7 +42,6 @@
   flat-map
   list-null? list-not-null? not-null-list?
   length=? length>? length>=? flatten
-  case-list case-list? case-list=?
 )
 (import (srfi srfi-1)
         (srfi srfi-13)
@@ -145,78 +144,6 @@
             "`deepest' or a integer, which will be uesd as depth,"
             " but got a ~A") depth)))
   ) ; end of (define* (flatten))
-
-(define-case-class case-list ((data list?))
-  (define (%collect) data)
-
-  (define (%map x . xs)
-    (let1 r (case-list (map x data))
-      (if (null? xs) r (apply r xs))))
-  
-  (define (%flat-map x . xs)
-    (let1 r (case-list (flat-map x data))
-      (if (null? xs) r (apply r xs))))
-  
-  (define (%filter x . xs)
-    (let1 r (case-list (filter x data))
-      (if (null? xs) r (apply r xs))))
-
-  (define (%for-each x)
-    (for-each x data))
-
-  (define (%take x . xs)
-    (typed-define (scala-take (data list?) (n integer?))
-      (cond ((< n 0) '())
-            ((>= n (length data)) data)
-            (else (take data n))))
-
-    (let1 r (case-list (scala-take data x))
-      (if (null? xs) r (apply r xs))))
-
-  (define (%take-right x . xs)
-    (typed-define (scala-take-right (data list?) (n integer?))
-      (cond ((< n 0) '())
-            ((>= n (length data)) data)
-            (else (take-right data n))))
-
-    (let1 r (case-list (scala-take-right data x))
-      (if (null? xs) r (apply r xs))))
-
-  (define (%count . xs)
-    (cond ((null? xs) (length data))
-          ((length=? 1 xs) (count (car xs) data))
-          (else (error 'wrong-number-of-args "case-list%count" xs))))
-
-  (define (%fold initial f)
-    (fold f initial data))
-
-  (define (%fold-right initial f)
-    (fold-right f initial data))
-
-  (define (%make-string . xs)
-    (define (parse-args xs)
-      (cond
-        ((null? xs) (values "" "" ""))
-        ((length=? 1 xs)
-         (let1 sep (car xs)
-           (if (string? sep)
-               (values "" sep "")
-               (type-error "case-list%make-string: separator must be a string" sep))))
-        ((length=? 2 xs)
-         (error 'wrong-number-of-args "case-list%make-string: expected 0, 1, or 3 arguments, but got 2" xs))
-        ((length=? 3 xs)
-         (let ((start (car xs))
-               (sep (cadr xs))
-               (end (caddr xs)))
-           (if (and (string? start) (string? sep) (string? end))
-               (values start sep end)
-               (error 'type-error "case-list%make-string: prefix, separator, and suffix must be strings" xs))))
-        (else (error 'wrong-number-of-args "case-list%make-string: expected 0, 1, or 3 arguments" xs))))
-
-    (receive (start sep end) (parse-args xs)
-      (string-append start (string-join (map object->string data) sep) end)))
-
-)
 
 ) ; end of begin
 ) ; end of library

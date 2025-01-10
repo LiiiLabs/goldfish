@@ -312,42 +312,5 @@
 (check (vector-filter (lambda (x) #t) #()) => #())
 (check (vector-filter (lambda (x) #f) #(1 2 3)) => #())
 
-(let ((vec (case-vector #(1 2 3 4 5))))
-  (check (vec :take -1 :collect) => #())
-  (check (vec :take 0 :collect) => #())
-  (check (vec :take 3 :collect) => #(1 2 3))
-  (check (vec :take 5 :collect) => #(1 2 3 4 5))
-  (check (vec :take 10 :collect) => #(1 2 3 4 5))
-)
-
-(let ((vec (case-vector #(1 2 3 4 5))))
-  (check (vec :take-right -1 :collect) => #())
-  (check (vec :take-right 0 :collect) => #())
-  (check (vec :take-right 3 :collect) => #(3 4 5))
-  (check (vec :take-right 5 :collect) => #(1 2 3 4 5))
-  (check (vec :take-right 10 :collect) => #(1 2 3 4 5))
-)
-
-(let ((vec (case-vector #(1 2 3 4 5))))
-  (check (vec :fold 0 +) => 15)
-  (check (vec :fold '() (lambda (x acc) (cons x acc))) => '(5 4 3 2 1))
-
-  (check (vec :fold-right 0 +) => 15)
-  (check (vec :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
-)
-
-(let1 v (case-vector #(1 2 3))
-  (check (v :count) => 3)
-  (check (v :count (cut > <> 1)) => 2)
-  (check (v :make-string) => "123")
-  (check (v :make-string " ") => "1 2 3")
-  (check (v :make-string "[" "," "]") => "[1,2,3]")
-  
-  (check-catch 'wrong-number-of-args (v :make-string "[" ","))
-  (check-catch 'type-error (v :make-string 123 "," "]"))
-  (check-catch 'type-error (v :make-string "[" 123 "]"))
-  (check-catch 'type-error (v :make-string "[" "," 123))
-)
-
 (check-report)
 
