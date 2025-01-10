@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.8>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
 <style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
 
@@ -94,7 +94,7 @@
 
     (export
 
-    \ \ option option? option=?
+    \ \ option option? option=? none
 
     \ \ case-list case-list? case-list=?
 
@@ -279,6 +279,14 @@
     \;
   </scm-chunk>
 
+  <paragraph|none><index|none>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    (define (none) (option '()))
+
+    \;
+  </scm-chunk>
+
   <paragraph|case-list>
 
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
@@ -399,6 +407,48 @@
     \;
   </scm-chunk>
 
+  <paragraph|case-list%find>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    \ \ (define (%find pred)
+
+    \ \ \ \ (let loop ((lst data))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((null? lst) (none))
+
+    \ \ \ \ \ \ \ \ ((pred (car lst)) (option (car lst)))
+
+    \ \ \ \ \ \ \ \ (else (loop (cdr lst))))))
+
+    \;
+  </scm-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 lst (case-list '(1 2 3 4 5))
+
+    \ \ (check ((lst :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
+
+    \ \ (check ((lst :find (lambda (x) (\<gtr\> x 2))) :get) =\<gtr\> 3)
+
+    \;
+
+    \ \ (check ((lst :find (lambda (x) (\<gtr\> x 10))) :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check ((lst :find even?) :get) =\<gtr\> 2)
+
+    \;
+
+    \ \ (check ((lst :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
+
+    )
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|case-list%count>
 
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
@@ -417,6 +467,34 @@
     (check ((case-list (list 1 2 3)) :count) =\<gtr\> 3)
 
     (check ((case-list (list 1 2 3)) :count (cut \<gtr\> \<less\>\<gtr\> 1)) =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-list%forall>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    \ \ (define (%forall pred)
+
+    \ \ \ \ (every pred data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let ((lst (case-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
+
+    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f)
+
+    )
+
+    \;
+
+    (let ((empty-lst (case-list '())))
+
+    \ \ \ \ (check (empty-lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
 
     \;
   </scm-chunk>
@@ -680,6 +758,72 @@
 
     \;
   </goldfish-chunk>
+
+  <paragraph|case-vector%find>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    \ \ (define (%find p)
+
+    \ \ \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((\<gtr\>= i (vector-length data)) (none))
+
+    \ \ \ \ \ \ \ \ ((p (vector-ref data i)) (option (vector-ref data i)))
+
+    \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let ((vec (case-vector #(1 2 3 4 5))))
+
+    \ \ (check ((vec :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
+
+    \ \ (check ((vec :find (lambda (x) (\<gtr\> x 2))) :get) =\<gtr\> 3)
+
+    \;
+
+    \ \ (check ((vec :find (lambda (x) (\<gtr\> x 10))) :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check ((vec :find even?) :get) =\<gtr\> 2)
+
+    \;
+
+    \ \ (check ((vec :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
+
+    )
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-vector%forall>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    \ \ (define (%forall p)
+
+    \ \ \ \ (vector-every p data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let ((vec (case-vector #(1 2 3 4 5))))
+
+    \ \ (check (vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
+
+    \ \ (check (vec :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f))
+
+    \;
+
+    (let ((empty-vec (case-vector #())))
+
+    \ \ (check (empty-vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
+
+    \;
+  </scm-chunk>
 
   <paragraph|case-vector%fold>
 

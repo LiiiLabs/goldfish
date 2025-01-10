@@ -17,7 +17,7 @@
 (define-library (liii scala)
 (import (liii string) (liii vector) (liii list))
 (export
-  option option? option=?
+  option option? option=? none
   case-list case-list? case-list=?
   case-vector case-vector? case-vector=?)
 (begin
@@ -55,6 +55,8 @@
         (if (procedure? default) (default) default)
         value))
 )
+(define (none) (option '()))
+
 (define-case-class case-list ((data list?))
   (define (%collect) data)
 
@@ -91,10 +93,20 @@
     (let1 r (case-list (scala-take-right data x))
       (if (null? xs) r (apply r xs))))
 
+  (define (%find pred)
+    (let loop ((lst data))
+      (cond
+        ((null? lst) (none))
+        ((pred (car lst)) (option (car lst)))
+        (else (loop (cdr lst))))))
+
   (define (%count . xs)
     (cond ((null? xs) (length data))
           ((length=? 1 xs) (count (car xs) data))
           (else (error 'wrong-number-of-args "case-list%count" xs))))
+
+  (define (%forall pred)
+    (every pred data))
 
   (define (%fold initial f)
     (fold f initial data))
@@ -175,6 +187,15 @@
 
     (let1 r (case-vector (scala-take-right data x))
       (if (null? xs) r (apply r xs))))
+
+  (define (%find p)
+    (let loop ((i 0))
+      (cond
+        ((>= i (vector-length data)) (none))
+        ((p (vector-ref data i)) (option (vector-ref data i)))
+        (else (loop (+ i 1))))))
+  (define (%forall p)
+    (vector-every p data))
 
   (define (%fold initial f)
     (vector-fold f initial data))

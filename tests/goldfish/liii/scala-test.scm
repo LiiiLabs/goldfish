@@ -78,8 +78,27 @@
   (check (lst :take-right 10 :collect) => '(1 2 3 4 5))
 )
 
+(let1 lst (case-list '(1 2 3 4 5))
+  (check ((lst :find (lambda (x) (= x 3))) :get) => 3)
+  (check ((lst :find (lambda (x) (> x 2))) :get) => 3)
+
+  (check ((lst :find (lambda (x) (> x 10))) :empty?) => #t)
+
+  (check ((lst :find even?) :get) => 2)
+
+  (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t)
+)
+
 (check ((case-list (list 1 2 3)) :count) => 3)
 (check ((case-list (list 1 2 3)) :count (cut > <> 1)) => 2)
+
+(let ((lst (case-list '(1 2 3 4 5))))
+  (check (lst :forall (lambda (x) (> x 0))) => #t)
+  (check (lst :forall (lambda (x) (> x 3))) => #f)
+)
+
+(let ((empty-lst (case-list '())))
+    (check (empty-lst :forall (lambda (x) (> x 0))) => #t))
 
 (let ((lst (case-list '(1 2 3 4 5))))
   (check (lst :fold 0 +) => 15)
@@ -115,6 +134,24 @@
   (check (vec :take-right 5 :collect) => #(1 2 3 4 5))
   (check (vec :take-right 10 :collect) => #(1 2 3 4 5))
 )
+
+(let ((vec (case-vector #(1 2 3 4 5))))
+  (check ((vec :find (lambda (x) (= x 3))) :get) => 3)
+  (check ((vec :find (lambda (x) (> x 2))) :get) => 3)
+
+  (check ((vec :find (lambda (x) (> x 10))) :empty?) => #t)
+
+  (check ((vec :find even?) :get) => 2)
+
+  (check ((vec :find (lambda (x) (< x 0))) :empty?) => #t)
+)
+
+(let ((vec (case-vector #(1 2 3 4 5))))
+  (check (vec :forall (lambda (x) (> x 0))) => #t)
+  (check (vec :forall (lambda (x) (> x 3))) => #f))
+
+(let ((empty-vec (case-vector #())))
+  (check (empty-vec :forall (lambda (x) (> x 0))) => #t))
 
 (let ((vec (case-vector #(1 2 3 4 5))))
   (check (vec :fold 0 +) => 15)
