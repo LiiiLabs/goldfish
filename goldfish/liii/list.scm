@@ -169,6 +169,12 @@
           ((length=? 1 xs) (count (car xs) data))
           (else (error 'wrong-number-of-args "case-list%count" xs))))
 
+  (define (%fold initial f)
+    (fold f initial data))
+
+  (define (%fold-right initial f)
+    (fold-right f initial data))
+
   (define (%make-string . xs)
     (define (parse-args xs)
       (cond

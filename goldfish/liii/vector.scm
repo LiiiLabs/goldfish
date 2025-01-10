@@ -72,6 +72,12 @@
           ((length=? 1 xs) (vector-count (car xs) data))
           (else (error 'wrong-number-of-args "case-vector%count" xs))))
 
+  (define (%fold initial f)
+    (vector-fold f initial data))
+
+  (define (%fold-right initial f)
+    (vector-fold-right f initial data))
+
   (define (%make-string . xs)
     (define (parse-args xs)
       (cond
@@ -95,7 +101,6 @@
     (receive (start sep end) (parse-args xs)
       (string-append start (string-join (map object->string (vector->list data)) sep) end)))
 )
-
 ) ; end of begin
 ) ; end of define-library
 

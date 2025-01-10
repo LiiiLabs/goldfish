@@ -312,6 +312,14 @@
 (check (vector-filter (lambda (x) #t) #()) => #())
 (check (vector-filter (lambda (x) #f) #(1 2 3)) => #())
 
+(let ((vec (case-vector #(1 2 3 4 5))))
+  (check (vec :fold 0 +) => 15)
+  (check (vec :fold '() (lambda (x acc) (cons x acc))) => '(5 4 3 2 1))
+
+  (check (vec :fold-right 0 +) => 15)
+  (check (vec :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
+)
+
 (let1 v (case-vector #(1 2 3))
   (check (v :count) => 3)
   (check (v :count (cut > <> 1)) => 2)

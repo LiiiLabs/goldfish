@@ -8581,6 +8581,40 @@
     \;
   </scm-chunk>
 
+  <subparagraph|fold>
+
+  <\scm-chunk|goldfish/liii/list.scm|true|true>
+    \ \ (define (%fold initial f)
+
+    \ \ \ \ (fold f initial data))
+
+    \;
+
+    \ \ (define (%fold-right initial f)
+
+    \ \ \ \ (fold-right f initial data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (let ((lst (case-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :fold 0 +) =\<gtr\> 15)
+
+    \ \ (check (lst :fold '() (lambda (x acc) (cons x acc))) =\<gtr\> '(5 4 3 2 1))
+
+    \;
+
+    \ \ (check (lst :fold-right 0 +) =\<gtr\> 15)
+
+    \ \ (check (lst :fold-right '() (lambda (x acc) (cons x acc))) =\<gtr\> '(1 2 3 4 5))
+
+    )
+
+    \;
+  </scm-chunk>
+
   <subparagraph|make-string>
 
   <\scm-chunk|goldfish/liii/list.scm|true|true>
@@ -13511,7 +13545,45 @@
     \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args "case-vector%count" xs))))
 
     \;
+  </scm-chunk>
 
+  <subparagraph|fold>
+
+  <\scm-chunk|goldfish/liii/vector.scm|true|true>
+    \ \ (define (%fold initial f)
+
+    \ \ \ \ (vector-fold f initial data))
+
+    \;
+
+    \ \ (define (%fold-right initial f)
+
+    \ \ \ \ (vector-fold-right f initial data))
+
+    \;
+  </scm-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/vector-test.scm|true|true>
+    (let ((vec (case-vector #(1 2 3 4 5))))
+
+    \ \ (check (vec :fold 0 +) =\<gtr\> 15)
+
+    \ \ (check (vec :fold '() (lambda (x acc) (cons x acc))) =\<gtr\> '(5 4 3 2 1))
+
+    \;
+
+    \ \ (check (vec :fold-right 0 +) =\<gtr\> 15)
+
+    \ \ (check (vec :fold-right '() (lambda (x acc) (cons x acc))) =\<gtr\> '(1 2 3 4 5))
+
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|make-string>
+
+  <\scm-chunk|goldfish/liii/vector.scm|true|true>
     \ \ (define (%make-string . xs)
 
     \ \ \ \ (define (parse-args xs)
@@ -13557,8 +13629,6 @@
     \ \ \ \ \ \ (string-append start (string-join (map object-\<gtr\>string (vector-\<gtr\>list data)) sep) end)))
 
     )
-
-    \;
   </scm-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/vector-test.scm|true|true>
