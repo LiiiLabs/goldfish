@@ -377,31 +377,53 @@
 
   <subsection|case-string>
 
+  Unicode编码的字符串。
+
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
     (define-case-class case-string ((data string?))
-
-    \ \ (define (%unbox) data)
 
     \;
   </scm-chunk>
 
-  <paragraph|case-string%map><typehint|((p procedure?)) =\<gtr\> case-string?>
+  <subsubsection|基础操作>
+
+  <paragraph|case-string%unbox>
 
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
-    (define (%map x . xs)
-
-    \ \ (%apply-one x xs
-
-    \ \ \ \ (case-string (string-map x data))))
+    (define (%unbox) data)
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
-    (check ((case-string "abc") :map char-upcase :unbox) =\<gtr\> "ABC")
+    (check ((box "abc") :unbox) =\<gtr\> "abc")
+
+    (check ((box "") :unbox) =\<gtr\> "")
 
     \;
   </goldfish-chunk>
+
+  <subsubsection|选择器>
+
+  <paragraph|case-string%length>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%length)
+
+    \ \ (u8-string-length data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (check ((case-string "abc") :length) =\<gtr\> 3)
+
+    (check ((case-string "中文") :length) =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <subsubsection|谓词>
 
   <paragraph|case-string%empty?><typehint|=\<gtr\> boolean?>
 
@@ -421,21 +443,25 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|case-string%length>
+  <paragraph|case-string%starts-with>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
-    (define (%length)
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%starts-with prefix)
 
-    \ \ (string-length data))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
-    (check ((case-string "abc") :length) =\<gtr\> 3)
+    \ \ (string-starts? data prefix))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
+
+  <paragraph|case-string%ends-with>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%ends-with suffix)
+
+    \ \ (string-ends? data suffix))
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|case-string%forall>
 
@@ -463,12 +489,52 @@
 
   <paragraph|case-string%contains>
 
-  检查字符串中是否包含指定的字符。
+  检查字符串中是否包含指定的字符或者子字符串。
 
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
-    (define (%contains ch)
+    (define (%contains elem)
 
-    \ \ (string-any (lambda (x) (equal? x ch)) data))
+    \ \ (cond ((string? elem)
+
+    \ \ \ \ \ \ \ \ \ (string-contains data elem))
+
+    \ \ \ \ \ \ \ \ ((char? elem)
+
+    \ \ \ \ \ \ \ \ \ (string-contains data (string elem)))
+
+    \ \ \ \ \ \ \ \ (else (type-error "elem must be char or string"))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 str (case-string "Hello, World!")
+
+    \ \ (check-true (str :contains #\\W))
+
+    \ \ (check-true (str :contains "Hello"))
+
+    \ \ (check-true (str :contains "")))
+
+    \;
+  </goldfish-chunk>
+
+  <subsubsection|高阶函数>
+
+  <paragraph|case-string%map><typehint|((p procedure?)) =\<gtr\> case-string?>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%map x . xs)
+
+    \ \ (%apply-one x xs
+
+    \ \ \ \ (case-string (string-map x data))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (check ((case-string "abc") :map char-upcase :unbox) =\<gtr\> "ABC")
 
     \;
   </goldfish-chunk>
@@ -491,8 +557,6 @@
     \ \ (check (str :forall char-alphabetic?) =\<gtr\> #f)
 
     \ \ (check (str :exists char-alphabetic?) =\<gtr\> #t)
-
-    \ \ (check (str :contains #\\W) =\<gtr\> #t)
 
     \ \ (check (str :count char-alphabetic?) =\<gtr\> 10)
 

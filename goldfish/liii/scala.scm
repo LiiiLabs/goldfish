@@ -83,17 +83,20 @@
 )
 
 (define-case-class case-string ((data string?))
-  (define (%unbox) data)
 
-(define (%map x . xs)
-  (%apply-one x xs
-    (case-string (string-map x data))))
+(define (%unbox) data)
+
+(define (%length)
+  (u8-string-length data))
 
 (define (%empty?)
   (string-null? data))
 
-(define (%length)
-  (string-length data))
+(define (%starts-with prefix)
+  (string-starts? data prefix))
+
+(define (%ends-with suffix)
+  (string-ends? data suffix))
 
 (define (%forall pred)
   (string-every pred data))
@@ -101,8 +104,16 @@
 (define (%exists pred)
   (string-any pred data))
 
-(define (%contains ch)
-  (string-any (lambda (x) (equal? x ch)) data))
+(define (%contains elem)
+  (cond ((string? elem)
+         (string-contains data elem))
+        ((char? elem)
+         (string-contains data (string elem)))
+        (else (type-error "elem must be char or string"))))
+
+(define (%map x . xs)
+  (%apply-one x xs
+    (case-string (string-map x data))))
 
 (define (%count pred?)
   (string-count data pred?))

@@ -70,17 +70,25 @@
 (check (((box 1) :until 2) :collect) => (list 1))
 (check (((box 2) :until 2) :collect) => (list ))
 
-(check ((case-string "abc") :map char-upcase :unbox) => "ABC")
+(check ((box "abc") :unbox) => "abc")
+(check ((box "") :unbox) => "")
+
+(check ((case-string "abc") :length) => 3)
+(check ((case-string "中文") :length) => 2)
 
 (check-true ((case-string "") :empty?))
 (check-false ((case-string "abc") :empty?))
 
-(check ((case-string "abc") :length) => 3)
+(let1 str (case-string "Hello, World!")
+  (check-true (str :contains #\W))
+  (check-true (str :contains "Hello"))
+  (check-true (str :contains "")))
+
+(check ((case-string "abc") :map char-upcase :unbox) => "ABC")
 
 (let1 str (case-string "Hello, World!")
   (check (str :forall char-alphabetic?) => #f)
   (check (str :exists char-alphabetic?) => #t)
-  (check (str :contains #\W) => #t)
   (check (str :count char-alphabetic?) => 10)
 )
 
