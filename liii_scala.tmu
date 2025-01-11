@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
 
@@ -17,7 +17,7 @@
 
   <section|许可证>
 
-  <\scm-chunk|goldfish/liii/scala.scm|false|true>
+  <\goldfish-chunk|goldfish/liii/scala.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -49,9 +49,9 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|false|true>
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -83,7 +83,7 @@
     ;
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <section|接口>
 
@@ -96,9 +96,13 @@
 
     \ \ option option? option=? none
 
+    \ \ case-string case-string? case-string=?
+
     \ \ case-list case-list? case-list=?
 
-    \ \ case-vector case-vector? case-vector=?)
+    \ \ case-vector case-vector? case-vector=?
+
+    )
 
     (begin
 
@@ -120,6 +124,18 @@
 
     \;
   </scm-chunk>
+
+  <section|公共子函数>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%apply-one x xs r)
+
+    \ \ (let1 result r
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </goldfish-chunk>
 
   <section|实现>
 
@@ -283,6 +299,74 @@
 
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
     (define (none) (option '()))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-string>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    (define-case-class case-string ((data string?))
+
+    \ \ (define (%unbox) data)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-string%map><typehint|((p procedure?)) =\<gtr\> case-string?>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%map x . xs)
+
+    \ \ (%apply-one x xs
+
+    \ \ \ \ (case-string (string-map x data))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (check ((case-string "abc") :map char-upcase :unbox) =\<gtr\> "ABC")
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-string%empty?><typehint|=\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|false>
+    (define (%empty?)
+
+    \ \ (string-null? data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|false>
+    (check-true ((case-string "") :empty?))
+
+    (check-false ((case-string "abc") :empty?))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-string%length>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%length)
+
+    \ \ (string-length data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (check ((case-string "abc") :length) =\<gtr\> 3)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+    )
 
     \;
   </scm-chunk>

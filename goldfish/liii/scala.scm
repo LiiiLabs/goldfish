@@ -18,9 +18,15 @@
 (import (liii string) (liii vector) (liii list))
 (export
   option option? option=? none
+  case-string case-string? case-string=?
   case-list case-list? case-list=?
-  case-vector case-vector? case-vector=?)
+  case-vector case-vector? case-vector=?
+)
 (begin
+
+(define (%apply-one x xs r)
+  (let1 result r
+    (if (null? xs) r (apply r xs))))
 
 (define-case-class option ((value any?))
   (define (%map f . xs)
@@ -56,6 +62,21 @@
         value))
 )
 (define (none) (option '()))
+
+(define-case-class case-string ((data string?))
+  (define (%unbox) data)
+
+(define (%map x . xs)
+  (%apply-one x xs
+    (case-string (string-map x data))))
+
+(define (%empty?)
+  (string-null? data))
+
+(define (%length)
+  (string-length data))
+
+)
 
 (define-case-class case-list ((data list?))
   (define (%collect) data)

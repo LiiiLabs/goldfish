@@ -62,6 +62,13 @@
   (check (opt2 :get-or-else (lambda () 0)) => 0)
 )
 
+(check ((case-string "abc") :map char-upcase :unbox) => "ABC")
+
+(check-true ((case-string "") :empty?))
+(check-false ((case-string "abc") :empty?))
+
+(check ((case-string "abc") :length) => 3)
+
 (let ((lst (case-list '(1 2 3 4 5))))
   (check (lst :take -1 :collect) => '())
   (check (lst :take 0 :collect) => '())
