@@ -147,7 +147,7 @@
 
   <section|实现>
 
-  <paragraph|option>
+  <subsection|option>
 
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     (define-case-class option ((value any?))
@@ -311,7 +311,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|case-integer>
+  <subsection|case-integer>
 
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     (define-case-class case-integer ((data integer?))
@@ -347,7 +347,7 @@
 
   <paragraph|case-integer%until>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     (typed-define (%until (n integer?))
 
     \ \ (if (\<less\>= n data)
@@ -375,7 +375,7 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|case-string>
+  <subsection|case-string>
 
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
     (define-case-class case-string ((data string?))
@@ -443,15 +443,25 @@
     \;
   </scm-chunk>
 
-  <paragraph|case-list>
+  <subsection|case-list>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     (define-case-class case-list ((data list?))
 
-    \ \ (define (%collect) data)
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-list%collect>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%collect) data)
 
     \;
+  </goldfish-chunk>
 
+  \;
+
+  <\scm-chunk|goldfish/liii/scala.scm|true|true>
     \ \ (define (%map x . xs)
 
     \ \ \ \ (let1 r (case-list (map x data))
@@ -563,20 +573,76 @@
     \;
   </scm-chunk>
 
+  <paragraph|case-list%forall>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%forall pred)
+
+    \ \ (every pred data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 l (case-list '(1 2 3))
+
+    \ \ (check-true (l :forall positive?)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-list%exists>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%exists pred)
+
+    \ \ (any pred data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 l (case-list '(1 2 3))
+
+    \ \ (check-true (l :exists even?)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-list%contains><typehint|(elem) =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%contains elem)
+
+    \ \ (%exists (lambda (x) (equal? x elem))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 l (case-list '(1 2 3))
+
+    \ \ (check-true (l :contains 1))
+
+    \ \ (check-false (l :contains 4)))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|case-list%find><typehint|((pred procedure?)) =\<gtr\> option?>
 
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
-    \ \ (define (%find pred)
+    (define (%find pred)
 
-    \ \ \ \ (let loop ((lst data))
+    \ \ (let loop ((lst data))
 
-    \ \ \ \ \ \ (cond
+    \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ ((null? lst) (none))
+    \ \ \ \ \ \ ((null? lst) (none))
 
-    \ \ \ \ \ \ \ \ ((pred (car lst)) (option (car lst)))
+    \ \ \ \ \ \ ((pred (car lst)) (option (car lst)))
 
-    \ \ \ \ \ \ \ \ (else (loop (cdr lst))))))
+    \ \ \ \ \ \ (else (loop (cdr lst))))))
 
     \;
   </scm-chunk>
@@ -769,7 +835,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|case-vector>
+  <subsection|case-vector>
 
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
     (define-case-class case-vector ((data vector?))
@@ -1093,7 +1159,7 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|case-hash-table>
+  <subsection|case-hash-table>
 
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     (define-case-class case-hash-table ((data hash-table?))

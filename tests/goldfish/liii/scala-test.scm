@@ -93,6 +93,16 @@
   (check (lst :take-right 10 :collect) => '(1 2 3 4 5))
 )
 
+(let1 l (case-list '(1 2 3))
+  (check-true (l :forall positive?)))
+
+(let1 l (case-list '(1 2 3))
+  (check-true (l :exists even?)))
+
+(let1 l (case-list '(1 2 3))
+  (check-true (l :contains 1))
+  (check-false (l :contains 4)))
+
 (let1 lst (case-list '(1 2 3 4 5))
   (check ((lst :find (lambda (x) (= x 3))) :get) => 3)
   (check ((lst :find (lambda (x) (> x 2))) :get) => 3)

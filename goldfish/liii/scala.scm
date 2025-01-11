@@ -98,7 +98,8 @@
 )
 
 (define-case-class case-list ((data list?))
-  (define (%collect) data)
+
+(define (%collect) data)
 
   (define (%map x . xs)
     (let1 r (case-list (map x data))
@@ -133,12 +134,21 @@
     (let1 r (case-list (scala-take-right data x))
       (if (null? xs) r (apply r xs))))
 
-  (define (%find pred)
-    (let loop ((lst data))
-      (cond
-        ((null? lst) (none))
-        ((pred (car lst)) (option (car lst)))
-        (else (loop (cdr lst))))))
+(define (%forall pred)
+  (every pred data))
+
+(define (%exists pred)
+  (any pred data))
+
+(define (%contains elem)
+  (%exists (lambda (x) (equal? x elem))))
+
+(define (%find pred)
+  (let loop ((lst data))
+    (cond
+      ((null? lst) (none))
+      ((pred (car lst)) (option (car lst)))
+      (else (loop (cdr lst))))))
 
   (define (%count . xs)
     (cond ((null? xs) (length data))
