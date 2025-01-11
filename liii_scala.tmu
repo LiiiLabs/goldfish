@@ -98,6 +98,8 @@
 
     \ \ option option? option=? none
 
+    \ \ case-integer case-integer? case-integer=?
+
     \ \ case-string case-string? case-string=?
 
     \ \ case-list case-list? case-list=?
@@ -308,6 +310,46 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|case-integer>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define-case-class case-integer ((data integer?))
+
+    \ \ (define (%unbox) data)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-integer%to>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (typed-define (%to (n integer?))
+
+    \ \ (if (\<less\> n data)
+
+    \ \ \ \ \ \ (case-list (list))
+
+    \ \ \ \ \ \ (case-list (iota (+ (- n data) 1) data))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (check (((box 1) :to 2) :collect) =\<gtr\> (list 1 2))
+
+    (check (((box 1) :to 1) :collect) =\<gtr\> (list 1))
+
+    (check (((box 2) :to 1) :collect) =\<gtr\> (list ))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|case-string>
 
@@ -1128,7 +1170,9 @@
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     (define (box x)
 
-    \ \ (cond ((string? x) (case-string x))
+    \ \ (cond ((integer? x) (case-integer x))
+
+    \ \ \ \ \ \ \ \ ((string? x) (case-string x))
 
     \ \ \ \ \ \ \ \ ((list? x) (case-list x))
 

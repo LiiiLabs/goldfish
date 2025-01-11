@@ -19,6 +19,7 @@
         (liii list) (liii hash-table))
 (export
   option option? option=? none
+  case-integer case-integer? case-integer=?
   case-string case-string? case-string=?
   case-list case-list? case-list=?
   case-vector case-vector? case-vector=?
@@ -65,6 +66,16 @@
         value))
 )
 (define (none) (option '()))
+
+(define-case-class case-integer ((data integer?))
+  (define (%unbox) data)
+
+(typed-define (%to (n integer?))
+  (if (< n data)
+      (case-list (list))
+      (case-list (iota (+ (- n data) 1) data))))
+
+)
 
 (define-case-class case-string ((data string?))
   (define (%unbox) data)
@@ -272,7 +283,8 @@
 )
 
 (define (box x)
-  (cond ((string? x) (case-string x))
+  (cond ((integer? x) (case-integer x))
+        ((string? x) (case-string x))
         ((list? x) (case-list x))
         ((vector? x) (case-vector x))
         ((hash-table? x) (case-hash-table x))
