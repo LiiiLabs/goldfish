@@ -497,7 +497,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|case-list%find>
+  <paragraph|case-list%find><typehint|((pred procedure?)) =\<gtr\> option?>
 
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
     \ \ (define (%find pred)
@@ -1075,6 +1075,46 @@
     \ \ \ \ (check (r 'c) =\<gtr\> 4)))
 
     \ \ \ \ \ \ 
+  </goldfish-chunk>
+
+  <paragraph|case-hash-table%get><typehint|((k any?)) =\<gtr\> option?>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%get k)
+
+    \ \ (option (hash-table-ref/default data k '())))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+
+    \ \ (check ((ht :get 'a) :get) =\<gtr\> 1)
+
+    \ \ (check ((ht :get 'd) :empty?) =\<gtr\> #t))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-hash-table%contains><typehint|((k any?)) =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%contains k)
+
+    \ \ (hash-table-contains? data k))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+
+    \ \ (check-true (ht :contains 'a))
+
+    \ \ (check-false (ht :contains 'd)))
+
+    \;
   </goldfish-chunk>
 
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>

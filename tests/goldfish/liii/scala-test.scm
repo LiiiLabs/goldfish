@@ -188,5 +188,13 @@
     (check (r 'b) => 3)
     (check (r 'c) => 4)))
       
+(let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+  (check ((ht :get 'a) :get) => 1)
+  (check ((ht :get 'd) :empty?) => #t))
+
+(let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+  (check-true (ht :contains 'a))
+  (check-false (ht :contains 'd)))
+
 (check-report)
 

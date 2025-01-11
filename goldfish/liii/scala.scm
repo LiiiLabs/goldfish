@@ -263,6 +263,12 @@
          data)
       (case-hash-table r))))
 
+(define (%get k)
+  (option (hash-table-ref/default data k '())))
+
+(define (%contains k)
+  (hash-table-contains? data k))
+
 )
 
 (define (box x)
