@@ -345,6 +345,30 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|case-integer%until>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|false>
+    (typed-define (%until (n integer?))
+
+    \ \ (if (\<less\>= n data)
+
+    \ \ \ \ \ \ (case-list (list))
+
+    \ \ \ \ \ \ (case-list (iota (+ (- n data)) data))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (check (((box 1) :until 3) :collect) =\<gtr\> (list 1 2))
+
+    (check (((box 1) :until 2) :collect) =\<gtr\> (list 1))
+
+    (check (((box 2) :until 2) :collect) =\<gtr\> (list ))
+
+    \;
+  </goldfish-chunk>
+
   <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     )
 

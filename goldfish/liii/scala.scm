@@ -75,6 +75,11 @@
       (case-list (list))
       (case-list (iota (+ (- n data) 1) data))))
 
+(typed-define (%until (n integer?))
+  (if (<= n data)
+      (case-list (list))
+      (case-list (iota (+ (- n data)) data))))
+
 )
 
 (define-case-class case-string ((data string?))

@@ -66,6 +66,10 @@
 (check (((box 1) :to 1) :collect) => (list 1))
 (check (((box 2) :to 1) :collect) => (list ))
 
+(check (((box 1) :until 3) :collect) => (list 1 2))
+(check (((box 1) :until 2) :collect) => (list 1))
+(check (((box 2) :until 2) :collect) => (list ))
+
 (check ((case-string "abc") :map char-upcase :unbox) => "ABC")
 
 (check-true ((case-string "") :empty?))
