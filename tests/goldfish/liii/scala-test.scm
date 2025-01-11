@@ -168,7 +168,7 @@
   (check (vec :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
 )
 
-(let1 v (case-vector #(1 2 3))
+(let1 v (box #(1 2 3))
   (check (v :count) => 3)
   (check (v :count (cut > <> 1)) => 2)
   (check (v :make-string) => "123")
@@ -181,5 +181,12 @@
   (check-catch 'type-error (v :make-string "[" "," 123))
 )
 
+(let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+  (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
+              :collect)
+    (check (r 'a) => 2)
+    (check (r 'b) => 3)
+    (check (r 'c) => 4)))
+      
 (check-report)
 

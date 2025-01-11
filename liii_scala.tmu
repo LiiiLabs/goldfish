@@ -90,7 +90,9 @@
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
     (define-library (liii scala)
 
-    (import (liii string) (liii vector) (liii list))
+    (import (liii string) (liii vector)
+
+    \ \ \ \ \ \ \ \ (liii list) (liii hash-table))
 
     (export
 
@@ -101,6 +103,10 @@
     \ \ case-list case-list? case-list=?
 
     \ \ case-vector case-vector? case-vector=?
+
+    \ \ case-hash-table case-hash-table? case-hash-table=?
+
+    \ \ box
 
     )
 
@@ -333,7 +339,7 @@
 
   <paragraph|case-string%empty?><typehint|=\<gtr\> boolean?>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     (define (%empty?)
 
     \ \ (string-null? data))
@@ -341,7 +347,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|false>
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
     (check-true ((case-string "") :empty?))
 
     (check-false ((case-string "abc") :empty?))
@@ -994,7 +1000,7 @@
   </scm-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
-    (let1 v (case-vector #(1 2 3))
+    (let1 v (box #(1 2 3))
 
     \ \ (check (v :count) =\<gtr\> 3)
 
@@ -1017,6 +1023,80 @@
     \ \ (check-catch 'type-error (v :make-string "[" "," 123))
 
     )
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-hash-table>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define-case-class case-hash-table ((data hash-table?))
+
+    \ \ (define (%collect) data)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-hash-table%map>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%map f . xs)
+
+    \ \ (%apply-one f xs
+
+    \ \ \ \ (let1 r (make-hash-table)
+
+    \ \ \ \ \ \ (hash-table-for-each
+
+    \ \ \ \ \ \ \ \ \ (lambda (k v)
+
+    \ \ \ \ \ \ \ \ \ \ \ (receive (k1 v1) (f k v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! r k1 v1)))
+
+    \ \ \ \ \ \ \ \ \ data)
+
+    \ \ \ \ \ \ (case-hash-table r))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+
+    \ \ (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ :collect)
+
+    \ \ \ \ (check (r 'a) =\<gtr\> 2)
+
+    \ \ \ \ (check (r 'b) =\<gtr\> 3)
+
+    \ \ \ \ (check (r 'c) =\<gtr\> 4)))
+
+    \ \ \ \ \ \ 
+  </goldfish-chunk>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|box>
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (box x)
+
+    \ \ (cond ((string? x) (case-string x))
+
+    \ \ \ \ \ \ \ \ ((list? x) (case-list x))
+
+    \ \ \ \ \ \ \ \ ((vector? x) (case-vector x))
+
+    \ \ \ \ \ \ \ \ ((hash-table? x) (case-hash-table x))
+
+    \ \ \ \ \ \ \ \ (else (type-error "box: x must be string?, list?, vector?, hash-table?"))))
 
     \;
   </goldfish-chunk>

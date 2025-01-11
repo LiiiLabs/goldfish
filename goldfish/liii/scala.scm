@@ -15,12 +15,15 @@
 ;
 
 (define-library (liii scala)
-(import (liii string) (liii vector) (liii list))
+(import (liii string) (liii vector)
+        (liii list) (liii hash-table))
 (export
   option option? option=? none
   case-string case-string? case-string=?
   case-list case-list? case-list=?
   case-vector case-vector? case-vector=?
+  case-hash-table case-hash-table? case-hash-table=?
+  box
 )
 (begin
 
@@ -247,6 +250,28 @@
     (receive (start sep end) (parse-args xs)
       (string-append start (string-join (map object->string (vector->list data)) sep) end)))
 )
+(define-case-class case-hash-table ((data hash-table?))
+  (define (%collect) data)
+
+(define (%map f . xs)
+  (%apply-one f xs
+    (let1 r (make-hash-table)
+      (hash-table-for-each
+         (lambda (k v)
+           (receive (k1 v1) (f k v)
+             (hash-table-set! r k1 v1)))
+         data)
+      (case-hash-table r))))
+
+)
+
+(define (box x)
+  (cond ((string? x) (case-string x))
+        ((list? x) (case-list x))
+        ((vector? x) (case-vector x))
+        ((hash-table? x) (case-hash-table x))
+        (else (type-error "box: x must be string?, list?, vector?, hash-table?"))))
+
 ) ; end of begin
 ) ; end of library
 
