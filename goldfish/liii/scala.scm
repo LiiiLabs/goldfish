@@ -95,6 +95,18 @@
 (define (%length)
   (string-length data))
 
+(define (%forall pred)
+  (string-every pred data))
+
+(define (%exists pred)
+  (string-any pred data))
+
+(define (%contains ch)
+  (string-any (lambda (x) (equal? x ch)) data))
+
+(define (%count pred?)
+  (string-count data pred?))
+
 )
 
 (define-case-class case-list ((data list?))
@@ -154,9 +166,6 @@
     (cond ((null? xs) (length data))
           ((length=? 1 xs) (count (car xs) data))
           (else (error 'wrong-number-of-args "case-list%count" xs))))
-
-  (define (%forall pred)
-    (every pred data))
 
   (define (%fold initial f)
     (fold f initial data))

@@ -10618,6 +10618,10 @@
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
     (define (string-count str char/pred? . start+end)
 
+    \ \ (when (not (string? str))
+
+    \ \ \ \ (type-error "string-count: first parameter must be string"))
+
     \ \ (let ((str-sub (%string-from-range str start+end))
 
     \ \ \ \ \ \ \ \ (criterion (%make-criterion char/pred?)))

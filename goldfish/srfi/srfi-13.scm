@@ -278,6 +278,8 @@
               (loop (+ i 1)))))))
 
 (define (string-count str char/pred? . start+end)
+  (when (not (string? str))
+    (type-error "string-count: first parameter must be string"))
   (let ((str-sub (%string-from-range str start+end))
         (criterion (%make-criterion char/pred?)))
     (count criterion (string->list str-sub))))

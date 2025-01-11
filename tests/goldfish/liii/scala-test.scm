@@ -77,6 +77,13 @@
 
 (check ((case-string "abc") :length) => 3)
 
+(let1 str (case-string "Hello, World!")
+  (check (str :forall char-alphabetic?) => #f)
+  (check (str :exists char-alphabetic?) => #t)
+  (check (str :contains #\W) => #t)
+  (check (str :count char-alphabetic?) => 10)
+)
+
 (let ((lst (case-list '(1 2 3 4 5))))
   (check (lst :take -1 :collect) => '())
   (check (lst :take 0 :collect) => '())
@@ -93,8 +100,13 @@
   (check (lst :take-right 10 :collect) => '(1 2 3 4 5))
 )
 
-(let1 l (case-list '(1 2 3))
-  (check-true (l :forall positive?)))
+(let1 lst (case-list '(1 2 3 4 5))
+  (check (lst :forall (lambda (x) (> x 0))) => #t)
+  (check (lst :forall (lambda (x) (> x 3))) => #f)
+)
+
+(let1 empty-lst (case-list '())
+  (check (empty-lst :forall (lambda (x) (> x 0))) => #t))
 
 (let1 l (case-list '(1 2 3))
   (check-true (l :exists even?)))
@@ -116,14 +128,6 @@
 
 (check ((case-list (list 1 2 3)) :count) => 3)
 (check ((case-list (list 1 2 3)) :count (cut > <> 1)) => 2)
-
-(let ((lst (case-list '(1 2 3 4 5))))
-  (check (lst :forall (lambda (x) (> x 0))) => #t)
-  (check (lst :forall (lambda (x) (> x 3))) => #f)
-)
-
-(let ((empty-lst (case-list '())))
-    (check (empty-lst :forall (lambda (x) (> x 0))) => #t))
 
 (let ((lst (case-list '(1 2 3 4 5))))
   (check (lst :fold 0 +) => 15)

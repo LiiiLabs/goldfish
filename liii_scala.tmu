@@ -437,6 +437,70 @@
     \;
   </scm-chunk>
 
+  <paragraph|case-string%forall>
+
+  检查字符串中的所有字符是否都满足给定的谓词。
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%forall pred)
+
+    \ \ (string-every pred data))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-string%exists>
+
+  检查字符串中是否存在至少一个字符满足给定的谓词。
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%exists pred)
+
+    \ \ (string-any pred data))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-string%contains>
+
+  检查字符串中是否包含指定的字符。
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%contains ch)
+
+    \ \ (string-any (lambda (x) (equal? x ch)) data))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-string%count>
+
+  计算字符串中满足给定谓词的字符的数量
+
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+    (define (%count pred?)
+
+    \ \ (string-count data pred?))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+    (let1 str (case-string "Hello, World!")
+
+    \ \ (check (str :forall char-alphabetic?) =\<gtr\> #f)
+
+    \ \ (check (str :exists char-alphabetic?) =\<gtr\> #t)
+
+    \ \ (check (str :contains #\\W) =\<gtr\> #t)
+
+    \ \ (check (str :count char-alphabetic?) =\<gtr\> 10)
+
+    )
+
+    \;
+  </goldfish-chunk>
+
   <\scm-chunk|goldfish/liii/scala.scm|true|true>
     )
 
@@ -584,9 +648,19 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
-    (let1 l (case-list '(1 2 3))
+    (let1 lst (case-list '(1 2 3 4 5))
 
-    \ \ (check-true (l :forall positive?)))
+    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
+
+    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f)
+
+    )
+
+    \;
+
+    (let1 empty-lst (case-list '())
+
+    \ \ (check (empty-lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
 
     \;
   </goldfish-chunk>
@@ -693,33 +767,7 @@
     \;
   </scm-chunk>
 
-  <paragraph|case-list%forall>
-
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
-    \ \ (define (%forall pred)
-
-    \ \ \ \ (every pred data))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
-    (let ((lst (case-list '(1 2 3 4 5))))
-
-    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
-
-    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f)
-
-    )
-
-    \;
-
-    (let ((empty-lst (case-list '())))
-
-    \ \ \ \ (check (empty-lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
-
-    \;
-  </scm-chunk>
+  \;
 
   <subparagraph|fold>
 
@@ -929,7 +977,7 @@
 
   <paragraph|case-vector%take-right>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
     \ \ (define (%take-right x . xs)
 
     \ \ \ \ (typed-define (scala-take-right (data vector?) (n integer?))
@@ -961,7 +1009,7 @@
     \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
     (let ((vec (case-vector #(1 2 3 4 5))))
