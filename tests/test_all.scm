@@ -18,7 +18,7 @@
         (liii string)
         (liii os)
         (liii path)
-        (liii scala))
+        (liii lang))
 
 (define (listdir2 dir)
   (map (lambda (x) (string-append dir "/" x))
@@ -26,7 +26,7 @@
 
 ; (display (listdir2 "tests"))
 (define (all-tests)
-  ((case-list (listdir2 "tests/goldfish"))
+  ((box (listdir2 "tests/goldfish"))
     :filter path-dir?
     :flat-map listdir2
     :filter (lambda (x) (path-file? x))

@@ -13,11 +13,11 @@
     <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
   </hide-preamble>
 
-  <chapter|(liii scala)>
+  <chapter|(liii lang)>
 
   <section|许可证>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|false|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -51,7 +51,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|false|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|false|true>
     ;
 
     ; Copyright (C) 2024 The Goldfish Scheme Authors
@@ -87,8 +87,8 @@
 
   <section|接口>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
-    (define-library (liii scala)
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define-library (liii lang)
 
     (import (liii string) (liii vector)
 
@@ -119,10 +119,10 @@
 
   <section|测试>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (import (liii check)
 
-    \ \ \ \ \ \ \ \ (liii scala)
+    \ \ \ \ \ \ \ \ (liii lang)
 
     \ \ \ \ \ \ \ \ (liii cut))
 
@@ -135,7 +135,7 @@
 
   <section|公共子函数>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%apply-one x xs r)
 
     \ \ (let1 result r
@@ -149,7 +149,7 @@
 
   <subsection|option>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class option ((value any?))
 
     \ \ (define (%map f . xs)
@@ -217,7 +217,7 @@
     )
   </goldfish-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((opt1 (option 42))
 
     \ \ \ \ \ \ (opt2 (option '())))
@@ -305,7 +305,7 @@
 
   <paragraph|none><index|none>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define (none) (option '()))
 
     \;
@@ -313,7 +313,7 @@
 
   <subsection|case-integer>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-integer ((data integer?))
 
     \ \ (define (%unbox) data)
@@ -323,7 +323,7 @@
 
   <paragraph|case-integer%to>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (typed-define (%to (n integer?))
 
     \ \ (if (\<less\> n data)
@@ -335,7 +335,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check (((box 1) :to 2) :collect) =\<gtr\> (list 1 2))
 
     (check (((box 1) :to 1) :collect) =\<gtr\> (list 1))
@@ -347,7 +347,7 @@
 
   <paragraph|case-integer%until>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (typed-define (%until (n integer?))
 
     \ \ (if (\<less\>= n data)
@@ -359,7 +359,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check (((box 1) :until 3) :collect) =\<gtr\> (list 1 2))
 
     (check (((box 1) :until 2) :collect) =\<gtr\> (list 1))
@@ -369,7 +369,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     )
 
     \;
@@ -379,7 +379,7 @@
 
   Unicode编码的字符串。
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-string ((data string?))
 
     \;
@@ -389,13 +389,13 @@
 
   <paragraph|case-string%unbox>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%unbox) data)
 
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((box "abc") :unbox) =\<gtr\> "abc")
 
     (check ((box "") :unbox) =\<gtr\> "")
@@ -407,7 +407,7 @@
 
   <paragraph|case-string%length>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define (%length)
 
     \ \ (u8-string-length data))
@@ -415,7 +415,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((case-string "abc") :length) =\<gtr\> 3)
 
     (check ((case-string "中文") :length) =\<gtr\> 2)
@@ -427,7 +427,7 @@
 
   <paragraph|case-string%empty?><typehint|=\<gtr\> boolean?>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%empty?)
 
     \ \ (string-null? data))
@@ -435,7 +435,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check-true ((case-string "") :empty?))
 
     (check-false ((case-string "abc") :empty?))
@@ -445,7 +445,7 @@
 
   <paragraph|case-string%starts-with>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%starts-with prefix)
 
     \ \ (string-starts? data prefix))
@@ -455,7 +455,7 @@
 
   <paragraph|case-string%ends-with>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%ends-with suffix)
 
     \ \ (string-ends? data suffix))
@@ -467,7 +467,7 @@
 
   检查字符串中的所有字符是否都满足给定的谓词。
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%forall pred)
 
     \ \ (string-every pred data))
@@ -479,7 +479,7 @@
 
   检查字符串中是否存在至少一个字符满足给定的谓词。
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%exists pred)
 
     \ \ (string-any pred data))
@@ -491,7 +491,7 @@
 
   检查字符串中是否包含指定的字符或者子字符串。
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%contains elem)
 
     \ \ (cond ((string? elem)
@@ -507,7 +507,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 str (case-string "Hello, World!")
 
     \ \ (check-true (str :contains #\\W))
@@ -523,7 +523,7 @@
 
   <paragraph|case-string%map><typehint|((p procedure?)) =\<gtr\> case-string?>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%map x . xs)
 
     \ \ (%apply-one x xs
@@ -533,7 +533,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((case-string "abc") :map char-upcase :unbox) =\<gtr\> "ABC")
 
     \;
@@ -543,7 +543,7 @@
 
   计算字符串中满足给定谓词的字符的数量
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%count pred?)
 
     \ \ (string-count data pred?))
@@ -551,7 +551,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 str (case-string "Hello, World!")
 
     \ \ (check (str :forall char-alphabetic?) =\<gtr\> #f)
@@ -565,7 +565,7 @@
     \;
   </goldfish-chunk>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     )
 
     \;
@@ -573,7 +573,7 @@
 
   <subsection|case-list>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-list ((data list?))
 
     \;
@@ -581,7 +581,7 @@
 
   <paragraph|case-list%collect>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%collect) data)
 
     \;
@@ -589,7 +589,7 @@
 
   \;
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%map x . xs)
 
     \ \ \ \ (let1 r (case-list (map x data))
@@ -623,7 +623,7 @@
 
   <paragraph|case-list%take>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%take x . xs)
 
     \ \ \ \ (typed-define (scala-take (data list?) (n integer?))
@@ -643,7 +643,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((lst (case-list '(1 2 3 4 5))))
 
     \ \ (check (lst :take -1 :collect) =\<gtr\> '())
@@ -663,7 +663,7 @@
 
   <paragraph|case-list%take-right>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%take-right x . xs)
 
     \ \ \ \ (typed-define (scala-take-right (data list?) (n integer?))
@@ -683,7 +683,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((lst (case-list '(1 2 3 4 5))))
 
     \ \ (check (lst :take-right -1 :collect) =\<gtr\> '())
@@ -703,7 +703,7 @@
 
   <paragraph|case-list%forall>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%forall pred)
 
     \ \ (every pred data))
@@ -711,7 +711,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 lst (case-list '(1 2 3 4 5))
 
     \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
@@ -731,7 +731,7 @@
 
   <paragraph|case-list%exists>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%exists pred)
 
     \ \ (any pred data))
@@ -739,7 +739,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 l (case-list '(1 2 3))
 
     \ \ (check-true (l :exists even?)))
@@ -749,7 +749,7 @@
 
   <paragraph|case-list%contains><typehint|(elem) =\<gtr\> boolean?>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%contains elem)
 
     \ \ (%exists (lambda (x) (equal? x elem))))
@@ -757,7 +757,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 l (case-list '(1 2 3))
 
     \ \ (check-true (l :contains 1))
@@ -769,7 +769,7 @@
 
   <paragraph|case-list%find><typehint|((pred procedure?)) =\<gtr\> option?>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define (%find pred)
 
     \ \ (let loop ((lst data))
@@ -785,7 +785,7 @@
     \;
   </scm-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 lst (case-list '(1 2 3 4 5))
 
     \ \ (check ((lst :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
@@ -811,7 +811,7 @@
 
   <paragraph|case-list%count>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%count . xs)
 
     \ \ \ \ (cond ((null? xs) (length data))
@@ -823,7 +823,7 @@
     \;
   </goldfish-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((case-list (list 1 2 3)) :count) =\<gtr\> 3)
 
     (check ((case-list (list 1 2 3)) :count (cut \<gtr\> \<less\>\<gtr\> 1)) =\<gtr\> 2)
@@ -835,7 +835,7 @@
 
   <subparagraph|fold>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%fold initial f)
 
     \ \ \ \ (fold f initial data))
@@ -849,7 +849,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((lst (case-list '(1 2 3 4 5))))
 
     \ \ (check (lst :fold 0 +) =\<gtr\> 15)
@@ -869,7 +869,7 @@
 
   <subparagraph|make-string>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%make-string . xs)
 
     \ \ \ \ (define (parse-args xs)
@@ -917,7 +917,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 l (case-list (list 1 2 3))
 
     \ \ (check (l :make-string) =\<gtr\> "123")
@@ -941,7 +941,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     )
 
     \;
@@ -949,7 +949,7 @@
 
   <subsection|case-vector>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-vector ((data vector?))
 
     \ \ (define (%collect) data)
@@ -991,7 +991,7 @@
 
   <paragraph|case-vector%take>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%take x . xs)
 
     \ \ \ \ (typed-define (scala-take (data vector?) (n integer?))
@@ -1021,7 +1021,7 @@
     \;
   </scm-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((vec (case-vector #(1 2 3 4 5))))
 
     \ \ (check (vec :take -1 :collect) =\<gtr\> #())
@@ -1041,7 +1041,7 @@
 
   <paragraph|case-vector%take-right>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%take-right x . xs)
 
     \ \ \ \ (typed-define (scala-take-right (data vector?) (n integer?))
@@ -1075,7 +1075,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((vec (case-vector #(1 2 3 4 5))))
 
     \ \ (check (vec :take-right -1 :collect) =\<gtr\> #())
@@ -1095,7 +1095,7 @@
 
   <paragraph|case-vector%find>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%find p)
 
     \ \ \ \ (let loop ((i 0))
@@ -1109,7 +1109,7 @@
     \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((vec (case-vector #(1 2 3 4 5))))
 
     \ \ (check ((vec :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
@@ -1135,7 +1135,7 @@
 
   <paragraph|case-vector%forall>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%forall p)
 
     \ \ \ \ (vector-every p data))
@@ -1143,7 +1143,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((vec (case-vector #(1 2 3 4 5))))
 
     \ \ (check (vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
@@ -1161,7 +1161,7 @@
 
   <paragraph|case-vector%fold>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%fold initial f)
 
     \ \ \ \ (vector-fold f initial data))
@@ -1175,7 +1175,7 @@
     \;
   </scm-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((vec (case-vector #(1 2 3 4 5))))
 
     \ \ (check (vec :fold 0 +) =\<gtr\> 15)
@@ -1195,7 +1195,7 @@
 
   <paragraph|case-vector%make-string>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|true>
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%make-string . xs)
 
     \ \ \ \ (define (parse-args xs)
@@ -1243,7 +1243,7 @@
     )
   </scm-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 v (box #(1 2 3))
 
     \ \ (check (v :count) =\<gtr\> 3)
@@ -1273,7 +1273,7 @@
 
   <subsection|case-hash-table>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-hash-table ((data hash-table?))
 
     \ \ (define (%collect) data)
@@ -1283,7 +1283,7 @@
 
   <paragraph|case-hash-table%map>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%map f . xs)
 
     \ \ (%apply-one f xs
@@ -1305,7 +1305,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
 
     \ \ (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
@@ -1323,7 +1323,7 @@
 
   <paragraph|case-hash-table%get><typehint|((k any?)) =\<gtr\> option?>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%get k)
 
     \ \ (option (hash-table-ref/default data k '())))
@@ -1331,7 +1331,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
 
     \ \ (check ((ht :get 'a) :get) =\<gtr\> 1)
@@ -1343,7 +1343,7 @@
 
   <paragraph|case-hash-table%contains><typehint|((k any?)) =\<gtr\> boolean?>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%contains k)
 
     \ \ (hash-table-contains? data k))
@@ -1351,7 +1351,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|tests/goldfish/liii/scala-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
 
     \ \ (check-true (ht :contains 'a))
@@ -1361,7 +1361,7 @@
     \;
   </goldfish-chunk>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     )
 
     \;
@@ -1369,7 +1369,7 @@
 
   <paragraph|box>
 
-  <\goldfish-chunk|goldfish/liii/scala.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (box x)
 
     \ \ (cond ((integer? x) (case-integer x))
@@ -1389,7 +1389,7 @@
 
   <section|结尾>
 
-  <\scm-chunk|goldfish/liii/scala.scm|true|false>
+  <\scm-chunk|goldfish/liii/lang.scm|true|false>
     ) ; end of begin
 
     ) ; end of library
@@ -1397,7 +1397,7 @@
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/scala-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|false>
     (check-report)
 
     \;

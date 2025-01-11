@@ -15,7 +15,7 @@
 ;
 
 (import (liii check)
-        (liii scala)
+        (liii lang)
         (liii cut))
 
 (check-set-mode! 'report-failed)

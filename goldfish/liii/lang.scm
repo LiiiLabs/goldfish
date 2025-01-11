@@ -14,7 +14,7 @@
 ; under the License.
 ;
 
-(define-library (liii scala)
+(define-library (liii lang)
 (import (liii string) (liii vector)
         (liii list) (liii hash-table))
 (export
