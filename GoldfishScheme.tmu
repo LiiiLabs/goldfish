@@ -14923,14 +14923,12 @@
 
   <paragraph|hash-table-ref/default><index|hash-table-ref/default><typehint|((ht hash-table?) key default) =\<gtr\> value>
 
-  <todo|需要设计一种合理的方式，标注default参数实际上是惰性求值的>
-
   <\description>
     <item*|ht>哈希表
 
     <item*|key>键
 
-    <item*|default>默认值，如果key这个键在哈希表中对应的值不存在，则返回默认值。注意，该默认值只有在key这个键不存在的时候，才会被求值。
+    <item*|default>默认值，如果key这个键在哈希表中对应的值不存在，则返回默认值。如果这个值是一个函数，那么仅在值不存在时，该函数被求值。
 
     <item*|value>键对应的值，如果不存在，则为默认值。
   </description>
@@ -14952,9 +14950,9 @@
 
     \ \ (check (hash-table-ref/default ht 'key
 
-    \ \ \ \ \ \ \ \ \ \ \ (begin (display "hello")
+    \ \ \ \ \ \ \ \ \ \ \ (lambda () (begin (display "hello")
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ 1 2)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ 1 2))))
 
     \ \ \ \ =\<gtr\> 'value)
 
@@ -14966,11 +14964,11 @@
   <subparagraph|实现>
 
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
-    (define-macro (hash-table-ref/default ht key default)
+    (define (hash-table-ref/default ht key default)
 
-    \ \ `(or (hash-table-ref ,ht ,key)
+    \ \ (or (hash-table-ref ht key)
 
-    \ \ \ \ \ \ \ \ ,default))
+    \ \ \ \ \ \ (if (procedure? default) (default) default)))
 
     \;
   </scm-chunk>

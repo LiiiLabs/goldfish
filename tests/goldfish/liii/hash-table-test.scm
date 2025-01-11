@@ -79,8 +79,8 @@
 
   (hash-table-set! ht 'key 'value)
   (check (hash-table-ref/default ht 'key
-           (begin (display "hello")
-                  (+ 1 2)))
+           (lambda () (begin (display "hello")
+                             (+ 1 2))))
     => 'value)
 ) ; end of let1
 

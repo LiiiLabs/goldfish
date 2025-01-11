@@ -69,9 +69,9 @@
 (define (hash-table=? ht1 ht2)
   (equal? ht1 ht2))
 
-(define-macro (hash-table-ref/default ht key default)
-  `(or (hash-table-ref ,ht ,key)
-        ,default))
+(define (hash-table-ref/default ht key default)
+  (or (hash-table-ref ht key)
+      (if (procedure? default) (default) default)))
 
 (define (hash-table-set! ht . rest)
   (assert-hash-table-type ht hash-table-set!)
