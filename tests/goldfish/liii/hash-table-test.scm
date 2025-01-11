@@ -147,6 +147,67 @@
                            (lambda (ks vs) (list ks vs)))
          => (list (list 'k1) (list 'v1))))
 
+(let ((ht (make-hash-table)))
+  (hash-table-set! ht 'a 1)
+  (hash-table-set! ht 'b 2)
+  (hash-table-set! ht 'c 3)
+
+  (check (hash-table-find
+        (lambda (k v) (= v 2))
+        ht
+        (lambda () 'not-found))
+       => 2))
+
+(let ((ht (make-hash-table)))
+  (hash-table-set! ht 'a 1)
+  (hash-table-set! ht 'b 2)
+  (hash-table-set! ht 'c 3)
+    
+  (check (hash-table-find
+          (lambda (k v) (= v 4))
+          ht
+          'not-found)
+         => 'not-found))
+
+(let ((ht (make-hash-table)))
+  (hash-table-set! ht 'a 1)
+  (hash-table-set! ht 'b 2)
+  (hash-table-set! ht 'c 3)
+
+  (check (hash-table-find
+          (lambda (k v) (eq? k 'b))
+          ht
+          (lambda () 'not-found))
+         => 2))
+
+(let ((ht (make-hash-table)))
+  (hash-table-set! ht 'a 1)
+  (hash-table-set! ht 'b 2)
+  (hash-table-set! ht 'c 3)
+
+  (check (hash-table-find
+          (lambda (k v) (eq? k 'd))
+          ht
+          'not-found)
+        => 'not-found))
+
+(let ((empty-ht (make-hash-table)))
+  (check (hash-table-find
+          (lambda (k v) #t)
+          empty-ht
+          'empty)
+         => 'empty))
+
+(let ((ht (make-hash-table)))
+  (hash-table-set! ht 'a 1)
+  (hash-table-set! ht 'b 2)
+  (hash-table-set! ht 'c 3)
+    
+  (check (hash-table-find
+          (lambda (k v) (and (symbol? k) (even? v)))
+          ht
+          (lambda () 'not-found))
+         => 2))
 
 (check (hash-table-count (lambda (k v) #f) (hash-table)) => 0)
 (check (hash-table-count (lambda (k v) #t) (hash-table 'a 1 'b 2 'c 3)) => 3)

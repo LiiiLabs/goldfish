@@ -3166,15 +3166,15 @@
   但是S7 Scheme里面没有define-syntax和syntax-rule，在墨干中的实现是这样的：
 
   <\session|goldfish|default>
-    <\folded-io>
+    <\unfolded-io>
       \<gtr\>\ 
-    <|folded-io>
+    <|unfolded-io>
       (define-macro (receive vars vals . body)
 
       \ \ `((lambda ,vars ,@body) ,vals)) ; GPL
-    <|folded-io>
+    <|unfolded-io>
       receive
-    </folded-io>
+    </unfolded-io>
 
     <\folded-io>
       \<gtr\>\ 
@@ -15277,15 +15277,197 @@
 
   对于哈希表中的每个关联项，调用proc函数处理它的键和值。如果proc返回真（true），那么hash-table-find函数将返回proc返回的结果。如果所有对proc的调用都返回假（#f），则返回调用thunk failure函数的结果。
 
+  <\itemize>
+    <item>如果 failure 需要是一个函数：必须用 lambda 包装。
+
+    <item>如果 failure 是一个值：
+
+    <\itemize>
+      <item>当 hash-table-find 支持 failure 是值或函数时，lambda 是可选的。
+
+      <item>当 hash-table-find 要求 failure 必须是函数时，lambda 是必需的。
+    </itemize>
+  </itemize>
+
   <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-find proc ht failure)
+
+    \ \ (let ((keys (hash-table-keys ht)))
+
+    \ \ \ \ (let loop ((keys keys))
+
+    \ \ \ \ \ \ (if (null? keys)
+
+    \ \ \ \ \ \ \ \ \ \ (if (procedure? failure)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (failure)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ failure)
+
+    \ \ \ \ \ \ \ \ \ \ (let* ((key (car keys))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (value (hash-table-ref ht key)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (if (proc key value)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ value
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr keys))))))))
+
     \;
   </scm-chunk>
 
-  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
-    \;
-  </scm-chunk>
+  测试
 
   \;
+
+  测试 1: 查找值为 2 的键值对，期望返回 2
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let ((ht (make-hash-table)))
+
+    \ \ (hash-table-set! ht 'a 1)
+
+    \ \ (hash-table-set! ht 'b 2)
+
+    \ \ (hash-table-set! ht 'c 3)
+
+    \;
+
+    \ \ (check (hash-table-find
+
+    \ \ \ \ \ \ \ \ (lambda (k v) (= v 2))
+
+    \ \ \ \ \ \ \ \ ht
+
+    \ \ \ \ \ \ \ \ (lambda () 'not-found))
+
+    \ \ \ \ \ \ \ =\<gtr\> 2))
+
+    \;
+  </scm-chunk>
+
+  测试 2: 查找值为 4 的键值对，期望返回 'not-found
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let ((ht (make-hash-table)))
+
+    \ \ (hash-table-set! ht 'a 1)
+
+    \ \ (hash-table-set! ht 'b 2)
+
+    \ \ (hash-table-set! ht 'c 3)
+
+    \ \ \ \ 
+
+    \ \ (check (hash-table-find
+
+    \ \ \ \ \ \ \ \ \ \ (lambda (k v) (= v 4))
+
+    \ \ \ \ \ \ \ \ \ \ ht
+
+    \ \ \ \ \ \ \ \ \ \ 'not-found)
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> 'not-found))
+
+    \;
+  </scm-chunk>
+
+  测试 3: 查找键为 'b 的键值对，期望返回 2
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let ((ht (make-hash-table)))
+
+    \ \ (hash-table-set! ht 'a 1)
+
+    \ \ (hash-table-set! ht 'b 2)
+
+    \ \ (hash-table-set! ht 'c 3)
+
+    \;
+
+    \ \ (check (hash-table-find
+
+    \ \ \ \ \ \ \ \ \ \ (lambda (k v) (eq? k 'b))
+
+    \ \ \ \ \ \ \ \ \ \ ht
+
+    \ \ \ \ \ \ \ \ \ \ (lambda () 'not-found))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> 2))
+
+    \;
+  </scm-chunk>
+
+  测试 4: 查找键为 'd 的键值对，期望返回 'not-found
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let ((ht (make-hash-table)))
+
+    \ \ (hash-table-set! ht 'a 1)
+
+    \ \ (hash-table-set! ht 'b 2)
+
+    \ \ (hash-table-set! ht 'c 3)
+
+    \;
+
+    \ \ (check (hash-table-find
+
+    \ \ \ \ \ \ \ \ \ \ (lambda (k v) (eq? k 'd))
+
+    \ \ \ \ \ \ \ \ \ \ ht
+
+    \ \ \ \ \ \ \ \ \ \ 'not-found)
+
+    \ \ \ \ \ \ \ \ =\<gtr\> 'not-found))
+
+    \;
+  </scm-chunk>
+
+  测试 5: 在空哈希表中查找任意键值对，期望返回 'empty
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let ((empty-ht (make-hash-table)))
+
+    \ \ (check (hash-table-find
+
+    \ \ \ \ \ \ \ \ \ \ (lambda (k v) #t)
+
+    \ \ \ \ \ \ \ \ \ \ empty-ht
+
+    \ \ \ \ \ \ \ \ \ \ 'empty)
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> 'empty))
+
+    \;
+  </scm-chunk>
+
+  测试 6: 查找满足复杂条件的键值对（键为符号且值为偶数），期望返回 2
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let ((ht (make-hash-table)))
+
+    \ \ (hash-table-set! ht 'a 1)
+
+    \ \ (hash-table-set! ht 'b 2)
+
+    \ \ (hash-table-set! ht 'c 3)
+
+    \ \ \ \ 
+
+    \ \ (check (hash-table-find
+
+    \ \ \ \ \ \ \ \ \ \ (lambda (k v) (and (symbol? k) (even? v)))
+
+    \ \ \ \ \ \ \ \ \ \ ht
+
+    \ \ \ \ \ \ \ \ \ \ (lambda () 'not-found))
+
+    \ \ \ \ \ \ \ \ \ =\<gtr\> 2))
+
+    \;
+  </scm-chunk>
 
   <paragraph|hash-table-count><index|hash-table-count><typehint|((pred? procedure?) (ht hash-table?)) =\<gtr\> integer?>
 

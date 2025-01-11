@@ -119,6 +119,18 @@
           (vs (hash-table-values ht)))
       (values ks vs))))
 
+(define (hash-table-find proc ht failure)
+  (let ((keys (hash-table-keys ht)))
+    (let loop ((keys keys))
+      (if (null? keys)
+          (if (procedure? failure)
+              (failure)
+              failure)
+          (let* ((key (car keys))
+                 (value (hash-table-ref ht key)))
+            (if (proc key value)
+                value
+                (loop (cdr keys))))))))
 
 (define hash-table-count
   (typed-lambda ((pred? procedure?) (ht hash-table?))
