@@ -92,13 +92,15 @@
 
     (import (liii string) (liii vector)
 
-    \ \ \ \ \ \ \ \ (liii list) (liii hash-table))
+    \ \ \ \ \ \ \ \ (liii list) (liii hash-table) (liii bitwise))
 
     (export
 
     \ \ option option? option=? none
 
     \ \ case-integer case-integer? case-integer=?
+
+    \ \ case-char case-char? case-char=?
 
     \ \ case-string case-string? case-string=?
 
@@ -369,8 +371,134 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|case-integer%to-char>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-char)
+
+    \ \ (case-char data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-catch 'value-error ((box #x110000) :to-char))
+
+    \;
+  </goldfish-chunk>
+
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     )
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|case-char>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-case-class case-char ((code-point integer?))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-char%to-bytevector>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-bytevector)
+
+    \ \ (cond
+
+    \ \ \ \ ((\<less\>= code-point #x7F)
+
+    \ \ \ \ \ (bytevector code-point))
+
+    \;
+
+    \ \ \ \ ((\<less\>= code-point #x7FF)
+
+    \ \ \ \ \ (let ((byte1 (bitwise-ior #b11000000 (bitwise-and (arithmetic-shift code-point -6) #b00011111)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (byte2 (bitwise-ior #b10000000 (bitwise-and code-point #b00111111))))
+
+    \ \ \ \ \ \ \ (bytevector byte1 byte2)))
+
+    \;
+
+    \ \ \ \ ((\<less\>= code-point #xFFFF)
+
+    \ \ \ \ \ (let ((byte1 (bitwise-ior #b11100000 (bitwise-and (arithmetic-shift code-point -12) #b00001111)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (byte2 (bitwise-ior #b10000000 (bitwise-and (arithmetic-shift code-point -6) #b00111111)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (byte3 (bitwise-ior #b10000000 (bitwise-and code-point #b00111111))))
+
+    \ \ \ \ \ \ \ (bytevector byte1 byte2 byte3)))
+
+    \;
+
+    \ \ \ \ ((\<less\>= code-point #x10FFFF)
+
+    \ \ \ \ \ (let ((byte1 (bitwise-ior #b11110000 (bitwise-and (arithmetic-shift code-point -18) #b00000111)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (byte2 (bitwise-ior #b10000000 (bitwise-and (arithmetic-shift code-point -12) #b00111111)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (byte3 (bitwise-ior #b10000000 (bitwise-and (arithmetic-shift code-point -6) #b00111111)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (byte4 (bitwise-ior #b10000000 (bitwise-and code-point #b00111111))))
+
+    \ \ \ \ \ \ \ (bytevector byte1 byte2 byte3 byte4)))
+
+    \;
+
+    \ \ \ \ (else
+
+    \ \ \ \ \ (value-error "Invalid code point"))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-char%to-string>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-string)
+
+    \ \ (case-string (utf8-\<gtr\>string (%to-bytevector))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (((case-char #x41) :to-string) :unbox) =\<gtr\> "A")
+
+    (check (((case-char #xA3) :to-string) :unbox) =\<gtr\> "£")
+
+    (check (((case-char #x4E2D) :to-string) :unbox) =\<gtr\> "<code|中>")
+
+    (check (((case-char #x1F600) :to-string) :unbox) =\<gtr\> "<code|😀>")
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define make-case-char case-char)
+
+    \;
+
+    (typed-define (case-char (code integer?))
+
+    \ \ (if (and (\<gtr\>= code 0) (\<less\>= code #x10FFFF))
+
+    \ \ \ \ \ \ (make-case-char code)
+
+    \ \ \ \ \ \ (value-error "case-char: code point out of range" code)))
 
     \;
   </goldfish-chunk>

@@ -16,10 +16,11 @@
 
 (define-library (liii lang)
 (import (liii string) (liii vector)
-        (liii list) (liii hash-table))
+        (liii list) (liii hash-table) (liii bitwise))
 (export
   option option? option=? none
   case-integer case-integer? case-integer=?
+  case-char case-char? case-char=?
   case-string case-string? case-string=?
   case-list case-list? case-list=?
   case-vector case-vector? case-vector=?
@@ -80,7 +81,50 @@
       (case-list (list))
       (case-list (iota (+ (- n data)) data))))
 
+(define (%to-char)
+  (case-char data))
+
 )
+
+(define-case-class case-char ((code-point integer?))
+
+(define (%to-bytevector)
+  (cond
+    ((<= code-point #x7F)
+     (bytevector code-point))
+
+    ((<= code-point #x7FF)
+     (let ((byte1 (bitwise-ior #b11000000 (bitwise-and (arithmetic-shift code-point -6) #b00011111)))
+           (byte2 (bitwise-ior #b10000000 (bitwise-and code-point #b00111111))))
+       (bytevector byte1 byte2)))
+
+    ((<= code-point #xFFFF)
+     (let ((byte1 (bitwise-ior #b11100000 (bitwise-and (arithmetic-shift code-point -12) #b00001111)))
+           (byte2 (bitwise-ior #b10000000 (bitwise-and (arithmetic-shift code-point -6) #b00111111)))
+           (byte3 (bitwise-ior #b10000000 (bitwise-and code-point #b00111111))))
+       (bytevector byte1 byte2 byte3)))
+
+    ((<= code-point #x10FFFF)
+     (let ((byte1 (bitwise-ior #b11110000 (bitwise-and (arithmetic-shift code-point -18) #b00000111)))
+           (byte2 (bitwise-ior #b10000000 (bitwise-and (arithmetic-shift code-point -12) #b00111111)))
+           (byte3 (bitwise-ior #b10000000 (bitwise-and (arithmetic-shift code-point -6) #b00111111)))
+           (byte4 (bitwise-ior #b10000000 (bitwise-and code-point #b00111111))))
+       (bytevector byte1 byte2 byte3 byte4)))
+
+    (else
+     (value-error "Invalid code point"))))
+
+(define (%to-string)
+  (case-string (utf8->string (%to-bytevector))))
+
+)
+
+(define make-case-char case-char)
+
+(typed-define (case-char (code integer?))
+  (if (and (>= code 0) (<= code #x10FFFF))
+      (make-case-char code)
+      (value-error "case-char: code point out of range" code)))
 
 (define-case-class case-string ((data string?))
 

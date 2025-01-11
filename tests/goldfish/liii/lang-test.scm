@@ -70,6 +70,13 @@
 (check (((box 1) :until 2) :collect) => (list 1))
 (check (((box 2) :until 2) :collect) => (list ))
 
+(check-catch 'value-error ((box #x110000) :to-char))
+
+(check (((case-char #x41) :to-string) :unbox) => "A")
+(check (((case-char #xA3) :to-string) :unbox) => "£")
+(check (((case-char #x4E2D) :to-string) :unbox) => "中")
+(check (((case-char #x1F600) :to-string) :unbox) => "😀")
+
 (check ((box "abc") :unbox) => "abc")
 (check ((box "") :unbox) => "")
 
