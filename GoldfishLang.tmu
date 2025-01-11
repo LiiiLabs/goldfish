@@ -401,6 +401,270 @@
     \;
   </goldfish-chunk>
 
+  <subsubsection|谓词>
+
+  <paragraph|case-char%digit?>
+
+  判断一个字符是否为数字。它支持所有 Unicode 标准中定义的数字字符，包括以下范围：
+
+  <tabular|<tformat|<twith|table-hmode|min>|<twith|table-width|1par>|<cwith|1|-1|1|-1|cell-hyphen|t>|<table|<row|<\cell>
+    数字名称
+  </cell>|<\cell>
+    范围
+  </cell>|<\cell>
+    示例字符
+  </cell>>|<row|<\cell>
+    <strong|ASCII 数字>
+  </cell>|<\cell>
+    <code*|U+0030><nbsp>-<nbsp><code*|U+0039>
+  </cell>|<\cell>
+    <code*|0-9>
+  </cell>>|<row|<\cell>
+    <strong|全角数字>
+  </cell>|<\cell>
+    <code*|U+FF10><nbsp>-<nbsp><code*|U+FF19>
+  </cell>|<\cell>
+    <code*|０-９>
+  </cell>>|<row|<\cell>
+    <strong|阿拉伯数字>
+  </cell>|<\cell>
+    <code*|U+0660><nbsp>-<nbsp><code*|U+0669>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|扩展阿拉伯数字>
+  </cell>|<\cell>
+    <code*|U+06F0><nbsp>-<nbsp><code*|U+06F9>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|印度数字>
+  </cell>|<\cell>
+    <code*|U+0966><nbsp>-<nbsp><code*|U+096F>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|孟加拉数字>
+  </cell>|<\cell>
+    <code*|U+09E6><nbsp>-<nbsp><code*|U+09EF>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|古尔穆奇数字>
+  </cell>|<\cell>
+    <code*|U+0A66><nbsp>-<nbsp><code*|U+0A6F>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|古吉拉特数字>
+  </cell>|<\cell>
+    <code*|U+0AE6><nbsp>-<nbsp><code*|U+0AEF>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|奥里亚数字>
+  </cell>|<\cell>
+    <code*|U+0B66><nbsp>-<nbsp><code*|U+0B6F>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|泰米尔数字>
+  </cell>|<\cell>
+    <code*|U+0BE6><nbsp>-<nbsp><code*|U+0BEF>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|泰卢固数字>
+  </cell>|<\cell>
+    <code*|U+0C66><nbsp>-<nbsp><code*|U+0C6F>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|卡纳达数字>
+  </cell>|<\cell>
+    <code*|U+0CE6><nbsp>-<nbsp><code*|U+0CEF>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|马拉雅拉姆数字>
+  </cell>|<\cell>
+    <code*|U+0D66><nbsp>-<nbsp><code*|U+0D6F>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|泰文数字>
+  </cell>|<\cell>
+    <code*|U+0E50><nbsp>-<nbsp><code*|U+0E59>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|老挝数字>
+  </cell>|<\cell>
+    <code*|U+0ED0><nbsp>-<nbsp><code*|U+0ED9>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|藏文数字>
+  </cell>|<\cell>
+    <code*|U+0F20><nbsp>-<nbsp><code*|U+0F29>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|缅甸数字>
+  </cell>|<\cell>
+    <code*|U+1040><nbsp>-<nbsp><code*|U+1049>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|高棉数字>
+  </cell>|<\cell>
+    <code*|U+17E0><nbsp>-<nbsp><code*|U+17E9>
+  </cell>|<\cell>
+    \;
+  </cell>>|<row|<\cell>
+    <strong|蒙古数字>
+  </cell>|<\cell>
+    <code*|U+1810><nbsp>-<nbsp><code*|U+1819>
+  </cell>|<\cell>
+    \;
+  </cell>>>>>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%digit?)
+
+    \ \ (or
+
+    \ \ \ (and (\<gtr\>= code-point 48) (\<less\>= code-point 57))
+
+    \ \ \ (and (\<gtr\>= code-point #xFF10) (\<less\>= code-point #xFF19))
+
+    \ \ \ (and (\<gtr\>= code-point #x0660) (\<less\>= code-point #x0669))
+
+    \ \ \ (and (\<gtr\>= code-point #x06F0) (\<less\>= code-point #x06F9))
+
+    \ \ \ (and (\<gtr\>= code-point #x0966) (\<less\>= code-point #x096F))
+
+    \ \ \ (and (\<gtr\>= code-point #x09E6) (\<less\>= code-point #x09EF))
+
+    \ \ \ (and (\<gtr\>= code-point #x0A66) (\<less\>= code-point #x0A6F))
+
+    \ \ \ (and (\<gtr\>= code-point #x0AE6) (\<less\>= code-point #x0AEF))
+
+    \ \ \ (and (\<gtr\>= code-point #x0B66) (\<less\>= code-point #x0B6F))
+
+    \ \ \ (and (\<gtr\>= code-point #x0BE6) (\<less\>= code-point #x0BEF))
+
+    \ \ \ (and (\<gtr\>= code-point #x0C66) (\<less\>= code-point #x0C6F))
+
+    \ \ \ (and (\<gtr\>= code-point #x0CE6) (\<less\>= code-point #x0CEF))
+
+    \ \ \ (and (\<gtr\>= code-point #x0D66) (\<less\>= code-point #x0D6F))
+
+    \ \ \ (and (\<gtr\>= code-point #x0E50) (\<less\>= code-point #x0E59))
+
+    \ \ \ (and (\<gtr\>= code-point #x0ED0) (\<less\>= code-point #x0ED9))
+
+    \ \ \ (and (\<gtr\>= code-point #x0F20) (\<less\>= code-point #x0F29))
+
+    \ \ \ (and (\<gtr\>= code-point #x1040) (\<less\>= code-point #x1049))
+
+    \ \ \ (and (\<gtr\>= code-point #x17E0) (\<less\>= code-point #x17E9))
+
+    \ \ \ (and (\<gtr\>= code-point #x1810) (\<less\>= code-point #x1819))))
+
+    \ \ 
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((char1 (case-char 48)) \ ;; ASCII '0'
+
+    \ \ \ \ \ \ (char2 (case-char #xFF10)) \ ;; 全角 '０'
+
+    \ \ \ \ \ \ (char3 (case-char #x0660)) \ ;; 阿拉伯数字 '٠'
+
+    \ \ \ \ \ \ (char4 (case-char #x06F0)) \ ;; 扩展阿拉伯数字 '۰'
+
+    \ \ \ \ \ \ (char5 (case-char #x0966)) \ ;; 印度数字
+
+    \ \ \ \ \ \ (char6 (case-char #x09E6)) \ ;; 孟加拉数字
+
+    \ \ \ \ \ \ (char7 (case-char #x0A66)) \ ;; 古尔穆奇数字
+
+    \ \ \ \ \ \ (char8 (case-char #x0AE6)) \ ;; 古吉拉特数字
+
+    \ \ \ \ \ \ (char9 (case-char #x0B66)) \ ;; 奥里亚数字
+
+    \ \ \ \ \ \ (char10 (case-char #x0BE6)) \ ;; 泰米尔数字
+
+    \ \ \ \ \ \ (char11 (case-char #x0C66)) \ ;; 泰卢固数字
+
+    \ \ \ \ \ \ (char12 (case-char #x0CE6)) \ ;; 卡纳达数字\ 
+
+    \ \ \ \ \ \ (char13 (case-char #x0D66)) \ ;; 马拉雅拉姆数字
+
+    \ \ \ \ \ \ (char14 (case-char #x0E50)) \ ;; 泰文数字 '๐'
+
+    \ \ \ \ \ \ (char15 (case-char #x0ED0)) \ ;; 老挝数字
+
+    \ \ \ \ \ \ (char16 (case-char #x0F20)) \ ;; 藏文数字
+
+    \ \ \ \ \ \ (char17 (case-char #x1040)) \ ;; 缅甸数字 '၀'
+
+    \ \ \ \ \ \ (char18 (case-char #x17E0)) \ ;; 高棉数字 '០'
+
+    \ \ \ \ \ \ (char19 (case-char #x1810)) \ ;; 蒙古数字 '᠐'
+
+    \ \ \ \ \ \ (char20 (case-char 65))) \ ;; ASCII 'A'
+
+    \;
+
+    \ \ ;; 测试 %digit?
+
+    \ \ (check (char1 :digit?) =\<gtr\> #t) \ ;; ASCII 数字
+
+    \ \ (check (char2 :digit?) =\<gtr\> #t) \ ;; 全角数字
+
+    \ \ (check (char3 :digit?) =\<gtr\> #t) \ ;; 阿拉伯数字
+
+    \ \ (check (char4 :digit?) =\<gtr\> #t) \ ;; 扩展阿拉伯数字
+
+    \ \ (check (char5 :digit?) =\<gtr\> #t) \ ;; 印度数字
+
+    \ \ (check (char6 :digit?) =\<gtr\> #t) \ ;; 孟加拉数字
+
+    \ \ (check (char7 :digit?) =\<gtr\> #t) \ ;; 古尔穆奇数字
+
+    \ \ (check (char8 :digit?) =\<gtr\> #t) \ ;; 古吉拉特数字
+
+    \ \ (check (char9 :digit?) =\<gtr\> #t) \ ;; 奥里亚数字
+
+    \ \ (check (char10 :digit?) =\<gtr\> #t) \ ;; 泰米尔数字
+
+    \ \ (check (char11 :digit?) =\<gtr\> #t) \ ;; 泰卢固数字
+
+    \ \ (check (char12 :digit?) =\<gtr\> #t) \ ;; 卡纳达数字
+
+    \ \ (check (char13 :digit?) =\<gtr\> #t) \ ;; 马拉雅拉姆数字
+
+    \ \ (check (char14 :digit?) =\<gtr\> #t) \ ;; 泰文数字
+
+    \ \ (check (char15 :digit?) =\<gtr\> #t) \ ;; 老挝数字
+
+    \ \ (check (char16 :digit?) =\<gtr\> #t) \ ;; 藏文数字
+
+    \ \ (check (char17 :digit?) =\<gtr\> #t) \ ;; 缅甸数字
+
+    \ \ (check (char18 :digit?) =\<gtr\> #t) \ ;; 高棉数字
+
+    \ \ (check (char19 :digit?) =\<gtr\> #t) \ ;; 蒙古数字
+
+    \ \ (check (char20 :digit?) =\<gtr\> #f)) \ ;; 非数字字符
+
+    \;
+  </goldfish-chunk>
+
+  <subsubsection|转换>
+
   <paragraph|case-char%to-bytevector>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

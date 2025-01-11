@@ -72,6 +72,49 @@
 
 (check-catch 'value-error ((box #x110000) :to-char))
 
+(let ((char1 (case-char 48))  ;; ASCII '0'
+      (char2 (case-char #xFF10))  ;; 全角 '０'
+      (char3 (case-char #x0660))  ;; 阿拉伯数字 '٠'
+      (char4 (case-char #x06F0))  ;; 扩展阿拉伯数字 '۰'
+      (char5 (case-char #x0966))  ;; 印度数字
+      (char6 (case-char #x09E6))  ;; 孟加拉数字
+      (char7 (case-char #x0A66))  ;; 古尔穆奇数字
+      (char8 (case-char #x0AE6))  ;; 古吉拉特数字
+      (char9 (case-char #x0B66))  ;; 奥里亚数字
+      (char10 (case-char #x0BE6))  ;; 泰米尔数字
+      (char11 (case-char #x0C66))  ;; 泰卢固数字
+      (char12 (case-char #x0CE6))  ;; 卡纳达数字 
+      (char13 (case-char #x0D66))  ;; 马拉雅拉姆数字
+      (char14 (case-char #x0E50))  ;; 泰文数字 '๐'
+      (char15 (case-char #x0ED0))  ;; 老挝数字
+      (char16 (case-char #x0F20))  ;; 藏文数字
+      (char17 (case-char #x1040))  ;; 缅甸数字 '၀'
+      (char18 (case-char #x17E0))  ;; 高棉数字 '០'
+      (char19 (case-char #x1810))  ;; 蒙古数字 '᠐'
+      (char20 (case-char 65)))  ;; ASCII 'A'
+
+  ;; 测试 %digit?
+  (check (char1 :digit?) => #t)  ;; ASCII 数字
+  (check (char2 :digit?) => #t)  ;; 全角数字
+  (check (char3 :digit?) => #t)  ;; 阿拉伯数字
+  (check (char4 :digit?) => #t)  ;; 扩展阿拉伯数字
+  (check (char5 :digit?) => #t)  ;; 印度数字
+  (check (char6 :digit?) => #t)  ;; 孟加拉数字
+  (check (char7 :digit?) => #t)  ;; 古尔穆奇数字
+  (check (char8 :digit?) => #t)  ;; 古吉拉特数字
+  (check (char9 :digit?) => #t)  ;; 奥里亚数字
+  (check (char10 :digit?) => #t)  ;; 泰米尔数字
+  (check (char11 :digit?) => #t)  ;; 泰卢固数字
+  (check (char12 :digit?) => #t)  ;; 卡纳达数字
+  (check (char13 :digit?) => #t)  ;; 马拉雅拉姆数字
+  (check (char14 :digit?) => #t)  ;; 泰文数字
+  (check (char15 :digit?) => #t)  ;; 老挝数字
+  (check (char16 :digit?) => #t)  ;; 藏文数字
+  (check (char17 :digit?) => #t)  ;; 缅甸数字
+  (check (char18 :digit?) => #t)  ;; 高棉数字
+  (check (char19 :digit?) => #t)  ;; 蒙古数字
+  (check (char20 :digit?) => #f))  ;; 非数字字符
+
 (check (((case-char #x41) :to-string) :unbox) => "A")
 (check (((case-char #xA3) :to-string) :unbox) => "£")
 (check (((case-char #x4E2D) :to-string) :unbox) => "中")

@@ -88,6 +88,28 @@
 
 (define-case-class case-char ((code-point integer?))
 
+(define (%digit?)
+  (or
+   (and (>= code-point 48) (<= code-point 57))
+   (and (>= code-point #xFF10) (<= code-point #xFF19))
+   (and (>= code-point #x0660) (<= code-point #x0669))
+   (and (>= code-point #x06F0) (<= code-point #x06F9))
+   (and (>= code-point #x0966) (<= code-point #x096F))
+   (and (>= code-point #x09E6) (<= code-point #x09EF))
+   (and (>= code-point #x0A66) (<= code-point #x0A6F))
+   (and (>= code-point #x0AE6) (<= code-point #x0AEF))
+   (and (>= code-point #x0B66) (<= code-point #x0B6F))
+   (and (>= code-point #x0BE6) (<= code-point #x0BEF))
+   (and (>= code-point #x0C66) (<= code-point #x0C6F))
+   (and (>= code-point #x0CE6) (<= code-point #x0CEF))
+   (and (>= code-point #x0D66) (<= code-point #x0D6F))
+   (and (>= code-point #x0E50) (<= code-point #x0E59))
+   (and (>= code-point #x0ED0) (<= code-point #x0ED9))
+   (and (>= code-point #x0F20) (<= code-point #x0F29))
+   (and (>= code-point #x1040) (<= code-point #x1049))
+   (and (>= code-point #x17E0) (<= code-point #x17E9))
+   (and (>= code-point #x1810) (<= code-point #x1819))))
+  
 (define (%to-bytevector)
   (cond
     ((<= code-point #x7F)
