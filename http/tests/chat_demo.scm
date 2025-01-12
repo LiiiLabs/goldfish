@@ -28,13 +28,16 @@
   (define (%to-json)
     `(("role" . ,role) ("content" . ,content))))
 
+(define (message? obj)
+  (obj :is-instance-of 'message))
+
 (define-case-class payload
   ((messages vector? #()))
   
   (define (%to-json)
     `(("model" . "deepseek-ai/DeepSeek-V2.5")
-          ("messages" . ,(vector-map (lambda (x) (x :to-json)) messages))
-          ("max_tokens" . 512)))
+     ("messages" . ,(vector-map (lambda (x) (x :to-json)) messages))
+     ("max_tokens" . 512)))
   
   (define (%to-json-string)
     (json->string (%to-json)))

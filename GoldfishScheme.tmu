@@ -8782,6 +8782,8 @@
   <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
     (define-library (srfi srfi-151)
 
+    (import (liii base))
+
     (export
 
     \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand bit-count\ 

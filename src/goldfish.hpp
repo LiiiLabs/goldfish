@@ -737,6 +737,9 @@ customize_goldfish_by_mode (s7_scheme* sc, string mode,
   }
 
   if (mode == "default" || mode == "liii") {
+    s7_eval_c_string (sc, "(import (liii base) (liii error) (liii lang))");
+  }
+  else if (mode == "scheme") {
     s7_eval_c_string (sc, "(import (liii base) (liii error))");
   }
   else if (mode == "sicp") {

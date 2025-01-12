@@ -17,30 +17,34 @@
 (import (liii list)
         (liii string)
         (liii os)
-        (liii path)
-        (liii lang))
+        (liii path))
 
 (define (listdir2 dir)
-  (map (lambda (x) (string-append dir "/" x))
-    (vector->list (listdir dir))))
+  ((box (vector->list (listdir dir)))
+   :map (lambda (x) (string-append dir "/" x))
+   :collect))
 
-; (display (listdir2 "tests"))
+(display (listdir2 "tests/goldfish"))
+
 (define (all-tests)
   ((box (listdir2 "tests/goldfish"))
-    :filter path-dir?
-    :flat-map listdir2
-    :filter (lambda (x) (path-file? x))
-    :filter (lambda (x) (not (string-ends? x "srfi-78-test.scm")))
-    :collect))
+   :filter path-dir?
+   :flat-map listdir2
+   :filter (lambda (x) (path-file? x))
+   :filter (lambda (x) (not (string-ends? x "srfi-78-test.scm")))))
 
 (define (goldfish-cmd)
   (if (os-windows?)
     "bin\\goldfish "
     "bin/goldfish "))
 
-(let ((ret-l
-       (map (lambda (x) (os-call x))
-         (map (lambda (x) (string-append (goldfish-cmd) x))
-           (all-tests)))))
-  (when (find (lambda (x) (not (= x 0))) ret-l)
+(let1 ret-l ((all-tests)
+             :map (lambda (x) (string-append (goldfish-cmd) x))
+             :map (lambda (x)
+                    (newline)
+                    (display "----------->") (newline)
+                    (display x) (newline)
+                    (os-call x)))
+  (when (ret-l :exists (compose not zero?))
     (exit -1)))
+

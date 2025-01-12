@@ -15,7 +15,7 @@
 ;
 
 (define-library (liii lang)
-(import (liii string) (liii vector)
+(import (liii base) (liii string) (liii vector)
         (liii list) (liii hash-table) (liii bitwise))
 (export
   option none

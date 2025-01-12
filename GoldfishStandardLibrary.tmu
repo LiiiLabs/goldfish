@@ -4184,6 +4184,12 @@
 
     \ \ if (mode == "default" \|\| mode == "liii") {
 
+    \ \ \ \ s7_eval_c_string (sc, "(import (liii base) (liii error) (liii lang))");
+
+    \ \ }
+
+    \ \ else if (mode == "scheme") {
+
     \ \ \ \ s7_eval_c_string (sc, "(import (liii base) (liii error))");
 
     \ \ }

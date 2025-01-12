@@ -267,6 +267,12 @@
     \ \ \ \ `(("role" . ,role) ("content" . ,content))))
 
     \;
+
+    (define (message? obj)
+
+    \ \ (obj :is-instance-of 'message))
+
+    \;
   </goldfish-chunk>
 
   将消息体添加到JSON对象q的尾部。q对象的结构就是上面定义的payload函数中的JSON，这里是在更改messages字段的值。
@@ -282,9 +288,9 @@
 
     \ \ \ \ `(("model" . "deepseek-ai/DeepSeek-V2.5")
 
-    \ \ \ \ \ \ \ \ \ \ ("messages" . ,(vector-map (lambda (x) (x :to-json)) messages))
+    \ \ \ \ \ ("messages" . ,(vector-map (lambda (x) (x :to-json)) messages))
 
-    \ \ \ \ \ \ \ \ \ \ ("max_tokens" . 512)))
+    \ \ \ \ \ ("max_tokens" . 512)))
 
     \ \ 
 
