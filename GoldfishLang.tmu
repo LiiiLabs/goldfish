@@ -867,20 +867,110 @@
     \;
   </goldfish-chunk>
 
-  由于默认的构造器无法处理非法输入，这里重新定义一下构造器。
+  <paragraph|case-char>
+
+  case-char是样本类case-char的伴生函数，用于定义更好的构造器。本构造器支持：
+
+  <\description>
+    <item*|integer>将整数形式的Unicode码点转换为case-char，一般我们使用十六进制来表示整数
+
+    <item*|bytevector>将UTF-8编码的字节数组转换为case-char
+
+    <item*|string>将UTF-8编码的长度为1的字符串转换为case-char。由于字符字面量不支持Unicode，故而采用这种方式做转换。
+  </description>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define make-case-char case-char)
 
     \;
 
-    (typed-define (case-char (code integer?))
+    (define (utf8-byte-sequence-\<gtr\>code-point byte-seq)
 
-    \ \ (if (and (\<gtr\>= code 0) (\<less\>= code #x10FFFF))
+    \ \ (let ((len (bytevector-length byte-seq)))
 
-    \ \ \ \ \ \ (make-case-char code)
+    \ \ \ \ (cond
 
-    \ \ \ \ \ \ (value-error "case-char: code point out of range" code)))
+    \ \ \ \ \ \ ((= len 1)
+
+    \ \ \ \ \ \ \ (bytevector-u8-ref byte-seq 0))
+
+    \ \ \ \ \ \ ((= len 2)
+
+    \ \ \ \ \ \ \ (let ((b1 (bytevector-u8-ref byte-seq 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (bytevector-u8-ref byte-seq 1)))
+
+    \ \ \ \ \ \ \ \ \ (bitwise-ior
+
+    \ \ \ \ \ \ \ \ \ \ (arithmetic-shift (bitwise-and b1 #x1F) 6)
+
+    \ \ \ \ \ \ \ \ \ \ (bitwise-and b2 #x3F))))
+
+    \ \ \ \ \ \ ((= len 3)
+
+    \ \ \ \ \ \ \ (let ((b1 (bytevector-u8-ref byte-seq 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (bytevector-u8-ref byte-seq 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (bytevector-u8-ref byte-seq 2)))
+
+    \ \ \ \ \ \ \ \ \ (bitwise-ior
+
+    \ \ \ \ \ \ \ \ \ \ (arithmetic-shift (bitwise-and b1 #x0F) 12)
+
+    \ \ \ \ \ \ \ \ \ \ (arithmetic-shift (bitwise-and b2 #x3F) 6)
+
+    \ \ \ \ \ \ \ \ \ \ (bitwise-and b3 #x3F))))
+
+    \ \ \ \ \ \ ((= len 4)
+
+    \ \ \ \ \ \ \ (let ((b1 (bytevector-u8-ref byte-seq 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (b2 (bytevector-u8-ref byte-seq 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (b3 (bytevector-u8-ref byte-seq 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (b4 (bytevector-u8-ref byte-seq 3)))
+
+    \ \ \ \ \ \ \ \ \ (bitwise-ior
+
+    \ \ \ \ \ \ \ \ \ \ (arithmetic-shift (bitwise-and b1 #x07) 18)
+
+    \ \ \ \ \ \ \ \ \ \ (arithmetic-shift (bitwise-and b2 #x3F) 12)
+
+    \ \ \ \ \ \ \ \ \ \ (arithmetic-shift (bitwise-and b3 #x3F) 6)
+
+    \ \ \ \ \ \ \ \ \ \ (bitwise-and b4 #x3F))))
+
+    \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ (value-error "Invalid UTF-8 byte sequence length")))))
+
+    \;
+
+    (define (case-char x)
+
+    \ \ (cond ((integer? x)
+
+    \ \ \ \ \ \ \ \ \ (if (and (\<gtr\>= x 0) (\<less\>= x #x10FFFF))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (make-case-char x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error "case-char: code point out of range" x)))
+
+    \ \ \ \ \ \ \ \ ((string? x)
+
+    \ \ \ \ \ \ \ \ \ (if (= 1 (u8-string-length x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (case-char (string-\<gtr\>utf8 x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (value-error "case-char: must be u8 string which length equals 1")))
+
+    \ \ \ \ \ \ \ \ ((bytevector? x)
+
+    \ \ \ \ \ \ \ \ \ (make-case-char (utf8-byte-sequence-\<gtr\>code-point x)))
+
+    \ \ \ \ \ \ \ \ (else (type-error "case-char: must be integer, string, bytevector"))))
 
     \;
   </goldfish-chunk>
@@ -930,6 +1020,62 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|case-string%char-at>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%char-at index)
+
+    \ \ (let* ((start index)
+
+    \ \ \ \ \ \ \ \ \ (end (+ index 1))
+
+    \ \ \ \ \ \ \ \ \ (byte-seq (string-\<gtr\>utf8 data start end))
+
+    \ \ \ \ \ \ \ \ \ (code-point (utf8-byte-sequence-\<gtr\>code-point byte-seq)))
+
+    \ \ \ \ (case-char byte-seq)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 str (box "你好，世界") \ 
+
+    \ \ (check (str :char-at 0) =\<gtr\> (case-char #x4F60)) \ ;; "你" 的 Unicode 码点
+
+    \ \ (check (str :char-at 1) =\<gtr\> (case-char #x597D)) \ ;; "好" 的 Unicode 码点
+
+    \ \ (check (str :char-at 2) =\<gtr\> (case-char #xFF0C)) \ ;; "，" 的 Unicode 码点
+
+    \ \ (check (str :char-at 3) =\<gtr\> (case-char #x4E16)) \ ;; "世" 的 Unicode 码点
+
+    \ \ (check (str :char-at 4) =\<gtr\> (case-char #x754C)) \ ;; "界" 的 Unicode 码点
+
+    \ \ (check-catch 'out-of-range (str :char-at 10)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-string%apply>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (typed-define (%apply (i integer?))
+
+    \ \ (%char-at i))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 str (box "Hello，世界")
+
+    \ \ \ (check (str 0) =\<gtr\> (box #\\H))
+
+    \ \ \ (check (str 7) =\<gtr\> (case-char "界")))
+
+    \;
+  </goldfish-chunk>
 
   <subsection|谓词>
 

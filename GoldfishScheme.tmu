@@ -4740,7 +4740,7 @@
   使用display作为测试结果的展示函数，比write好，因为display可以正常显示文本中的汉字。
 
   <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
-    (define check:write display)
+    (define check:write display*)
 
     \;
   </scm-chunk>

@@ -141,6 +141,18 @@
 (check ((case-string "abc") :length) => 3)
 (check ((case-string "中文") :length) => 2)
 
+(let1 str (box "你好，世界")  
+  (check (str :char-at 0) => (case-char #x4F60))  ;; "你" 的 Unicode 码点
+  (check (str :char-at 1) => (case-char #x597D))  ;; "好" 的 Unicode 码点
+  (check (str :char-at 2) => (case-char #xFF0C))  ;; "，" 的 Unicode 码点
+  (check (str :char-at 3) => (case-char #x4E16))  ;; "世" 的 Unicode 码点
+  (check (str :char-at 4) => (case-char #x754C))  ;; "界" 的 Unicode 码点
+  (check-catch 'out-of-range (str :char-at 10)))
+
+(let1 str (box "Hello，世界")
+   (check (str 0) => (box #\H))
+   (check (str 7) => (case-char "界")))
+
 (check (box "42") => (box "42"))
 (check-false ((box "41") :equals (box "42")))
 

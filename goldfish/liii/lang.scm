@@ -149,10 +149,50 @@
 
 (define make-case-char case-char)
 
-(typed-define (case-char (code integer?))
-  (if (and (>= code 0) (<= code #x10FFFF))
-      (make-case-char code)
-      (value-error "case-char: code point out of range" code)))
+(define (utf8-byte-sequence->code-point byte-seq)
+  (let ((len (bytevector-length byte-seq)))
+    (cond
+      ((= len 1)
+       (bytevector-u8-ref byte-seq 0))
+      ((= len 2)
+       (let ((b1 (bytevector-u8-ref byte-seq 0))
+             (b2 (bytevector-u8-ref byte-seq 1)))
+         (bitwise-ior
+          (arithmetic-shift (bitwise-and b1 #x1F) 6)
+          (bitwise-and b2 #x3F))))
+      ((= len 3)
+       (let ((b1 (bytevector-u8-ref byte-seq 0))
+             (b2 (bytevector-u8-ref byte-seq 1))
+             (b3 (bytevector-u8-ref byte-seq 2)))
+         (bitwise-ior
+          (arithmetic-shift (bitwise-and b1 #x0F) 12)
+          (arithmetic-shift (bitwise-and b2 #x3F) 6)
+          (bitwise-and b3 #x3F))))
+      ((= len 4)
+       (let ((b1 (bytevector-u8-ref byte-seq 0))
+             (b2 (bytevector-u8-ref byte-seq 1))
+             (b3 (bytevector-u8-ref byte-seq 2))
+             (b4 (bytevector-u8-ref byte-seq 3)))
+         (bitwise-ior
+          (arithmetic-shift (bitwise-and b1 #x07) 18)
+          (arithmetic-shift (bitwise-and b2 #x3F) 12)
+          (arithmetic-shift (bitwise-and b3 #x3F) 6)
+          (bitwise-and b4 #x3F))))
+      (else
+       (value-error "Invalid UTF-8 byte sequence length")))))
+
+(define (case-char x)
+  (cond ((integer? x)
+         (if (and (>= x 0) (<= x #x10FFFF))
+             (make-case-char x)
+             (value-error "case-char: code point out of range" x)))
+        ((string? x)
+         (if (= 1 (u8-string-length x))
+             (case-char (string->utf8 x))
+             (value-error "case-char: must be u8 string which length equals 1")))
+        ((bytevector? x)
+         (make-case-char (utf8-byte-sequence->code-point x)))
+        (else (type-error "case-char: must be integer, string, bytevector"))))
 
 (define-case-class case-string ((data string?))
 
@@ -160,6 +200,16 @@
 
 (define (%length)
   (u8-string-length data))
+
+(define (%char-at index)
+  (let* ((start index)
+         (end (+ index 1))
+         (byte-seq (string->utf8 data start end))
+         (code-point (utf8-byte-sequence->code-point byte-seq)))
+    (case-char byte-seq)))
+
+(typed-define (%apply (i integer?))
+  (%char-at i))
 
 (define (%empty?)
   (string-null? data))

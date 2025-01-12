@@ -43,7 +43,7 @@
         check:proc)
 (begin
 
-(define check:write display)
+(define check:write display*)
 
 (define check:mode #f)
 
