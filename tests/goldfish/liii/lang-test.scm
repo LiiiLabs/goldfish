@@ -18,7 +18,7 @@
         (liii lang)
         (liii cut))
 
-(check-set-mode! 'report-failed)
+;(check-set-mode! 'report-failed)
 
 (let ((opt1 (option 42))
       (opt2 (option '())))
@@ -62,6 +62,10 @@
   (check (opt2 :get-or-else (lambda () 0)) => 0)
 )
 
+(check-true ((option "str") :equals (option "str")))
+(check-true ((box 42) :equals (box 42)))
+(check-false ((box 41) :equals (box 42)))
+
 (check (((box 1) :to 2) :collect) => (list 1 2))
 (check (((box 1) :to 1) :collect) => (list 1))
 (check (((box 2) :to 1) :collect) => (list ))
@@ -71,6 +75,9 @@
 (check (((box 2) :until 2) :collect) => (list ))
 
 (check-catch 'value-error ((box #x110000) :to-char))
+
+(check-true ((case-char #x30) :equals (case-char #x30)))
+(check-false ((case-char #x31) :equals (case-char #x30)))
 
 (let ((char1 (case-char 48))  ;; ASCII '0'
       (char2 (case-char #xFF10))  ;; 全角 '０'
@@ -116,6 +123,8 @@
   (check (char20 :digit?) => #f))  ;; 非数字字符
 
 (check (((case-char #x41) :to-string) :unbox) => "A")
+(check-true ((box #\A) :equals (case-char #x41)))
+
 (check (((case-char #xA3) :to-string) :unbox) => "£")
 (check (((case-char #x4E2D) :to-string) :unbox) => "中")
 (check (((case-char #x1F600) :to-string) :unbox) => "😀")
@@ -125,6 +134,9 @@
 
 (check ((case-string "abc") :length) => 3)
 (check ((case-string "中文") :length) => 2)
+
+(check-true ((box "42") :equals (box "42")))
+(check-false ((box "41") :equals (box "42")))
 
 (check-true ((case-string "") :empty?))
 (check-false ((case-string "abc") :empty?))
@@ -142,20 +154,15 @@
   (check (str :count char-alphabetic?) => 10)
 )
 
-(let ((lst (case-list '(1 2 3 4 5))))
-  (check (lst :take -1 :collect) => '())
-  (check (lst :take 0 :collect) => '())
-  (check (lst :take 3 :collect) => '(1 2 3))
-  (check (lst :take 5 :collect) => '(1 2 3 4 5))
-  (check (lst :take 10 :collect) => '(1 2 3 4 5))
-)
+(let1 lst (case-list '(1 2 3 4 5))
+  (check ((lst :find (lambda (x) (= x 3))) :get) => 3)
+  (check ((lst :find (lambda (x) (> x 2))) :get) => 3)
 
-(let ((lst (case-list '(1 2 3 4 5))))
-  (check (lst :take-right -1 :collect) => '())
-  (check (lst :take-right 0 :collect) => '())
-  (check (lst :take-right 3 :collect) => '(3 4 5))
-  (check (lst :take-right 5 :collect) => '(1 2 3 4 5))
-  (check (lst :take-right 10 :collect) => '(1 2 3 4 5))
+  (check ((lst :find (lambda (x) (> x 10))) :empty?) => #t)
+
+  (check ((lst :find even?) :get) => 2)
+
+  (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t)
 )
 
 (let1 lst (case-list '(1 2 3 4 5))
@@ -173,15 +180,20 @@
   (check-true (l :contains 1))
   (check-false (l :contains 4)))
 
-(let1 lst (case-list '(1 2 3 4 5))
-  (check ((lst :find (lambda (x) (= x 3))) :get) => 3)
-  (check ((lst :find (lambda (x) (> x 2))) :get) => 3)
+(let ((lst (case-list '(1 2 3 4 5))))
+  (check (lst :take -1 :collect) => '())
+  (check (lst :take 0 :collect) => '())
+  (check (lst :take 3 :collect) => '(1 2 3))
+  (check (lst :take 5 :collect) => '(1 2 3 4 5))
+  (check (lst :take 10 :collect) => '(1 2 3 4 5))
+)
 
-  (check ((lst :find (lambda (x) (> x 10))) :empty?) => #t)
-
-  (check ((lst :find even?) :get) => 2)
-
-  (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t)
+(let ((lst (case-list '(1 2 3 4 5))))
+  (check (lst :take-right -1 :collect) => '())
+  (check (lst :take-right 0 :collect) => '())
+  (check (lst :take-right 3 :collect) => '(3 4 5))
+  (check (lst :take-right 5 :collect) => '(1 2 3 4 5))
+  (check (lst :take-right 10 :collect) => '(1 2 3 4 5))
 )
 
 (check ((case-list (list 1 2 3)) :count) => 3)
@@ -207,6 +219,26 @@
 )
 
 (let ((vec (case-vector #(1 2 3 4 5))))
+  (check ((vec :find (lambda (x) (= x 3))) :get) => 3)
+  (check ((vec :find (lambda (x) (> x 2))) :get) => 3)
+
+  (check ((vec :find (lambda (x) (> x 10))) :empty?) => #t)
+
+  (check ((vec :find even?) :get) => 2)
+
+  (check ((vec :find (lambda (x) (< x 0))) :empty?) => #t)
+)
+
+(check-true ((box #(1 2 3)) :equals (box #(1 2 3))))
+
+(let ((vec (case-vector #(1 2 3 4 5))))
+  (check (vec :forall (lambda (x) (> x 0))) => #t)
+  (check (vec :forall (lambda (x) (> x 3))) => #f))
+
+(let ((empty-vec (case-vector #())))
+  (check (empty-vec :forall (lambda (x) (> x 0))) => #t))
+
+(let ((vec (case-vector #(1 2 3 4 5))))
   (check (vec :take -1 :collect) => #())
   (check (vec :take 0 :collect) => #())
   (check (vec :take 3 :collect) => #(1 2 3))
@@ -221,24 +253,6 @@
   (check (vec :take-right 5 :collect) => #(1 2 3 4 5))
   (check (vec :take-right 10 :collect) => #(1 2 3 4 5))
 )
-
-(let ((vec (case-vector #(1 2 3 4 5))))
-  (check ((vec :find (lambda (x) (= x 3))) :get) => 3)
-  (check ((vec :find (lambda (x) (> x 2))) :get) => 3)
-
-  (check ((vec :find (lambda (x) (> x 10))) :empty?) => #t)
-
-  (check ((vec :find even?) :get) => 2)
-
-  (check ((vec :find (lambda (x) (< x 0))) :empty?) => #t)
-)
-
-(let ((vec (case-vector #(1 2 3 4 5))))
-  (check (vec :forall (lambda (x) (> x 0))) => #t)
-  (check (vec :forall (lambda (x) (> x 3))) => #f))
-
-(let ((empty-vec (case-vector #())))
-  (check (empty-vec :forall (lambda (x) (> x 0))) => #t))
 
 (let ((vec (case-vector #(1 2 3 4 5))))
   (check (vec :fold 0 +) => 15)

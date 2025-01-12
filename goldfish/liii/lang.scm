@@ -34,42 +34,52 @@
     (if (null? xs) r (apply r xs))))
 
 (define-case-class option ((value any?))
-  (define (%map f . xs)
-    (let1 r (if (null? value)
-                (option '())
-                (option (f value)))
-      (if (null? xs) r (apply r xs))))
 
-  (define (%flat-map f . xs)
-    (let1 r (if (null? value)
-                (option '())
-                (f value))
-      (if (null? xs) r (apply r xs))))
+(define (%get)
+  (if (null? value)
+      (value-error "option is empty, cannot get value")
+      value))
 
-  (define (%filter pred . xs)
+(define (%get-or-else default)
+  (if (null? value)
+      (if (procedure? default) (default) default)
+      value))
+
+(define (%equals that)
+  (== value (that 'value)))
+
+(define (%defined?) (not (null? value)))
+  
+(define (%empty?) (null? value))
+
+(define (%map f . xs)
+  (%apply-one f xs
+    (if (null? value)
+        (option '())
+        (option (f value)))))
+
+(define (%flat-map f . xs)
+  (let1 r (if (null? value)
+              (option '())
+              (f value))
+    (if (null? xs) r (apply r xs))))
+
+(define (%filter pred . xs)
     (let1 r (if (or (null? value) (not (pred value)))
                (option '())
                (option value))
       (if (null? xs) r (apply r xs))))
-  
-  (define (%defined?) (not (null? value)))
 
-  (define (%empty?) (null? value))
-
-  (define (%get)
-    (if (null? value)
-        (value-error "option is empty, cannot get value")
-        value))
-
-  (define (%get-or-else default)
-    (if (null? value)
-        (if (procedure? default) (default) default)
-        value))
 )
+
 (define (none) (option '()))
 
 (define-case-class case-integer ((data integer?))
-  (define (%unbox) data)
+
+(define (%unbox) data)
+
+(define (%equals that)
+  (equal? data (that 'data)))
 
 (typed-define (%to (n integer?))
   (if (< n data)
@@ -87,6 +97,9 @@
 )
 
 (define-case-class case-char ((code-point integer?))
+
+(define (%equals that)
+  (equal? code-point (that 'code-point)))
 
 (define (%digit?)
   (or
@@ -155,6 +168,9 @@
 (define (%length)
   (u8-string-length data))
 
+(define (%equals that)
+  (string=? data (that 'data)))
+
 (define (%empty?)
   (string-null? data))
 
@@ -190,6 +206,34 @@
 
 (define (%collect) data)
 
+(define (%find pred)
+  (let loop ((lst data))
+    (cond
+      ((null? lst) (none))
+      ((pred (car lst)) (option (car lst)))
+      (else (loop (cdr lst))))))
+
+(define (%equals that)
+  (let* ((l1 data)
+         (l2 (that 'data))
+         (len1 (length l1))
+         (len2 (length l2)))
+    (if (not (eq? len1 len2))
+        #f
+        (let loop ((left l1) (right l2))
+          (cond ((null? left) #t)
+                ((!= (car left) (car right)) #f)
+                (else (loop (cdr left) (cdr right))))))))
+
+(define (%forall pred)
+  (every pred data))
+
+(define (%exists pred)
+  (any pred data))
+
+(define (%contains elem)
+  (%exists (lambda (x) (equal? x elem))))
+
   (define (%map x . xs)
     (let1 r (case-list (map x data))
       (if (null? xs) r (apply r xs))))
@@ -222,22 +266,6 @@
 
     (let1 r (case-list (scala-take-right data x))
       (if (null? xs) r (apply r xs))))
-
-(define (%forall pred)
-  (every pred data))
-
-(define (%exists pred)
-  (any pred data))
-
-(define (%contains elem)
-  (%exists (lambda (x) (equal? x elem))))
-
-(define (%find pred)
-  (let loop ((lst data))
-    (cond
-      ((null? lst) (none))
-      ((pred (car lst)) (option (car lst)))
-      (else (loop (cdr lst))))))
 
   (define (%count . xs)
     (cond ((null? xs) (length data))
@@ -276,7 +304,20 @@
 )
 
 (define-case-class case-vector ((data vector?))
-  (define (%collect) data)
+
+(define (%collect) data)
+
+  (define (%find p)
+    (let loop ((i 0))
+      (cond
+        ((>= i (vector-length data)) (none))
+        ((p (vector-ref data i)) (option (vector-ref data i)))
+        (else (loop (+ i 1))))))
+(define (%equals that)
+  (vector= == data (that 'data)))
+
+  (define (%forall p)
+    (vector-every p data))
 
   (define (%map x . xs)
     (let1 r (case-vector (vector-map x data))
@@ -323,15 +364,6 @@
 
     (let1 r (case-vector (scala-take-right data x))
       (if (null? xs) r (apply r xs))))
-
-  (define (%find p)
-    (let loop ((i 0))
-      (cond
-        ((>= i (vector-length data)) (none))
-        ((p (vector-ref data i)) (option (vector-ref data i)))
-        (else (loop (+ i 1))))))
-  (define (%forall p)
-    (vector-every p data))
 
   (define (%fold initial f)
     (vector-fold f initial data))
@@ -385,11 +417,12 @@
 
 (define (box x)
   (cond ((integer? x) (case-integer x))
+        ((char? x) (case-char (char->integer x)))
         ((string? x) (case-string x))
         ((list? x) (case-list x))
         ((vector? x) (case-vector x))
         ((hash-table? x) (case-hash-table x))
-        (else (type-error "box: x must be string?, list?, vector?, hash-table?"))))
+        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
 
 ) ; end of begin
 ) ; end of library

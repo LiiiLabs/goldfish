@@ -1,6 +1,6 @@
 <TMU|<tuple|1.0.5|1.2.9.8>>
 
-<style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
+<style|<tuple|book|chinese|goldfish|literate|reduced-margins|python>>
 
 <\body>
   <\hide-preamble>
@@ -130,7 +130,7 @@
 
     \;
 
-    (check-set-mode! 'report-failed)
+    ;(check-set-mode! 'report-failed)
 
     \;
   </scm-chunk>
@@ -147,77 +147,15 @@
     \;
   </goldfish-chunk>
 
-  <section|实现>
-
-  <subsection|option>
+  <section|option>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class option ((value any?))
 
-    \ \ (define (%map f . xs)
-
-    \ \ \ \ (let1 r (if (null? value)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option (f value)))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
-
     \;
-
-    \ \ (define (%flat-map f . xs)
-
-    \ \ \ \ (let1 r (if (null? value)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f value))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
-
-    \;
-
-    \ \ (define (%filter pred . xs)
-
-    \ \ \ \ (let1 r (if (or (null? value) (not (pred value)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option value))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
-
-    \ \ 
-
-    \ \ (define (%defined?) (not (null? value)))
-
-    \;
-
-    \ \ (define (%empty?) (null? value))
-
-    \;
-
-    \ \ (define (%get)
-
-    \ \ \ \ (if (null? value)
-
-    \ \ \ \ \ \ \ \ (value-error "option is empty, cannot get value")
-
-    \ \ \ \ \ \ \ \ value))
-
-    \;
-
-    \ \ (define (%get-or-else default)
-
-    \ \ \ \ (if (null? value)
-
-    \ \ \ \ \ \ \ \ (if (procedure? default) (default) default)
-
-    \ \ \ \ \ \ \ \ value))
-
-    )
   </goldfish-chunk>
+
+  <subsection|测试>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((opt1 (option 42))
@@ -305,6 +243,126 @@
     \;
   </scm-chunk>
 
+  <subsection|选择器>
+
+  <paragraph|option%get>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%get)
+
+    \ \ (if (null? value)
+
+    \ \ \ \ \ \ (value-error "option is empty, cannot get value")
+
+    \ \ \ \ \ \ value))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|option%get-or-else>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%get-or-else default)
+
+    \ \ (if (null? value)
+
+    \ \ \ \ \ \ (if (procedure? default) (default) default)
+
+    \ \ \ \ \ \ value))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|谓词>
+
+  <paragraph|option%equals>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%equals that)
+
+    \ \ (== value (that 'value)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((option "str") :equals (option "str")))
+  </goldfish-chunk>
+
+  <paragraph|option%defined?>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%defined?) (not (null? value)))
+
+    \ \ 
+  </goldfish-chunk>
+
+  <paragraph|option%empty?>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%empty?) (null? value))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|高阶函数>
+
+  <paragraph|option%map>
+
+  \;
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%map f . xs)
+
+    \ \ (%apply-one f xs
+
+    \ \ \ \ (if (null? value)
+
+    \ \ \ \ \ \ \ \ (option '())
+
+    \ \ \ \ \ \ \ \ (option (f value)))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|option%flatmap>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%flat-map f . xs)
+
+    \ \ (let1 r (if (null? value)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f value))
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%filter pred . xs)
+
+    \ \ \ \ (let1 r (if (or (null? value) (not (pred value)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option value))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|结尾>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|none><index|none>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
@@ -313,15 +371,41 @@
     \;
   </scm-chunk>
 
-  <subsection|case-integer>
+  <section|case-integer>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-integer ((data integer?))
 
-    \ \ (define (%unbox) data)
+    \;
+  </goldfish-chunk>
+
+  <subsection|选择器>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%unbox) data)
 
     \;
   </goldfish-chunk>
+
+  <subsection|谓词>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%equals that)
+
+    \ \ (equal? data (that 'data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((box 42) :equals (box 42)))
+
+    (check-false ((box 41) :equals (box 42)))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|转换器>
 
   <paragraph|case-integer%to>
 
@@ -387,13 +471,15 @@
     \;
   </goldfish-chunk>
 
+  <subsection|结尾>
+
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     )
 
     \;
   </goldfish-chunk>
 
-  <subsection|case-char>
+  <section|case-char>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-char ((code-point integer?))
@@ -401,7 +487,25 @@
     \;
   </goldfish-chunk>
 
-  <subsubsection|谓词>
+  <subsection|谓词>
+
+  <paragraph|case-char%equals>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%equals that)
+
+    \ \ (equal? code-point (that 'code-point)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((case-char #x30) :equals (case-char #x30)))
+
+    (check-false ((case-char #x31) :equals (case-char #x30)))
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|case-char%digit?>
 
@@ -663,7 +767,7 @@
     \;
   </goldfish-chunk>
 
-  <subsubsection|转换>
+  <subsection|转换>
 
   <paragraph|case-char%to-bytevector>
 
@@ -734,6 +838,10 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check (((case-char #x41) :to-string) :unbox) =\<gtr\> "A")
 
+    (check-true ((box #\\A) :equals (case-char #x41)))
+
+    \;
+
     (check (((case-char #xA3) :to-string) :unbox) =\<gtr\> "£")
 
     (check (((case-char #x4E2D) :to-string) :unbox) =\<gtr\> "<code|中>")
@@ -743,6 +851,8 @@
     \;
   </goldfish-chunk>
 
+  <subsection|结尾>
+
   \;
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -750,6 +860,8 @@
 
     \;
   </goldfish-chunk>
+
+  由于默认的构造器无法处理非法输入，这里重新定义一下构造器。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define make-case-char case-char)
@@ -767,7 +879,7 @@
     \;
   </goldfish-chunk>
 
-  <subsection|case-string>
+  <section|case-string>
 
   Unicode编码的字符串。
 
@@ -777,7 +889,7 @@
     \;
   </scm-chunk>
 
-  <subsubsection|基础操作>
+  <subsection|选择器>
 
   <paragraph|case-string%unbox>
 
@@ -794,8 +906,6 @@
 
     \;
   </goldfish-chunk>
-
-  <subsubsection|选择器>
 
   <paragraph|case-string%length>
 
@@ -815,7 +925,25 @@
     \;
   </scm-chunk>
 
-  <subsubsection|谓词>
+  <subsection|谓词>
+
+  <paragraph|case-string%equals>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%equals that)
+
+    \ \ (string=? data (that 'data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((box "42") :equals (box "42")))
+
+    (check-false ((box "41") :equals (box "42")))
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|case-string%empty?><typehint|=\<gtr\> boolean?>
 
@@ -911,7 +1039,7 @@
     \;
   </goldfish-chunk>
 
-  <subsubsection|高阶函数>
+  <subsection|高阶函数>
 
   <paragraph|case-string%map><typehint|((p procedure?)) =\<gtr\> case-string?>
 
@@ -963,13 +1091,15 @@
     \;
   </scm-chunk>
 
-  <subsection|case-list>
+  <section|case-list>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-list ((data list?))
 
     \;
   </goldfish-chunk>
+
+  <subsection|选择器>
 
   <paragraph|case-list%collect>
 
@@ -978,6 +1108,146 @@
 
     \;
   </goldfish-chunk>
+
+  <paragraph|case-list%find><typehint|((pred procedure?)) =\<gtr\> option?>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%find pred)
+
+    \ \ (let loop ((lst data))
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((null? lst) (none))
+
+    \ \ \ \ \ \ ((pred (car lst)) (option (car lst)))
+
+    \ \ \ \ \ \ (else (loop (cdr lst))))))
+
+    \;
+  </scm-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 lst (case-list '(1 2 3 4 5))
+
+    \ \ (check ((lst :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
+
+    \ \ (check ((lst :find (lambda (x) (\<gtr\> x 2))) :get) =\<gtr\> 3)
+
+    \;
+
+    \ \ (check ((lst :find (lambda (x) (\<gtr\> x 10))) :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check ((lst :find even?) :get) =\<gtr\> 2)
+
+    \;
+
+    \ \ (check ((lst :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
+
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|谓词>
+
+  <paragraph|case-list%equals>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%equals that)
+
+    \ \ (let* ((l1 data)
+
+    \ \ \ \ \ \ \ \ \ (l2 (that 'data))
+
+    \ \ \ \ \ \ \ \ \ (len1 (length l1))
+
+    \ \ \ \ \ \ \ \ \ (len2 (length l2)))
+
+    \ \ \ \ (if (not (eq? len1 len2))
+
+    \ \ \ \ \ \ \ \ #f
+
+    \ \ \ \ \ \ \ \ (let loop ((left l1) (right l2))
+
+    \ \ \ \ \ \ \ \ \ \ (cond ((null? left) #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((!= (car left) (car right)) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (loop (cdr left) (cdr right))))))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-list%forall>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%forall pred)
+
+    \ \ (every pred data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 lst (case-list '(1 2 3 4 5))
+
+    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
+
+    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f)
+
+    )
+
+    \;
+
+    (let1 empty-lst (case-list '())
+
+    \ \ (check (empty-lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-list%exists>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%exists pred)
+
+    \ \ (any pred data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 l (case-list '(1 2 3))
+
+    \ \ (check-true (l :exists even?)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-list%contains><typehint|(elem) =\<gtr\> boolean?>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%contains elem)
+
+    \ \ (%exists (lambda (x) (equal? x elem))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 l (case-list '(1 2 3))
+
+    \ \ (check-true (l :contains 1))
+
+    \ \ (check-false (l :contains 4)))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|高阶函数>
 
   \;
 
@@ -1093,114 +1363,6 @@
     \;
   </scm-chunk>
 
-  <paragraph|case-list%forall>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%forall pred)
-
-    \ \ (every pred data))
-
-    \;
-  </goldfish-chunk>
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 lst (case-list '(1 2 3 4 5))
-
-    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
-
-    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f)
-
-    )
-
-    \;
-
-    (let1 empty-lst (case-list '())
-
-    \ \ (check (empty-lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|case-list%exists>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%exists pred)
-
-    \ \ (any pred data))
-
-    \;
-  </goldfish-chunk>
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 l (case-list '(1 2 3))
-
-    \ \ (check-true (l :exists even?)))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|case-list%contains><typehint|(elem) =\<gtr\> boolean?>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%contains elem)
-
-    \ \ (%exists (lambda (x) (equal? x elem))))
-
-    \;
-  </goldfish-chunk>
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 l (case-list '(1 2 3))
-
-    \ \ (check-true (l :contains 1))
-
-    \ \ (check-false (l :contains 4)))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|case-list%find><typehint|((pred procedure?)) =\<gtr\> option?>
-
-  <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%find pred)
-
-    \ \ (let loop ((lst data))
-
-    \ \ \ \ (cond
-
-    \ \ \ \ \ \ ((null? lst) (none))
-
-    \ \ \ \ \ \ ((pred (car lst)) (option (car lst)))
-
-    \ \ \ \ \ \ (else (loop (cdr lst))))))
-
-    \;
-  </scm-chunk>
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 lst (case-list '(1 2 3 4 5))
-
-    \ \ (check ((lst :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
-
-    \ \ (check ((lst :find (lambda (x) (\<gtr\> x 2))) :get) =\<gtr\> 3)
-
-    \;
-
-    \ \ (check ((lst :find (lambda (x) (\<gtr\> x 10))) :empty?) =\<gtr\> #t)
-
-    \;
-
-    \ \ (check ((lst :find even?) :get) =\<gtr\> 2)
-
-    \;
-
-    \ \ (check ((lst :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
-
-    )
-
-    \;
-  </goldfish-chunk>
-
   <paragraph|case-list%count>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -1258,6 +1420,8 @@
 
     \;
   </scm-chunk>
+
+  <subsection|转换器>
 
   <subparagraph|make-string>
 
@@ -1333,21 +1497,117 @@
     \;
   </scm-chunk>
 
+  <subsection|结尾>
+
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     )
 
     \;
   </scm-chunk>
 
-  <subsection|case-vector>
+  <section|case-vector>
 
-  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-vector ((data vector?))
 
-    \ \ (define (%collect) data)
+    \;
+  </goldfish-chunk>
+
+  <subsection|选择器>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%collect) data)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-vector%find>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    \ \ (define (%find p)
+
+    \ \ \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((\<gtr\>= i (vector-length data)) (none))
+
+    \ \ \ \ \ \ \ \ ((p (vector-ref data i)) (option (vector-ref data i)))
+
+    \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((vec (case-vector #(1 2 3 4 5))))
+
+    \ \ (check ((vec :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
+
+    \ \ (check ((vec :find (lambda (x) (\<gtr\> x 2))) :get) =\<gtr\> 3)
 
     \;
 
+    \ \ (check ((vec :find (lambda (x) (\<gtr\> x 10))) :empty?) =\<gtr\> #t)
+
+    \;
+
+    \ \ (check ((vec :find even?) :get) =\<gtr\> 2)
+
+    \;
+
+    \ \ (check ((vec :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
+
+    )
+
+    \;
+  </scm-chunk>
+
+  <subsection|谓词>
+
+  <paragraph|case-vector%equals>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%equals that)
+
+    \ \ (vector= == data (that 'data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((box #(1 2 3)) :equals (box #(1 2 3))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-vector%forall>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    \ \ (define (%forall p)
+
+    \ \ \ \ (vector-every p data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((vec (case-vector #(1 2 3 4 5))))
+
+    \ \ (check (vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
+
+    \ \ (check (vec :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f))
+
+    \;
+
+    (let ((empty-vec (case-vector #())))
+
+    \ \ (check (empty-vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
+
+    \;
+  </scm-chunk>
+
+  <subsection|高阶函数>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%map x . xs)
 
     \ \ \ \ (let1 r (case-vector (vector-map x data))
@@ -1485,71 +1745,9 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|case-vector%find>
+  \;
 
-  <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%find p)
-
-    \ \ \ \ (let loop ((i 0))
-
-    \ \ \ \ \ \ (cond
-
-    \ \ \ \ \ \ \ \ ((\<gtr\>= i (vector-length data)) (none))
-
-    \ \ \ \ \ \ \ \ ((p (vector-ref data i)) (option (vector-ref data i)))
-
-    \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (case-vector #(1 2 3 4 5))))
-
-    \ \ (check ((vec :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
-
-    \ \ (check ((vec :find (lambda (x) (\<gtr\> x 2))) :get) =\<gtr\> 3)
-
-    \;
-
-    \ \ (check ((vec :find (lambda (x) (\<gtr\> x 10))) :empty?) =\<gtr\> #t)
-
-    \;
-
-    \ \ (check ((vec :find even?) :get) =\<gtr\> 2)
-
-    \;
-
-    \ \ (check ((vec :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
-
-    )
-
-    \;
-  </scm-chunk>
-
-  <paragraph|case-vector%forall>
-
-  <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%forall p)
-
-    \ \ \ \ (vector-every p data))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (case-vector #(1 2 3 4 5))))
-
-    \ \ (check (vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
-
-    \ \ (check (vec :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f))
-
-    \;
-
-    (let ((empty-vec (case-vector #())))
-
-    \ \ (check (empty-vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
-
-    \;
-  </scm-chunk>
+  \;
 
   <paragraph|case-vector%fold>
 
@@ -1584,6 +1782,8 @@
 
     \;
   </goldfish-chunk>
+
+  <subsection|转换器>
 
   <paragraph|case-vector%make-string>
 
@@ -1753,11 +1953,15 @@
     \;
   </goldfish-chunk>
 
+  <subsection|结尾>
+
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     )
 
     \;
   </goldfish-chunk>
+
+  <section|常用函数>
 
   <paragraph|box>
 
@@ -1765,6 +1969,8 @@
     (define (box x)
 
     \ \ (cond ((integer? x) (case-integer x))
+
+    \ \ \ \ \ \ \ \ ((char? x) (case-char (char-\<gtr\>integer x)))
 
     \ \ \ \ \ \ \ \ ((string? x) (case-string x))
 
@@ -1774,7 +1980,7 @@
 
     \ \ \ \ \ \ \ \ ((hash-table? x) (case-hash-table x))
 
-    \ \ \ \ \ \ \ \ (else (type-error "box: x must be string?, list?, vector?, hash-table?"))))
+    \ \ \ \ \ \ \ \ (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
 
     \;
   </goldfish-chunk>
