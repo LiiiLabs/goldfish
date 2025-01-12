@@ -18,13 +18,9 @@
 (import (liii string) (liii vector)
         (liii list) (liii hash-table) (liii bitwise))
 (export
-  option option? option=? none
-  case-integer case-integer? case-integer=?
-  case-char case-char? case-char=?
-  case-string case-string? case-string=?
-  case-list case-list? case-list=?
-  case-vector case-vector? case-vector=?
-  case-hash-table case-hash-table? case-hash-table=?
+  option none
+  case-integer case-char case-string
+  case-list case-vector case-hash-table
   box
 )
 (begin
@@ -78,9 +74,6 @@
 
 (define (%unbox) data)
 
-(define (%equals that)
-  (equal? data (that 'data)))
-
 (typed-define (%to (n integer?))
   (if (< n data)
       (case-list (list))
@@ -97,9 +90,6 @@
 )
 
 (define-case-class case-char ((code-point integer?))
-
-(define (%equals that)
-  (equal? code-point (that 'code-point)))
 
 (define (%digit?)
   (or
@@ -167,9 +157,6 @@
 
 (define (%length)
   (u8-string-length data))
-
-(define (%equals that)
-  (string=? data (that 'data)))
 
 (define (%empty?)
   (string-null? data))

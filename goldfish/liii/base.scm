@@ -58,17 +58,12 @@
   ; Extra routines
   == != loose-car loose-cdr display* in? compose identity any?
   ; Extra structure
-  let1  typed-lambda typed-define define-case-class
+  let1  typed-lambda typed-define define-case-class case-class?
 )
 (begin
 
 (define* (u8-substring str (start 0) (end #t))
   (utf8->string (string->utf8 str start end)))
-
-(define == equal?)
-
-(define (!= left right)
-  (not (equal? left right)))
 
 (define (loose-car pair-or-empty)
   (if (eq? '() pair-or-empty)
@@ -160,12 +155,22 @@
                          fields)))
     `(begin
        (typed-define ,(cons class-name fields)
+         (define (%is-instance-of x)
+           (eq? x ',class-name))
+         
+         (typed-define (%equals (that case-class?))
+           (and (that :is-instance-of ',class-name)
+                ,@(map (lambda (field)
+                         `(equal? ,(car field) (that ',(car field))))
+                       fields)))
 
          ,@extra-operations
 
          (lambda (msg . args)
            (cond
-             ((eq? msg 'type) ',class-name)
+             ((eq? msg :is-instance-of) (apply %is-instance-of args))
+             ((eq? msg :equals) (apply %equals args))
+             
              ,@(map (lambda (field)
                       `((eq? msg ',(car field)) ,(car field)))
                     fields)
@@ -183,16 +188,26 @@
                         (apply ,(caadr op) args)))
                     extra-operations)
 
-             (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
+             (else (value-error "No such field or operation " msg " in case class " ,class-name))))))))
 
-       (define (,type-pred obj)
-         (and (procedure? obj)
-              (eq? (obj 'type) ',class-name)))
+(define (case-class? x)
+  (and-let* ((is-proc? (procedure? x))
+             (source (procedure-source x))
+             (body (source 2))
+             (is-cond? (eq? (car body) 'cond))
+             (at-least-2? (>= (length body) 3))
+             (pred1 ((body 1) 0))
+             (pred2 ((body 2) 0)))
+    (and (equal? pred1 '(eq? msg :is-instance-of))
+         (equal? pred2 '(eq? msg :equals)))))
 
-       (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
-         (and ,@(map (lambda (field)
-                       `(equal? (p1 ',(car field)) (p2 ',(car field))))
-                     fields))))))
+(define (== left right)
+  (if (and (case-class? left) (case-class? right))
+      (left :equals right)
+      (equal? left right)))
+
+(define (!= left right)
+  (not (== left right)))
 
 ) ; end of begin
 ) ; end of define-library

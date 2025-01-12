@@ -18,7 +18,7 @@
         (liii lang)
         (liii cut))
 
-;(check-set-mode! 'report-failed)
+(check-set-mode! 'report-failed)
 
 (let ((opt1 (option 42))
       (opt2 (option '())))
@@ -63,6 +63,7 @@
 )
 
 (check-true ((option "str") :equals (option "str")))
+
 (check-true ((box 42) :equals (box 42)))
 (check-false ((box 41) :equals (box 42)))
 
@@ -135,7 +136,7 @@
 (check ((case-string "abc") :length) => 3)
 (check ((case-string "中文") :length) => 2)
 
-(check-true ((box "42") :equals (box "42")))
+(check (box "42") => (box "42"))
 (check-false ((box "41") :equals (box "42")))
 
 (check-true ((case-string "") :empty?))
@@ -165,7 +166,10 @@
   (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t)
 )
 
-(let1 lst (case-list '(1 2 3 4 5))
+(check (box (list (box 1) (box 2) (box 3)))
+  => (((box 1) :to 3) :map box))
+
+(let1 lst (box '(1 2 3 4 5))
   (check (lst :forall (lambda (x) (> x 0))) => #t)
   (check (lst :forall (lambda (x) (> x 3))) => #f)
 )

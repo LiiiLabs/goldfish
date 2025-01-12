@@ -408,7 +408,7 @@
 
     \ \ ; Extra structure
 
-    \ \ let1 \ typed-lambda typed-define define-case-class
+    \ \ let1 \ typed-lambda typed-define define-case-class case-class?
 
     )
 
@@ -3519,46 +3519,6 @@
 
   <section|增补函数>
 
-  <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
-
-  <scm|equal?>的语法糖。
-
-  <\scm-chunk|goldfish/liii/base.scm|true|true>
-    (define == equal?)
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
-
-    (check (!= (list 1 2) (list 1 2)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
-  <paragraph|!=><index|!=><scm|(x y) =\<gtr\> bool>
-
-  语法糖。
-
-  <\scm-chunk|goldfish/liii/base.scm|true|true>
-    (define (!= left right)
-
-    \ \ (not (equal? left right)))
-
-    \;
-  </scm-chunk>
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
-
-    (check (!= (list 1 2) (list 1 2)) =\<gtr\> #f)
-
-    \;
-  </scm-chunk>
-
   <paragraph|loose-car>
 
   <\scm-chunk|goldfish/liii/base.scm|true|true>
@@ -3904,6 +3864,22 @@
 
     \ \ \ \ \ \ \ (typed-define ,(cons class-name fields)
 
+    \ \ \ \ \ \ \ \ \ (define (%is-instance-of x)
+
+    \ \ \ \ \ \ \ \ \ \ \ (eq? x ',class-name))
+
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ (typed-define (%equals (that case-class?))
+
+    \ \ \ \ \ \ \ \ \ \ \ (and (that :is-instance-of ',class-name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(equal? ,(car field) (that ',(car field))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)))
+
     \;
 
     \ \ \ \ \ \ \ \ \ ,@extra-operations
@@ -3914,17 +3890,21 @@
 
     \ \ \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg 'type) ',class-name)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :is-instance-of) (apply %is-instance-of args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ 
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((eq? msg ',(car field)) ,(car field)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ',(car field)) ,(car field)))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field key-field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((eq? msg ,key-field)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,key-field)
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,constructor ,@(map (lambda (f)
 
@@ -3942,7 +3922,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (op)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘((eq? msg ,(string-\<gtr\>symbol (string-append ":" (substring (symbol-\<gtr\>string (caadr op)) 1))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,(string-\<gtr\>symbol (string-append ":" (substring (symbol-\<gtr\>string (caadr op)) 1))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply ,(caadr op) args)))
 
@@ -3950,25 +3930,7 @@
 
     \;
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (value-error "No such field or operation " msg " in case class " ,class-name)))))
-
-    \;
-
-    \ \ \ \ \ \ \ (define (,type-pred obj)
-
-    \ \ \ \ \ \ \ \ \ (and (procedure? obj)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (eq? (obj 'type) ',class-name)))
-
-    \;
-
-    \ \ \ \ \ \ \ (typed-define (,equality-pred (p1 ,type-pred) (p2 ,type-pred))
-
-    \ \ \ \ \ \ \ \ \ (and ,@(map (lambda (field)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(equal? (p1 ',(car field)) (p2 ',(car field))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (value-error "No such field or operation " msg " in case class " ,class-name))))))))
 
     \;
   </goldfish-chunk>
@@ -3994,13 +3956,7 @@
 
     \ \ (check-catch 'value-error (bob 'sex))
 
-    \ \ (check-true (person? bob)))
-
-    \;
-
-    (check-true (person=? (person "Bob" 21) (person "Bob" 21)))
-
-    (check-false (person=? (person "Bob" 21) (person "Bob" 20)))
+    \ \ (check-true (bob :is-instance-of 'person)))
 
     \;
 
@@ -4014,7 +3970,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case* x
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\<less\>person?\<gtr\>) (x 'name))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\<less\>procedure?\<gtr\>) (x 'name))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (???))))))
 
@@ -4053,6 +4009,90 @@
     \ \ (check (bob :to-string) =\<gtr\> "I am Bob 21 years old!")
 
     \ \ (check (bob :greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old!"))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-class?>
+
+  case class的前两个方法必须是<scm|:is-instance-of>和<scm|:equals>。
+
+  <\goldfish-chunk|goldfish/liii/base.scm|true|true>
+    (define (case-class? x)
+
+    \ \ (and-let* ((is-proc? (procedure? x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (source (procedure-source x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (body (source 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (is-cond? (eq? (car body) 'cond))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (at-least-2? (\<gtr\>= (length body) 3))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (pred1 ((body 1) 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (pred2 ((body 2) 0)))
+
+    \ \ \ \ (and (equal? pred1 '(eq? msg :is-instance-of))
+
+    \ \ \ \ \ \ \ \ \ (equal? pred2 '(eq? msg :equals)))))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (case-class? (person "Bob" 21)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
+
+  <scm|equal?>的语法糖。
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (== left right)
+
+    \ \ (if (and (case-class? left) (case-class? right))
+
+    \ \ \ \ \ \ (left :equals right)
+
+    \ \ \ \ \ \ (equal? left right)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
+
+    (check (!= (list 1 2) (list 1 2)) =\<gtr\> #f)
+
+    (check-true (== (person "Bob" 21) (person "Bob" 21)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|!=><index|!=><scm|(x y) =\<gtr\> bool>
+
+  语法糖。
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (!= left right)
+
+    \ \ (not (== left right)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
+
+    (check (!= (list 1 2) (list 1 2)) =\<gtr\> #f)
+
+    (check-true (!= (person "Bob" 20) (person "Bob" 21)))
 
     \;
   </scm-chunk>
@@ -4968,7 +5008,7 @@
   <\scm-chunk|goldfish/srfi/srfi-78.scm|true|true>
     (define-macro (check expr =\<gtr\> expected)
 
-    \ \ `(check:proc ',expr (lambda () ,expr) equal? ,expected))
+    \ \ `(check:proc ',expr (lambda () ,expr) == ,expected))
 
     \;
   </scm-chunk>

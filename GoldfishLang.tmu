@@ -96,19 +96,11 @@
 
     (export
 
-    \ \ option option? option=? none
+    \ \ option none
 
-    \ \ case-integer case-integer? case-integer=?
+    \ \ case-integer case-char case-string
 
-    \ \ case-char case-char? case-char=?
-
-    \ \ case-string case-string? case-string=?
-
-    \ \ case-list case-list? case-list=?
-
-    \ \ case-vector case-vector? case-vector=?
-
-    \ \ case-hash-table case-hash-table? case-hash-table=?
+    \ \ case-list case-vector case-hash-table
 
     \ \ box
 
@@ -130,7 +122,7 @@
 
     \;
 
-    ;(check-set-mode! 'report-failed)
+    (check-set-mode! 'report-failed)
 
     \;
   </scm-chunk>
@@ -287,6 +279,8 @@
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check-true ((option "str") :equals (option "str")))
+
+    \;
   </goldfish-chunk>
 
   <paragraph|option%defined?>
@@ -389,13 +383,9 @@
 
   <subsection|谓词>
 
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%equals that)
+  <paragraph|case-integer%equals>
 
-    \ \ (equal? data (that 'data)))
-
-    \;
-  </goldfish-chunk>
+  该函数由define-case-class自动生成。
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check-true ((box 42) :equals (box 42)))
@@ -491,13 +481,7 @@
 
   <paragraph|case-char%equals>
 
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%equals that)
-
-    \ \ (equal? code-point (that 'code-point)))
-
-    \;
-  </goldfish-chunk>
+  该函数由<scm|define-case-class>自动生成。
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check-true ((case-char #x30) :equals (case-char #x30)))
@@ -929,16 +913,10 @@
 
   <paragraph|case-string%equals>
 
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%equals that)
-
-    \ \ (string=? data (that 'data)))
-
-    \;
-  </goldfish-chunk>
+  该函数由<scm|define-case-class>自动生成。
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check-true ((box "42") :equals (box "42")))
+    (check (box "42") =\<gtr\> (box "42"))
 
     (check-false ((box "41") :equals (box "42")))
 
@@ -1181,6 +1159,14 @@
     \;
   </goldfish-chunk>
 
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (box (list (box 1) (box 2) (box 3)))
+
+    \ \ =\<gtr\> (((box 1) :to 3) :map box))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|case-list%forall>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -1192,7 +1178,7 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 lst (case-list '(1 2 3 4 5))
+    (let1 lst (box '(1 2 3 4 5))
 
     \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
 

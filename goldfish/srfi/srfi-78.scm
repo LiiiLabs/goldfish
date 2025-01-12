@@ -136,7 +136,7 @@
     (else (error "unrecognized check:mode" check:mode))))
 
 (define-macro (check expr => expected)
-  `(check:proc ',expr (lambda () ,expr) equal? ,expected))
+  `(check:proc ',expr (lambda () ,expr) == ,expected))
 
 (define (check-report)
   (if (>= check:mode 1)

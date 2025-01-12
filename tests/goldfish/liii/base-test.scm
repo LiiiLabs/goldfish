@@ -657,12 +657,6 @@
 
 (check (eof-object) => #<eof>)
 
-(check (== (list 1 2) (list 1 2)) => #t)
-(check (!= (list 1 2) (list 1 2)) => #f)
-
-(check (== (list 1 2) (list 1 2)) => #t)
-(check (!= (list 1 2) (list 1 2)) => #f)
-
 (check
   (with-output-to-string
     (lambda ()
@@ -711,17 +705,14 @@
   (check (bob 'age) => 21)
   (check ((bob :name "hello") 'name) => "hello")
   (check-catch 'value-error (bob 'sex))
-  (check-true (person? bob)))
-
-(check-true (person=? (person "Bob" 21) (person "Bob" 21)))
-(check-false (person=? (person "Bob" 21) (person "Bob" 20)))
+  (check-true (bob :is-instance-of 'person)))
 
 (check-catch 'type-error (person 1 21))
 
 (let ((bob (person "Bob" 21))
       (get-name (lambda (x)
                  (case* x
-                   ((#<person?>) (x 'name))
+                   ((#<procedure?>) (x 'name))
                    (else (???))))))
   (check (get-name bob) => "Bob")
   (check-catch 'not-implemented-error (get-name 1)))
@@ -739,6 +730,16 @@
 (let1 bob (jerson "Bob" 21)
   (check (bob :to-string) => "I am Bob 21 years old!")
   (check (bob :greet "Alice") => "Hi Alice, I am Bob 21 years old!"))
+
+(check-true (case-class? (person "Bob" 21)))
+
+(check (== (list 1 2) (list 1 2)) => #t)
+(check (!= (list 1 2) (list 1 2)) => #f)
+(check-true (== (person "Bob" 21) (person "Bob" 21)))
+
+(check (== (list 1 2) (list 1 2)) => #t)
+(check (!= (list 1 2) (list 1 2)) => #f)
+(check-true (!= (person "Bob" 20) (person "Bob" 21)))
 
 (check-report)
 
