@@ -3,10 +3,56 @@
 
 金鱼Scheme 是一个 Scheme 解释器，具有以下特性：
 + 兼容 R7RS-small 标准
-+ 提供类似 Python 的标准库
++ 提供类似 Scala 的函数式集合库
++ 提供类似 Python 的功能丰富的标准库
 + 小巧且快速
 
 <img src="goldfish_scheme_logo.png" alt="示例图片" style="width: 360pt;">
+
+## 示例代码
+### 具名参数
+``` scheme
+(define* (person (name "Bob") (age 21))
+  (string-append name ": " (number->string age)))
+
+(person :name "Alice" :age 3)
+```
+### Unicode支持
+``` scheme
+((box "你好，世界") 0) ; => 你
+((box "你好，世界") 4) ; => 界
+((box "你好，世界") :length) ; => 5
+```
+
+### 函数式数据管道
+```
+((box (list 1 2 3 4 5))
+ :map (lambda (x) (* x x))
+ :filter even?
+ :collect) ; => (list 4 16)
+
+((box (vector 1 2 3 4 5))
+ :map (lambda (x) (* x x))
+ :filter even?
+ :collect) ; => (vector 4 16)
+```
+
+### 类似Scala的case class
+```
+(define-case-class person
+  ((name string?)
+   (age integer?))
+  
+  (define (%to-string)
+    (string-append "I am " name " " (number->string age) " years old!"))
+  (define (%greet x)
+    (string-append "Hi " x ", " (%to-string))))
+
+(define bob (person "Bob" 21))
+
+(bob :to-string) ; => "I am Bob 21 years old!"
+(bob :greet "Alice") ; => "Hi Alice, I am Bob 21 years old!"
+```
 
 ## 以简为美
 金鱼Scheme仍旧遵循和 S7 Scheme 一样的简约的原则。目前，它仅依赖于 [S7 Scheme](https://ccrma.stanford.edu/software/s7/) 、[tbox](https://gitee.com/tboox/tbox) 和 C++98 范围内的标准库。
@@ -15,10 +61,11 @@
 
 ## 标准库
 ### 金鱼标准库
-形如`(liii xyz)`的是金鱼标准库，模仿Python标准库的函数接口和实现方式，降低用户的学习成本。
+形如`(liii xyz)`的是金鱼标准库，模仿Python标准库和Scala集合库的函数接口和实现方式，降低用户的学习成本。
 
 | 库 | 描述 | 示例函数 |
 | --- | --- | --- |
+| [(liii lang)](goldfish/liii/lang.scm) | 类似Scala的集合库 | `box`支持一致的函数式集合库, `case-char`和`case-string`支持Unicode |
 | [(liii base)](goldfish/liii/base.scm) | 基础库 | `==`, `!=`, `display*` |
 | [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `os-error`函数抛出`'os-error`，类似Python的OSError |
 | [(liii check)](goldfish/liii/check.scm) | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch` |
@@ -118,7 +165,8 @@ based on S7 Scheme 10.11 (2-July-2024)
 `-m`帮助您指定预加载的标准库。
 
 + `default`: `-m default`等价于`-m liii`
-+ `liii`: 预加载`(liii base)`和`(liii error)`的金鱼Scheme
++ `liii`: 预加载`(liii lang)`, `(liii base)`和`(liii error)`的Goldfish Scheme
++ `scheme`: 预加载`(liii base)`和`(liii error)`的Goldfish Scheme
 + `sicp`: 预加载`(srfi sicp)`和`(scheme base)`的S7 Scheme
 + `r7rs`: 预加载`(scheme base)`的S7 Scheme
 + `s7`: 无任何无加载库的S7 Scheme

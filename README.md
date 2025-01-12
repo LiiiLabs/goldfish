@@ -3,10 +3,56 @@
 
 Goldfish Scheme is a Scheme interpreter with the following features:
 + R7RS-small compatible
-+ Python-like standard library
++ Scala-like functional collection
++ Python-like versatile standard library
 + Small and fast
 
 <img src="goldfish_scheme_logo.png" alt="示例图片" style="width: 360pt;">
+
+## Demo Code
+### Named parameter
+``` scheme
+(define* (person (name "Bob") (age 21))
+  (string-append name ": " (number->string age)))
+
+(person :name "Alice" :age 3)
+```
+### Unicode Support
+``` scheme
+((box "你好，世界") 0) ; => 你
+((box "你好，世界") 4) ; => 界
+((box "你好，世界") :length) ; => 5
+```
+
+### Functional Data Pipeline
+```
+((box (list 1 2 3 4 5))
+ :map (lambda (x) (* x x))
+ :filter even?
+ :collect) ; => (list 4 16)
+
+((box (vector 1 2 3 4 5))
+ :map (lambda (x) (* x x))
+ :filter even?
+ :collect) ; => (vector 4 16)
+```
+
+### Scala like case class
+```
+(define-case-class person
+  ((name string?)
+   (age integer?))
+  
+  (define (%to-string)
+    (string-append "I am " name " " (number->string age) " years old!"))
+  (define (%greet x)
+    (string-append "Hi " x ", " (%to-string))))
+
+(define bob (person "Bob" 21))
+
+(bob :to-string) ; => "I am Bob 21 years old!"
+(bob :greet "Alice") ; => "Hi Alice, I am Bob 21 years old!"
+```
 
 ## Simplicity is Beauty
 Goldfish Scheme still follows the same principle of simplicity as S7 Scheme. Currently, Goldfish Scheme only depends on [S7 Scheme](https://ccrma.stanford.edu/software/s7/), [tbox](https://gitee.com/tboox/tbox) and C++ standard library defined in C++ 98.
@@ -15,10 +61,11 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 
 
 ## Standard Library
-### Python-like standard library
+### Python-like standard library and Scala-like collections
 
 | Library | Description | Example functions |
 |---|---|---|
+| [(liii lang)](goldfish/liii/lang.scm) | Scala-like Collection | `box` for functional api, `case-char`, `case-string` for unicode |
 | [(liii base)](goldfish/liii/base.scm) | Basic routines | `==`, `!=`, `display*` |
 | [(liii error)](goldfish/liii/error.scm) | Python like Errors  |  `os-error` to raise `'os-error` just like OSError in Python |
 | [(liii check)](goldfish/liii/check.scm) | Test framework based on SRFI-78 | `check`, `check-catch` |
@@ -114,7 +161,8 @@ based on S7 Scheme 10.11 (2-July-2024)
 `-m` helps you specify the standard libray mode.
 
 + `default`: `-m default` is the equiv of `-m liii`
-+ `liii`: Goldfish Scheme with `(liii base)` and `(liii error)`
++ `liii`: Goldfish Scheme with `(liii lang)`, `(liii base)` and `(liii error)`
++ `scheme`: Goldfish Scheme with `(liii base)` and `(liii error)`
 + `sicp`: S7 Scheme with `(scheme base)` and `(srfi sicp)`
 + `r7rs`: S7 Scheme with `(scheme base)`
 + `s7`: S7 Scheme without any extra library
