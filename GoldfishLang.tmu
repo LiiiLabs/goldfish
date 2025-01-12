@@ -1087,6 +1087,24 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|case-list%apply>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%apply n)
+
+    \ \ (list-ref data n))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box '(1 2 3)) :apply 0) =\<gtr\> 1)
+
+    (check ((box '(1 2 3)) 0) =\<gtr\> 1)
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|case-list%find><typehint|((pred procedure?)) =\<gtr\> option?>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
@@ -1503,6 +1521,24 @@
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%collect) data)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|case-vector%apply>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%apply n)
+
+    \ \ (vector-ref data n))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box #(1 2 3)) :apply 1) =\<gtr\> 2)
+
+    (check ((box #(1 2 3)) 1) =\<gtr\> 2)
 
     \;
   </goldfish-chunk>

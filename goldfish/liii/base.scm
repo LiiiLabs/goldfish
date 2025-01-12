@@ -148,8 +148,6 @@
 
 (define-macro (define-case-class class-name fields . extra-operations)
   (let ((constructor (string->symbol (string-append (symbol->string class-name))))
-        (type-pred (string->symbol (string-append (symbol->string class-name) "?")))
-        (equality-pred (string->symbol (string-append (symbol->string class-name) "=?")))
         (key-fields (map (lambda (field)
                            (string->symbol (string-append ":" (symbol->string (car field)))))
                          fields)))
@@ -163,6 +161,18 @@
                 ,@(map (lambda (field)
                          `(equal? ,(car field) (that ',(car field))))
                        fields)))
+         
+         (define (%apply . args)
+           (when (null? args)
+             (??? ,class-name "apply on zero args is not implemented"))
+           (cond ((equal? ((symbol->string (car args)) 0) #\:)
+                  (??? ,class-name
+                    "No such method: " (car args)
+                    "Please implement the method"))
+                 (else
+                  (??? ,class-name "No such field: " (car args)
+                       "Please use the correct field name"
+                       "Or you may implement %apply to process " args))))
 
          ,@extra-operations
 
@@ -188,7 +198,7 @@
                         (apply ,(caadr op) args)))
                     extra-operations)
 
-             (else (value-error "No such field or operation " msg " in case class " ,class-name))))))))
+             (else (apply %apply (cons msg args)))))))))
 
 (define (case-class? x)
   (and-let* ((is-proc? (procedure? x))

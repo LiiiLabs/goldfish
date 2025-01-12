@@ -704,7 +704,8 @@
   (check (bob 'name) => "Bob")
   (check (bob 'age) => 21)
   (check ((bob :name "hello") 'name) => "hello")
-  (check-catch 'value-error (bob 'sex))
+  (check-catch '??? (bob 'sex))
+  (check-catch '??? (bob :sex))
   (check-true (bob :is-instance-of 'person)))
 
 (check-catch 'type-error (person 1 21))
@@ -715,7 +716,7 @@
                    ((#<procedure?>) (x 'name))
                    (else (???))))))
   (check (get-name bob) => "Bob")
-  (check-catch 'not-implemented-error (get-name 1)))
+  (check-catch '??? (get-name 1)))
 
 (define-case-class jerson
   ((name string?)

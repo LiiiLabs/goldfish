@@ -155,6 +155,9 @@
   (check (str :count char-alphabetic?) => 10)
 )
 
+(check ((box '(1 2 3)) :apply 0) => 1)
+(check ((box '(1 2 3)) 0) => 1)
+
 (let1 lst (case-list '(1 2 3 4 5))
   (check ((lst :find (lambda (x) (= x 3))) :get) => 3)
   (check ((lst :find (lambda (x) (> x 2))) :get) => 3)
@@ -221,6 +224,9 @@
   (check-catch 'type-error (l :make-string "[" 123 "]"))
   (check-catch 'type-error (l :make-string "[" "," 123))
 )
+
+(check ((box #(1 2 3)) :apply 1) => 2)
+(check ((box #(1 2 3)) 1) => 2)
 
 (let ((vec (case-vector #(1 2 3 4 5))))
   (check ((vec :find (lambda (x) (= x 3))) :get) => 3)

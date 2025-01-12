@@ -41,7 +41,7 @@
 
 (check-catch 'value-error (value-error))
 
-(check-catch 'not-implemented-error (???))
+(check-catch '??? (???))
 
 (check-report)
 

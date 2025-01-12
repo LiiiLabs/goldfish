@@ -193,6 +193,9 @@
 
 (define (%collect) data)
 
+(define (%apply n)
+  (list-ref data n))
+
 (define (%find pred)
   (let loop ((lst data))
     (cond
@@ -293,6 +296,9 @@
 (define-case-class case-vector ((data vector?))
 
 (define (%collect) data)
+
+(define (%apply n)
+  (vector-ref data n))
 
   (define (%find p)
     (let loop ((i 0))
