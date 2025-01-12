@@ -87,6 +87,9 @@
 (define (%to-char)
   (case-char data))
 
+(define (%to-string)
+  (number->string data))
+
 )
 
 (define-case-class case-char ((code-point integer?))
@@ -140,7 +143,7 @@
      (value-error "Invalid code point"))))
 
 (define (%to-string)
-  (case-string (utf8->string (%to-bytevector))))
+  (utf8->string (%to-bytevector)))
 
 )
 
@@ -186,6 +189,9 @@
 
 (define (%count pred?)
   (string-count data pred?))
+
+(define (%to-string)
+  data)
 
 )
 
@@ -267,6 +273,9 @@
 
   (define (%fold-right initial f)
     (fold-right f initial data))
+
+(define (%to-string)
+  (object->string data))
 
   (define (%make-string . xs)
     (define (parse-args xs)
@@ -364,6 +373,9 @@
   (define (%fold-right initial f)
     (vector-fold-right f initial data))
 
+(define (%to-string)
+  (object->string data))
+
   (define (%make-string . xs)
     (define (parse-args xs)
       (cond
@@ -386,7 +398,9 @@
 
     (receive (start sep end) (parse-args xs)
       (string-append start (string-join (map object->string (vector->list data)) sep) end)))
+
 )
+
 (define-case-class case-hash-table ((data hash-table?))
   (define (%collect) data)
 

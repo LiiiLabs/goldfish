@@ -461,6 +461,22 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|case-integer%to-string>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-string)
+
+    \ \ (number-\<gtr\>string data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box 1) :to-string) =\<gtr\> "1")
+
+    \;
+  </goldfish-chunk>
+
   <subsection|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -814,23 +830,29 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%to-string)
 
-    \ \ (case-string (utf8-\<gtr\>string (%to-bytevector))))
+    \ \ (utf8-\<gtr\>string (%to-bytevector)))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check (((case-char #x41) :to-string) :unbox) =\<gtr\> "A")
+    (check ((case-char #x41) :to-string) =\<gtr\> "A")
 
     (check-true ((box #\\A) :equals (case-char #x41)))
 
     \;
 
-    (check (((case-char #xA3) :to-string) :unbox) =\<gtr\> "£")
+    (check ((case-char #xA3) :to-string) =\<gtr\> "£")
 
-    (check (((case-char #x4E2D) :to-string) :unbox) =\<gtr\> "<code|中>")
+    \;
 
-    (check (((case-char #x1F600) :to-string) :unbox) =\<gtr\> "<code|😀>")
+    (check ((case-char #x4E2D) :to-string) =\<gtr\> "<code|中>")
+
+    (check (object-\<gtr\>string (case-char #x4E2D)) =\<gtr\> "中")
+
+    \;
+
+    (check ((case-char #x1F600) :to-string) =\<gtr\> "<code|😀>")
 
     \;
   </goldfish-chunk>
@@ -1062,6 +1084,26 @@
 
     \;
   </goldfish-chunk>
+
+  <subsection|转换器>
+
+  <paragraph|case-string%to-string>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-string)
+
+    \ \ data)
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((case-string "hello") :to-string) =\<gtr\> "hello")
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|结尾>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     )
@@ -1427,7 +1469,23 @@
 
   <subsection|转换器>
 
-  <subparagraph|make-string>
+  <paragraph|case-list%to-string>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-string)
+
+    \ \ (object-\<gtr\>string data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (object-\<gtr\>string (box '(1 2 3))) =\<gtr\> "(1 2 3)")
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|case-list%make-string>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%make-string . xs)
@@ -1807,6 +1865,22 @@
 
   <subsection|转换器>
 
+  <paragraph|case-vector%to-string>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-string)
+
+    \ \ (object-\<gtr\>string data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (object-\<gtr\>string (box #(1 2 3))) =\<gtr\> "#(1 2 3)")
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|case-vector%make-string>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
@@ -1854,7 +1928,7 @@
 
     \ \ \ \ \ \ (string-append start (string-join (map object-\<gtr\>string (vector-\<gtr\>list data)) sep) end)))
 
-    )
+    \;
   </scm-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
@@ -1885,7 +1959,15 @@
     \;
   </goldfish-chunk>
 
-  <subsection|case-hash-table>
+  <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <section|case-hash-table>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class case-hash-table ((data hash-table?))

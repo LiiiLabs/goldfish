@@ -77,6 +77,8 @@
 
 (check-catch 'value-error ((box #x110000) :to-char))
 
+(check ((box 1) :to-string) => "1")
+
 (check-true ((case-char #x30) :equals (case-char #x30)))
 (check-false ((case-char #x31) :equals (case-char #x30)))
 
@@ -123,12 +125,15 @@
   (check (char19 :digit?) => #t)  ;; 蒙古数字
   (check (char20 :digit?) => #f))  ;; 非数字字符
 
-(check (((case-char #x41) :to-string) :unbox) => "A")
+(check ((case-char #x41) :to-string) => "A")
 (check-true ((box #\A) :equals (case-char #x41)))
 
-(check (((case-char #xA3) :to-string) :unbox) => "£")
-(check (((case-char #x4E2D) :to-string) :unbox) => "中")
-(check (((case-char #x1F600) :to-string) :unbox) => "😀")
+(check ((case-char #xA3) :to-string) => "£")
+
+(check ((case-char #x4E2D) :to-string) => "中")
+(check (object->string (case-char #x4E2D)) => "中")
+
+(check ((case-char #x1F600) :to-string) => "😀")
 
 (check ((box "abc") :unbox) => "abc")
 (check ((box "") :unbox) => "")
@@ -154,6 +159,8 @@
   (check (str :exists char-alphabetic?) => #t)
   (check (str :count char-alphabetic?) => 10)
 )
+
+(check ((case-string "hello") :to-string) => "hello")
 
 (check ((box '(1 2 3)) :apply 0) => 1)
 (check ((box '(1 2 3)) 0) => 1)
@@ -214,6 +221,8 @@
   (check (lst :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
 )
 
+(check (object->string (box '(1 2 3))) => "(1 2 3)")
+
 (let1 l (case-list (list 1 2 3))
   (check (l :make-string) => "123")
   (check (l :make-string " ") => "1 2 3")
@@ -271,6 +280,8 @@
   (check (vec :fold-right 0 +) => 15)
   (check (vec :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
 )
+
+(check (object->string (box #(1 2 3))) => "#(1 2 3)")
 
 (let1 v (box #(1 2 3))
   (check (v :count) => 3)

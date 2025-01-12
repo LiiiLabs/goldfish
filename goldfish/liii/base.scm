@@ -56,9 +56,10 @@
   ; SRFI-8
   receive
   ; Extra routines
-  == != loose-car loose-cdr display* in? compose identity any?
+  loose-car loose-cdr in? compose identity any?
   ; Extra structure
   let1  typed-lambda typed-define define-case-class case-class?
+  == != display* object->string
 )
 (begin
 
@@ -74,9 +75,6 @@
   (if (eq? '() pair-or-empty)
       '()
       (cdr pair-or-empty)))
-
-(define (display* . params)
-  (for-each display params))
 
 (define (in? elem l)
   (cond ((list? l) (not (not (member elem l))))
@@ -173,6 +171,22 @@
                   (??? ,class-name "No such field: " (car args)
                        "Please use the correct field name"
                        "Or you may implement %apply to process " args))))
+         
+         (define (%to-string)
+           (let ((field-strings
+                  (list ,@(map (lambda (field key-field)
+                                 `(string-append
+                                   ,(symbol->string key-field) " "
+                                   (object->string ,(car field))))
+                               fields key-fields))))
+             (let loop ((strings field-strings)
+                        (acc ""))
+               (if (null? strings)
+                   (string-append "(" ,(symbol->string class-name) " " acc ")")
+                   (loop (cdr strings)
+                         (if (zero? (string-length acc))
+                             (car strings)
+                             (string-append acc " " (car strings))))))))
 
          ,@extra-operations
 
@@ -180,6 +194,7 @@
            (cond
              ((eq? msg :is-instance-of) (apply %is-instance-of args))
              ((eq? msg :equals) (apply %equals args))
+             ((eq? msg :to-string) (%to-string))
              
              ,@(map (lambda (field)
                       `((eq? msg ',(car field)) ,(car field)))
@@ -218,6 +233,20 @@
 
 (define (!= left right)
   (not (== left right)))
+
+(define (display* . params)
+  (define (%display x)
+    (if (case-class? x)
+        (display (x :to-string))
+        (display x)))
+  (for-each %display params))
+
+(define s7-object->string object->string)
+
+(define (object->string x)
+  (if (case-class? x)
+      (x :to-string)
+      (s7-object->string x)))
 
 ) ; end of begin
 ) ; end of define-library

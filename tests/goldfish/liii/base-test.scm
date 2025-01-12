@@ -657,12 +657,6 @@
 
 (check (eof-object) => #<eof>)
 
-(check
-  (with-output-to-string
-    (lambda ()
-      (display* "hello world" "\n")))
-  => "hello world\n")
-
 (check (in? 1 (list )) => #f)
 (check (in? 1 (list 3 2 1)) => #t)
 (check (in? #\x "texmacs") => #t)
@@ -706,7 +700,8 @@
   (check ((bob :name "hello") 'name) => "hello")
   (check-catch '??? (bob 'sex))
   (check-catch '??? (bob :sex))
-  (check-true (bob :is-instance-of 'person)))
+  (check-true (bob :is-instance-of 'person))
+  (check (bob :to-string) => "(person :name \"Bob\" :age 21)"))
 
 (check-catch 'type-error (person 1 21))
 
@@ -741,6 +736,12 @@
 (check (== (list 1 2) (list 1 2)) => #t)
 (check (!= (list 1 2) (list 1 2)) => #f)
 (check-true (!= (person "Bob" 20) (person "Bob" 21)))
+
+(check
+  (with-output-to-string
+    (lambda ()
+      (display* "hello world" "\n")))
+  => "hello world\n")
 
 (check-report)
 

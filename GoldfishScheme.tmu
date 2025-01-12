@@ -404,11 +404,13 @@
 
     \ \ ; Extra routines
 
-    \ \ == != loose-car loose-cdr display* in? compose identity any?
+    \ \ loose-car loose-cdr in? compose identity any?
 
     \ \ ; Extra structure
 
     \ \ let1 \ typed-lambda typed-define define-case-class case-class?
+
+    \ \ == != display* object-\<gtr\>string
 
     )
 
@@ -3547,34 +3549,6 @@
     \;
   </scm-chunk>
 
-  <paragraph|display*><index|display*><scm|(x y z ...) =\<gtr\> \<less\>#unspecified\<gtr\>>
-
-  <scm|display*>可以输入多个参数，是<scm|display>的加强版。
-
-  <\scm-chunk|goldfish/liii/base.scm|true|true>
-    (define (display* . params)
-
-    \ \ (for-each display params))
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check
-
-    \ \ (with-output-to-string
-
-    \ \ \ \ (lambda ()
-
-    \ \ \ \ \ \ (display* "hello world" "\\n")))
-
-    \ \ =\<gtr\> "hello world\\n")
-
-    \;
-  </scm-chunk>
-
   <paragraph|in?><index|in?><scm|(x sequence) =\<gtr\> bool>
 
   判断一个元素是否在对象中：
@@ -3859,7 +3833,7 @@
 
   在这个filter方法的实现中，<scm|%filter>这个内部方法只处理第一个参数，得到的结果仍旧是一个样本类对象，再使用得到的样本类对象处理剩余的参数。
 
-  define-case-class会自动生成这些内部方法：<scm|%equals>、<scm|%is-instance-of>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
+  define-case-class会自动生成这些内部方法：<scm|%equals>、<scm|%is-instance-of>、<scm|%to-string>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
 
   样本类的默认构造函数有类型校验，不做任何值校验的。如果需要做值校验，那么需要使用同名的函数覆盖define-case-class生成的默认实现。改同名函数我们成为该样本类的伴生函数。
 
@@ -3918,6 +3892,38 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Or you may implement %apply to process " args))))
 
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ (define (%to-string)
+
+    \ \ \ \ \ \ \ \ \ \ \ (let ((field-strings
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list ,@(map (lambda (field key-field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(string-append
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(symbol-\<gtr\>string key-field) " "
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (object-\<gtr\>string ,(car field))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (let loop ((strings field-strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (acc ""))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append "(" ,(symbol-\<gtr\>string class-name) " " acc ")")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (zero? (string-length acc))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append acc " " (car strings))))))))
+
     \;
 
     \ \ \ \ \ \ \ \ \ ,@extra-operations
@@ -3931,6 +3937,8 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :is-instance-of) (apply %is-instance-of args))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ 
 
@@ -3996,7 +4004,9 @@
 
     \ \ (check-catch '??? (bob :sex))
 
-    \ \ (check-true (bob :is-instance-of 'person)))
+    \ \ (check-true (bob :is-instance-of 'person))
+
+    \ \ (check (bob :to-string) =\<gtr\> "(person :name \\"Bob\\" :age 21)"))
 
     \;
 
@@ -4136,6 +4146,62 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|display*><index|display*><scm|(x y z ...) =\<gtr\> \<less\>#unspecified\<gtr\>>
+
+  <scm|display*>可以正确展示样本类，以及接受多个参数，是<scm|display>的加强版。
+
+  <\scm-chunk|goldfish/liii/base.scm|true|true>
+    (define (display* . params)
+
+    \ \ (define (%display x)
+
+    \ \ \ \ (if (case-class? x)
+
+    \ \ \ \ \ \ \ \ (display (x :to-string))
+
+    \ \ \ \ \ \ \ \ (display x)))
+
+    \ \ (for-each %display params))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check
+
+    \ \ (with-output-to-string
+
+    \ \ \ \ (lambda ()
+
+    \ \ \ \ \ \ (display* "hello world" "\\n")))
+
+    \ \ =\<gtr\> "hello world\\n")
+
+    \;
+  </scm-chunk>
+
+  <paragraph|object-\<gtr\>string>
+
+  基于S7的实现，新增对样本类的支持。
+
+  <\goldfish-chunk|goldfish/liii/base.scm|true|true>
+    (define s7-object-\<gtr\>string object-\<gtr\>string)
+
+    \;
+
+    (define (object-\<gtr\>string x)
+
+    \ \ (if (case-class? x)
+
+    \ \ \ \ \ \ (x :to-string)
+
+    \ \ \ \ \ \ (s7-object-\<gtr\>string x)))
+
+    \;
+  </goldfish-chunk>
 
   \;
 
