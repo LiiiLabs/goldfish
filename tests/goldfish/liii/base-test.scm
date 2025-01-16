@@ -408,6 +408,9 @@
 
 (check (+ 1 2) => 3)
 (check (+ ) => 0)
+(check (- 2 1) => 1)
+
+(check (- #x8000000000000000 1) => #x7fffffffffffffff)
 
 (check (+ #x7fffffffffffffff 1) => #x8000000000000000)
 
