@@ -1075,6 +1075,60 @@
 
   <value|r7rs><paragraph|define><index|define>
 
+  <value|srfi><paragraph|define*><index|define*>
+
+  <strong|<code*|define*>> 和 <strong|<code*|lambda*>> 是对原有 <strong|<code*|define>> 和 <strong|<code*|lambda>> 的扩展，用于更轻松地处理可选参数（optional）、关键字参数（keyword）以及可变数量（rest）参数。
+
+  它们的语法非常简单：在 <strong|<code*|define*>> 中，每个形参都会带有一个默认值，同时也会被自动视为可以用关键字方式传递的参数。这个默认值如果没有明确指定，就会是 <code*|#f>；如果指定了，就以 <code*|(参数名 默认值)> 的形式表示。
+
+  如果需要可变数量的参数（rest argument），可以在最后一个参数的前面写 <code*|:rest> 或者直接用一个点（<code*|.>）来表示，这样所有剩余的实参会被打包成一个列表绑定到这个最后的参数。可变数量参数的默认值是 <code*|()>，并且无法在声明中显式指定。需要注意的是，这个 <em|rest> 参数并不支持关键字传递方式。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define* (hi a (b 32) (c "hi")) (list a b c))
+
+    \;
+  </scm-chunk>
+
+  上面这个示例函数 <code*|hi> 使用了 <strong|<code*|define*>>：它有三个形参：
+
+  <\itemize>
+    <item><code*|a>，没有声明默认值，所以默认是 <code*|#f>
+
+    <item><code*|(b 32)>，声明默认值为 <code*|32>
+
+    <item><code*|(c "hi")>，声明默认值为 <code*|"hi">
+  </itemize>
+
+  函数体 <code*|(list a b c)> 会返回一个列表，依次是传入时计算好的 <code*|a>、<code*|b>、<code*|c>。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check (hi 1) =\<gtr\> <code|<em|'(1 32 "hi")>>)
+
+    (check <code|(hi :b 2 :a 3)> =\<gtr\> <code|<em|'<code|<em|(3 2 "hi")>>>>)
+
+    (check <code|<code|(hi 3 2 1)>> =\<gtr\> <code|<em|'<code|<em|(3 2 1)>>>>)
+
+    \;
+  </scm-chunk>
+
+  另一个来自SRFI-89的案例（注意我们这里的<with|font-family|tt|define*>的语法与SRFI-89不同）
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (define* (g a (b a) (k (* a b)))
+
+    \ \ (list a b k))
+
+    \;
+
+    (check (g 3 4) =\<gtr\> '(3 4 12))
+
+    (check (g 3 4 :k 5) =\<gtr\> '(3 4 5))
+
+    \;
+  </scm-chunk>
+
+  \;
+
   <value|r7rs><paragraph|define-values><index|define-values>
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>

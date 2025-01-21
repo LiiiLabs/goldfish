@@ -171,6 +171,18 @@
       (vector-set! vec i i)))
   => #(0 1 2 3 4))
 
+(define* (hi a (b 32) (c "hi")) (list a b c))
+
+(check (hi 1) => '(1 32 "hi"))
+(check (hi :b 2 :a 3) => '(3 2 "hi"))
+(check (hi 3 2 1) => '(3 2 1))
+
+(define* (g a (b a) (k (* a b)))
+  (list a b k))
+
+(check (g 3 4) => '(3 4 12))
+(check (g 3 4 :k 5) => '(3 4 5))
+
 (let ()
   (define-values (value1 value2) (values 1 2))
   (check value1 => 1)
