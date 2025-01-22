@@ -874,6 +874,10 @@
   (check (bob :to-string) => "I am Bob 21 years old!")
   (check (bob :greet "Alice") => "Hi Alice, I am Bob 21 years old!"))
 
+(check-false (case-class? (lambda (x) x)))
+(check-false (case-class? +))
+(check-false (case-class? identity))
+
 (check-true (case-class? (person "Bob" 21)))
 
 (check (== (list 1 2) (list 1 2)) => #t)

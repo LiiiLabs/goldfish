@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.7>>
+<TMU|<tuple|1.1.0|2025.0.0>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python|elvish>>
 
@@ -4436,11 +4436,13 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (source (procedure-source x))
 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (source-at-least-3? (and (list? source) (\<gtr\>= (length source) 3)))
+
     \ \ \ \ \ \ \ \ \ \ \ \ \ (body (source 2))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (is-cond? (eq? (car body) 'cond))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (body-at-least-3? (and (list? body) (\<gtr\>= (length body) 3)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (at-least-2? (\<gtr\>= (length body) 3))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (is-cond? (eq? (car body) 'cond))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ (pred1 ((body 1) 0))
 
@@ -4452,6 +4454,56 @@
 
     \;
   </goldfish-chunk>
+
+  匿名函数、内置函数、简单的自定义函数都不是case class，需要正确返回。
+
+  <\session|goldfish|default>
+    <\output>
+      Liii Scheme 17.11.2 Enterprise Edition by LiiiLabs
+
+      implemented on S7 Scheme (11.2, 30-Dec-2024)
+    </output>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (procedure-source (lambda (x) x))
+    <|unfolded-io>
+      <goldfish-result|(lambda (x) x)>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (procedure-source +)
+    <|unfolded-io>
+      <goldfish-result|()>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (procedure-source identity)
+    <|unfolded-io>
+      <goldfish-result|(lambda (x) x)>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-false (case-class? (lambda (x) x)))
+
+    (check-false (case-class? +))
+
+    (check-false (case-class? identity))
+
+    \;
+  </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
     (check-true (case-class? (person "Bob" 21)))
