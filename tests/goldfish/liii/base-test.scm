@@ -429,6 +429,7 @@
 
 (check (+ 1+i 2+2i) => 3.0+3.0i)
 (check (- 2+2i 1+i) => 1.0+1.0i)
+(check (+ 3+2i 4-3i) => 7.0-1.0i)
 
 (check (+ +inf.0 0.7) => +inf.0)
 (check (+ -inf.0 7) => -inf.0)
