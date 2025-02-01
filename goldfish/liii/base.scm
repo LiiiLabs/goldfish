@@ -58,8 +58,7 @@
   ; Extra routines
   loose-car loose-cdr in? compose identity any?
   ; Extra structure
-  let1  typed-lambda typed-define define-case-class case-class?
-  == != display* object->string
+  let1  typed-lambda typed-define
 )
 (begin
 
@@ -143,111 +142,6 @@
               params)
        ,x
        ,@xs)))
-
-(define-macro (define-case-class class-name fields . extra-operations)
-  (let ((constructor (string->symbol (string-append (symbol->string class-name))))
-        (key-fields (map (lambda (field)
-                           (string->symbol (string-append ":" (symbol->string (car field)))))
-                         fields)))
-    `(begin
-       (typed-define ,(cons class-name fields)
-         (define (%is-instance-of x)
-           (eq? x ',class-name))
-         
-         (typed-define (%equals (that case-class?))
-           (and (that :is-instance-of ',class-name)
-                ,@(map (lambda (field)
-                         `(equal? ,(car field) (that ',(car field))))
-                       fields)))
-         
-         (define (%apply . args)
-           (when (null? args)
-             (??? ,class-name "apply on zero args is not implemented"))
-           (cond ((equal? ((symbol->string (car args)) 0) #\:)
-                  (??? ,class-name
-                    "No such method: " (car args)
-                    "Please implement the method"))
-                 (else
-                  (??? ,class-name "No such field: " (car args)
-                       "Please use the correct field name"
-                       "Or you may implement %apply to process " args))))
-         
-         (define (%to-string)
-           (let ((field-strings
-                  (list ,@(map (lambda (field key-field)
-                                 `(string-append
-                                   ,(symbol->string key-field) " "
-                                   (object->string ,(car field))))
-                               fields key-fields))))
-             (let loop ((strings field-strings)
-                        (acc ""))
-               (if (null? strings)
-                   (string-append "(" ,(symbol->string class-name) " " acc ")")
-                   (loop (cdr strings)
-                         (if (zero? (string-length acc))
-                             (car strings)
-                             (string-append acc " " (car strings))))))))
-
-         ,@extra-operations
-
-         (lambda (msg . args)
-           (cond
-             ((eq? msg :is-instance-of) (apply %is-instance-of args))
-             ((eq? msg :equals) (apply %equals args))
-             ((eq? msg :to-string) (%to-string))
-             
-             ,@(map (lambda (field)
-                      `((eq? msg ',(car field)) ,(car field)))
-                    fields)
-             ,@(map (lambda (field key-field)
-                      `((eq? msg ,key-field)
-                        (,constructor ,@(map (lambda (f)
-                                               (if (eq? (car f) (car field))
-                                                   '(car args)
-                                                   (car f)))
-                                             fields))))
-                    fields key-fields)
-
-             ,@(map (lambda (op)
-                      `((eq? msg ,(string->symbol (string-append ":" (substring (symbol->string (caadr op)) 1))))
-                        (apply ,(caadr op) args)))
-                    extra-operations)
-
-             (else (apply %apply (cons msg args)))))))))
-
-(define (case-class? x)
-  (and-let* ((is-proc? (procedure? x))
-             (source (procedure-source x))
-             (source-at-least-3? (and (list? source) (>= (length source) 3)))
-             (body (source 2))
-             (body-at-least-3? (and (list? body) (>= (length body) 3)))
-             (is-cond? (eq? (car body) 'cond))
-             (pred1 ((body 1) 0))
-             (pred2 ((body 2) 0)))
-    (and (equal? pred1 '(eq? msg :is-instance-of))
-         (equal? pred2 '(eq? msg :equals)))))
-
-(define (== left right)
-  (if (and (case-class? left) (case-class? right))
-      (left :equals right)
-      (equal? left right)))
-
-(define (!= left right)
-  (not (== left right)))
-
-(define (display* . params)
-  (define (%display x)
-    (if (case-class? x)
-        (display (x :to-string))
-        (display x)))
-  (for-each %display params))
-
-(define s7-object->string object->string)
-
-(define (object->string x)
-  (if (case-class? x)
-      (x :to-string)
-      (s7-object->string x)))
 
 ) ; end of begin
 ) ; end of define-library

@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.1>>
+<TMU|<tuple|1.1.0|2025.0.3>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -96,6 +96,8 @@
 
     (export
 
+    \ \ define-case-class case-class? == != display* object-\<gtr\>string
+
     \ \ option none
 
     \ \ rich-integer rich-char rich-string
@@ -118,7 +120,9 @@
 
     \ \ \ \ \ \ \ \ (liii lang)
 
-    \ \ \ \ \ \ \ \ (liii cut))
+    \ \ \ \ \ \ \ \ (liii cut)
+
+    \ \ \ \ \ \ \ \ (liii case))
 
     \;
 
@@ -126,6 +130,484 @@
 
     \;
   </scm-chunk>
+
+  <section|样本类>
+
+  <paragraph|define-case-class><index|define-case-class>
+
+  <scm|define-case-class>用于在Goldfish Scheme定义类似Scala的样本类。
+
+  样本类对象实际上是函数，该函数的第一个参数可以是字段或者是方法，字段统一使用<scm|'field>表示，方法统一使用<scm|:method>表示，方法的实现统一采用<scm|%>作为前缀。比如<scm|(person :to-string)>实际上调用的是person对象的内部方法<scm|%to-string>。
+
+  内部方法将第一个参数之外剩下的参数作为参数传入，我们通过只处理部分参数，递归处理未处理参数的方式，可以实现方法调用链。比如
+
+  <\goldfish-code>
+    (l :filter positive? :filter zero?)
+
+    =\<gtr\> ((l :filter positve?) :filter zero?)
+  </goldfish-code>
+
+  在这个filter方法的实现中，<scm|%filter>这个内部方法只处理第一个参数，得到的结果仍旧是一个样本类对象，再使用得到的样本类对象处理剩余的参数。
+
+  define-case-class会自动生成这些内部方法：<scm|%equals>、<scm|%is-instance-of>、<scm|%to-string>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
+
+  样本类的默认构造函数有类型校验，不做任何值校验的。如果需要做值校验，那么需要使用同名的函数覆盖define-case-class生成的默认实现。改同名函数我们成为该样本类的伴生函数。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-macro (define-case-class class-name fields . methods)
+
+    \ \ (let ((constructor (string-\<gtr\>symbol (string-append (symbol-\<gtr\>string class-name))))
+
+    \ \ \ \ \ \ \ \ (key-fields
+
+    \ \ \ \ \ \ \ \ \ (map (lambda (field) (string-\<gtr\>symbol (string-append ":" (symbol-\<gtr\>string (car field)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))
+
+    \ \ \ \ \ \ \ \ (instance-methods
+
+    \ \ \ \ \ \ \ \ \ (filter (lambda (name) (equal? ((symbol-\<gtr\>string name) 0) #\\%))
+
+    \ \ \ \ \ \ \ \ \ \ (map (lambda (method) (caadr method))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ methods))))
+
+    \ \ \ \ ‘(begin
+
+    \ \ \ \ \ \ \ (typed-define ,(cons class-name fields)
+
+    \ \ \ \ \ \ \ \ \ (define (%is-instance-of x)
+
+    \ \ \ \ \ \ \ \ \ \ \ (eq? x ',class-name))
+
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ (typed-define (%equals (that case-class?))
+
+    \ \ \ \ \ \ \ \ \ \ \ (and (that :is-instance-of ',class-name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(equal? ,(car field) (that ',(car field))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)))
+
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ (define (%apply . args)
+
+    \ \ \ \ \ \ \ \ \ \ \ (when (null? args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "apply on zero args is not implemented"))
+
+    \ \ \ \ \ \ \ \ \ \ \ (cond ((equal? ((symbol-\<gtr\>string (car args)) 0) #\\:)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "No such method: " (car args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Please implement the method"))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "No such field: " (car args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Please use the correct field name"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Or you may implement %apply to process " args))))
+
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ (define (%to-string)
+
+    \ \ \ \ \ \ \ \ \ \ \ (let ((field-strings
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list ,@(map (lambda (field key-field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(string-append
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(symbol-\<gtr\>string key-field) " "
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (object-\<gtr\>string ,(car field))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (let loop ((strings field-strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (acc ""))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append "(" ,(symbol-\<gtr\>string class-name) " " acc ")")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (zero? (string-length acc))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append acc " " (car strings))))))))
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ ,@methods
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ (lambda (msg . args)
+
+    \ \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :is-instance-of) (apply %is-instance-of args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ',(car field)) ,(car field)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field key-field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,key-field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,constructor ,@(map (lambda (f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (eq? (car f) (car field))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '(car args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car f)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields)
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (method)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,(string-\<gtr\>symbol (string-append ":" (substring (symbol-\<gtr\>string method) 1))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply ,method args)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instance-methods)
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (apply %apply (cons msg args)))))))))
+
+    \;
+  </goldfish-chunk>
+
+  测试：不带用户自定义方法的样本类person
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (define-case-class person
+
+    \ \ ((name string? "Bob")
+
+    \ \ \ (age integer?)))
+
+    \;
+
+    (let1 bob (person :name "Bob" :age 21)
+
+    \ \ (check (bob 'name) =\<gtr\> "Bob")
+
+    \ \ (check (bob 'age) =\<gtr\> 21)
+
+    \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello")
+
+    \ \ (check-catch '??? (bob 'sex))
+
+    \ \ (check-catch '??? (bob :sex))
+
+    \ \ (check-true (bob :is-instance-of 'person))
+
+    \ \ (check (bob :to-string) =\<gtr\> "(person :name \\"Bob\\" :age 21)"))
+
+    \;
+
+    (check-catch 'type-error (person 1 21))
+
+    \;
+
+    (let ((bob (person "Bob" 21))
+
+    \ \ \ \ \ \ (get-name (lambda (x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (case* x
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\<less\>procedure?\<gtr\>) (x 'name))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (???))))))
+
+    \ \ (check (get-name bob) =\<gtr\> "Bob")
+
+    \ \ (check-catch '??? (get-name 1)))
+
+    \;
+  </goldfish-chunk>
+
+  测试：带用户自定义方法的样本类jerson
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (define-case-class jerson
+
+    \ \ ((name string?)
+
+    \ \ \ (age integer?))
+
+    \ \ 
+
+    \ \ (define (%to-string)
+
+    \ \ \ \ (string-append "I am " name " " (number-\<gtr\>string age) " years old!"))
+
+    \ \ (define (%greet x)
+
+    \ \ \ \ (string-append "Hi " x ", " (%to-string)))
+
+    )
+
+    \;
+
+    (let1 bob (jerson "Bob" 21)
+
+    \ \ (check (bob :to-string) =\<gtr\> "I am Bob 21 years old!")
+
+    \ \ (check (bob :greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old!"))
+
+    \;
+  </scm-chunk>
+
+  测试：只有%开头的才是实例方法，其它的不应该被识别。
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (define-case-class test-case-class
+
+    \ \ ((name string?))
+
+    \ \ 
+
+    \ \ (define (@this-is-a-static-method)
+
+    \ \ \ \ (test-case-class "static"))
+
+    \ \ 
+
+    \ \ (define (%this-is-a-instance-method)
+
+    \ \ \ \ (test-case-class (string-append name "instance")))
+
+    )
+
+    \;
+
+    (let1 hello (test-case-class "hello ")
+
+    \ \ (check-catch '??? (hello :this-is-a-static-method)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|case-class?>
+
+  case class的前两个方法必须是<scm|:is-instance-of>和<scm|:equals>。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (case-class? x)
+
+    \ \ (and-let* ((is-proc? (procedure? x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (source (procedure-source x))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (source-at-least-3? (and (list? source) (\<gtr\>= (length source) 3)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (body (source 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (body-at-least-3? (and (list? body) (\<gtr\>= (length body) 3)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (is-cond? (eq? (car body) 'cond))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (pred1 ((body 1) 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (pred2 ((body 2) 0)))
+
+    \ \ \ \ (and (equal? pred1 '(eq? msg :is-instance-of))
+
+    \ \ \ \ \ \ \ \ \ (equal? pred2 '(eq? msg :equals)))))
+
+    \;
+  </goldfish-chunk>
+
+  匿名函数、内置函数、简单的自定义函数都不是case class，需要正确返回。
+
+  <\session|goldfish|default>
+    <\output>
+      Liii Scheme 17.11.2 Enterprise Edition by LiiiLabs
+
+      implemented on S7 Scheme (11.2, 30-Dec-2024)
+    </output>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (procedure-source (lambda (x) x))
+    <|unfolded-io>
+      <goldfish-result|(lambda (x) x)>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (procedure-source +)
+    <|unfolded-io>
+      <goldfish-result|()>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (procedure-source identity)
+    <|unfolded-io>
+      <goldfish-result|(lambda (x) x)>
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-false (case-class? (lambda (x) x)))
+
+    (check-false (case-class? +))
+
+    (check-false (case-class? identity))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true (case-class? (person "Bob" 21)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
+
+  如果两个参数都是样本类，那么使用样本类的相等性判断；否则使用<scm|equal?>判断。
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (== left right)
+
+    \ \ (if (and (case-class? left) (case-class? right))
+
+    \ \ \ \ \ \ (left :equals right)
+
+    \ \ \ \ \ \ (equal? left right)))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
+
+    (check (!= (list 1 2) (list 1 2)) =\<gtr\> #f)
+
+    (check-true (== (person "Bob" 21) (person "Bob" 21)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|!=><index|!=><scm|(x y) =\<gtr\> bool>
+
+  ==的布尔逻辑取反。
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (!= left right)
+
+    \ \ (not (== left right)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
+
+    (check (!= (list 1 2) (list 1 2)) =\<gtr\> #f)
+
+    (check-true (!= (person "Bob" 20) (person "Bob" 21)))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|display*><index|display*><scm|(x y z ...) =\<gtr\> \<less\>#unspecified\<gtr\>>
+
+  <scm|display*>可以正确展示样本类，以及接受多个参数，是<scm|display>的加强版。
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (display* . params)
+
+    \ \ (define (%display x)
+
+    \ \ \ \ (if (case-class? x)
+
+    \ \ \ \ \ \ \ \ (display (x :to-string))
+
+    \ \ \ \ \ \ \ \ (display x)))
+
+    \ \ (for-each %display params))
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check
+
+    \ \ (with-output-to-string
+
+    \ \ \ \ (lambda ()
+
+    \ \ \ \ \ \ (display* "hello world" "\\n")))
+
+    \ \ =\<gtr\> "hello world\\n")
+
+    \;
+  </scm-chunk>
+
+  <paragraph|object-\<gtr\>string>
+
+  基于S7的实现，新增对样本类的支持。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define s7-object-\<gtr\>string object-\<gtr\>string)
+
+    \;
+
+    (define (object-\<gtr\>string x)
+
+    \ \ (if (case-class? x)
+
+    \ \ \ \ \ \ (x :to-string)
+
+    \ \ \ \ \ \ (s7-object-\<gtr\>string x)))
+
+    \;
+  </goldfish-chunk>
 
   <section|公共子函数>
 

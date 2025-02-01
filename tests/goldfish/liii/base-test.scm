@@ -17,7 +17,8 @@
 (import (liii check)
         (liii base)
         (liii list)
-        (liii case))
+        (liii case)
+        (liii lang))
 
 (check-set-mode! 'report-failed)
 
@@ -932,63 +933,6 @@
 (check (person :age 21) => "Bob is 21 years old")
 (check (person :name "Alice" :age 25) => "Alice is 25 years old")
 (check-catch 'type-error (person :name 123 :age 25))
-
-(define-case-class person
-  ((name string? "Bob")
-   (age integer?)))
-
-(let1 bob (person :name "Bob" :age 21)
-  (check (bob 'name) => "Bob")
-  (check (bob 'age) => 21)
-  (check ((bob :name "hello") 'name) => "hello")
-  (check-catch '??? (bob 'sex))
-  (check-catch '??? (bob :sex))
-  (check-true (bob :is-instance-of 'person))
-  (check (bob :to-string) => "(person :name \"Bob\" :age 21)"))
-
-(check-catch 'type-error (person 1 21))
-
-(let ((bob (person "Bob" 21))
-      (get-name (lambda (x)
-                 (case* x
-                   ((#<procedure?>) (x 'name))
-                   (else (???))))))
-  (check (get-name bob) => "Bob")
-  (check-catch '??? (get-name 1)))
-
-(define-case-class jerson
-  ((name string?)
-   (age integer?))
-  
-  (define (%to-string)
-    (string-append "I am " name " " (number->string age) " years old!"))
-  (define (%greet x)
-    (string-append "Hi " x ", " (%to-string)))
-)
-
-(let1 bob (jerson "Bob" 21)
-  (check (bob :to-string) => "I am Bob 21 years old!")
-  (check (bob :greet "Alice") => "Hi Alice, I am Bob 21 years old!"))
-
-(check-false (case-class? (lambda (x) x)))
-(check-false (case-class? +))
-(check-false (case-class? identity))
-
-(check-true (case-class? (person "Bob" 21)))
-
-(check (== (list 1 2) (list 1 2)) => #t)
-(check (!= (list 1 2) (list 1 2)) => #f)
-(check-true (== (person "Bob" 21) (person "Bob" 21)))
-
-(check (== (list 1 2) (list 1 2)) => #t)
-(check (!= (list 1 2) (list 1 2)) => #f)
-(check-true (!= (person "Bob" 20) (person "Bob" 21)))
-
-(check
-  (with-output-to-string
-    (lambda ()
-      (display* "hello world" "\n")))
-  => "hello world\n")
 
 (check-report)
 
