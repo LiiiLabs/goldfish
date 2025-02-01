@@ -291,6 +291,15 @@
 
 (check-catch 'wrong-number-of-args ("hello":strip-suffix "llo"))
 (check-catch 'unbound-variable (123:strip-suffix 1))
+(check (rich-list :range 1 5) => (box (list 1 2 3 4)))
+(check (rich-list :range 1 5 2) => (box (list 1 3)))
+(check (rich-list :range 1 6 2) => (box (list 1 3 5)))
+(check (rich-list :range 5 1 -1) => (box (list 5 4 3 2)))
+
+(check (rich-list :range 5 1 1) => (box (list )))
+
+(check-catch 'value-error (rich-list :range 1 5 0))
+
 (check ((box '(1 2 3)) :apply 0) => 1)
 (check ((box '(1 2 3)) 0) => 1)
 

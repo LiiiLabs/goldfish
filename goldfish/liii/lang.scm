@@ -421,6 +421,19 @@
 
 (define-case-class rich-list ((data list?))
 
+(define (@range start end . step)
+  (let ((step-size (if (null? step) 1 (car step))))
+    (cond
+      ((and (positive? step-size) (>= start end))
+       (rich-list '()))
+      ((and (negative? step-size) (<= start end))
+       (rich-list '()))
+      ((zero? step-size)
+       (value-error "Step size cannot be zero"))
+      (else
+       (let1 cnt (ceiling (/ (- end start) step-size))
+         (rich-list (iota cnt start step-size)))))))
+
 (define (%collect) data)
 
 (define (%apply n)
