@@ -192,6 +192,18 @@
 
 (check ((rich-string "hello") :to-string) => "hello")
 
+(check ((box "") :strip-prefix "") => (box ""))
+(check ((box "hello") :strip-prefix "") => (box "hello"))
+(check ((box "hello") :strip-prefix "he") => (box "llo"))
+(check ((box "hello") :strip-prefix "hello") => (box ""))
+(check ((box "hello") :strip-prefix "abc") => (box "hello"))
+(check ((box "hello") :strip-prefix "helloo") => (box "hello"))
+(check ((box "hello") :strip-prefix "he"
+                      :strip-prefix "ll") => (box "o"))
+
+(check-catch 'wrong-number-of-args ("hello":strip-prefix "he"))
+(check-catch 'unbound-variable (123:strip-prefix 1))
+
 (check ((box '(1 2 3)) :apply 0) => 1)
 (check ((box '(1 2 3)) 0) => 1)
 

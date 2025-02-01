@@ -266,6 +266,12 @@
 (define (%to-string)
   data)
 
+(define (%strip-prefix prefix . xs)
+  (let ((result (rich-string (string-remove-prefix data prefix))))
+    (if (null? xs)                                 
+        result
+        (apply result xs)))) 
+
 )
 
 (define-case-class rich-list ((data list?))

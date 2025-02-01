@@ -1,6 +1,6 @@
 <TMU|<tuple|1.1.0|2025.0.1>>
 
-<style|<tuple|book|chinese|goldfish|literate|reduced-margins|python>>
+<style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
 <\body>
   <\hide-preamble>
@@ -1355,6 +1355,50 @@
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((rich-string "hello") :to-string) =\<gtr\> "hello")
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-string%strip-prefix>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%strip-prefix prefix . xs)
+
+    \ \ (let ((result (rich-string (string-remove-prefix data prefix))))
+
+    \ \ \ \ (if (null? xs) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ (apply result xs))))\ 
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box "") :strip-prefix "") =\<gtr\> (box ""))
+
+    (check ((box "hello") :strip-prefix "") =\<gtr\> (box "hello"))
+
+    (check ((box "hello") :strip-prefix "he") =\<gtr\> (box "llo"))
+
+    (check ((box "hello") :strip-prefix "hello") =\<gtr\> (box ""))
+
+    (check ((box "hello") :strip-prefix "abc") =\<gtr\> (box "hello"))
+
+    (check ((box "hello") :strip-prefix "helloo") =\<gtr\> (box "hello"))
+
+    (check ((box "hello") :strip-prefix "he"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :strip-prefix "ll") =\<gtr\> (box "o"))
+
+    \;
+
+    (check-catch 'wrong-number-of-args ("hello":strip-prefix "he"))
+
+    (check-catch 'unbound-variable (123:strip-prefix 1))
 
     \;
   </goldfish-chunk>
