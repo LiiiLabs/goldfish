@@ -169,6 +169,10 @@
 
 (check ((box 1) :to-string) => "1")
 
+(check (+ 1 (rich-integer :max-value)) => (rich-integer :min-value))
+
+(check (- (rich-integer :min-value) 1) => (rich-integer :max-value))
+
 (check-true ((rich-char #x30) :equals (rich-char #x30)))
 (check-false ((rich-char #x31) :equals (rich-char #x30)))
 

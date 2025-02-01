@@ -249,6 +249,10 @@
 (define (%to-string)
   (number->string data))
 
+(define (@max-value) 9223372036854775807)
+
+(define (@min-value) -9223372036854775808)
+
 )
 
 (define-case-class rich-char ((code-point integer?))

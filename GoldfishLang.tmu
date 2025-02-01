@@ -1123,6 +1123,40 @@
     \;
   </goldfish-chunk>
 
+  <subsection|静态方法>
+
+  <paragraph|rich-integer@max-value>
+
+  Goldfish Scheme中的integer是64位有符号整数，最大值为<math|2<rsup|63>-1>。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@max-value) 9223372036854775807)
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (+ 1 (rich-integer :max-value)) =\<gtr\> (rich-integer :min-value))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-integer@min-value>
+
+  Goldfish Scheme中的integer是64位有符号整数，最大值为<math|-2<rsup|63>>。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@min-value) -9223372036854775808)
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (- (rich-integer :min-value) 1) =\<gtr\> (rich-integer :max-value))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
