@@ -156,151 +156,203 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-macro (define-case-class class-name fields . methods)
 
-    \ \ (let ((constructor (string-\<gtr\>symbol (string-append (symbol-\<gtr\>string class-name))))
-
-    \ \ \ \ \ \ \ \ (key-fields
+    \ \ (let* ((key-fields
 
     \ \ \ \ \ \ \ \ \ (map (lambda (field) (string-\<gtr\>symbol (string-append ":" (symbol-\<gtr\>string (car field)))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))
 
-    \ \ \ \ \ \ \ \ (instance-methods
+    \ \ \ \ \ \ \ \ \ (instance-methods
 
-    \ \ \ \ \ \ \ \ \ (filter (lambda (name) (equal? ((symbol-\<gtr\>string name) 0) #\\%))
+    \ \ \ \ \ \ \ \ \ \ (filter (lambda (method) (string-starts? (symbol-\<gtr\>string (caadr method)) "%"))
 
-    \ \ \ \ \ \ \ \ \ \ (map (lambda (method) (caadr method))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ methods))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ methods))))
+    \ \ \ \ \ \ \ \ \ (instance-method-symbols (map caadr instance-methods))
 
-    \ \ \ \ ‘(begin
+    \ \ \ \ \ \ \ \ \ (instance-messages
 
-    \ \ \ \ \ \ \ (typed-define ,(cons class-name fields)
+    \ \ \ \ \ \ \ \ \ \ (map (lambda (method)
 
-    \ \ \ \ \ \ \ \ \ (define (%is-instance-of x)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let1 name (string-remove-prefix (symbol-\<gtr\>string method) "%")
 
-    \ \ \ \ \ \ \ \ \ \ \ (eq? x ',class-name))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-\<gtr\>symbol (string-append ":" name))))
 
-    \ \ \ \ \ \ \ \ \ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instance-method-symbols))
 
-    \ \ \ \ \ \ \ \ \ (typed-define (%equals (that case-class?))
+    \ \ \ \ \ \ \ \ \ (static-methods
 
-    \ \ \ \ \ \ \ \ \ \ \ (and (that :is-instance-of ',class-name)
+    \ \ \ \ \ \ \ \ \ \ (filter (lambda (method) (string-starts? (symbol-\<gtr\>string (caadr method)) "@"))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ methods))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(equal? ,(car field) (that ',(car field))))
+    \ \ \ \ \ \ \ \ \ (static-method-symbols (map caadr static-methods))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)))
+    \ \ \ \ \ \ \ \ \ (static-messages
 
-    \ \ \ \ \ \ \ \ \ 
+    \ \ \ \ \ \ \ \ \ \ (map (lambda (method)
 
-    \ \ \ \ \ \ \ \ \ (define (%apply . args)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let1 name (string-remove-prefix (symbol-\<gtr\>string method) "@")
 
-    \ \ \ \ \ \ \ \ \ \ \ (when (null? args)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-\<gtr\>symbol (string-append ":" name))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "apply on zero args is not implemented"))
-
-    \ \ \ \ \ \ \ \ \ \ \ (cond ((equal? ((symbol-\<gtr\>string (car args)) 0) #\\:)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "No such method: " (car args)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Please implement the method"))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "No such field: " (car args)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Please use the correct field name"
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Or you may implement %apply to process " args))))
-
-    \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ \ (define (%to-string)
-
-    \ \ \ \ \ \ \ \ \ \ \ (let ((field-strings
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list ,@(map (lambda (field key-field)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(string-append
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(symbol-\<gtr\>string key-field) " "
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (object-\<gtr\>string ,(car field))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (let loop ((strings field-strings)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (acc ""))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? strings)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append "(" ,(symbol-\<gtr\>string class-name) " " acc ")")
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr strings)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (zero? (string-length acc))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car strings)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append acc " " (car strings))))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static-method-symbols)))
 
     \;
 
-    \ \ \ \ \ \ \ \ \ ,@methods
+    `(define (,class-name msg . args)
 
     \;
 
-    \ \ \ \ \ \ \ \ \ (lambda (msg . args)
+    ,@static-methods
 
-    \ \ \ \ \ \ \ \ \ \ \ (cond
+    \ \ \ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :is-instance-of) (apply %is-instance-of args))
+    (define (static-dispatcher msg . args)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
+    \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
+    \ \ \ \ \ ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ static-method-symbols static-messages)
+
+    \ \ \ \ \ (else (value-error "No such static method " msg))))
+
+    \;
+
+    (typed-define (create-instance ,@fields)
+
+    \ \ (define (%is-instance-of x)
+
+    \ \ \ \ (eq? x ',class-name))
+
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ (typed-define (%equals (that case-class?))
+
+    \ \ \ \ (and (that :is-instance-of ',class-name)
+
+    \ \ \ \ \ \ \ \ \ ,@(map (lambda (field) `(equal? ,(car field) (that ',(car field))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)))
+
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ (define (%apply . args)
+
+    \ \ \ \ (when (null? args)
+
+    \ \ \ \ \ \ \ \ \ \ (??? ,class-name "apply on zero args is not implemented"))
+
+    \ \ \ \ (cond ((equal? ((symbol-\<gtr\>string (car args)) 0) #\\:)
+
+    \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "No such method: " (car args) "Please implement the method"))
+
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "No such field: " (car args)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Please use the correct field name\\n"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Or you may implement %apply to process " args))))
+
+    \ \ \ \ \ \ \ \ \ 
+
+    \ \ (define (%to-string)
+
+    \ \ \ \ (let ((field-strings
+
+    \ \ \ \ \ \ \ \ \ \ \ (list ,@(map (lambda (field key-field)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(string-append
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(symbol-\<gtr\>string key-field) " "
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (object-\<gtr\>string ,(car field))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields))))
+
+    \ \ \ \ \ \ (let loop ((strings field-strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (acc ""))
+
+    \ \ \ \ \ \ \ \ (if (null? strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (string-append "(" ,(symbol-\<gtr\>string class-name) " " acc ")")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (zero? (string-length acc))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car strings)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-append acc " " (car strings))))))))
+
+    \;
+
+    \ \ ,@instance-methods
+
+    \ 
+
+    \ \ (define (instance-dispatcher)
+
+    \ \ \ \ (lambda (msg . args)
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((eq? msg :is-instance-of) (apply %is-instance-of args))
+
+    \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
+
+    \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field)
+    \ \ \ \ \ \ \ \ ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ',(car field)) ,(car field)))
+    \ \ \ \ \ \ \ \ ,@(map (lambda (field key-field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,key-field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (field key-field)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,class-name
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,key-field)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (f) (if (eq? (car f) (car field)) '(car args) (car f)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,constructor ,@(map (lambda (f)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (eq? (car f) (car field))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ '(car args)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car f)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields)
 
     \;
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (method)
+    \ \ \ \ \ \ \ \ ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,(string-\<gtr\>symbol (string-append ":" (substring (symbol-\<gtr\>string method) 1))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (apply ,method args)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instance-methods)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instance-method-symbols instance-messages)
 
     \;
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (else (apply %apply (cons msg args)))))))))
+    \ \ \ \ \ \ \ \ (else (apply %apply (cons msg args))))))
+
+    \;
+
+    \ \ (instance-dispatcher)
+
+    ) ; end of the internal typed define
+
+    \;
+
+    (if (in? msg (list ,@static-messages))
+
+    \ \ \ \ (apply static-dispatcher (cons msg args))
+
+    \ \ \ \ (apply create-instance (cons msg args)))
+
+    \;
+
+    ) ; end of define
+
+    ) ; end of let
+
+    ) ; end of define-macro
 
     \;
   </goldfish-chunk>
@@ -357,7 +409,7 @@
 
   测试：带用户自定义方法的样本类jerson
 
-  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (define-case-class jerson
 
     \ \ ((name string?)
@@ -385,11 +437,11 @@
     \ \ (check (bob :greet "Alice") =\<gtr\> "Hi Alice, I am Bob 21 years old!"))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   测试：只有%开头的才是实例方法，其它的不应该被识别。
 
-  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (define-case-class test-case-class
 
     \ \ ((name string?))
@@ -412,10 +464,12 @@
 
     (let1 hello (test-case-class "hello ")
 
-    \ \ (check-catch '??? (hello :this-is-a-static-method)))
+    \ \ (check-catch '??? (hello :this-is-a-static-method))
+
+    \ \ (check (test-case-class :this-is-a-static-method) =\<gtr\> (test-case-class "static")))
 
     \;
-  </scm-chunk>
+  </goldfish-chunk>
 
   <paragraph|case-class?>
 

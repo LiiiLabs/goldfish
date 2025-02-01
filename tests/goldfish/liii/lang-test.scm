@@ -69,7 +69,8 @@
 )
 
 (let1 hello (test-case-class "hello ")
-  (check-catch '??? (hello :this-is-a-static-method)))
+  (check-catch '??? (hello :this-is-a-static-method))
+  (check (test-case-class :this-is-a-static-method) => (test-case-class "static")))
 
 (check-false (case-class? (lambda (x) x)))
 (check-false (case-class? +))

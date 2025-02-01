@@ -27,79 +27,105 @@
 (begin
 
 (define-macro (define-case-class class-name fields . methods)
-  (let ((constructor (string->symbol (string-append (symbol->string class-name))))
-        (key-fields
+  (let* ((key-fields
          (map (lambda (field) (string->symbol (string-append ":" (symbol->string (car field)))))
               fields))
-        (instance-methods
-         (filter (lambda (name) (equal? ((symbol->string name) 0) #\%))
-          (map (lambda (method) (caadr method))
-               methods))))
-    `(begin
-       (typed-define ,(cons class-name fields)
-         (define (%is-instance-of x)
-           (eq? x ',class-name))
-         
-         (typed-define (%equals (that case-class?))
-           (and (that :is-instance-of ',class-name)
-                ,@(map (lambda (field)
-                         `(equal? ,(car field) (that ',(car field))))
-                       fields)))
-         
-         (define (%apply . args)
-           (when (null? args)
-             (??? ,class-name "apply on zero args is not implemented"))
-           (cond ((equal? ((symbol->string (car args)) 0) #\:)
-                  (??? ,class-name
-                    "No such method: " (car args)
-                    "Please implement the method"))
-                 (else
-                  (??? ,class-name "No such field: " (car args)
-                       "Please use the correct field name"
-                       "Or you may implement %apply to process " args))))
-         
-         (define (%to-string)
-           (let ((field-strings
-                  (list ,@(map (lambda (field key-field)
-                                 `(string-append
-                                   ,(symbol->string key-field) " "
-                                   (object->string ,(car field))))
-                               fields key-fields))))
-             (let loop ((strings field-strings)
-                        (acc ""))
-               (if (null? strings)
-                   (string-append "(" ,(symbol->string class-name) " " acc ")")
-                   (loop (cdr strings)
-                         (if (zero? (string-length acc))
-                             (car strings)
-                             (string-append acc " " (car strings))))))))
+         (instance-methods
+          (filter (lambda (method) (string-starts? (symbol->string (caadr method)) "%"))
+                  methods))
+         (instance-method-symbols (map caadr instance-methods))
+         (instance-messages
+          (map (lambda (method)
+                 (let1 name (string-remove-prefix (symbol->string method) "%")
+                   (string->symbol (string-append ":" name))))
+               instance-method-symbols))
+         (static-methods
+          (filter (lambda (method) (string-starts? (symbol->string (caadr method)) "@"))
+                  methods))
+         (static-method-symbols (map caadr static-methods))
+         (static-messages
+          (map (lambda (method)
+                 (let1 name (string-remove-prefix (symbol->string method) "@")
+                   (string->symbol (string-append ":" name))))
+               static-method-symbols)))
 
-         ,@methods
+`(define (,class-name msg . args)
 
-         (lambda (msg . args)
-           (cond
-             ((eq? msg :is-instance-of) (apply %is-instance-of args))
-             ((eq? msg :equals) (apply %equals args))
-             ((eq? msg :to-string) (%to-string))
+,@static-methods
+   
+(define (static-dispatcher msg . args)
+    (cond
+     ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
+            static-method-symbols static-messages)
+     (else (value-error "No such static method " msg))))
+
+(typed-define (create-instance ,@fields)
+  (define (%is-instance-of x)
+    (eq? x ',class-name))
+         
+  (typed-define (%equals (that case-class?))
+    (and (that :is-instance-of ',class-name)
+         ,@(map (lambda (field) `(equal? ,(car field) (that ',(car field))))
+                fields)))
+         
+  (define (%apply . args)
+    (when (null? args)
+          (??? ,class-name "apply on zero args is not implemented"))
+    (cond ((equal? ((symbol->string (car args)) 0) #\:)
+           (??? ,class-name "No such method: " (car args) "Please implement the method"))
+          (else
+           (??? ,class-name "No such field: " (car args)
+                "Please use the correct field name\n"
+                "Or you may implement %apply to process " args))))
+         
+  (define (%to-string)
+    (let ((field-strings
+           (list ,@(map (lambda (field key-field)
+                          `(string-append
+                            ,(symbol->string key-field) " "
+                            (object->string ,(car field))))
+                        fields key-fields))))
+      (let loop ((strings field-strings)
+                 (acc ""))
+        (if (null? strings)
+            (string-append "(" ,(symbol->string class-name) " " acc ")")
+            (loop (cdr strings)
+                  (if (zero? (string-length acc))
+                      (car strings)
+                      (string-append acc " " (car strings))))))))
+
+  ,@instance-methods
+ 
+  (define (instance-dispatcher)
+    (lambda (msg . args)
+      (cond
+        ((eq? msg :is-instance-of) (apply %is-instance-of args))
+        ((eq? msg :equals) (apply %equals args))
+        ((eq? msg :to-string) (%to-string))
              
-             ,@(map (lambda (field)
-                      `((eq? msg ',(car field)) ,(car field)))
-                    fields)
-             ,@(map (lambda (field key-field)
-                      `((eq? msg ,key-field)
-                        (,constructor ,@(map (lambda (f)
-                                               (if (eq? (car f) (car field))
-                                                   '(car args)
-                                                   (car f)))
-                                             fields))))
-                    fields key-fields)
+        ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
+        ,@(map (lambda (field key-field)
+                 `((eq? msg ,key-field)
+                   (,class-name
+                    ,@(map (lambda (f) (if (eq? (car f) (car field)) '(car args) (car f)))
+                           fields))))
+               fields key-fields)
 
-             ,@(map (lambda (method)
-                      `((eq? msg ,(string->symbol (string-append ":" (substring (symbol->string method) 1))))
-                        (apply ,method args)))
-                    instance-methods)
+        ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
+               instance-method-symbols instance-messages)
 
-             (else (apply %apply (cons msg args)))))))))
+        (else (apply %apply (cons msg args))))))
+
+  (instance-dispatcher)
+) ; end of the internal typed define
+
+(if (in? msg (list ,@static-messages))
+    (apply static-dispatcher (cons msg args))
+    (apply create-instance (cons msg args)))
+
+) ; end of define
+) ; end of let
+) ; end of define-macro
 
 (define (case-class? x)
   (and-let* ((is-proc? (procedure? x))
