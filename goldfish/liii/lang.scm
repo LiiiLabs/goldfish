@@ -382,6 +382,11 @@
         result
         (apply result xs)))) 
 
+(define (%strip-suffix suffix . xs)
+  (let ((result (rich-string (string-remove-suffix data suffix))))
+    (if (null? xs)                                 
+        result
+        (apply result xs)))) 
 )
 
 (define-case-class rich-list ((data list?))

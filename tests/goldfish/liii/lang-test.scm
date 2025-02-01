@@ -275,6 +275,17 @@
 (check-catch 'wrong-number-of-args ("hello":strip-prefix "he"))
 (check-catch 'unbound-variable (123:strip-prefix 1))
 
+(check ((box "") :strip-suffix "") => (box ""))
+(check ((box "hello") :strip-suffix "") => (box "hello"))
+(check ((box "hello") :strip-suffix "lo") => (box "hel"))
+(check ((box "hello") :strip-suffix "hello") => (box ""))
+(check ((box "hello") :strip-suffix "abc") => (box "hello"))
+(check ((box "hello") :strip-suffix "hhello") => (box "hello"))
+(check ((box "hello") :strip-suffix "lo"
+                      :strip-suffix "el") => (box "h"))
+
+(check-catch 'wrong-number-of-args ("hello":strip-suffix "llo"))
+(check-catch 'unbound-variable (123:strip-suffix 1))
 (check ((box '(1 2 3)) :apply 0) => 1)
 (check ((box '(1 2 3)) 0) => 1)
 
