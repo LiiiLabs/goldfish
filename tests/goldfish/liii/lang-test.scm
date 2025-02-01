@@ -233,6 +233,14 @@
 )
 
 (let ((lst (rich-list '(1 2 3 4 5))))
+  (check (lst :drop -1 :collect) => '(1 2 3 4 5))
+  (check (lst :drop 0 :collect) => '(1 2 3 4 5))
+  (check (lst :drop 3 :collect) => '(4 5))
+  (check (lst :drop 5 :collect) => '())
+  (check (lst :drop 10 :collect) => '())
+)
+
+(let ((lst (rich-list '(1 2 3 4 5))))
   (check (lst :take-right -1 :collect) => '())
   (check (lst :take-right 0 :collect) => '())
   (check (lst :take-right 3 :collect) => '(3 4 5))

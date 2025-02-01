@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.0>>
+<TMU|<tuple|1.1.0|2025.0.1>>
 
 <style|<tuple|book|chinese|goldfish|literate|reduced-margins|python>>
 
@@ -1625,7 +1625,53 @@
     \;
   </scm-chunk>
 
-  <paragraph|rich-list%take-right>
+  \;
+
+  <paragraph|rich-list%drop >
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%drop x . xs)
+
+    \ \ \ \ (typed-define (scala-drop (data list?) (n integer?))
+
+    \ \ \ \ \ \ (cond ((\<less\> n 0) data)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= n (length data)) '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (drop data n))))
+
+    \;
+
+    \ \ \ \ (let1 r (rich-list (scala-drop data x))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((lst (rich-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :drop -1 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    \ \ (check (lst :drop 0 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    \ \ (check (lst :drop 3 :collect) =\<gtr\> '(4 5))
+
+    \ \ (check (lst :drop 5 :collect) =\<gtr\> '())
+
+    \ \ (check (lst :drop 10 :collect) =\<gtr\> '())
+
+    )
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\paragraph>
+    rich-list%take-right
+  </paragraph>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     \ \ (define (%take-right x . xs)

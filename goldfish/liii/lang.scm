@@ -327,6 +327,15 @@
     (let1 r (rich-list (scala-take data x))
       (if (null? xs) r (apply r xs))))
 
+(define (%drop x . xs)
+    (typed-define (scala-drop (data list?) (n integer?))
+      (cond ((< n 0) data)
+            ((>= n (length data)) '())
+            (else (drop data n))))
+
+    (let1 r (rich-list (scala-drop data x))
+      (if (null? xs) r (apply r xs))))
+
   (define (%take-right x . xs)
     (typed-define (scala-take-right (data list?) (n integer?))
       (cond ((< n 0) '())
