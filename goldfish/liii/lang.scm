@@ -509,6 +509,15 @@
     (let1 r (rich-list (scala-take-right data x))
       (if (null? xs) r (apply r xs))))
 
+ (define (%drop-right x . xs)
+    (typed-define (scala-drop-right (data list?) (n integer?))
+      (cond ((< n 0) data)
+            ((>= n (length data)) '())
+            (else (drop-right data n))))
+
+    (let1 r (rich-list (scala-drop-right data x))
+      (if (null? xs) r (apply r xs))))
+ 
   (define (%count . xs)
     (cond ((null? xs) (length data))
           ((length=? 1 xs) (count (car xs) data))

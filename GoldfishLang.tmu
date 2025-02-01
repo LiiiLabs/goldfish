@@ -2415,6 +2415,46 @@
     \;
   </scm-chunk>
 
+  <paragraph|rich-list%drop-right>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    \ (define (%drop-right x . xs)
+
+    \ \ \ \ (typed-define (scala-drop-right (data list?) (n integer?))
+
+    \ \ \ \ \ \ (cond ((\<less\> n 0) data)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= n (length data)) '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else (drop-right data n))))
+
+    \;
+
+    \ \ \ \ (let1 r (rich-list (scala-drop-right data x))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \ 
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((lst (rich-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :drop-right -1 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    \ \ (check (lst :drop-right 0 :collect) =\<gtr\> '(1 2 3 4 5))
+
+    \ \ (check (lst :drop-right 3 :collect) =\<gtr\> '(1 2))
+
+    \ \ (check (lst :drop-right 5 :collect) =\<gtr\> '())
+
+    \ \ (check (lst :drop-right 10 :collect) =\<gtr\> '())
+
+    )
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-list%count>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
