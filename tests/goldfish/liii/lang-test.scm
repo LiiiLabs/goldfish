@@ -391,6 +391,8 @@
   (check-catch 'type-error (l :make-string "[" "," 123))
 )
 
+(check (rich-vector :empty) => (box #()))
+
 (check ((box #(1 2 3)) :apply 1) => 2)
 (check ((box #(1 2 3)) 1) => 2)
 

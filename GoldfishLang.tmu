@@ -2639,6 +2639,24 @@
     \;
   </goldfish-chunk>
 
+  <subsection|静态方法>
+
+  <paragraph|rich-vector@empty>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@empty)
+
+    \ \ (rich-vector #()))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (rich-vector :empty) =\<gtr\> (box #()))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|选择器>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
