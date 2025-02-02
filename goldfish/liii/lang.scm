@@ -567,6 +567,11 @@
 (define* (@inclusive start end (step 1))
   (range start end step #t))
 
+(define (%empty?)
+  (or (and (> start end) (> step 0))
+      (and (< start end) (< step 0))
+      (and (= start end) (not inclusive?))))
+
 )
 
 (define-case-class rich-vector ((data vector?))

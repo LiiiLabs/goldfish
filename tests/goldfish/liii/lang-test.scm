@@ -403,6 +403,10 @@
   (check (r 'step) => 2)
   (check-true (r 'inclusive?)))
 
+(check-false ((range :inclusive 1 3) :empty?))
+(check-true ((range :inclusive 3 1) :empty?))
+(check-false ((range :inclusive 1 3 0) :empty?))
+
 (check ((box #(1 2 3)) :apply 1) => 2)
 (check ((box #(1 2 3)) 1) => 2)
 
