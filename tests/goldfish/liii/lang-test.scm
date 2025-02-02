@@ -391,7 +391,17 @@
   (check-catch 'type-error (l :make-string "[" "," 123))
 )
 
-(check (rich-vector :empty) => (box #()))
+(let1 r (range :inclusive 1 2)
+  (check (r 'start) => 1)
+  (check (r 'end) => 2)
+  (check (r 'step) => 1)
+  (check-true (r 'inclusive?)))
+
+(let1 r (range :inclusive 1 3 2)
+  (check (r 'start) => 1)
+  (check (r 'end) => 3)
+  (check (r 'step) => 2)
+  (check-true (r 'inclusive?)))
 
 (check ((box #(1 2 3)) :apply 1) => 2)
 (check ((box #(1 2 3)) 1) => 2)

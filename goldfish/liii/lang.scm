@@ -21,7 +21,8 @@
   define-case-class case-class? == != display* object->string
   option none
   rich-integer rich-char rich-string
-  rich-list rich-vector rich-hash-table
+  rich-list range
+  rich-vector rich-hash-table
   box
 )
 (begin
@@ -560,10 +561,15 @@
 
 )
 
-(define-case-class rich-vector ((data vector?))
+(define-case-class range
+  ((start integer?) (end integer?) (step integer?) (inclusive? boolean?))
 
-(define (@empty)
-  (rich-vector #()))
+(define* (@inclusive start end (step 1))
+  (range start end step #t))
+
+)
+
+(define-case-class rich-vector ((data vector?))
 
 (define (%collect) data)
 

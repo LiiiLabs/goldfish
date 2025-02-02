@@ -102,7 +102,9 @@
 
     \ \ rich-integer rich-char rich-string
 
-    \ \ rich-list rich-vector rich-hash-table
+    \ \ rich-list range
+
+    \ \ rich-vector rich-hash-table
 
     \ \ box
 
@@ -2631,28 +2633,66 @@
     \;
   </scm-chunk>
 
-  <section|rich-vector>
+  <section|range>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define-case-class rich-vector ((data vector?))
+    (define-case-class range
+
+    \ \ ((start integer?) (end integer?) (step integer?) (inclusive? boolean?))
 
     \;
   </goldfish-chunk>
 
   <subsection|静态方法>
 
-  <paragraph|rich-vector@empty>
+  <paragraph|@inclusive>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty)
+    (define* (@inclusive start end (step 1))
 
-    \ \ (rich-vector #()))
+    \ \ (range start end step #t))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check (rich-vector :empty) =\<gtr\> (box #()))
+    (let1 r (range :inclusive 1 2)
+
+    \ \ (check (r 'start) =\<gtr\> 1)
+
+    \ \ (check (r 'end) =\<gtr\> 2)
+
+    \ \ (check (r 'step) =\<gtr\> 1)
+
+    \ \ (check-true (r 'inclusive?)))
+
+    \;
+
+    (let1 r (range :inclusive 1 3 2)
+
+    \ \ (check (r 'start) =\<gtr\> 1)
+
+    \ \ (check (r 'end) =\<gtr\> 3)
+
+    \ \ (check (r 'step) =\<gtr\> 2)
+
+    \ \ (check-true (r 'inclusive?)))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|结尾>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
+
+  <section|rich-vector>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-case-class rich-vector ((data vector?))
 
     \;
   </goldfish-chunk>
