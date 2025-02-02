@@ -2079,6 +2079,24 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-list@empty>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@empty)
+
+    \ \ (rich-list (list )))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    \;
+
+    (check (rich-list :empty)=\<gtr\> (box (list )))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|选择器>
 
   <paragraph|rich-list%collect>

@@ -434,6 +434,9 @@
        (let1 cnt (ceiling (/ (- end start) step-size))
          (rich-list (iota cnt start step-size)))))))
 
+(define (@empty)
+  (rich-list (list )))
+
 (define (%collect) data)
 
 (define (%apply n)

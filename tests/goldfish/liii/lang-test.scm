@@ -300,6 +300,9 @@
 
 (check-catch 'value-error (rich-list :range 1 5 0))
 
+
+(check (rich-list :empty)=> (box (list )))
+
 (check ((box '(1 2 3)) :apply 0) => 1)
 (check ((box '(1 2 3)) 0) => 1)
 
