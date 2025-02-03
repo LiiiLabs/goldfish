@@ -303,6 +303,11 @@
 
 (check (rich-list :empty)=> (box (list )))
 
+
+(check (rich-list :concat (box (list 1)) (box (list 2))) => (box (list 1 2)))
+(check (rich-list :concat (box (list 1 2)) (box (list 3 4))) => (box (list 1 2 3 4)))
+(check (rich-list :concat (rich-list :range 1 4) (box (list 3 4))) => (box (list 1 2 3 3 4)))
+
 ;; test :fill
 (let1 result (rich-list :fill 3 "a")
   (check (result :collect) => '("a" "a" "a"))
