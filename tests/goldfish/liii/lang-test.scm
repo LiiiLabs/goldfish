@@ -291,6 +291,11 @@
 
 (check-catch 'wrong-number-of-args ("hello":strip-suffix "llo"))
 (check-catch 'unbound-variable (123:strip-suffix 1))
+
+(check ((box "da@liii.pro") :split "@") => (box (vector "da" "liii.pro")))
+(check ((box "da@liii.pro") :split ".") => (box (vector "da@liii" "pro")))
+(check (((box "da@liii.pro") :split "@") :collect) => (vector "da" "liii.pro")) ;Test for chaining
+
 (check (rich-list :range 1 5) => (box (list 1 2 3 4)))
 (check (rich-list :range 1 5 2) => (box (list 1 3)))
 (check (rich-list :range 1 6 2) => (box (list 1 3 5)))
