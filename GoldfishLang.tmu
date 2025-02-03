@@ -2831,6 +2831,38 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-vector@fill>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@fill n elem . xs)
+
+    \ \ (unless (integer? n)
+
+    \ \ \ \ (type-error "n must be integer" n))
+
+    \ \ (when (\<less\> n 0)
+
+    \ \ \ \ (value-error "n must be non-negative" n))
+
+    \;
+
+    \ \ (let1 r (rich-vector (make-vector n elem))
+
+    \ \ \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true (rich-vector :fill 0 #\\a :empty?))
+
+    \;
+
+    (check (rich-vector :fill 3 #\\a) =\<gtr\> (box (vector #\\a #\\a #\\a)))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|选择器>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -2898,6 +2930,24 @@
   </scm-chunk>
 
   <subsection|谓词>
+
+  <paragraph|rich-vector%empty?>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%empty?)
+
+    \ \ (= (length data) 0))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((box (vector)) :empty?))
+
+    (check-false ((box #(1 2 3)) :empty?))
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|rich-vector%equals>
 

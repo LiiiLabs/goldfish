@@ -591,6 +591,15 @@
 (define (@empty)
   (rich-vector #()))
 
+(define (@fill n elem . xs)
+  (unless (integer? n)
+    (type-error "n must be integer" n))
+  (when (< n 0)
+    (value-error "n must be non-negative" n))
+
+  (let1 r (rich-vector (make-vector n elem))
+        (if (null? xs) r (apply r xs))))
+
 (define (%collect) data)
 
 (define (%apply n)
@@ -602,6 +611,9 @@
         ((>= i (vector-length data)) (none))
         ((p (vector-ref data i)) (option (vector-ref data i)))
         (else (loop (+ i 1))))))
+(define (%empty?)
+  (= (length data) 0))
+
 (define (%equals that)
   (vector= == data (that 'data)))
 

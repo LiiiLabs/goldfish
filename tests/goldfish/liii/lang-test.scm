@@ -437,6 +437,10 @@
 
 (check (rich-vector :empty) => (box #()))
 
+(check-true (rich-vector :fill 0 #\a :empty?))
+
+(check (rich-vector :fill 3 #\a) => (box (vector #\a #\a #\a)))
+
 (check ((box #(1 2 3)) :apply 1) => 2)
 (check ((box #(1 2 3)) 1) => 2)
 
@@ -450,6 +454,9 @@
 
   (check ((vec :find (lambda (x) (< x 0))) :empty?) => #t)
 )
+
+(check-true ((box (vector)) :empty?))
+(check-false ((box #(1 2 3)) :empty?))
 
 (check-true ((box #(1 2 3)) :equals (box #(1 2 3))))
 
