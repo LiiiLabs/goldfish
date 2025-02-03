@@ -2102,9 +2102,11 @@
   <paragraph|rich-list@concat>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@concat lst1 lst2)
+    (define (@concat lst1 lst2 . xs)
 
-    \ \ (rich-list (append (lst1 :collect) (lst2 :collect))))
+    \ \ (let1 r (rich-list (append (lst1 :collect) (lst2 :collect)))
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
   </goldfish-chunk>
@@ -2117,6 +2119,12 @@
     (check (rich-list :concat (box (list 1 2)) (box (list 3 4))) =\<gtr\> (box (list 1 2 3 4)))
 
     (check (rich-list :concat (rich-list :range 1 4) (box (list 3 4))) =\<gtr\> (box (list 1 2 3 3 4)))
+
+    (check (rich-list :concat (box (list 1)) (box (list 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ :collect) =\<gtr\> (list 1 2))
+
+    <code|(check (rich-list :concat (rich-list '(1)) (rich-list '(2)) :count) =\> 2)>
 
     \;
   </goldfish-chunk>

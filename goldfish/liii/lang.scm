@@ -438,8 +438,9 @@
 (define (@empty)
   (rich-list (list )))
 
-(define (@concat lst1 lst2)
-  (rich-list (append (lst1 :collect) (lst2 :collect))))
+(define (@concat lst1 lst2 . xs)
+  (let1 r (rich-list (append (lst1 :collect) (lst2 :collect)))
+    (if (null? xs) r (apply r xs))))
 
 (define (@fill n elem)
   (cond
