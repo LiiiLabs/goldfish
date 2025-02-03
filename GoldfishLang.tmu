@@ -2099,6 +2099,28 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-list@concat>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@concat lst1 lst2)
+
+    \ \ (rich-list (append (lst1 :collect) (lst2 :collect))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    \;
+
+    (check (rich-list :concat (box (list 1)) (box (list 2))) =\<gtr\> (box (list 1 2)))
+
+    (check (rich-list :concat (box (list 1 2)) (box (list 3 4))) =\<gtr\> (box (list 1 2 3 4)))
+
+    (check (rich-list :concat (rich-list :range 1 4) (box (list 3 4))) =\<gtr\> (box (list 1 2 3 3 4)))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-list@fill>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

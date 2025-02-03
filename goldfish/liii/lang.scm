@@ -438,6 +438,9 @@
 (define (@empty)
   (rich-list (list )))
 
+(define (@concat lst1 lst2)
+  (rich-list (append (lst1 :collect) (lst2 :collect))))
+
 (define (@fill n elem)
   (cond
     ((< n 0)
