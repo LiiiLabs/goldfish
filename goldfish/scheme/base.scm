@@ -21,7 +21,7 @@
   define-values define-record-type
   ; R7RS 6.2: Numbers
   square exact inexact max min floor s7-floor ceiling s7-ceiling truncate s7-truncate
-  round s7-round floor-quotient gcd lcm s7-lcm boolean=?
+  round s7-round floor-quotient gcd lcm s7-lcm boolean=? exact-integer-sqrt
   ; R7RS 6.4: list
   pair? cons car cdr set-car! set-cdr! caar cadr cdar cddr
   null? list? make-list list length append reverse list-tail
@@ -204,6 +204,18 @@
                                (cddr args))))))
 
 (define (square x) (* x x))
+
+(define (exact-integer-sqrt n)
+  (when (not (integer? n))
+    (type-error "n must be an integer" n))
+  (when (< n 0)
+    (value-error "n must be non-negative" n))
+  (let* ((a (sqrt n))
+         (b (inexact->exact (floor a)))
+         (square-b (square b)))
+    (if (= square-b n)
+        (values b 0)
+        (values b (- n square-b)))))
 
 (define (boolean=? obj1 obj2 . rest)
   (define (same-boolean obj rest)

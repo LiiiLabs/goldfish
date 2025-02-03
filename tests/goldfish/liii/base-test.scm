@@ -719,6 +719,14 @@
 
 (check (square 2) => 4)
 
+(check (list (exact-integer-sqrt 9)) => (list 3 0))
+(check (list (exact-integer-sqrt 5)) => (list 2 1))
+(check (list (exact-integer-sqrt 0)) => (list 0 0))
+(check-catch 'type-error (exact-integer-sqrt "a"))
+(check-catch 'value-error (exact-integer-sqrt -1))
+(check-catch 'type-error (exact-integer-sqrt 1.1))
+(check-catch 'type-error (exact-integer-sqrt 1+i)) 
+
 (check (number->string 123) => "123")
 (check (number->string -456) => "-456")
 
