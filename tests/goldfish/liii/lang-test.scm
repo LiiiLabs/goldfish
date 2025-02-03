@@ -435,6 +435,15 @@
 (check-true ((range :inclusive 3 1) :empty?))
 (check-false ((range :inclusive 1 3 0) :empty?))
 
+(check (rich-vector :range 1 5) => (box (vector 1 2 3 4)))
+(check (rich-vector :range 1 5 2) => (box (vector 1 3)))
+(check (rich-vector :range 1 6 2) => (box (vector 1 3 5)))
+(check (rich-vector :range 5 1 -1) => (box (vector 5 4 3 2)))
+
+(check (rich-vector :range 5 1 1) => (box (vector )))
+
+(check-catch 'value-error (rich-vector :range 1 5 0))
+
 (check (rich-vector :empty) => (box #()))
 
 (check-true (rich-vector :fill 0 #\a :empty?))

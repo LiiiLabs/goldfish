@@ -2815,6 +2815,56 @@
 
   <subsection|静态方法>
 
+  <paragraph|rich-vector@range>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@range start end . step)
+
+    \ \ (let ((step-size (if (null? step) 1 (car step))))
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((and (positive? step-size) (\<gtr\>= start end))
+
+    \ \ \ \ \ \ \ (rich-vector #()))
+
+    \ \ \ \ \ \ ((and (negative? step-size) (\<less\>= start end))
+
+    \ \ \ \ \ \ \ (rich-vector #()))
+
+    \ \ \ \ \ \ ((zero? step-size)
+
+    \ \ \ \ \ \ \ (value-error "Step size cannot be zero"))
+
+    \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ (let1 cnt (ceiling (/ (- end start) step-size))
+
+    \ \ \ \ \ \ \ \ \ (rich-vector <code|<code*|(list-\>vector>> (iota cnt start step-size))))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (rich-vector :range 1 5) =\<gtr\> (box (vector 1 2 3 4)))
+
+    (check (rich-vector :range 1 5 2) =\<gtr\> (box (vector 1 3)))
+
+    (check (rich-vector :range 1 6 2) =\<gtr\> (box (vector 1 3 5)))
+
+    (check (rich-vector :range 5 1 -1) =\<gtr\> (box (vector 5 4 3 2)))
+
+    \;
+
+    (check (rich-vector :range 5 1 1) =\<gtr\> (box (vector )))
+
+    \;
+
+    (check-catch 'value-error (rich-vector :range 1 5 0))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-vector@empty>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

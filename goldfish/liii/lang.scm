@@ -588,6 +588,19 @@
 
 (define-case-class rich-vector ((data vector?))
 
+(define (@range start end . step)
+  (let ((step-size (if (null? step) 1 (car step))))
+    (cond
+      ((and (positive? step-size) (>= start end))
+       (rich-vector #()))
+      ((and (negative? step-size) (<= start end))
+       (rich-vector #()))
+      ((zero? step-size)
+       (value-error "Step size cannot be zero"))
+      (else
+       (let1 cnt (ceiling (/ (- end start) step-size))
+         (rich-vector (list->vector (iota cnt start step-size))))))))
+
 (define (@empty)
   (rich-vector #()))
 
