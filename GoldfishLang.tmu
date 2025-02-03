@@ -3075,7 +3075,47 @@
 
   \;
 
-  \;
+  <paragraph|rich-vector%drop>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%drop x . xs)
+
+    \ \ \ \ (typed-define (scala-drop (data vector?) (n integer?))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((\<less\> n 0) data)
+
+    \ \ \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) (vector))
+
+    \ \ \ \ \ \ \ \ (else (vector-copy data n))))
+
+    \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ (let1 r (rich-vector (scala-drop data x))
+
+    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((vec (rich-vector #(1 2 3 4 5))))
+
+    \ \ (check (vec :drop -1 :collect) =\<gtr\> #(1 2 3 4 5))
+
+    \ \ (check (vec :drop 0 :collect) =\<gtr\> #(1 2 3 4 5))
+
+    \ \ (check (vec :drop 3 :collect) =\<gtr\> #(4 5))
+
+    \ \ (check (vec :drop 5 :collect) =\<gtr\> #())
+
+    \ \ (check (vec :drop 10 :collect) =\<gtr\> #())
+
+    )
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|rich-vector%fold>
 

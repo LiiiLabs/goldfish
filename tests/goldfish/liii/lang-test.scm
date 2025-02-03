@@ -474,6 +474,14 @@
 )
 
 (let ((vec (rich-vector #(1 2 3 4 5))))
+  (check (vec :drop -1 :collect) => #(1 2 3 4 5))
+  (check (vec :drop 0 :collect) => #(1 2 3 4 5))
+  (check (vec :drop 3 :collect) => #(4 5))
+  (check (vec :drop 5 :collect) => #())
+  (check (vec :drop 10 :collect) => #())
+)
+
+(let ((vec (rich-vector #(1 2 3 4 5))))
   (check (vec :fold 0 +) => 15)
   (check (vec :fold '() (lambda (x acc) (cons x acc))) => '(5 4 3 2 1))
 
