@@ -407,6 +407,8 @@
 (check-true ((range :inclusive 3 1) :empty?))
 (check-false ((range :inclusive 1 3 0) :empty?))
 
+(check (rich-vector :empty) => (box #()))
+
 (check ((box #(1 2 3)) :apply 1) => 2)
 (check ((box #(1 2 3)) 1) => 2)
 

@@ -576,6 +576,9 @@
 
 (define-case-class rich-vector ((data vector?))
 
+(define (@empty)
+  (rich-vector #()))
+
 (define (%collect) data)
 
 (define (%apply n)
