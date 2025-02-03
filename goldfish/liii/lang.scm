@@ -424,7 +424,40 @@
     (if (null? xs)                                 
         result
         (apply result xs)))) 
+(define (%split sep) 
+  (rich-vector (list->vector (string-split data sep))))
 )
+
+(define (string-split str sep)
+  (let ((sep-len (string-length sep))
+        (str-len (string-length str)))
+    ;; Helper function to compare substrings
+    (define (substring= str1 start1 str2 start2 len)
+      (let loop ((i 0))
+        (cond
+         ((= i len) #t)
+         ((char=? (string-ref str1 (+ start1 i)) 
+                 (string-ref str2 (+ start2 i)))
+          (loop (+ i 1)))
+         (else #f))))
+    
+    (cond
+     ((= sep-len 0) (list str))  ;; Handle empty separator
+     (else
+      (let loop ((start 0) (result '()))
+        (if (>= start str-len)
+            (reverse result)
+            (let ((found-at #f))
+              ;; Manual search for the separator
+              (do ((i start (+ i 1)))
+                  ((or found-at (> i (- str-len sep-len))))
+                (when (and (<= (+ i sep-len) str-len)
+                           (substring= str i sep 0 sep-len))
+                  (set! found-at i)))
+              (if found-at
+                  (loop (+ found-at sep-len)
+                        (cons (substring str start found-at) result))
+                  (reverse (cons (substring str start str-len) result))))))))))
 
 (define-case-class rich-list ((data list?))
 

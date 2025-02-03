@@ -1,6 +1,6 @@
 <TMU|<tuple|1.1.0|2025.0.3>>
 
-<style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
+<style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese|llm>>
 
 <\body>
   <\hide-preamble>
@@ -2037,10 +2037,100 @@
     (check-catch 'unbound-variable (123:strip-suffix 1))
   </goldfish-chunk>
 
+  <subsection|其余函数>
+
+  <paragraph|rich-string%split>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%split sep)\ 
+
+    \ \ (rich-vector (list-\>vector (string-split data sep))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    \;
+
+    (check ((box "da@liii.pro") :split "@") =\<gtr\> (box (vector "da" "liii.pro")))
+
+    (check ((box "da@liii.pro") :split ".") =\<gtr\> (box (vector "da@liii" "pro")))
+
+    (check (((box "da@liii.pro") :split "@") :collect) =\<gtr\> (vector "da" "liii.pro")) ;Test for chaining
+
+    \;
+  </goldfish-chunk>
+
   <subsection|结尾>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     )
+
+    \;
+  </scm-chunk>
+
+  <subsection|帮助函数>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (string-split str sep)
+
+    \ \ (let ((sep-len (string-length sep))
+
+    \ \ \ \ \ \ \ \ (str-len (string-length str)))
+
+    \ \ \ \ ;; Helper function to compare substrings
+
+    \ \ \ \ (define (substring= str1 start1 str2 start2 len)
+
+    \ \ \ \ \ \ (let loop ((i 0))
+
+    \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ ((= i len) #t)
+
+    \ \ \ \ \ \ \ \ \ ((char=? (string-ref str1 (+ start1 i))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-ref str2 (+ start2 i)))
+
+    \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)))
+
+    \ \ \ \ \ \ \ \ \ (else #f))))
+
+    \ \ \ \ 
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ ((= sep-len 0) (list str)) \ ;; Handle empty separator
+
+    \ \ \ \ \ (else
+
+    \ \ \ \ \ \ (let loop ((start 0) (result '()))
+
+    \ \ \ \ \ \ \ \ (if (\<gtr\>= start str-len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (reverse result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let ((found-at #f))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;; Manual search for the separator
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (do ((i start (+ i 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((or found-at (\<gtr\> i (- str-len sep-len))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (when (and (\<less\>= (+ i sep-len) str-len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring= str i sep 0 sep-len))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! found-at i)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if found-at
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ found-at sep-len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (substring str start found-at) result))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (reverse (cons (substring str start str-len) result))))))))))
 
     \;
   </scm-chunk>
