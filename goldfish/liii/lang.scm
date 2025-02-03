@@ -676,6 +676,16 @@
     (let1 r (rich-vector (scala-drop data x))
       (if (null? xs) r (apply r xs))))
 
+(define (%drop-right x . xs)
+  (typed-define (scala-drop-right (data vector?) (n integer?))
+    (cond
+      ((< n 0) data) 
+      ((>= n (vector-length data)) (vector)) 
+      (else (vector-copy data 0 (- (vector-length data) n))))) 
+
+  (let1 r (rich-vector (scala-drop-right data x))  
+    (if (null? xs) r (apply r xs))))
+
   (define (%fold initial f)
     (vector-fold f initial data))
 
