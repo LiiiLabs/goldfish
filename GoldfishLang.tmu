@@ -2099,6 +2099,68 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-list@fill>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@fill n elem)
+
+    \ \ (cond
+
+    \ \ \ \ ((\<less\> n 0)
+
+    \ \ \ \ \ \ (value-error "n cannot be negative"))
+
+    \ \ \ \ ((= n 0)
+
+    \ \ \ \ \ \ (rich-list '()))
+
+    \ \ \ \ (else
+
+    \ \ \ \ \ \ (rich-list (make-list n elem)))))
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    ;; test :fill
+
+    (let1 result (rich-list :fill 3 "a")
+
+    \ \ (check (result :collect) =\<gtr\> '("a" "a" "a"))
+
+    )
+
+    \;
+
+    (let1 result (rich-list :fill 0 "a")
+
+    \ \ (check (result :collect) =\<gtr\> '())
+
+    )
+
+    \;
+
+    (check-catch 'value-error (rich-list :fill -1 "a"))
+
+    \;
+
+    (let1 result (rich-list :fill 2 42)
+
+    \ \ (check (result :collect) =\<gtr\> '(42 42))
+
+    )
+
+    \;
+
+    (let1 result (rich-list :fill 1000 "x")
+
+    \ \ (check (length (result :collect)) =\<gtr\> 1000)
+
+    )
+
+    \;
+
+    ;; test :fill finished
+  </goldfish-chunk>
+
   <subsection|选择器>
 
   <paragraph|rich-list%collect>

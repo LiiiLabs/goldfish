@@ -438,6 +438,14 @@
 (define (@empty)
   (rich-list (list )))
 
+(define (@fill n elem)
+  (cond
+    ((< n 0)
+      (value-error "n cannot be negative"))
+    ((= n 0)
+      (rich-list '()))
+    (else
+      (rich-list (make-list n elem)))))
 (define (%collect) data)
 
 (define (%apply n)

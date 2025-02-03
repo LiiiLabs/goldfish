@@ -303,6 +303,26 @@
 
 (check (rich-list :empty)=> (box (list )))
 
+;; test :fill
+(let1 result (rich-list :fill 3 "a")
+  (check (result :collect) => '("a" "a" "a"))
+)
+
+(let1 result (rich-list :fill 0 "a")
+  (check (result :collect) => '())
+)
+
+(check-catch 'value-error (rich-list :fill -1 "a"))
+
+(let1 result (rich-list :fill 2 42)
+  (check (result :collect) => '(42 42))
+)
+
+(let1 result (rich-list :fill 1000 "x")
+  (check (length (result :collect)) => 1000)
+)
+
+;; test :fill finished
 (check ((box '(1 2 3)) :apply 0) => 1)
 (check ((box '(1 2 3)) 0) => 1)
 
