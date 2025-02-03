@@ -141,9 +141,15 @@
          (equal? pred2 '(eq? msg :equals)))))
 
 (define (== left right)
-  (if (and (case-class? left) (case-class? right))
-      (left :equals right)
-      (equal? left right)))
+  (cond
+    ((and (case-class? left) (case-class? right))
+     (left :equals right))
+    ((case-class? left)
+     (left :equals (box right)))
+    ((case-class? right)
+     ((box left) :equals right))
+    (else
+     (equal? left right))))
 
 (define (!= left right)
   (not (== left right)))

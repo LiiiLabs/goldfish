@@ -561,16 +561,32 @@
 
   <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
 
-  如果两个参数都是样本类，那么使用样本类的相等性判断；否则使用<scm|equal?>判断。
+  如果两个参数都是样本类，那么使用样本类的相等性判断；
+
+  如果某个参数为非样本类，我们使用box函数装箱，之后再进行比较；
+
+  如果两个样本都不是样本类，则使用<scm|equal?>判断。
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define (== left right)
 
-    \ \ (if (and (case-class? left) (case-class? right))
+    \ \ (cond
 
-    \ \ \ \ \ \ (left :equals right)
+    \ \ \ \ ((and (case-class? left) (case-class? right))
 
-    \ \ \ \ \ \ (equal? left right)))
+    \ \ \ \ \ (left :equals right))
+
+    \ \ \ \ ((case-class? left)
+
+    \ \ \ \ \ (left :equals (box right)))
+
+    \ \ \ \ ((case-class? right)
+
+    \ \ \ \ \ ((box left) :equals right))
+
+    \ \ \ \ (else
+
+    \ \ \ \ \ (equal? left right))))
 
     \;
   </scm-chunk>
@@ -581,6 +597,14 @@
     (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
 
     (check (!= (list 1 2) (list 1 2)) =\<gtr\> #f)
+
+    (check (== (box 10) 10) =\<gtr\> #t) \ 
+
+    (check (== 10 (box 10)) =\<gtr\> #t) \ 
+
+    (check (== (box 10) (box 10)) =\<gtr\> #t) \ 
+
+    (check (== 10 10) =\<gtr\> #t) \ 
 
     (check-true (== (person "Bob" 21) (person "Bob" 21)))
 
@@ -2260,6 +2284,8 @@
 
     \;
   </goldfish-chunk>
+
+  \;
 
   <subsection|谓词>
 

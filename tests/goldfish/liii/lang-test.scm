@@ -80,6 +80,10 @@
 
 (check (== (list 1 2) (list 1 2)) => #t)
 (check (!= (list 1 2) (list 1 2)) => #f)
+(check (== (box 10) 10) => #t)  
+(check (== 10 (box 10)) => #t)  
+(check (== (box 10) (box 10)) => #t)  
+(check (== 10 10) => #t)  
 (check-true (== (person "Bob" 21) (person "Bob" 21)))
 
 (check (== (list 1 2) (list 1 2)) => #t)
