@@ -630,6 +630,28 @@
         ((>= i (vector-length data)) (none))
         ((p (vector-ref data i)) (option (vector-ref data i)))
         (else (loop (+ i 1))))))
+(define (%head)
+  (if (> (vector-length data) 0)
+      (vector-ref data 0)
+      (error 'out-of-range "out-of-range")))
+
+(define (%head-option)
+  (if (> (vector-length data) 0)
+      (option (vector-ref data 0))
+      (none)))
+
+(define (%last)
+  (let ((len (vector-length data)))
+    (if (> len 0)
+      (vector-ref data (- len 1))
+      (error 'out-of-range "out-of-range"))))
+
+(define (%last-option)
+  (let ((len (vector-length data)))
+    (if (> len 0)
+      (option (vector-ref data (- len 1)))
+      (none))))
+
 (define (%empty?)
   (= (length data) 0))
 

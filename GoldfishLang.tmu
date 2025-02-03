@@ -3005,6 +3005,82 @@
     \;
   </scm-chunk>
 
+  <paragraph|rich-vector%head><paragraph|rich-vector%head-option>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%head)
+
+    \ \ (if (\<gtr\> (vector-length data) 0)
+
+    \ \ \ \ \ \ (vector-ref data 0)
+
+    \ \ \ \ \ \ (error 'out-of-range "out-of-range")))
+
+    \;
+
+    (define (%head-option)
+
+    \ \ (if (\<gtr\> (vector-length data) 0)
+
+    \ \ \ \ \ \ (option (vector-ref data 0))
+
+    \ \ \ \ \ \ (none)))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box (vector 1 2 3)) :head) =\> 1)
+
+    (check-catch 'out-of-range ((rich-vector :empty) :head))
+
+    (check ((box (vector 1 2 3)) :head-option) =\> (option 1))
+
+    (check ((rich-vector :empty) :head-option) =\> (none))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|rich-vector%last><paragraph|rich-vector%last-option>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%last)
+
+    \ \ (let ((len (vector-length data)))
+
+    \ \ \ \ (if (\<gtr\> len 0)
+
+    \ \ \ \ \ \ (vector-ref data (- len 1))
+
+    \ \ \ \ \ \ (error 'out-of-range "out-of-range"))))
+
+    \;
+
+    (define (%last-option)
+
+    \ \ (let ((len (vector-length data)))
+
+    \ \ \ \ (if (\<gtr\> len 0)
+
+    \ \ \ \ \ \ (option (vector-ref data (- len 1)))
+
+    \ \ \ \ \ \ (none))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box (vector 1 2 3)) :last) =\> 3)
+
+    (check-catch 'out-of-range ((rich-vector :empty) :last))
+
+    (check ((box (vector 1 2 3)) :last-option) =\> (option 3))
+
+    (check ((rich-vector :empty) :last-option) =\> (none))
+
+    \;
+  </scm-chunk>
+
   <subsection|谓词>
 
   <paragraph|rich-vector%empty?>
