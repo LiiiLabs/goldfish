@@ -512,6 +512,12 @@
 
 (check-true ((box #(1 2 3)) :equals (box #(1 2 3))))
 
+(check (box (vector (rich-char "中")
+                    (rich-char "文")))
+       => ((box "中文") :to-vector))
+
+(check-false (((box "中文") :to-vector) :equals (rich-char "中")))
+
 (let ((vec (rich-vector #(1 2 3 4 5))))
   (check (vec :forall (lambda (x) (> x 0))) => #t)
   (check (vec :forall (lambda (x) (> x 3))) => #f))

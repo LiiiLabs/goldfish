@@ -722,7 +722,8 @@
   (= (length data) 0))
 
 (define (%equals that)
-  (vector= == data (that 'data)))
+  (and (that :is-instance-of 'rich-vector)
+       (vector= == data (that 'data))))
 
 (define (%forall p)
   (vector-every p data))
