@@ -424,6 +424,32 @@
     (if (null? xs)                                 
         result
         (apply result xs)))) 
+(define (%split sep)
+  ;; 在 %split 内部定义 string-split 作为子函数
+  (define (string-split str sep)
+    (let ((sep-len (string-length sep))
+          (str-len (string-length str)))
+      (cond
+       ;; 处理分隔符长度为0的特殊情况
+       ((= sep-len 0)
+        (map string (string->list str)))
+       (else
+        (let loop ((start 0) (result '()))
+          (if (>= start str-len)
+              (reverse result)
+              (let ((found-at
+                     (let search ((i start))
+                       (and (<= (+ i sep-len) str-len)
+                            (or (and (string-starts? (substring str i (+ i sep-len)) sep)
+                                     i)
+                                (search (+ i 1)))))))
+                (if found-at
+                    (loop (+ found-at sep-len)
+                          (cons (substring str start found-at) result))
+                    (reverse (cons (substring str start str-len) result))))))))))
+  ;; 利用(liii string)定义的 string-split 来处理 data
+  (rich-vector (list->vector (string-split data sep))))
+
 )
 
 (define-case-class rich-list ((data list?))
