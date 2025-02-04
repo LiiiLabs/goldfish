@@ -442,7 +442,7 @@
          (rich-list (iota cnt start step-size)))))))
 
 (define (@empty)
-  (rich-list (list )))
+  (rich-list(list )))
 
 (define (@concat lst1 lst2 . xs)
   (let1 r (rich-list (append (lst1 :collect) (lst2 :collect)))
@@ -467,6 +467,18 @@
       ((null? lst) (none))
       ((pred (car lst)) (option (car lst)))
       (else (loop (cdr lst))))))
+
+(define (%head)
+  (if (null? data)
+      (error 'out-of-range "rich-list%head: list is empty")
+      (car data)))
+
+
+(define (%head-option)
+  (if (null? data)
+      (none)
+      (option (car data))))
+
 
 (define (%equals that)
   (let* ((l1 data)

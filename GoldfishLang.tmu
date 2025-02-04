@@ -2110,7 +2110,7 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (@empty)
 
-    \ \ (rich-list (list )))
+    \ \ (rich-list(list )))
 
     \;
   </goldfish-chunk>
@@ -2281,6 +2281,56 @@
     \ \ (check ((lst :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
 
     )
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-list%head>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    <\code>
+      (define (%head)
+
+      \ \ (if (null? data)
+
+      \ \ \ \ \ \ (error 'out-of-range "rich-list%head: list is empty")
+
+      \ \ \ \ \ \ (car data)))
+
+      \;
+    </code>
+
+    \;
+  </scm-chunk>
+
+  <paragraph|rich-list%head-option>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    <\code>
+      (define (%head-option)
+
+      \ \ (if (null? data)
+
+      \ \ \ \ \ \ (none)
+
+      \ \ \ \ \ \ (option (car data))))
+
+      \;
+    </code>
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box (list 1 2 3)) :head) =\<gtr\> 1)
+
+    (check-catch 'out-of-range ((rich-list :empty) :head))
+
+    (check ((box (list 1 2 3)) :head-option) =\<gtr\> (option 1))
+
+    (check ((rich-list :empty) :head-option) =\<gtr\> (none))
 
     \;
   </goldfish-chunk>

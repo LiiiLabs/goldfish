@@ -349,6 +349,11 @@
   (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t)
 )
 
+(check ((box (list 1 2 3)) :head) => 1)
+(check-catch 'out-of-range ((rich-list :empty) :head))
+(check ((box (list 1 2 3)) :head-option) => (option 1))
+(check ((rich-list :empty) :head-option) => (none))
+
 (check (box (list (box 1) (box 2) (box 3)))
   => (((box 1) :to 3) :map box))
 
