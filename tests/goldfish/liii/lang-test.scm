@@ -295,6 +295,16 @@
 
 (check-catch 'wrong-number-of-args ("hello":strip-suffix "llo"))
 (check-catch 'unbound-variable (123:strip-suffix 1))
+
+
+(check ((box "da@liii.pro") :split "@") => (box (vector "da" "liii.pro")))
+(check ((box "da@liii.pro") :split ".") => (box (vector "da@liii" "pro")))
+(check (((box "da@liii.pro") :split "@") :collect) => (vector "da" "liii.pro")) ;Test for chaining
+(check ((box "test") :split "") => (box (vector "t" "e" "s" "t")))
+(check ((box "aXXbXXcXX") :split "XX") => (box (vector "a" "b" "c")))
+(check ((box "a||b||c") :split "||") => (box (vector "a" "b" "c")))
+(check ((box "XXaXXb") :split "XX") => (box (vector "" "a" "b"))) ;分隔符出现在开头
+
 (check (rich-list :range 1 5) => (box (list 1 2 3 4)))
 (check (rich-list :range 1 5 2) => (box (list 1 3)))
 (check (rich-list :range 1 6 2) => (box (list 1 3 5)))
@@ -348,11 +358,6 @@
 
   (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t)
 )
-
-(check ((box (list 1 2 3)) :head) => 1)
-(check-catch 'out-of-range ((rich-list :empty) :head))
-(check ((box (list 1 2 3)) :head-option) => (option 1))
-(check ((rich-list :empty) :head-option) => (none))
 
 (check (box (list (box 1) (box 2) (box 3)))
   => (((box 1) :to 3) :map box))
@@ -564,8 +569,6 @@
 (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
   (check-true (ht :contains 'a))
   (check-false (ht :contains 'd)))
-
-(check (rich-hash-table :empty) => (box (hash-table)))
 
 (check-report)
 

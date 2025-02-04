@@ -1,6 +1,6 @@
 <TMU|<tuple|1.1.0|2025.0.3>>
 
-<style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
+<style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese|llm>>
 
 <\body>
   <\hide-preamble>
@@ -2011,6 +2011,8 @@
     \ \ \ \ \ \ \ \ result
 
     \ \ \ \ \ \ \ \ (apply result xs))))\ 
+
+    \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
@@ -2035,6 +2037,86 @@
     (check-catch 'wrong-number-of-args ("hello":strip-suffix "llo"))
 
     (check-catch 'unbound-variable (123:strip-suffix 1))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|其余函数>
+
+  <paragraph|rich-string%split>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%split sep)
+
+    \ \ ;; 在 %split 内部定义 string-split 作为子函数
+
+    \ \ (define (string-split str sep)
+
+    \ \ \ \ (let ((sep-len (string-length sep))
+
+    \ \ \ \ \ \ \ \ \ \ (str-len (string-length str)))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ ;; 处理分隔符长度为0的特殊情况
+
+    \ \ \ \ \ \ \ ((= sep-len 0)
+
+    \ \ \ \ \ \ \ \ (map string (string-\<gtr\>list str)))
+
+    \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ (let loop ((start 0) (result '()))
+
+    \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= start str-len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (reverse result)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((found-at
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let search ((i start))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (\<less\>= (+ i sep-len) str-len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (or (and (string-starts? (substring str i (+ i sep-len)) sep)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (search (+ i 1)))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if found-at
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ found-at sep-len)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (substring str start found-at) result))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (reverse (cons (substring str start str-len) result))))))))))
+
+    \ \ ;; 利用(liii string)定义的 string-split 来处理 data
+
+    \ \ (rich-vector (list-\<gtr\>vector (string-split data sep))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    \;
+
+    (check ((box "da@liii.pro") :split "@") =\<gtr\> (box (vector "da" "liii.pro")))
+
+    (check ((box "da@liii.pro") :split ".") =\<gtr\> (box (vector "da@liii" "pro")))
+
+    (check (((box "da@liii.pro") :split "@") :collect) =\<gtr\> (vector "da" "liii.pro")) ;Test for chaining
+
+    (check ((box "test") :split "") =\<gtr\> (box (vector "t" "e" "s" "t")))
+
+    (check ((box "aXXbXXcXX") :split "XX") =\<gtr\> (box (vector "a" "b" "c")))
+
+    (check ((box "a\|\|b\|\|c") :split "\|\|") =\<gtr\> (box (vector "a" "b" "c")))
+
+    (check ((box "XXaXXb") :split "XX") =\<gtr\> (box (vector "" "a" "b"))) ;分隔符出现在开头
+
+    \;
   </goldfish-chunk>
 
   <subsection|结尾>
@@ -2110,7 +2192,7 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (@empty)
 
-    \ \ (rich-list(list )))
+    \ \ (rich-list (list )))
 
     \;
   </goldfish-chunk>
@@ -2281,56 +2363,6 @@
     \ \ (check ((lst :find (lambda (x) (\<less\> x 0))) :empty?) =\<gtr\> #t)
 
     )
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|rich-list%head>
-
-  <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    <\code>
-      (define (%head)
-
-      \ \ (if (null? data)
-
-      \ \ \ \ \ \ (error 'out-of-range "rich-list%head: list is empty")
-
-      \ \ \ \ \ \ (car data)))
-
-      \;
-    </code>
-
-    \;
-  </scm-chunk>
-
-  <paragraph|rich-list%head-option>
-
-  <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    <\code>
-      (define (%head-option)
-
-      \ \ (if (null? data)
-
-      \ \ \ \ \ \ (none)
-
-      \ \ \ \ \ \ (option (car data))))
-
-      \;
-    </code>
-
-    \;
-  </scm-chunk>
-
-  \;
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check ((box (list 1 2 3)) :head) =\<gtr\> 1)
-
-    (check-catch 'out-of-range ((rich-list :empty) :head))
-
-    (check ((box (list 1 2 3)) :head-option) =\<gtr\> (option 1))
-
-    (check ((rich-list :empty) :head-option) =\<gtr\> (none))
 
     \;
   </goldfish-chunk>
@@ -3647,22 +3679,6 @@
     \ \ (check-true (ht :contains 'a))
 
     \ \ (check-false (ht :contains 'd)))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|rich-hash-table@empty>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty)
-
-    \ \ (rich-hash-table (make-hash-table)))
-
-    \;
-  </goldfish-chunk>
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check (rich-hash-table :empty) =\<gtr\> (box (hash-table)))
 
     \;
   </goldfish-chunk>

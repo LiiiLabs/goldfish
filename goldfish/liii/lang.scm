@@ -424,6 +424,33 @@
     (if (null? xs)                                 
         result
         (apply result xs)))) 
+
+(define (%split sep)
+  ;; 在 %split 内部定义 string-split 作为子函数
+  (define (string-split str sep)
+    (let ((sep-len (string-length sep))
+          (str-len (string-length str)))
+      (cond
+       ;; 处理分隔符长度为0的特殊情况
+       ((= sep-len 0)
+        (map string (string->list str)))
+       (else
+        (let loop ((start 0) (result '()))
+          (if (>= start str-len)
+              (reverse result)
+              (let ((found-at
+                     (let search ((i start))
+                       (and (<= (+ i sep-len) str-len)
+                            (or (and (string-starts? (substring str i (+ i sep-len)) sep)
+                                     i)
+                                (search (+ i 1)))))))
+                (if found-at
+                    (loop (+ found-at sep-len)
+                          (cons (substring str start found-at) result))
+                    (reverse (cons (substring str start str-len) result))))))))))
+  ;; 利用(liii string)定义的 string-split 来处理 data
+  (rich-vector (list->vector (string-split data sep))))
+
 )
 
 (define-case-class rich-list ((data list?))
@@ -442,7 +469,7 @@
          (rich-list (iota cnt start step-size)))))))
 
 (define (@empty)
-  (rich-list(list )))
+  (rich-list (list )))
 
 (define (@concat lst1 lst2 . xs)
   (let1 r (rich-list (append (lst1 :collect) (lst2 :collect)))
@@ -467,18 +494,6 @@
       ((null? lst) (none))
       ((pred (car lst)) (option (car lst)))
       (else (loop (cdr lst))))))
-
-(define (%head)
-  (if (null? data)
-      (error 'out-of-range "rich-list%head: list is empty")
-      (car data)))
-
-
-(define (%head-option)
-  (if (null? data)
-      (none)
-      (option (car data))))
-
 
 (define (%equals that)
   (let* ((l1 data)
@@ -791,9 +806,6 @@
 
 (define (%contains k)
   (hash-table-contains? data k))
-
-(define (@empty)
-  (rich-hash-table (make-hash-table)))
 
 )
 
