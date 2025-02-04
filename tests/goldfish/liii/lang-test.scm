@@ -303,6 +303,7 @@
 (check ((box "aXXbXXcXX") :split "XX") => (box (vector "a" "b" "c")))
 (check ((box "a||b||c") :split "||") => (box (vector "a" "b" "c")))
 (check ((box "XXaXXb") :split "XX") => (box (vector "" "a" "b"))) ;分隔符出现在开头
+(check ((box "你好，欢迎使用Liii STEM") :split "，") => (box (vector "你好" "欢迎使用Liii STEM")))
 
 (check (rich-list :range 1 5) => (box (list 1 2 3 4)))
 (check (rich-list :range 1 5 2) => (box (list 1 3)))

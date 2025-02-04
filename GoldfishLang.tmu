@@ -2112,6 +2112,8 @@
 
     (check ((box "XXaXXb") :split "XX") =\<gtr\> (box (vector "" "a" "b"))) ;分隔符出现在开头
 
+    (check ((box "你好，欢迎使用Liii STEM") :split "，") =\<gtr\> (box (vector "你好" "欢迎使用Liii STEM")))
+
     \;
   </goldfish-chunk>
 
