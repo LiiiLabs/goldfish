@@ -415,7 +415,11 @@
 
 (define (%map x . xs)
   (%apply-one x xs
-    (rich-string (string-map x data))))
+    (rich-string
+     ((%to-vector)
+      :map x
+      :map (lambda (c) (c :to-string))
+      :make-string))))
 
 (define (%count pred?)
   (string-count data pred?))
@@ -799,28 +803,30 @@
 (define (%to-string)
   (object->string data))
 
-  (define (%make-string . xs)
-    (define (parse-args xs)
-      (cond
-        ((null? xs) (values "" "" ""))
-        ((length=? 1 xs)
-         (let1 sep (car xs)
-           (if (string? sep)
-               (values "" sep "")
-               (type-error "rich-vector%make-string: separator must be a string" sep))))
-        ((length=? 2 xs)
-         (error 'wrong-number-of-args "rich-vector%make-string: expected 0, 1, or 3 arguments, but got 2" xs))
-        ((length=? 3 xs)
-         (let ((start (car xs))
-               (sep (cadr xs))
-               (end (caddr xs)))
-           (if (and (string? start) (string? sep) (string? end))
-               (values start sep end)
-               (type-error "rich-vector%make-string: prefix, separator, and suffix must be strings" xs))))
-        (else (error 'wrong-number-of-args "rich-vector%make-string: expected 0, 1, or 3 arguments" xs))))
+(define (%make-string . xs)
+  (define (parse-args xs)
+    (cond
+      ((null? xs) (values "" "" ""))
+      ((length=? 1 xs)
+       (let1 sep (car xs)
+         (if (string? sep)
+             (values "" sep "")
+             (type-error "rich-vector%make-string: separator must be a string" sep))))
+      ((length=? 2 xs)
+       (error 'wrong-number-of-args "rich-vector%make-string: expected 0, 1, or 3 arguments, but got 2" xs))
+      ((length=? 3 xs)
+       (let ((start (car xs))
+             (sep (cadr xs))
+             (end (caddr xs)))
+         (if (and (string? start) (string? sep) (string? end))
+             (values start sep end)
+             (type-error "rich-vector%make-string: prefix, separator, and suffix must be strings" xs))))
+      (else (error 'wrong-number-of-args "rich-vector%make-string: expected 0, 1, or 3 arguments" xs))))
 
-    (receive (start sep end) (parse-args xs)
-      (string-append start (string-join (map object->string (vector->list data)) sep) end)))
+  (receive (start sep end) (parse-args xs)
+    (let* ((as-string (lambda (x) (if (string? x) x (object->string x))))
+           (middle (string-join (map as-string (vector->list data)) sep)))
+      (string-append start middle end))))
 
 )
 

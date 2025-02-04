@@ -272,7 +272,8 @@
   (check-true (str :contains "Hello"))
   (check-true (str :contains "")))
 
-(check ((rich-string "abc") :map char-upcase :get) => "ABC")
+(check ((box "abc") :map (lambda (c) (c :to-upper))) => "ABC")
+(check ((box "abc中文") :map (lambda (c) (c :to-upper))) => "ABC中文")
 
 (let1 str (rich-string "Hello, World!")
   (check (str :forall char-alphabetic?) => #f)
@@ -573,6 +574,8 @@
   (check-catch 'type-error (v :make-string "[" 123 "]"))
   (check-catch 'type-error (v :make-string "[" "," 123))
 )
+
+(check ((box #("a" "b" "c")) :make-string) => "abc")
 
 (let1 ht (box (hash-table 'a 1 'b 2 'c 3))
   (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
