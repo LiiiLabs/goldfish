@@ -302,7 +302,9 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length bytevector-u8-ref
 
-    \ \ bytevector-u8-set! bytevector-append utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
+    \ \ bytevector-u8-set! bytevector-copy bytevector-append
+
+    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length bytevector-advance-u8
 
     \ \ ; Input and Output
 
@@ -380,9 +382,9 @@
 
     \ \ bytevector? make-bytevector bytevector bytevector-length bytevector-u8-ref
 
-    \ \ bytevector-u8-set! bytevector-append utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length
+    \ \ bytevector-u8-set! bytevector-copy bytevector-append
 
-    \ \ u8-substring
+    \ \ utf8-\<gtr\>string string-\<gtr\>utf8 u8-string-length u8-substring bytevector-advance-u8
 
     \ \ ; Input and Output
 
@@ -3331,6 +3333,40 @@
 
   <\scm-chunk|goldfish/scheme/base.scm|true|true>
     (define bytevector-u8-set! byte-vector-set!)
+
+    \;
+  </scm-chunk>
+
+  <paragraph|<value|r7rs>bytevector-copy><index|bytevector-copy>
+
+  <\goldfish-chunk|goldfish/scheme/base.scm|true|true>
+    (define* (bytevector-copy v (start 0) (end (bytevector-length v)))
+
+    \ \ (if (or (\<less\> start 0) (\<gtr\> start end) (\<gtr\> end (bytevector-length v)))
+
+    \ \ \ \ \ \ (error 'out-of-range "bytevector-copy"))
+
+    \ \ (let ((new-v (make-bytevector (- end start))))
+
+    \ \ \ \ (let loop ((i start) (j 0))
+
+    \ \ \ \ \ \ (if (\<gtr\>= i end)
+
+    \ \ \ \ \ \ \ \ \ \ new-v
+
+    \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (bytevector-u8-set! new-v j (bytevector-u8-ref v i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) (+ j 1)))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (let1 bv (bytevector 1 2 3 4 5)
+
+    \ \ (check (bytevector-copy bv 1 4) =\<gtr\> #u8(2 3 4)))
 
     \;
   </scm-chunk>

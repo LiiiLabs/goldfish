@@ -36,7 +36,8 @@
   vector->string string->vector vector-copy vector-copy! vector-fill!
   ; R7RS 6.9: Bytevectors
   bytevector? make-bytevector bytevector bytevector-length bytevector-u8-ref
-  bytevector-u8-set! bytevector-append utf8->string string->utf8 u8-string-length
+  bytevector-u8-set! bytevector-copy bytevector-append
+  utf8->string string->utf8 u8-string-length bytevector-advance-u8
   ; Input and Output
   call-with-port port? binary-port? textual-port? input-port-open? output-port-open?
   open-binary-input-file open-binary-output-file close-port eof-object
@@ -250,6 +251,17 @@
 (define bytevector-u8-ref byte-vector-ref)
 
 (define bytevector-u8-set! byte-vector-set!)
+
+(define* (bytevector-copy v (start 0) (end (bytevector-length v)))
+  (if (or (< start 0) (> start end) (> end (bytevector-length v)))
+      (error 'out-of-range "bytevector-copy"))
+  (let ((new-v (make-bytevector (- end start))))
+    (let loop ((i start) (j 0))
+      (if (>= i end)
+          new-v
+          (begin
+            (bytevector-u8-set! new-v j (bytevector-u8-ref v i))
+            (loop (+ i 1) (+ j 1)))))))
 
 (define bytevector-append append)
 

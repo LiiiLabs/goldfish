@@ -825,6 +825,9 @@
 (check (make-bytevector 3 0) => #u8(0 0 0))
 (check (make-bytevector 3 3) => #u8(3 3 3))
 
+(let1 bv (bytevector 1 2 3 4 5)
+  (check (bytevector-copy bv 1 4) => #u8(2 3 4)))
+
 (check (bytevector-append #u8() #u8()) => #u8())
 (check (bytevector-append #u8() #u8(1)) => #u8(1))
 (check (bytevector-append #u8(1) #u8()) => #u8(1))

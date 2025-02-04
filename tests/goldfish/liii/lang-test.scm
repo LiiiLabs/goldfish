@@ -282,6 +282,10 @@
 
 (check ((rich-string "hello") :to-string) => "hello")
 
+(let1 v ((box "中文") :to-vector)
+  (check (v 0) => (rich-char "中"))
+  (check (v 1) => (rich-char "文")))
+
 (check ((box "") :strip-prefix "") => (box ""))
 (check ((box "hello") :strip-prefix "") => (box "hello"))
 (check ((box "hello") :strip-prefix "he") => (box "llo"))
