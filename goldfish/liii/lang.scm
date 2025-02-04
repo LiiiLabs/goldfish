@@ -286,6 +286,16 @@
    (and (>= code-point #x17E0) (<= code-point #x17E9))
    (and (>= code-point #x1810) (<= code-point #x1819))))
   
+(define (%to-upper)
+  (if (and (>= code-point 97) (<= code-point 122))
+      (rich-char (- code-point 32))
+      (rich-char code-point)))
+
+(define (%to-lower)
+  (if (and (>= code-point 65) (<= code-point 90))
+      (rich-char (+ code-point 32))
+      (rich-char code-point)))
+
 (define (%to-bytevector)
   (cond
     ((<= code-point #x7F)

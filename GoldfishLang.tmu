@@ -1475,6 +1475,60 @@
 
   <subsection|转换>
 
+  <paragraph|rich-char%to-upper>
+
+  目前只支持将英文字母的a-z转换为A-Z，其它字符保持不变。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-upper)
+
+    \ \ (if (and (\<gtr\>= code-point 97) (\<less\>= code-point 122))
+
+    \ \ \ \ \ \ (rich-char (- code-point 32))
+
+    \ \ \ \ \ \ (rich-char code-point)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box #\\a) :to-upper) =\<gtr\> #\\A)
+
+    (check ((box #\\z) :to-upper) =\<gtr\> #\\Z)
+
+    (check ((box #\\A) :to-upper) =\<gtr\> #\\A)
+
+    (check ((box #\\Z) :to-upper) =\<gtr\> #\\Z)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-char%to-lower>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-lower)
+
+    \ \ (if (and (\<gtr\>= code-point 65) (\<less\>= code-point 90))
+
+    \ \ \ \ \ \ (rich-char (+ code-point 32))
+
+    \ \ \ \ \ \ (rich-char code-point)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box #\\A) :to-lower) =\<gtr\> #\\a)
+
+    (check ((box #\\Z) :to-lower) =\<gtr\> #\\z)
+
+    (check ((box #\\a) :to-lower) =\<gtr\> #\\a)
+
+    (check ((box #\\z) :to-lower) =\<gtr\> #\\z)
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-char%to-bytevector>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

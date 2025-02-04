@@ -223,6 +223,16 @@
   (check (char19 :digit?) => #t)  ;; 蒙古数字
   (check (char20 :digit?) => #f))  ;; 非数字字符
 
+(check ((box #\a) :to-upper) => #\A)
+(check ((box #\z) :to-upper) => #\Z)
+(check ((box #\A) :to-upper) => #\A)
+(check ((box #\Z) :to-upper) => #\Z)
+
+(check ((box #\A) :to-lower) => #\a)
+(check ((box #\Z) :to-lower) => #\z)
+(check ((box #\a) :to-lower) => #\a)
+(check ((box #\z) :to-lower) => #\z)
+
 (check ((rich-char #x41) :to-string) => "A")
 (check-true ((box #\A) :equals (rich-char #x41)))
 
