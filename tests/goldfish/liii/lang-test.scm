@@ -560,5 +560,7 @@
   (check-true (ht :contains 'a))
   (check-false (ht :contains 'd)))
 
+(check (rich-hash-table :empty) => (box (hash-table)))
+
 (check-report)
 

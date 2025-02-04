@@ -780,6 +780,9 @@
 (define (%contains k)
   (hash-table-contains? data k))
 
+(define (@empty)
+  (rich-hash-table (make-hash-table)))
+
 )
 
 (define (box x)

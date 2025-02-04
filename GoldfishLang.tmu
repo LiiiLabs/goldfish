@@ -3601,6 +3601,22 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-hash-table@empty>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@empty)
+
+    \ \ (rich-hash-table (make-hash-table)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (rich-hash-table :empty) =\<gtr\> (box (hash-table)))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
