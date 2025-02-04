@@ -454,18 +454,18 @@
         result
         (apply result xs)))) 
 (define (%split sep)
-  ;; 在 %split 内部定义 string-split 作为子函数
   (define (string-split str sep)
     (let ((sep-len (string-length sep))
           (str-len (string-length str)))
       (cond
-       ;; 处理分隔符长度为0的特殊情况
-       ((= sep-len 0)
-        (map string (string->list str)))
+       ((zero? sep-len)
+        ((%to-vector)
+         :map (lambda (c) (c :to-string))
+         :collect))
        (else
         (let loop ((start 0) (result '()))
           (if (>= start str-len)
-              (reverse result)
+              (list->vector (reverse result))
               (let ((found-at
                      (let search ((i start))
                        (and (<= (+ i sep-len) str-len)
@@ -475,9 +475,8 @@
                 (if found-at
                     (loop (+ found-at sep-len)
                           (cons (substring str start found-at) result))
-                    (reverse (cons (substring str start str-len) result))))))))))
-  ;; 利用(liii string)定义的 string-split 来处理 data
-  (rich-vector (list->vector (string-split data sep))))
+                    (list->vector (reverse (cons (substring str start str-len) result)))))))))))
+  (rich-vector (string-split data sep)))
 
 )
 

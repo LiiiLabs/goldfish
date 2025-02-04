@@ -319,6 +319,7 @@
 (check ((box "a||b||c") :split "||") => (box (vector "a" "b" "c")))
 (check ((box "XXaXXb") :split "XX") => (box (vector "" "a" "b"))) ;分隔符出现在开头
 (check ((box "你好，欢迎使用Liii STEM") :split "，") => (box (vector "你好" "欢迎使用Liii STEM")))
+(check ((box "中国智造，惠及全球") :split "") => #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
 
 (check (rich-list :range 1 5) => (box (list 1 2 3 4)))
 (check (rich-list :range 1 5 2) => (box (list 1 3)))
