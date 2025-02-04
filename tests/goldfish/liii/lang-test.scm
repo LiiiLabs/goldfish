@@ -267,6 +267,10 @@
 (check-true ((rich-string "") :empty?))
 (check-false ((rich-string "abc") :empty?))
 
+(check-false ((box "全部都是中文") :forall (lambda (c) (c :digit?))))
+
+(check-true ((box "全部都是中文") :exists (lambda (c) (c :equals (rich-char "中")))))
+
 (let1 str (rich-string "Hello, World!")
   (check-true (str :contains #\W))
   (check-true (str :contains "Hello"))
@@ -274,12 +278,6 @@
 
 (check ((box "abc") :map (lambda (c) (c :to-upper))) => "ABC")
 (check ((box "abc中文") :map (lambda (c) (c :to-upper))) => "ABC中文")
-
-(let1 str (rich-string "Hello, World!")
-  (check (str :forall char-alphabetic?) => #f)
-  (check (str :exists char-alphabetic?) => #t)
-  (check (str :count char-alphabetic?) => 10)
-)
 
 (check ((rich-string "hello") :to-string) => "hello")
 

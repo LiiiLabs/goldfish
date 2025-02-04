@@ -401,10 +401,10 @@
   (string-ends? data suffix))
 
 (define (%forall pred)
-  (string-every pred data))
+  ((%to-vector) :forall pred))
 
 (define (%exists pred)
-  (string-any pred data))
+  ((%to-vector) :exists pred))
 
 (define (%contains elem)
   (cond ((string? elem)
@@ -724,8 +724,11 @@
 (define (%equals that)
   (vector= == data (that 'data)))
 
-  (define (%forall p)
-    (vector-every p data))
+(define (%forall p)
+  (vector-every p data))
+
+(define (%exists p)
+  (vector-any p data))
 
   (define (%map x . xs)
     (let1 r (rich-vector (vector-map x data))

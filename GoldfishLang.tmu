@@ -1896,7 +1896,13 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%forall pred)
 
-    \ \ (string-every pred data))
+    \ \ ((%to-vector) :forall pred))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-false ((box "全部都是中文") :forall (lambda (c) (c :digit?))))
 
     \;
   </goldfish-chunk>
@@ -1908,7 +1914,13 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%exists pred)
 
-    \ \ (string-any pred data))
+    \ \ ((%to-vector) :exists pred))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((box "全部都是中文") :exists (lambda (c) (c :equals (rich-char "中")))))
 
     \;
   </goldfish-chunk>
@@ -1983,20 +1995,6 @@
     (define (%count pred?)
 
     \ \ (string-count data pred?))
-
-    \;
-  </goldfish-chunk>
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 str (rich-string "Hello, World!")
-
-    \ \ (check (str :forall char-alphabetic?) =\<gtr\> #f)
-
-    \ \ (check (str :exists char-alphabetic?) =\<gtr\> #t)
-
-    \ \ (check (str :count char-alphabetic?) =\<gtr\> 10)
-
-    )
 
     \;
   </goldfish-chunk>
@@ -3360,9 +3358,9 @@
   <paragraph|rich-vector%forall>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%forall p)
+    (define (%forall p)
 
-    \ \ \ \ (vector-every p data))
+    \ \ (vector-every p data))
 
     \;
   </scm-chunk>
@@ -3382,6 +3380,16 @@
 
     \;
   </scm-chunk>
+
+  <paragraph|rich-vector%exists>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%exists p)
+
+    \ \ (vector-any p data))
+
+    \;
+  </goldfish-chunk>
 
   <subsection|高阶函数>
 
