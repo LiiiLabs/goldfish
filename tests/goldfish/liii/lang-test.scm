@@ -457,6 +457,9 @@
   (check-catch 'type-error (l :make-string "[" "," 123))
 )
 
+(check ((box (list "a" "b")) :make-string) => "ab")
+(check ((box (list "a" "b")) :make-string " ") => "a b")
+
 (let1 r (range :inclusive 1 2)
   (check (r 'start) => 1)
   (check (r 'end) => 2)
