@@ -422,7 +422,7 @@
       :make-string))))
 
 (define (%count pred?)
-  (string-count data pred?))
+  ((%to-vector) :count pred?))
 
 (define (%to-string)
   data)

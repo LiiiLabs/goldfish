@@ -279,6 +279,11 @@
 (check ((box "abc") :map (lambda (c) (c :to-upper))) => "ABC")
 (check ((box "abc中文") :map (lambda (c) (c :to-upper))) => "ABC中文")
 
+(check ((box "") :count (lambda (c) (== c #\A))) => 0)
+(check ((box "hello") :count (lambda (c) (== c #\l))) => 2)
+(check ((box "你好，我是韩梅梅")
+        :count (lambda (c) (== c (rich-char "梅")))) => 2)
+
 (check ((rich-string "hello") :to-string) => "hello")
 
 (let1 v ((box "中文") :to-vector)

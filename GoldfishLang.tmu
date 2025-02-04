@@ -1994,7 +1994,19 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%count pred?)
 
-    \ \ (string-count data pred?))
+    \ \ ((%to-vector) :count pred?))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box "") :count (lambda (c) (== c #\\A))) =\<gtr\> 0)
+
+    (check ((box "hello") :count (lambda (c) (== c #\\l))) =\<gtr\> 2)
+
+    (check ((box "你好，我是韩梅梅")
+
+    \ \ \ \ \ \ \ \ :count (lambda (c) (== c (rich-char "梅")))) =\<gtr\> 2)
 
     \;
   </goldfish-chunk>
