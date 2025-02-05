@@ -21,6 +21,8 @@
 
 (check-set-mode! 'report-failed)
 
+(check ((@ + _ 2) 1) => 3)
+
 (define-case-class person
   ((name string? "Bob")
    (age integer?)))
@@ -267,9 +269,9 @@
 (check-true ((rich-string "") :empty?))
 (check-false ((rich-string "abc") :empty?))
 
-(check-false ((box "全部都是中文") :forall (lambda (c) (c :digit?))))
+(check-false ((box "全部都是中文") :forall (@ _ :digit?)))
 
-(check-true ((box "全部都是中文") :exists (lambda (c) (c :equals (rich-char "中")))))
+(check-true ((box "全部都是中文") :exists (@ _ :equals (rich-char "中"))))
 
 (let1 str (rich-string "Hello, World!")
   (check-true (str :contains #\W))
@@ -279,10 +281,10 @@
 (check ((box "abc") :map (lambda (c) (c :to-upper))) => "ABC")
 (check ((box "abc中文") :map (lambda (c) (c :to-upper))) => "ABC中文")
 
-(check ((box "") :count (lambda (c) (== c #\A))) => 0)
-(check ((box "hello") :count (lambda (c) (== c #\l))) => 2)
+(check ((box "") :count (@ == _ #\A)) => 0)
+(check ((box "hello") :count (@ == _ #\l)) => 2)
 (check ((box "你好，我是韩梅梅")
-        :count (lambda (c) (== c (rich-char "梅")))) => 2)
+        :count (@ == _ (rich-char "梅"))) => 2)
 
 (check ((rich-string "hello") :to-string) => "hello")
 

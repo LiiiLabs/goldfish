@@ -96,6 +96,8 @@
 
     (export
 
+    \ \ @ cut_
+
     \ \ define-case-class case-class? == != display* object-\<gtr\>string
 
     \ \ option none
@@ -132,6 +134,108 @@
 
     \;
   </scm-chunk>
+
+  <section|部分应用>
+
+  提供类似Scala语法的部分应用（Partial Application）功能，实现来自于<scm|(liii cut)>。<todo|后续需要把<scm|\<less\>...\<gtr\>>这个功能的支持移除掉，我们只支持单个参数。>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-macro (cut_ . paras)
+
+    \ \ (letrec*
+
+    \ \ \ \ ((slot? (lambda (x) (equal? '_ x)))
+
+    \ \ \ \ \ (more-slot? (lambda (x) (equal? '\<less\>...\<gtr\> x)))
+
+    \ \ \ \ \ (slots (filter slot? paras))
+
+    \ \ \ \ \ (more-slots (filter more-slot? paras))
+
+    \ \ \ \ \ (xs (map (lambda (x) (gensym)) slots))
+
+    \ \ \ \ \ (rest (gensym))
+
+    \ \ \ \ \ (parse
+
+    \ \ \ \ \ \ \ (lambda (xs paras)
+
+    \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ ((null? paras) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((not (list? paras)) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((more-slot? (car paras)) ‘(,rest ,@(parse xs (cdr paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ ((slot? (car paras)) ‘(,(car xs) ,@(parse (cdr xs) (cdr paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else ‘(,(car paras) ,@(parse xs (cdr paras))))))))
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((null? more-slots)
+
+    \ \ \ \ \ \ \ ‘(lambda ,xs ,(parse xs paras)))
+
+    \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ (when
+
+    \ \ \ \ \ \ \ \ \ \ (or (\<gtr\> (length more-slots) 1)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (more-slot? (last paras))))
+
+    \ \ \ \ \ \ \ \ \ \ (error 'syntax-error "\<less\>...\<gtr\> must be the last parameter of cut"))
+
+    \ \ \ \ \ \ \ \ (let ((parsed (parse xs paras)))
+
+    \ \ \ \ \ \ \ \ \ \ ‘(lambda (,@xs . ,rest) (apply ,@parsed)))))))
+
+    \;
+
+    (define-macro (@ . paras)
+
+    \ \ (letrec*
+
+    \ \ \ \ ((slot? (lambda (x) (equal? '_ x)))
+
+    \ \ \ \ \ (more-slot? (lambda (x) (equal? '\<less\>...\<gtr\> x)))
+
+    \ \ \ \ \ (exprs (filter (lambda (x) (not (or (slot? x) (more-slot? x))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ paras))
+
+    \ \ \ \ \ (xs (map (lambda (x) (gensym)) exprs))
+
+    \ \ \ \ \ (lets (map list xs exprs))
+
+    \ \ \ \ \ (parse
+
+    \ \ \ \ \ \ \ (lambda (xs paras)
+
+    \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ ((null? paras) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((not (list? paras)) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((not (or (slot? (car paras)) (more-slot? (car paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ‘(,(car xs) ,@(parse (cdr xs) (cdr paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ (else ‘(,(car paras) ,@(parse xs (cdr paras))))))))
+
+    \ \ \ \ ‘(let ,lets (cut_ ,@(parse xs paras)))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((@ + _ 2) 1) =\<gtr\> 3)
+
+    \;
+  </goldfish-chunk>
 
   <section|样本类>
 
@@ -1902,7 +2006,7 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check-false ((box "全部都是中文") :forall (lambda (c) (c :digit?))))
+    (check-false ((box "全部都是中文") :forall (@ _ :digit?)))
 
     \;
   </goldfish-chunk>
@@ -1920,7 +2024,7 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check-true ((box "全部都是中文") :exists (lambda (c) (c :equals (rich-char "中")))))
+    (check-true ((box "全部都是中文") :exists (@ _ :equals (rich-char "中"))))
 
     \;
   </goldfish-chunk>
@@ -2000,13 +2104,13 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check ((box "") :count (lambda (c) (== c #\\A))) =\<gtr\> 0)
+    (check ((box "") :count (@ == _ #\\A)) =\<gtr\> 0)
 
-    (check ((box "hello") :count (lambda (c) (== c #\\l))) =\<gtr\> 2)
+    (check ((box "hello") :count (@ == _ #\\l)) =\<gtr\> 2)
 
     (check ((box "你好，我是韩梅梅")
 
-    \ \ \ \ \ \ \ \ :count (lambda (c) (== c (rich-char "梅")))) =\<gtr\> 2)
+    \ \ \ \ \ \ \ \ :count (@ == _ (rich-char "梅"))) =\<gtr\> 2)
 
     \;
   </goldfish-chunk>
