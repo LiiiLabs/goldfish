@@ -137,102 +137,162 @@
 
   <section|部分应用>
 
-  提供类似Scala语法的部分应用（Partial Application）功能，实现来自于<scm|(liii cut)>。<todo|后续需要把<scm|\<less\>...\<gtr\>>这个功能的支持移除掉，我们只支持单个参数。>
+  宏@提供类似Scala语法的部分应用（Partial Application）功能，详情参考SFRI 26中宏cute的说明，宏@与宏cute的区别在于@不支持类似\<less\><text-dots>\<gtr\>的未定参数，且用_表示占位符。
+
+  宏@的特点，简短的来说，@只在宏展开时求值并绑定占位符，而不是每次被调用时重新求值：
+
+  <\goldfish-lang>
+    <\code>
+      (let ((a 10))
+
+      \ \ (define add10 (@ + a _)) \ ; a 在宏展开时被求值为 10
+
+      \ \ (set! a 100)
+
+      \ \ (add10 5)) ; =\<gtr\> 15（而不是 105）
+    </code>
+  </goldfish-lang>
+
+  \;
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define-macro (cut_ . paras)
-
-    \ \ (letrec*
-
-    \ \ \ \ ((slot? (lambda (x) (equal? '_ x)))
-
-    \ \ \ \ \ (more-slot? (lambda (x) (equal? '\<less\>...\<gtr\> x)))
-
-    \ \ \ \ \ (slots (filter slot? paras))
-
-    \ \ \ \ \ (more-slots (filter more-slot? paras))
-
-    \ \ \ \ \ (xs (map (lambda (x) (gensym)) slots))
-
-    \ \ \ \ \ (rest (gensym))
-
-    \ \ \ \ \ (parse
-
-    \ \ \ \ \ \ \ (lambda (xs paras)
-
-    \ \ \ \ \ \ \ \ \ (cond
-
-    \ \ \ \ \ \ \ \ \ \ \ ((null? paras) paras)
-
-    \ \ \ \ \ \ \ \ \ \ \ ((not (list? paras)) paras)
-
-    \ \ \ \ \ \ \ \ \ \ \ ((more-slot? (car paras)) ‘(,rest ,@(parse xs (cdr paras))))
-
-    \ \ \ \ \ \ \ \ \ \ \ ((slot? (car paras)) ‘(,(car xs) ,@(parse (cdr xs) (cdr paras))))
-
-    \ \ \ \ \ \ \ \ \ \ \ (else ‘(,(car paras) ,@(parse xs (cdr paras))))))))
-
-    \ \ \ \ (cond
-
-    \ \ \ \ \ \ ((null? more-slots)
-
-    \ \ \ \ \ \ \ ‘(lambda ,xs ,(parse xs paras)))
-
-    \ \ \ \ \ \ (else
-
-    \ \ \ \ \ \ \ \ (when
-
-    \ \ \ \ \ \ \ \ \ \ (or (\<gtr\> (length more-slots) 1)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (not (more-slot? (last paras))))
-
-    \ \ \ \ \ \ \ \ \ \ (error 'syntax-error "\<less\>...\<gtr\> must be the last parameter of cut"))
-
-    \ \ \ \ \ \ \ \ (let ((parsed (parse xs paras)))
-
-    \ \ \ \ \ \ \ \ \ \ ‘(lambda (,@xs . ,rest) (apply ,@parsed)))))))
-
-    \;
-
     (define-macro (@ . paras)
 
     \ \ (letrec*
 
-    \ \ \ \ ((slot? (lambda (x) (equal? '_ x)))
+    \ \ \ \ (
 
-    \ \ \ \ \ (more-slot? (lambda (x) (equal? '\<less\>...\<gtr\> x)))
+    \ \ \ \ \ \ (slot? (lambda (x) (equal? '_ x)))
 
-    \ \ \ \ \ (exprs (filter (lambda (x) (not (or (slot? x) (more-slot? x))))
+    \ \ \ \ \ \ (exprs (filter (lambda (x) (not (slot? x))) paras))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ paras))
+    \ \ \ \ \ \ (slots (filter slot? paras))
 
-    \ \ \ \ \ (xs (map (lambda (x) (gensym)) exprs))
+    \;
 
-    \ \ \ \ \ (lets (map list xs exprs))
+    \ \ \ \ \ \ (exprs-sym-list (map (lambda (x) (gensym)) exprs)) \ 
 
-    \ \ \ \ \ (parse
+    \ \ \ \ \ \ (slots-sym-list (map (lambda (x) (gensym)) slots))
 
-    \ \ \ \ \ \ \ (lambda (xs paras)
+    \;
 
-    \ \ \ \ \ \ \ \ \ (cond
+    \ \ \ \ \ \ (lets (map list exprs-sym-list exprs))
 
-    \ \ \ \ \ \ \ \ \ \ \ ((null? paras) paras)
+    \;
 
-    \ \ \ \ \ \ \ \ \ \ \ ((not (list? paras)) paras)
+    \ \ \ \ \ \ (parse
 
-    \ \ \ \ \ \ \ \ \ \ \ ((not (or (slot? (car paras)) (more-slot? (car paras))))
+    \ \ \ \ \ \ \ \ (lambda (exprs-sym-list slots-sym-list paras)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ‘(,(car xs) ,@(parse (cdr xs) (cdr paras))))
+    \ \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ \ (else ‘(,(car paras) ,@(parse xs (cdr paras))))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ ((null? paras) paras)
 
-    \ \ \ \ ‘(let ,lets (cut_ ,@(parse xs paras)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ ((not (list? paras)) paras)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ((slot? (car paras))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(,(car slots-sym-list)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(parse exprs-sym-list (cdr slots-sym-list) (cdr paras))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (else\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(,(car exprs-sym-list)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(parse (cdr exprs-sym-list) slots-sym-list (cdr paras))))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ `(let ,lets\ 
+
+    \ \ \ \ \ \ \ \ (lambda ,slots-sym-list\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(parse exprs-sym-list slots-sym-list paras)))))
+
+    \;
 
     \;
   </goldfish-chunk>
 
+  \;
+
+  测试：基本部分应用
+
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((@ + _ 2) 1) =\<gtr\> 3)
+
+    (check ((@ list 1 _ 3 _ 5) 2 4) =\<gtr\> (list 1 2 3 4 5))
+
+    (check ((@ list _ _) 'a 'b) =\<gtr\> (list 'a 'b))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  测试：只宏展开时求值并绑定占位符
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check
+
+    \ \ (let ((a 10))
+
+    \ \ \ \ (define add (@ + (* a 2) _)) \ 
+
+    \ \ \ \ (set! a 100)
+
+    \ \ \ \ (add 5))
+
+    =\<gtr\> 25)
+
+    \;
+
+    (let ((x 5))
+
+    \ \ (check\ 
+
+    \ \ \ \ ((@ cons (+ x 1) _) 'y)\ 
+
+    \ \ \ =\<gtr\> (cons 6 'y)))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  测试：无占位符时生成的函数无参数
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (procedure? (@ list 1 2)) =\<gtr\> #t)
+
+    (check ((@ list 1 2)) =\<gtr\> '(1 2))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  测试：函数作为占位符参数
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((@ _ 'a 'b) list) =\<gtr\> (list 'a 'b))
+
+    (check ((@ map _ '(1 2 3)) (lambda (x) (+ x 1))) =\<gtr\> '(2 3 4))
+
+    (check ((@ apply _ '(1 2 3)) +) =\<gtr\> 6)
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  测试：嵌套@宏
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((@ (@ + _ 1) _) 2) =\<gtr\> 3)
+
+    (check ((@ _ _) (@ * _ 2) 3) =\<gtr\> 6)
 
     \;
   </goldfish-chunk>

@@ -28,50 +28,34 @@
 )
 (begin
 
-(define-macro (cut_ . paras)
-  (letrec*
-    ((slot? (lambda (x) (equal? '_ x)))
-     (more-slot? (lambda (x) (equal? '<...> x)))
-     (slots (filter slot? paras))
-     (more-slots (filter more-slot? paras))
-     (xs (map (lambda (x) (gensym)) slots))
-     (rest (gensym))
-     (parse
-       (lambda (xs paras)
-         (cond
-           ((null? paras) paras)
-           ((not (list? paras)) paras)
-           ((more-slot? (car paras)) `(,rest ,@(parse xs (cdr paras))))
-           ((slot? (car paras)) `(,(car xs) ,@(parse (cdr xs) (cdr paras))))
-           (else `(,(car paras) ,@(parse xs (cdr paras))))))))
-    (cond
-      ((null? more-slots)
-       `(lambda ,xs ,(parse xs paras)))
-      (else
-        (when
-          (or (> (length more-slots) 1)
-              (not (more-slot? (last paras))))
-          (error 'syntax-error "<...> must be the last parameter of cut"))
-        (let ((parsed (parse xs paras)))
-          `(lambda (,@xs . ,rest) (apply ,@parsed)))))))
-
 (define-macro (@ . paras)
   (letrec*
-    ((slot? (lambda (x) (equal? '_ x)))
-     (more-slot? (lambda (x) (equal? '<...> x)))
-     (exprs (filter (lambda (x) (not (or (slot? x) (more-slot? x))))
-                    paras))
-     (xs (map (lambda (x) (gensym)) exprs))
-     (lets (map list xs exprs))
-     (parse
-       (lambda (xs paras)
-         (cond
-           ((null? paras) paras)
-           ((not (list? paras)) paras)
-           ((not (or (slot? (car paras)) (more-slot? (car paras))))
-            `(,(car xs) ,@(parse (cdr xs) (cdr paras))))
-           (else `(,(car paras) ,@(parse xs (cdr paras))))))))
-    `(let ,lets (cut_ ,@(parse xs paras)))))
+    (
+      (slot? (lambda (x) (equal? '_ x)))
+      (exprs (filter (lambda (x) (not (slot? x))) paras))
+      (slots (filter slot? paras))
+
+      (exprs-sym-list (map (lambda (x) (gensym)) exprs))  
+      (slots-sym-list (map (lambda (x) (gensym)) slots))
+
+      (lets (map list exprs-sym-list exprs))
+
+      (parse
+        (lambda (exprs-sym-list slots-sym-list paras)
+          (cond
+            ((null? paras) paras)
+            ((not (list? paras)) paras)
+            ((slot? (car paras)) 
+              `(,(car slots-sym-list) 
+                ,@(parse exprs-sym-list (cdr slots-sym-list) (cdr paras))))
+            (else 
+              `(,(car exprs-sym-list) 
+                ,@(parse (cdr exprs-sym-list) slots-sym-list (cdr paras))))))))
+                
+  `(let ,lets 
+        (lambda ,slots-sym-list 
+                ,(parse exprs-sym-list slots-sym-list paras)))))
+
 
 (define-macro (define-case-class class-name fields . methods)
   (let* ((key-fields
