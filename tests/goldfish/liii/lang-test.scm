@@ -511,7 +511,8 @@
 
 (check-catch 'value-error (rich-vector :range 1 5 0))
 
-(check (rich-vector :empty) => (box #()))
+(check (rich-vector :empty :empty?) => #t)
+(check (rich-vector :empty :head-option) => (none))
 
 (check-true (rich-vector :fill 0 #\a :empty?))
 

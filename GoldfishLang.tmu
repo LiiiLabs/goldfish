@@ -3314,15 +3314,19 @@
   <paragraph|rich-vector@empty>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty)
+    (define (@empty . xs)
 
-    \ \ (rich-vector #()))
+    \ \ (let1 r (rich-vector #())
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check (rich-vector :empty) =\<gtr\> (box #()))
+    (check (rich-vector :empty :empty?) =\<gtr\> #t)
+
+    (check (rich-vector :empty :head-option) =\<gtr\> (none))
 
     \;
   </goldfish-chunk>

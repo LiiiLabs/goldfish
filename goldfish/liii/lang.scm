@@ -702,8 +702,9 @@
        (let1 cnt (ceiling (/ (- end start) step-size))
          (rich-vector (list->vector (iota cnt start step-size))))))))
 
-(define (@empty)
-  (rich-vector #()))
+(define (@empty . xs)
+  (let1 r (rich-vector #())
+    (if (null? xs) r (apply r xs))))
 
 (define (@fill n elem . xs)
   (unless (integer? n)
