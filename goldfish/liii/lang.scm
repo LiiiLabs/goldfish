@@ -483,30 +483,28 @@
     (if (null? xs)                                 
         result
         (apply result xs)))) 
+;; Split string with sep.
 (define (%split sep)
-  (define (string-split str sep)
-    (let ((sep-len (string-length sep))
-          (str-len (string-length str)))
-      (cond
-       ((zero? sep-len)
-        ((%to-vector)
-         :map (lambda (c) (c :to-string))
-         :collect))
-       (else
-        (let loop ((start 0) (result '()))
-          (if (>= start str-len)
-              (list->vector (reverse result))
-              (let ((found-at
-                     (let search ((i start))
-                       (and (<= (+ i sep-len) str-len)
-                            (or (and (string-starts? (substring str i (+ i sep-len)) sep)
-                                     i)
-                                (search (+ i 1)))))))
-                (if found-at
-                    (loop (+ found-at sep-len)
-                          (cons (substring str start found-at) result))
-                    (list->vector (reverse (cons (substring str start str-len) result)))))))))))
-  (rich-vector (string-split data sep)))
+  (let ((str-len (string-length data))
+        (sep-len (string-length sep)))
+    ; find the index for the pattern in str from index start, else #f
+    (define (find-string str pattern start)
+      (let loop ((i start))
+        (cond
+          ((> (+ i sep-len) str-len) #f)
+          ((equal? (substring str i (+ i sep-len)) pattern) i)
+          (else (loop (+ i 1))))))
+    ; tail recursive auxiliary function
+    (define (split-helper start acc)
+      (let ((next-pos/false (find-string data sep start)))
+        (if (not next-pos/false)
+            (cons (substring data start) acc)
+            (split-helper (+ next-pos/false sep-len) (cons (substring data start next-pos/false) acc)))))
+    ; do split
+    (rich-vector
+      (if (zero? sep-len)
+          ((%to-vector) :map (lambda (c) (c :to-string)) :collect)
+          (list->vector (reverse (split-helper 0 '())))))))
 
 )
 

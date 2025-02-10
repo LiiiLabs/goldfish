@@ -2326,56 +2326,54 @@
   <paragraph|rich-string%split>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    ;; Split string with sep.
+
     (define (%split sep)
 
-    \ \ (define (string-split str sep)
+    \ \ (let ((str-len (string-length data))
 
-    \ \ \ \ (let ((sep-len (string-length sep))
+    \ \ \ \ \ \ \ \ (sep-len (string-length sep)))
 
-    \ \ \ \ \ \ \ \ \ \ (str-len (string-length str)))
+    \ \ \ \ ; find the index for the pattern in str from index start, else #f
 
-    \ \ \ \ \ \ (cond
+    \ \ \ \ (define (find-string str pattern start)
 
-    \ \ \ \ \ \ \ ((zero? sep-len)
+    \ \ \ \ \ \ (let loop ((i start))
 
-    \ \ \ \ \ \ \ \ ((%to-vector)
+    \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ :map (lambda (c) (c :to-string))
+    \ \ \ \ \ \ \ \ \ \ ((\<gtr\> (+ i sep-len) str-len) #f)
 
-    \ \ \ \ \ \ \ \ \ :collect))
+    \ \ \ \ \ \ \ \ \ \ ((equal? (substring str i (+ i sep-len)) pattern) i)
 
-    \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
 
-    \ \ \ \ \ \ \ \ (let loop ((start 0) (result '()))
+    \ \ \ \ ; tail recursive auxiliary function
 
-    \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= start str-len)
+    \ \ \ \ (define (split-helper start acc)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector (reverse result))
+    \ \ \ \ \ \ (let ((next-pos/false (find-string data sep start)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((found-at
+    \ \ \ \ \ \ \ \ (if (not next-pos/false)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let search ((i start))
+    \ \ \ \ \ \ \ \ \ \ \ \ (cons (substring data start) acc)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (and (\<less\>= (+ i sep-len) str-len)
+    \ \ \ \ \ \ \ \ \ \ \ \ (split-helper (+ next-pos/false sep-len) (cons (substring data start next-pos/false) acc)))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (or (and (string-starts? (substring str i (+ i sep-len)) sep)
+    \ \ \ \ ; do split
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ i)
+    \ \ \ \ (rich-vector
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (search (+ i 1)))))))
+    \ \ \ \ \ \ (if (zero? sep-len)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if found-at
+    \ \ \ \ \ \ \ \ \ \ ((%to-vector) :map (lambda (c) (c :to-string)) :collect)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ found-at sep-len)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (substring str start found-at) result))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector (reverse (cons (substring str start str-len) result)))))))))))
-
-    \ \ (rich-vector (string-split data sep)))
+    \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector (reverse (split-helper 0 '())))))))
 
     \;
   </goldfish-chunk>
+
+  SRFI 文档（<hlink|SRFI 135: Immutable Texts|https://srfi.schemers.org/srfi-135/srfi-135.html#ReplicationSplitting>，<hlink|SRFI 140: Immutable Strings|https://srfi.schemers.org/srfi-140/srfi-140.html>）指出：<cite*|The returned list will have one more item than the number of non-overlapping occurrences of the delimiter in the string.>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     \;
@@ -2384,15 +2382,15 @@
 
     (check ((box "da@liii.pro") :split ".") =\<gtr\> (box (vector "da@liii" "pro")))
 
-    (check (((box "da@liii.pro") :split "@") :collect) =\<gtr\> (vector "da" "liii.pro")) ;Test for chaining
+    (check (((box "da@liii.pro") :split "@") :collect) =\<gtr\> (vector "da" "liii.pro"))
 
     (check ((box "test") :split "") =\<gtr\> (box (vector "t" "e" "s" "t")))
 
-    (check ((box "aXXbXXcXX") :split "XX") =\<gtr\> (box (vector "a" "b" "c")))
+    (check ((box "aXXbXXcXX") :split "XX") =\<gtr\> (box (vector "a" "b" "c" "")))
 
     (check ((box "a\|\|b\|\|c") :split "\|\|") =\<gtr\> (box (vector "a" "b" "c")))
 
-    (check ((box "XXaXXb") :split "XX") =\<gtr\> (box (vector "" "a" "b"))) ;分隔符出现在开头
+    (check ((box "XXaXXb") :split "XX") =\<gtr\> (box (vector "" "a" "b")))
 
     (check ((box "你好，欢迎使用Liii STEM") :split "，") =\<gtr\> (box (vector "你好" "欢迎使用Liii STEM")))
 

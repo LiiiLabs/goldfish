@@ -342,11 +342,11 @@
 
 (check ((box "da@liii.pro") :split "@") => (box (vector "da" "liii.pro")))
 (check ((box "da@liii.pro") :split ".") => (box (vector "da@liii" "pro")))
-(check (((box "da@liii.pro") :split "@") :collect) => (vector "da" "liii.pro")) ;Test for chaining
+(check (((box "da@liii.pro") :split "@") :collect) => (vector "da" "liii.pro"))
 (check ((box "test") :split "") => (box (vector "t" "e" "s" "t")))
-(check ((box "aXXbXXcXX") :split "XX") => (box (vector "a" "b" "c")))
+(check ((box "aXXbXXcXX") :split "XX") => (box (vector "a" "b" "c" "")))
 (check ((box "a||b||c") :split "||") => (box (vector "a" "b" "c")))
-(check ((box "XXaXXb") :split "XX") => (box (vector "" "a" "b"))) ;分隔符出现在开头
+(check ((box "XXaXXb") :split "XX") => (box (vector "" "a" "b")))
 (check ((box "你好，欢迎使用Liii STEM") :split "，") => (box (vector "你好" "欢迎使用Liii STEM")))
 (check ((box "中国智造，惠及全球") :split "") => #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
 
