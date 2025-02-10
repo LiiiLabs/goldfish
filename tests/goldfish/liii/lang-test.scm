@@ -533,14 +533,14 @@
 )
 
 (check ((box (vector 1 2 3)) :head) => 1)
-(check-catch 'out-of-range ((rich-vector :empty) :head))
+(check-catch 'out-of-range (rich-vector :empty :head))
 (check ((box (vector 1 2 3)) :head-option) => (option 1))
-(check ((rich-vector :empty) :head-option) => (none))
+(check (rich-vector :empty :head-option) => (none))
 
 (check ((box (vector 1 2 3)) :last) => 3)
-(check-catch 'out-of-range ((rich-vector :empty) :last))
+(check-catch 'out-of-range (rich-vector :empty :last))
 (check ((box (vector 1 2 3)) :last-option) => (option 3))
-(check ((rich-vector :empty) :last-option) => (none))
+(check (rich-vector :empty :last-option) => (none))
 
 (check-true ((box (vector)) :empty?))
 (check-false ((box #(1 2 3)) :empty?))
