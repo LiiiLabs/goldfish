@@ -2123,24 +2123,42 @@
 
   <paragraph|rich-string%index-of>
 
+  查找字符串中指定的字符或子串的下标，找不到则返回 -1。
+
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    ;; Find the index for the substring in rich-string from index start, else return -1
+    ;; Find the index for the char or substring in rich-string from index start, else return -1
 
     (define (%index-of sub start)
 
-    \ \ (let ((str-len (string-length data))
+    \ \ (cond
 
-    \ \ \ \ \ \ \ \ (sub-len (string-length sub)))
+    \ \ \ \ ((string? sub)
 
-    \ \ (let loop ((i start))
+    \ \ \ \ \ (let ((str-len (string-length data))
 
-    \ \ \ \ (cond
+    \ \ \ \ \ \ \ \ \ \ \ (sub-len (string-length sub)))
 
-    \ \ \ \ \ \ ((\<gtr\> (+ i sub-len) str-len) -1)
+    \ \ \ \ \ \ \ (let loop ((i start))
 
-    \ \ \ \ \ \ ((equal? (substring data i (+ i sub-len)) sub) i)
+    \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ (else (loop (+ i 1)))))))
+    \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\> (+ i sub-len) str-len) -1)
+
+    \ \ \ \ \ \ \ \ \ \ \ ((equal? (substring data i (+ i sub-len)) sub) i)
+
+    \ \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1)))))))
+
+    \ \ \ \ ((char? sub)
+
+    \ \ \ \ \ (let loop ((lst (string-\>list (substring data start))) (index start))
+
+    \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ ((null? lst) -1)
+
+    \ \ \ \ \ \ \ ((char=? (car lst) sub) index)
+
+    \ \ \ \ \ \ \ (else (loop (cdr lst) (+ index 1))))))))
 
     \;
   </goldfish-chunk>
@@ -2158,7 +2176,19 @@
 
     \ \ (check (str :index-of "!" 0) =\<gtr\> 11)
 
-    \ \ (check (str :index-of "scheme" 0) =\<gtr\> -1))
+    \ \ (check (str :index-of "scheme" 0) =\<gtr\> -1)
+
+    \ \ (check (str :index-of #\\h 0) =\<gtr\> 0)
+
+    \ \ (check (str :index-of #\\h 1) =\<gtr\> -1)
+
+    \ \ (check (str :index-of #\\w 0) =\<gtr\> 6)
+
+    \ \ (check (str :index-of #\\w 1) =\<gtr\> 6)
+
+    \ \ (check (str :index-of #\\! 0) =\<gtr\> 11)
+
+    \ \ (check (str :index-of #\\~ 0) =\<gtr\> -1))
 
     \;
   </goldfish-chunk>

@@ -443,15 +443,23 @@
          (string-contains data (string elem)))
         (else (type-error "elem must be char or string"))))
 
-;; Find the index for the substring in rich-string from index start, else return -1
+;; Find the index for the char or substring in rich-string from index start, else return -1
 (define (%index-of sub start)
-  (let ((str-len (string-length data))
-        (sub-len (string-length sub)))
-  (let loop ((i start))
-    (cond
-      ((> (+ i sub-len) str-len) -1)
-      ((equal? (substring data i (+ i sub-len)) sub) i)
-      (else (loop (+ i 1)))))))
+  (cond
+    ((string? sub)
+     (let ((str-len (string-length data))
+           (sub-len (string-length sub)))
+       (let loop ((i start))
+         (cond
+           ((> (+ i sub-len) str-len) -1)
+           ((equal? (substring data i (+ i sub-len)) sub) i)
+           (else (loop (+ i 1)))))))
+    ((char? sub)
+     (let loop ((lst (string->list (substring data start))) (index start))
+       (cond
+       ((null? lst) -1)
+       ((char=? (car lst) sub) index)
+       (else (loop (cdr lst) (+ index 1))))))))
 
 (define (%map x . xs)
   (%apply-one x xs
