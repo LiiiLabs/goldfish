@@ -443,6 +443,16 @@
          (string-contains data (string elem)))
         (else (type-error "elem must be char or string"))))
 
+;; Find the index for the substring in rich-string from index start, else return -1
+(define (%index-of sub start)
+  (let ((str-len (string-length data))
+        (sub-len (string-length sub)))
+  (let loop ((i start))
+    (cond
+      ((> (+ i sub-len) str-len) -1)
+      ((equal? (substring data i (+ i sub-len)) sub) i)
+      (else (loop (+ i 1)))))))
+
 (define (%map x . xs)
   (%apply-one x xs
     (rich-string
@@ -483,23 +493,43 @@
     (if (null? xs)                                 
         result
         (apply result xs)))) 
+;; Replace the first occurrence of the substring old to new.
+(define (%replace-first old new . xs)
+  (define (replace-helper str old new start)
+    (let ((next-pos (%index-of old start)))
+      (if (= next-pos -1)
+          str
+          (string-append
+           (substring str 0 next-pos)
+           new
+           (substring str (+ next-pos (string-length old)))))))
+  (let ((result (rich-string (replace-helper data old new 0))))
+    (if (null? xs)
+        result
+        (apply result xs))))
+
+;; Replace the occurrences of the substring old to new.
+(define (%replace old new . xs)
+  (define (replace-helper str old new)
+    (let ((next-pos ((rich-string str) :index-of old 0)))
+      (if (= next-pos -1)
+          str
+          (replace-helper ((rich-string str) :replace-first old new :get) old new))))
+  (let ((result (rich-string (replace-helper data old new))))
+    (if (null? xs)
+        result
+        (apply result xs))))
+
 ;; Split string with sep.
 (define (%split sep)
   (let ((str-len (string-length data))
         (sep-len (string-length sep)))
-    ; find the index for the pattern in str from index start, else #f
-    (define (find-string str pattern start)
-      (let loop ((i start))
-        (cond
-          ((> (+ i sep-len) str-len) #f)
-          ((equal? (substring str i (+ i sep-len)) pattern) i)
-          (else (loop (+ i 1))))))
     ; tail recursive auxiliary function
     (define (split-helper start acc)
-      (let ((next-pos/false (find-string data sep start)))
-        (if (not next-pos/false)
+      (let ((next-pos (%index-of sep start)))
+        (if (= next-pos -1)
             (cons (substring data start) acc)
-            (split-helper (+ next-pos/false sep-len) (cons (substring data start next-pos/false) acc)))))
+            (split-helper (+ next-pos sep-len) (cons (substring data start next-pos) acc)))))
     ; do split
     (rich-vector
       (if (zero? sep-len)

@@ -302,6 +302,14 @@
   (check-true (str :contains "Hello"))
   (check-true (str :contains "")))
 
+(let1 str (rich-string "hello world!")
+  (check (str :index-of "hello" 0) => 0)
+  (check (str :index-of "hello" 1) => -1)
+  (check (str :index-of "world" 0) => 6)
+  (check (str :index-of "world" 1) => 6)
+  (check (str :index-of "!" 0) => 11)
+  (check (str :index-of "scheme" 0) => -1))
+
 (check ((box "abc") :map (lambda (c) (c :to-upper))) => "ABC")
 (check ((box "abc中文") :map (lambda (c) (c :to-upper))) => "ABC中文")
 
@@ -339,6 +347,14 @@
 
 (check-catch 'wrong-number-of-args ("hello":strip-suffix "llo"))
 (check-catch 'unbound-variable (123:strip-suffix 1))
+(check ((box "hahaha") :replace-first "a" "oo") => (box "hoohaha"))
+(check ((box "hello") :replace-first "world" "") => (box "hello"))
+(check ((box "hello") :replace-first "l" "L" :strip-prefix "he") => (box "Llo")) ; chain
+
+(check ((box "hahaha") :replace "a" "oo") => (box "hoohoohoo"))
+(check ((box "hello") :replace "world" "") => (box "hello"))
+(check ((box "hello") :replace "l" "L" :strip-prefix "he") => (box "LLo")) ; chain
+
 
 (check ((box "da@liii.pro") :split "@") => (box (vector "da" "liii.pro")))
 (check ((box "da@liii.pro") :split ".") => (box (vector "da@liii" "pro")))

@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.3>>
+<TMU|<tuple|1.1.0|2025.0.4>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -2121,6 +2121,48 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-string%index-of>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    ;; Find the index for the substring in rich-string from index start, else return -1
+
+    (define (%index-of sub start)
+
+    \ \ (let ((str-len (string-length data))
+
+    \ \ \ \ \ \ \ \ (sub-len (string-length sub)))
+
+    \ \ (let loop ((i start))
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((\<gtr\> (+ i sub-len) str-len) -1)
+
+    \ \ \ \ \ \ ((equal? (substring data i (+ i sub-len)) sub) i)
+
+    \ \ \ \ \ \ (else (loop (+ i 1)))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 str (rich-string "hello world!")
+
+    \ \ (check (str :index-of "hello" 0) =\<gtr\> 0)
+
+    \ \ (check (str :index-of "hello" 1) =\<gtr\> -1)
+
+    \ \ (check (str :index-of "world" 0) =\<gtr\> 6)
+
+    \ \ (check (str :index-of "world" 1) =\<gtr\> 6)
+
+    \ \ (check (str :index-of "!" 0) =\<gtr\> 11)
+
+    \ \ (check (str :index-of "scheme" 0) =\<gtr\> -1))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|高阶函数>
 
   <paragraph|rich-string%map><typehint|((p procedure?)) =\<gtr\> rich-string?>
@@ -2321,6 +2363,88 @@
     (check-catch 'unbound-variable (123:strip-suffix 1))
   </goldfish-chunk>
 
+  <paragraph|rich-string%replace-first>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    ;; Replace the first occurrence of the substring old to new.
+
+    (define (%replace-first old new . xs)
+
+    \ \ (define (replace-helper str old new start)
+
+    \ \ \ \ (let ((next-pos (%index-of old start)))
+
+    \ \ \ \ \ \ (if (= next-pos -1)
+
+    \ \ \ \ \ \ \ \ \ \ str
+
+    \ \ \ \ \ \ \ \ \ \ (string-append
+
+    \ \ \ \ \ \ \ \ \ \ \ (substring str 0 next-pos)
+
+    \ \ \ \ \ \ \ \ \ \ \ new
+
+    \ \ \ \ \ \ \ \ \ \ \ (substring str (+ next-pos (string-length old)))))))
+
+    \ \ (let ((result (rich-string (replace-helper data old new 0))))
+
+    \ \ \ \ (if (null? xs)
+
+    \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ (apply result xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box "hahaha") :replace-first "a" "oo") =\<gtr\> (box "hoohaha"))
+
+    (check ((box "hello") :replace-first "world" "") =\<gtr\> (box "hello"))
+
+    (check ((box "hello") :replace-first "l" "L" :strip-prefix "he") =\<gtr\> (box "Llo")) ; chain
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-string%replace>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    ;; Replace the occurrences of the substring old to new.
+
+    (define (%replace old new . xs)
+
+    \ \ (define (replace-helper str old new)
+
+    \ \ \ \ (let ((next-pos ((rich-string str) :index-of old 0)))
+
+    \ \ \ \ \ \ (if (= next-pos -1)
+
+    \ \ \ \ \ \ \ \ \ \ str
+
+    \ \ \ \ \ \ \ \ \ \ (replace-helper ((rich-string str) :replace-first old new :get) old new))))
+
+    \ \ (let ((result (rich-string (replace-helper data old new))))
+
+    \ \ \ \ (if (null? xs)
+
+    \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ (apply result xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((box "hahaha") :replace "a" "oo") =\<gtr\> (box "hoohoohoo"))
+
+    (check ((box "hello") :replace "world" "") =\<gtr\> (box "hello"))
+
+    (check ((box "hello") :replace "l" "L" :strip-prefix "he") =\<gtr\> (box "LLo")) ; chain
+
+    \;
+  </goldfish-chunk>
+
   <subsection|其余函数>
 
   <paragraph|rich-string%split>
@@ -2334,31 +2458,17 @@
 
     \ \ \ \ \ \ \ \ (sep-len (string-length sep)))
 
-    \ \ \ \ ; find the index for the pattern in str from index start, else #f
-
-    \ \ \ \ (define (find-string str pattern start)
-
-    \ \ \ \ \ \ (let loop ((i start))
-
-    \ \ \ \ \ \ \ \ (cond
-
-    \ \ \ \ \ \ \ \ \ \ ((\<gtr\> (+ i sep-len) str-len) #f)
-
-    \ \ \ \ \ \ \ \ \ \ ((equal? (substring str i (+ i sep-len)) pattern) i)
-
-    \ \ \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
-
     \ \ \ \ ; tail recursive auxiliary function
 
     \ \ \ \ (define (split-helper start acc)
 
-    \ \ \ \ \ \ (let ((next-pos/false (find-string data sep start)))
+    \ \ \ \ \ \ (let ((next-pos (%index-of sep start)))
 
-    \ \ \ \ \ \ \ \ (if (not next-pos/false)
+    \ \ \ \ \ \ \ \ (if (= next-pos -1)
 
     \ \ \ \ \ \ \ \ \ \ \ \ (cons (substring data start) acc)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (split-helper (+ next-pos/false sep-len) (cons (substring data start next-pos/false) acc)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (split-helper (+ next-pos sep-len) (cons (substring data start next-pos) acc)))))
 
     \ \ \ \ ; do split
 
