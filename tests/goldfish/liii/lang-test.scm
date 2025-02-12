@@ -254,10 +254,14 @@
 (check ((box #\A) :to-upper) => #\A)
 (check ((box #\Z) :to-upper) => #\Z)
 
+(check ((box #\Z) :to-upper :to-lower) => #\z) ; chain
+
 (check ((box #\A) :to-lower) => #\a)
 (check ((box #\Z) :to-lower) => #\z)
 (check ((box #\a) :to-lower) => #\a)
 (check ((box #\z) :to-lower) => #\z)
+
+(check ((box #\z) :to-lower :to-upper) => #\Z) ; chain
 
 (check ((rich-char #x41) :to-string) => "A")
 (check-true ((box #\A) :equals (rich-char #x41)))
@@ -381,8 +385,8 @@
 
 (check-catch 'value-error (rich-list :range 1 5 0))
 
-
-(check (rich-list :empty)=> (box (list )))
+(check (rich-list :empty :empty?) => #t)
+(check (rich-list :empty :head-option) => (none))
 
 
 (check (rich-list :concat (box (list 1)) (box (list 2))) => (box (list 1 2)))
@@ -427,20 +431,22 @@
 )
 
 (check ((box (list 1 2 3)) :head) => 1)
-(check-catch 'out-of-range ((rich-list :empty) :head))
+(check-catch 'out-of-range (rich-list :empty :head))
 (check ((box (list 1 2 3)) :head-option) => (option 1))
-(check ((rich-list :empty) :head-option) => (none))
+(check (rich-list :empty :head-option) => (none))
+
+(check-true ((box (list)) :empty?))
+(check-false ((box '(1 2 3)) :empty?))
 
 (check (box (list (box 1) (box 2) (box 3)))
   => (((box 1) :to 3) :map box))
 
 (let1 lst (box '(1 2 3 4 5))
-  (check (lst :forall (lambda (x) (> x 0))) => #t)
-  (check (lst :forall (lambda (x) (> x 3))) => #f)
+  (check (lst :forall (@ > _ 0)) => #t)
+  (check (lst :forall (@ > _ 3)) => #f)
 )
 
-(let1 empty-lst (rich-list '())
-  (check (empty-lst :forall (lambda (x) (> x 0))) => #t))
+(check (rich-list :empty :forall (@ > _ 0)) => #t)
 
 (let1 l (rich-list '(1 2 3))
   (check-true (l :exists even?)))
@@ -655,6 +661,7 @@
   (check-false (ht :contains 'd)))
 
 (check (rich-hash-table :empty) => (box (hash-table)))
+(check (rich-hash-table :empty :collect) => (hash-table))
 
 (check-report)
 

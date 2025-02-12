@@ -316,15 +316,19 @@
    (and (>= code-point #x17E0) (<= code-point #x17E9))
    (and (>= code-point #x1810) (<= code-point #x1819))))
   
-(define (%to-upper)
-  (if (and (>= code-point 97) (<= code-point 122))
+(define (%to-upper . xs)
+  (let1 r
+    (if (and (>= code-point 97) (<= code-point 122))
       (rich-char (- code-point 32))
-      (rich-char code-point)))
+      (rich-char code-point))
+    (if (null? xs) r (apply r xs))))
 
-(define (%to-lower)
-  (if (and (>= code-point 65) (<= code-point 90))
+(define (%to-lower . xs)
+  (let1 r
+    (if (and (>= code-point 65) (<= code-point 90))
       (rich-char (+ code-point 32))
-      (rich-char code-point)))
+      (rich-char code-point))
+    (if (null? xs) r (apply r xs))))
 
 (define (%to-bytevector)
   (cond
@@ -561,8 +565,9 @@
        (let1 cnt (ceiling (/ (- end start) step-size))
          (rich-list (iota cnt start step-size)))))))
 
-(define (@empty)
-  (rich-list(list )))
+(define (@empty . xs)
+  (let1 r (rich-list (list ))
+    (if (null? xs) r (apply r xs))))
 
 (define (@concat lst1 lst2 . xs)
   (let1 r (rich-list (append (lst1 :collect) (lst2 :collect)))
@@ -599,6 +604,9 @@
       (none)
       (option (car data))))
 
+
+(define (%empty?)
+  (null? data))
 
 (define (%equals that)
   (let* ((l1 data)
@@ -920,8 +928,9 @@
 (define (%contains k)
   (hash-table-contains? data k))
 
-(define (@empty)
-  (rich-hash-table (make-hash-table)))
+(define (@empty . xs)
+  (let1 r (rich-hash-table (make-hash-table))
+    (if (null? xs) r (apply r xs))))
 
 )
 

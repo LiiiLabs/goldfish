@@ -1137,8 +1137,6 @@
 
   <paragraph|option%map>
 
-  \;
-
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%map f . xs)
 
@@ -1644,13 +1642,17 @@
   目前只支持将英文字母的a-z转换为A-Z，其它字符保持不变。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%to-upper)
+    (define (%to-upper . xs)
 
-    \ \ (if (and (\<gtr\>= code-point 97) (\<less\>= code-point 122))
+    \ \ (let1 r
+
+    \ \ \ \ (if (and (\<gtr\>= code-point 97) (\<less\>= code-point 122))
 
     \ \ \ \ \ \ (rich-char (- code-point 32))
 
-    \ \ \ \ \ \ (rich-char code-point)))
+    \ \ \ \ \ \ (rich-char code-point))
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
   </goldfish-chunk>
@@ -1665,18 +1667,26 @@
     (check ((box #\\Z) :to-upper) =\<gtr\> #\\Z)
 
     \;
+
+    (check ((box #\\Z) :to-upper :to-lower) =\<gtr\> #\\z) ; chain
+
+    \;
   </goldfish-chunk>
 
   <paragraph|rich-char%to-lower>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%to-lower)
+    (define (%to-lower . xs)
 
-    \ \ (if (and (\<gtr\>= code-point 65) (\<less\>= code-point 90))
+    \ \ (let1 r
+
+    \ \ \ \ (if (and (\<gtr\>= code-point 65) (\<less\>= code-point 90))
 
     \ \ \ \ \ \ (rich-char (+ code-point 32))
 
-    \ \ \ \ \ \ (rich-char code-point)))
+    \ \ \ \ \ \ (rich-char code-point))
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
   </goldfish-chunk>
@@ -1689,6 +1699,10 @@
     (check ((box #\\a) :to-lower) =\<gtr\> #\\a)
 
     (check ((box #\\z) :to-lower) =\<gtr\> #\\z)
+
+    \;
+
+    (check ((box #\\z) :to-lower :to-upper) =\<gtr\> #\\Z) ; chain
 
     \;
   </goldfish-chunk>
@@ -2610,17 +2624,19 @@
   <paragraph|rich-list@empty>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty)
+    (define (@empty . xs)
 
-    \ \ (rich-list(list )))
+    \ \ (let1 r (rich-list (list ))
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    \;
+    (check (rich-list :empty :empty?) =\<gtr\> #t)
 
-    (check (rich-list :empty)=\<gtr\> (box (list )))
+    (check (rich-list :empty :head-option) =\<gtr\> (none))
 
     \;
   </goldfish-chunk>
@@ -2828,11 +2844,11 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((box (list 1 2 3)) :head) =\<gtr\> 1)
 
-    (check-catch 'out-of-range ((rich-list :empty) :head))
+    (check-catch 'out-of-range (rich-list :empty :head))
 
     (check ((box (list 1 2 3)) :head-option) =\<gtr\> (option 1))
 
-    (check ((rich-list :empty) :head-option) =\<gtr\> (none))
+    (check (rich-list :empty :head-option) =\<gtr\> (none))
 
     \;
   </goldfish-chunk>
@@ -2840,6 +2856,24 @@
   \;
 
   <subsection|谓词>
+
+  <paragraph|rich-list%empty?>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%empty?)
+
+    \ \ (null? data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((box (list)) :empty?))
+
+    (check-false ((box '(1 2 3)) :empty?))
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|rich-list%equals>
 
@@ -2890,17 +2924,15 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 lst (box '(1 2 3 4 5))
 
-    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
+    \ \ (check (lst :forall (@ \<gtr\> _ 0)) =\<gtr\> #t)
 
-    \ \ (check (lst :forall (lambda (x) (\<gtr\> x 3))) =\<gtr\> #f)
+    \ \ (check (lst :forall (@ \<gtr\> _ 3)) =\<gtr\> #f)
 
     )
 
     \;
 
-    (let1 empty-lst (rich-list '())
-
-    \ \ (check (empty-lst :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
+    (check (rich-list :empty :forall (@ \<gtr\> _ 0)) =\<gtr\> #t)
 
     \;
   </goldfish-chunk>
@@ -4202,15 +4234,19 @@
   <paragraph|rich-hash-table@empty>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty)
+    (define (@empty . xs)
 
-    \ \ (rich-hash-table (make-hash-table)))
+    \ \ (let1 r (rich-hash-table (make-hash-table))
+
+    \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check (rich-hash-table :empty) =\<gtr\> (box (hash-table)))
+
+    (check (rich-hash-table :empty :collect) =\<gtr\> (hash-table))
 
     \;
   </goldfish-chunk>
