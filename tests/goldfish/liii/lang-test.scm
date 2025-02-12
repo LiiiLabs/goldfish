@@ -253,6 +253,7 @@
 (check ((box #\z) :to-upper) => #\Z)
 (check ((box #\A) :to-upper) => #\A)
 (check ((box #\Z) :to-upper) => #\Z)
+(check ((box #\@) :to-upper) => #\@)
 
 (check ((box #\Z) :to-upper :to-lower) => #\z) ; chain
 
@@ -260,6 +261,7 @@
 (check ((box #\Z) :to-lower) => #\z)
 (check ((box #\a) :to-lower) => #\a)
 (check ((box #\z) :to-lower) => #\z)
+(check ((box #\@) :to-lower) => #\@)
 
 (check ((box #\z) :to-lower :to-upper) => #\Z) ; chain
 

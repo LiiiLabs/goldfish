@@ -317,17 +317,17 @@
    (and (>= code-point #x1810) (<= code-point #x1819))))
   
 (define (%to-upper . xs)
-  (let1 r
-    (if (and (>= code-point 97) (<= code-point 122))
-      (rich-char (- code-point 32))
-      (rich-char code-point))
+  (let1 r (rich-char
+    (if (and (>= code-point #x61) (<= code-point #x7A))
+      (bitwise-and code-point #b11011111)
+      code-point))
     (if (null? xs) r (apply r xs))))
 
 (define (%to-lower . xs)
-  (let1 r
-    (if (and (>= code-point 65) (<= code-point 90))
-      (rich-char (+ code-point 32))
-      (rich-char code-point))
+  (let1 r (rich-char
+    (if (and (>= code-point #x41) (<= code-point #x5A))
+      (bitwise-ior code-point #b00100000)
+      code-point))
     (if (null? xs) r (apply r xs))))
 
 (define (%to-bytevector)

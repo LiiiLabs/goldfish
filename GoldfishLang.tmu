@@ -1644,13 +1644,13 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%to-upper . xs)
 
-    \ \ (let1 r
+    \ \ (let1 r (rich-char
 
-    \ \ \ \ (if (and (\<gtr\>= code-point 97) (\<less\>= code-point 122))
+    \ \ \ \ (if (and (\<gtr\>= code-point #x61) (\<less\>= code-point #x7A))
 
-    \ \ \ \ \ \ (rich-char (- code-point 32))
+    \ \ \ \ \ \ (bitwise-and code-point #b11011111)
 
-    \ \ \ \ \ \ (rich-char code-point))
+    \ \ \ \ \ \ code-point))
 
     \ \ \ \ (if (null? xs) r (apply r xs))))
 
@@ -1666,6 +1666,8 @@
 
     (check ((box #\\Z) :to-upper) =\<gtr\> #\\Z)
 
+    (check ((box #\\@) :to-upper) =\<gtr\> #\\@)
+
     \;
 
     (check ((box #\\Z) :to-upper :to-lower) =\<gtr\> #\\z) ; chain
@@ -1678,13 +1680,13 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%to-lower . xs)
 
-    \ \ (let1 r
+    \ \ (let1 r (rich-char
 
-    \ \ \ \ (if (and (\<gtr\>= code-point 65) (\<less\>= code-point 90))
+    \ \ \ \ (if (and (\<gtr\>= code-point #x41) (\<less\>= code-point #x5A))
 
-    \ \ \ \ \ \ (rich-char (+ code-point 32))
+    \ \ \ \ \ \ (bitwise-ior code-point #b00100000)
 
-    \ \ \ \ \ \ (rich-char code-point))
+    \ \ \ \ \ \ code-point))
 
     \ \ \ \ (if (null? xs) r (apply r xs))))
 
@@ -1699,6 +1701,8 @@
     (check ((box #\\a) :to-lower) =\<gtr\> #\\a)
 
     (check ((box #\\z) :to-lower) =\<gtr\> #\\z)
+
+    (check ((box #\\@) :to-lower) =\<gtr\> #\\@)
 
     \;
 
