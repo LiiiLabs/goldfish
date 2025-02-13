@@ -24,7 +24,7 @@
   rich-integer rich-char rich-string
   rich-list range
   rich-vector rich-hash-table
-  box
+  box $
 )
 (begin
 
@@ -581,6 +581,7 @@
       (rich-list '()))
     (else
       (rich-list (make-list n elem)))))
+
 (define (%collect) data)
 
 (define (%apply n)
@@ -772,6 +773,7 @@
         ((>= i (vector-length data)) (none))
         ((p (vector-ref data i)) (option (vector-ref data i)))
         (else (loop (+ i 1))))))
+
 (define (%head)
   (if (> (vector-length data) 0)
       (vector-ref data 0)
@@ -934,14 +936,19 @@
 
 )
 
-(define (box x)
-  (cond ((integer? x) (rich-integer x))
+(define (box x . xs)
+  (let1 r
+      (cond ((integer? x) (rich-integer x))
         ((char? x) (rich-char (char->integer x)))
         ((string? x) (rich-string x))
         ((list? x) (rich-list x))
         ((vector? x) (rich-vector x))
         ((hash-table? x) (rich-hash-table x))
-        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
+        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?")))
+       (if (null? xs) r (apply r xs))))
+
+(define ($ x . xs)
+  (if (null? xs) (box x) (apply (box x) xs)))
 
 ) ; end of begin
 ) ; end of library

@@ -166,7 +166,7 @@
   (check (opt2 :get-or-else (lambda () 0)) => 0)
 )
 
-(check ((none) :get-or-else (box 1)) => (box 1))
+(check ((none) :get-or-else ($ 1)) => ($ 1))
 
 (let ((opt1 (option 42)) (opt2 (option '())))
   (check (opt1 :or-else (option 0)) => (option 42))
@@ -184,20 +184,20 @@
   (check-true (opt1 :exists (lambda (x) (== x 42))))
   (check-false (opt2 :exists (lambda (x) (== x 42)))))
 
-(check-true ((box 42) :equals (box 42)))
-(check-false ((box 41) :equals (box 42)))
+(check-true ($ 42 :equals ($ 42)))
+(check-false ($ 41 :equals ($ 42)))
 
-(check (((box 1) :to 2) :collect) => (list 1 2))
-(check (((box 1) :to 1) :collect) => (list 1))
-(check (((box 2) :to 1) :collect) => (list ))
+(check (($ 1 :to 2) :collect) => (list 1 2))
+(check (($ 1 :to 1) :collect) => (list 1))
+(check (($ 2 :to 1) :collect) => (list ))
 
-(check (((box 1) :until 3) :collect) => (list 1 2))
-(check (((box 1) :until 2) :collect) => (list 1))
-(check (((box 2) :until 2) :collect) => (list ))
+(check (($ 1 :until 3) :collect) => (list 1 2))
+(check (($ 1 :until 2) :collect) => (list 1))
+(check (($ 2 :until 2) :collect) => (list ))
 
-(check-catch 'value-error ((box #x110000) :to-char))
+(check-catch 'value-error ($ #x110000 :to-char))
 
-(check ((box 1) :to-string) => "1")
+(check ($ 1 :to-string) => "1")
 
 (check (+ 1 (rich-integer :max-value)) => (rich-integer :min-value))
 
@@ -249,24 +249,24 @@
   (check (char19 :digit?) => #t)  ;; 蒙古数字
   (check (char20 :digit?) => #f))  ;; 非数字字符
 
-(check ((box #\a) :to-upper) => #\A)
-(check ((box #\z) :to-upper) => #\Z)
-(check ((box #\A) :to-upper) => #\A)
-(check ((box #\Z) :to-upper) => #\Z)
-(check ((box #\@) :to-upper) => #\@)
+(check ($ #\a :to-upper) => #\A)
+(check ($ #\z :to-upper) => #\Z)
+(check ($ #\A :to-upper) => #\A)
+(check ($ #\Z :to-upper) => #\Z)
+(check ($ #\@ :to-upper) => #\@)
 
-(check ((box #\Z) :to-upper :to-lower) => #\z) ; chain
+(check ($ #\Z :to-upper :to-lower) => #\z) ; chain
 
-(check ((box #\A) :to-lower) => #\a)
-(check ((box #\Z) :to-lower) => #\z)
-(check ((box #\a) :to-lower) => #\a)
-(check ((box #\z) :to-lower) => #\z)
-(check ((box #\@) :to-lower) => #\@)
+(check ($ #\A :to-lower) => #\a)
+(check ($ #\Z :to-lower) => #\z)
+(check ($ #\a :to-lower) => #\a)
+(check ($ #\z :to-lower) => #\z)
+(check ($ #\@ :to-lower) => #\@)
 
-(check ((box #\z) :to-lower :to-upper) => #\Z) ; chain
+(check ($ #\z :to-lower :to-upper) => #\Z) ; chain
 
 (check ((rich-char #x41) :to-string) => "A")
-(check-true ((box #\A) :equals (rich-char #x41)))
+(check-true ($ #\A :equals (rich-char #x41)))
 
 (check ((rich-char #xA3) :to-string) => "£")
 
@@ -275,13 +275,13 @@
 
 (check ((rich-char #x1F600) :to-string) => "😀")
 
-(check ((box "abc") :get) => "abc")
-(check ((box "") :get) => "")
+(check ($ "abc" :get) => "abc")
+(check ($ "" :get) => "")
 
 (check ((rich-string "abc") :length) => 3)
 (check ((rich-string "中文") :length) => 2)
 
-(let1 str (box "你好，世界")  
+(let1 str ($ "你好，世界")
   (check (str :char-at 0) => (rich-char #x4F60))  ;; "你" 的 Unicode 码点
   (check (str :char-at 1) => (rich-char #x597D))  ;; "好" 的 Unicode 码点
   (check (str :char-at 2) => (rich-char #xFF0C))  ;; "，" 的 Unicode 码点
@@ -289,19 +289,19 @@
   (check (str :char-at 4) => (rich-char #x754C))  ;; "界" 的 Unicode 码点
   (check-catch 'out-of-range (str :char-at 10)))
 
-(let1 str (box "Hello，世界")
-   (check (str 0) => (box #\H))
+(let1 str ($ "Hello，世界")
+   (check (str 0) => ($ #\H))
    (check (str 7) => (rich-char "界")))
 
-(check (box "42") => (box "42"))
-(check-false ((box "41") :equals (box "42")))
+(check ($ "42") => ($ "42"))
+(check-false ($ "41" :equals ($ "42")))
 
 (check-true ((rich-string "") :empty?))
 (check-false ((rich-string "abc") :empty?))
 
-(check-false ((box "全部都是中文") :forall (@ _ :digit?)))
+(check-false ($ "全部都是中文" :forall (@ _ :digit?)))
 
-(check-true ((box "全部都是中文") :exists (@ _ :equals (rich-char "中"))))
+(check-true ($ "全部都是中文" :exists (@ _ :equals (rich-char "中"))))
 
 (let1 str (rich-string "Hello, World!")
   (check-true (str :contains #\W))
@@ -322,68 +322,65 @@
   (check (str :index-of #\! 0) => 11)
   (check (str :index-of #\~ 0) => -1))
 
-(check ((box "abc") :map (lambda (c) (c :to-upper))) => "ABC")
-(check ((box "abc中文") :map (lambda (c) (c :to-upper))) => "ABC中文")
+(check ($ "abc" :map (lambda (c) (c :to-upper))) => "ABC")
+(check ($ "abc中文" :map (lambda (c) (c :to-upper))) => "ABC中文")
 
-(check ((box "") :count (@ == _ #\A)) => 0)
-(check ((box "hello") :count (@ == _ #\l)) => 2)
-(check ((box "你好，我是韩梅梅")
-        :count (@ == _ (rich-char "梅"))) => 2)
+(check ($ "" :count (@ == _ #\A)) => 0)
+(check ($ "hello" :count (@ == _ #\l)) => 2)
+(check ($ "你好，我是韩梅梅" :count (@ == _ (rich-char "梅"))) => 2)
 
 (check ((rich-string "hello") :to-string) => "hello")
 
-(let1 v ((box "中文") :to-vector)
+(let1 v ($ "中文" :to-vector)
   (check (v 0) => (rich-char "中"))
   (check (v 1) => (rich-char "文")))
 
-(check ((box "") :strip-prefix "") => (box ""))
-(check ((box "hello") :strip-prefix "") => (box "hello"))
-(check ((box "hello") :strip-prefix "he") => (box "llo"))
-(check ((box "hello") :strip-prefix "hello") => (box ""))
-(check ((box "hello") :strip-prefix "abc") => (box "hello"))
-(check ((box "hello") :strip-prefix "helloo") => (box "hello"))
-(check ((box "hello") :strip-prefix "he"
-                      :strip-prefix "ll") => (box "o"))
+(check ($ "" :strip-prefix "") => ($ ""))
+(check ($ "hello" :strip-prefix "") => ($ "hello"))
+(check ($ "hello" :strip-prefix "he") => ($ "llo"))
+(check ($ "hello" :strip-prefix "hello") => ($ ""))
+(check ($ "hello" :strip-prefix "abc") => ($ "hello"))
+(check ($ "hello" :strip-prefix "helloo") => ($ "hello"))
+(check ($ "hello" :strip-prefix "he" :strip-prefix "ll") => ($ "o"))
 
 (check-catch 'wrong-number-of-args ("hello":strip-prefix "he"))
 (check-catch 'unbound-variable (123:strip-prefix 1))
 
-(check ((box "") :strip-suffix "") => (box ""))
-(check ((box "hello") :strip-suffix "") => (box "hello"))
-(check ((box "hello") :strip-suffix "lo") => (box "hel"))
-(check ((box "hello") :strip-suffix "hello") => (box ""))
-(check ((box "hello") :strip-suffix "abc") => (box "hello"))
-(check ((box "hello") :strip-suffix "hhello") => (box "hello"))
-(check ((box "hello") :strip-suffix "lo"
-                      :strip-suffix "el") => (box "h"))
+(check ($ "" :strip-suffix "") => ($ ""))
+(check ($ "hello" :strip-suffix "") => ($ "hello"))
+(check ($ "hello" :strip-suffix "lo") => ($ "hel"))
+(check ($ "hello" :strip-suffix "hello") => ($ ""))
+(check ($ "hello" :strip-suffix "abc") => ($ "hello"))
+(check ($ "hello" :strip-suffix "hhello") => ($ "hello"))
+(check ($ "hello" :strip-suffix "lo" :strip-suffix "el") => ($ "h"))
 
 (check-catch 'wrong-number-of-args ("hello":strip-suffix "llo"))
 (check-catch 'unbound-variable (123:strip-suffix 1))
-(check ((box "hahaha") :replace-first "a" "oo") => (box "hoohaha"))
-(check ((box "hello") :replace-first "world" "") => (box "hello"))
-(check ((box "hello") :replace-first "l" "L" :strip-prefix "he") => (box "Llo")) ; chain
+(check ($ "hahaha" :replace-first "a" "oo") => ($ "hoohaha"))
+(check ($ "hello" :replace-first "world" "") => ($ "hello"))
+(check ($ "hello" :replace-first "l" "L" :strip-prefix "he") => ($ "Llo")) ; chain
 
-(check ((box "hahaha") :replace "a" "oo") => (box "hoohoohoo"))
-(check ((box "hello") :replace "world" "") => (box "hello"))
-(check ((box "hello") :replace "l" "L" :strip-prefix "he") => (box "LLo")) ; chain
+(check ($ "hahaha" :replace "a" "oo") => ($ "hoohoohoo"))
+(check ($ "hello" :replace "world" "") => ($ "hello"))
+(check ($ "hello" :replace "l" "L" :strip-prefix "he") => ($ "LLo")) ; chain
 
 
-(check ((box "da@liii.pro") :split "@") => (box (vector "da" "liii.pro")))
-(check ((box "da@liii.pro") :split ".") => (box (vector "da@liii" "pro")))
-(check (((box "da@liii.pro") :split "@") :collect) => (vector "da" "liii.pro"))
-(check ((box "test") :split "") => (box (vector "t" "e" "s" "t")))
-(check ((box "aXXbXXcXX") :split "XX") => (box (vector "a" "b" "c" "")))
-(check ((box "a||b||c") :split "||") => (box (vector "a" "b" "c")))
-(check ((box "XXaXXb") :split "XX") => (box (vector "" "a" "b")))
-(check ((box "你好，欢迎使用Liii STEM") :split "，") => (box (vector "你好" "欢迎使用Liii STEM")))
-(check ((box "中国智造，惠及全球") :split "") => #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
+(check ($ "da@liii.pro" :split "@") => ($ (vector "da" "liii.pro")))
+(check ($ "da@liii.pro" :split ".") => ($ (vector "da@liii" "pro")))
+(check (($ "da@liii.pro" :split "@") :collect) => (vector "da" "liii.pro"))
+(check ($ "test" :split "") => ($ (vector "t" "e" "s" "t")))
+(check ($ "aXXbXXcXX" :split "XX") => ($ (vector "a" "b" "c" "")))
+(check ($ "a||b||c" :split "||") => ($ (vector "a" "b" "c")))
+(check ($ "XXaXXb" :split "XX") => ($ (vector "" "a" "b")))
+(check ($ "你好，欢迎使用Liii STEM" :split "，") => ($ (vector "你好" "欢迎使用Liii STEM")))
+(check ($ "中国智造，惠及全球" :split "") => ($ (vector "中" "国" "智" "造" "，" "惠" "及" "全" "球")))
 
-(check (rich-list :range 1 5) => (box (list 1 2 3 4)))
-(check (rich-list :range 1 5 2) => (box (list 1 3)))
-(check (rich-list :range 1 6 2) => (box (list 1 3 5)))
-(check (rich-list :range 5 1 -1) => (box (list 5 4 3 2)))
+(check (rich-list :range 1 5) => ($ (list 1 2 3 4)))
+(check (rich-list :range 1 5 2) => ($ (list 1 3)))
+(check (rich-list :range 1 6 2) => ($ (list 1 3 5)))
+(check (rich-list :range 5 1 -1) => ($ (list 5 4 3 2)))
 
-(check (rich-list :range 5 1 1) => (box (list )))
+(check (rich-list :range 5 1 1) => ($ (list )))
 
 (check-catch 'value-error (rich-list :range 1 5 0))
 
@@ -391,59 +388,48 @@
 (check (rich-list :empty :head-option) => (none))
 
 
-(check (rich-list :concat (box (list 1)) (box (list 2))) => (box (list 1 2)))
-(check (rich-list :concat (box (list 1 2)) (box (list 3 4))) => (box (list 1 2 3 4)))
-(check (rich-list :concat (rich-list :range 1 4) (box (list 3 4))) => (box (list 1 2 3 3 4)))
-(check (rich-list :concat (box (list 1)) (box (list 2))
+(check (rich-list :concat ($ (list 1)) ($ (list 2))) => ($ (list 1 2)))
+(check (rich-list :concat ($ (list 1 2)) ($ (list 3 4))) => ($ (list 1 2 3 4)))
+(check (rich-list :concat (rich-list :range 1 4) ($ (list 3 4))) => ($ (list 1 2 3 3 4)))
+(check (rich-list :concat ($ (list 1)) ($ (list 2))
            :collect) => (list 1 2))
 (check (rich-list :concat (rich-list '(1)) (rich-list '(2)) :count) => 2)
 
-;; test :fill
 (let1 result (rich-list :fill 3 "a")
-  (check (result :collect) => '("a" "a" "a"))
-)
+  (check (result :collect) => '("a" "a" "a")))
 
 (let1 result (rich-list :fill 0 "a")
-  (check (result :collect) => '())
-)
+  (check (result :collect) => '()))
 
 (check-catch 'value-error (rich-list :fill -1 "a"))
 
 (let1 result (rich-list :fill 2 42)
-  (check (result :collect) => '(42 42))
-)
+  (check (result :collect) => '(42 42)))
 
 (let1 result (rich-list :fill 1000 "x")
-  (check (length (result :collect)) => 1000)
-)
+  (check (length (result :collect)) => 1000))
 
-;; test :fill finished
-(check ((box '(1 2 3)) :apply 0) => 1)
-(check ((box '(1 2 3)) 0) => 1)
+(check ($ '(1 2 3) :apply 0) => 1)
+(check ($ '(1 2 3) 0) => 1)
 
 (let1 lst (rich-list '(1 2 3 4 5))
   (check ((lst :find (lambda (x) (= x 3))) :get) => 3)
   (check ((lst :find (lambda (x) (> x 2))) :get) => 3)
-
   (check ((lst :find (lambda (x) (> x 10))) :empty?) => #t)
-
   (check ((lst :find even?) :get) => 2)
+  (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t))
 
-  (check ((lst :find (lambda (x) (< x 0))) :empty?) => #t)
-)
-
-(check ((box (list 1 2 3)) :head) => 1)
+(check ($ (list 1 2 3) :head) => 1)
 (check-catch 'out-of-range (rich-list :empty :head))
-(check ((box (list 1 2 3)) :head-option) => (option 1))
+(check ($ (list 1 2 3) :head-option) => (option 1))
 (check (rich-list :empty :head-option) => (none))
 
-(check-true ((box (list)) :empty?))
-(check-false ((box '(1 2 3)) :empty?))
+(check-true ($ (list) :empty?))
+(check-false ($ '(1 2 3) :empty?))
 
-(check (box (list (box 1) (box 2) (box 3)))
-  => (((box 1) :to 3) :map box))
+(check ($ (list ($ 1) ($ 2) ($ 3))) => (($ 1 :to 3) :map $))
 
-(let1 lst (box '(1 2 3 4 5))
+(let1 lst ($ '(1 2 3 4 5))
   (check (lst :forall (@ > _ 0)) => #t)
   (check (lst :forall (@ > _ 3)) => #f)
 )
@@ -500,7 +486,7 @@
   (check (lst :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
 )
 
-(check (object->string (box '(1 2 3))) => "(1 2 3)")
+(check (object->string ($ '(1 2 3))) => "(1 2 3)")
 
 (let1 l (rich-list (list 1 2 3))
   (check (l :make-string) => "123")
@@ -513,8 +499,8 @@
   (check-catch 'type-error (l :make-string "[" "," 123))
 )
 
-(check ((box (list "a" "b")) :make-string) => "ab")
-(check ((box (list "a" "b")) :make-string " ") => "a b")
+(check ($ (list "a" "b") :make-string) => "ab")
+(check ($ (list "a" "b") :make-string " ") => "a b")
 
 (let1 r (range :inclusive 1 2)
   (check (r 'start) => 1)
@@ -532,12 +518,12 @@
 (check-true ((range :inclusive 3 1) :empty?))
 (check-false ((range :inclusive 1 3 0) :empty?))
 
-(check (rich-vector :range 1 5) => (box (vector 1 2 3 4)))
-(check (rich-vector :range 1 5 2) => (box (vector 1 3)))
-(check (rich-vector :range 1 6 2) => (box (vector 1 3 5)))
-(check (rich-vector :range 5 1 -1) => (box (vector 5 4 3 2)))
+(check (rich-vector :range 1 5) => ($ (vector 1 2 3 4)))
+(check (rich-vector :range 1 5 2) => ($ (vector 1 3)))
+(check (rich-vector :range 1 6 2) => ($ (vector 1 3 5)))
+(check (rich-vector :range 5 1 -1) => ($ (vector 5 4 3 2)))
 
-(check (rich-vector :range 5 1 1) => (box (vector )))
+(check (rich-vector :range 5 1 1) => ($ (vector )))
 
 (check-catch 'value-error (rich-vector :range 1 5 0))
 
@@ -546,42 +532,36 @@
 
 (check-true (rich-vector :fill 0 #\a :empty?))
 
-(check (rich-vector :fill 3 #\a) => (box (vector #\a #\a #\a)))
+(check (rich-vector :fill 3 #\a) => ($ (vector #\a #\a #\a)))
 
-(check ((box #(1 2 3)) :apply 1) => 2)
-(check ((box #(1 2 3)) 1) => 2)
+(check ($ #(1 2 3) :apply 1) => 2)
+(check ($ #(1 2 3) 1) => 2)
 
 (let ((vec (rich-vector #(1 2 3 4 5))))
   (check ((vec :find (lambda (x) (= x 3))) :get) => 3)
   (check ((vec :find (lambda (x) (> x 2))) :get) => 3)
-
   (check ((vec :find (lambda (x) (> x 10))) :empty?) => #t)
-
   (check ((vec :find even?) :get) => 2)
+  (check ((vec :find (lambda (x) (< x 0))) :empty?) => #t))
 
-  (check ((vec :find (lambda (x) (< x 0))) :empty?) => #t)
-)
-
-(check ((box (vector 1 2 3)) :head) => 1)
+(check ($ (vector 1 2 3) :head) => 1)
 (check-catch 'out-of-range (rich-vector :empty :head))
-(check ((box (vector 1 2 3)) :head-option) => (option 1))
+(check ($ (vector 1 2 3) :head-option) => (option 1))
 (check (rich-vector :empty :head-option) => (none))
 
-(check ((box (vector 1 2 3)) :last) => 3)
+(check ($ (vector 1 2 3) :last) => 3)
 (check-catch 'out-of-range (rich-vector :empty :last))
-(check ((box (vector 1 2 3)) :last-option) => (option 3))
+(check ($ (vector 1 2 3) :last-option) => (option 3))
 (check (rich-vector :empty :last-option) => (none))
 
-(check-true ((box (vector)) :empty?))
-(check-false ((box #(1 2 3)) :empty?))
+(check-true ($ (vector) :empty?))
+(check-false ($ #(1 2 3) :empty?))
 
-(check-true ((box #(1 2 3)) :equals (box #(1 2 3))))
+(check-true ($ #(1 2 3) :equals ($ #(1 2 3))))
 
-(check (box (vector (rich-char "中")
-                    (rich-char "文")))
-       => ((box "中文") :to-vector))
+(check ($ (vector (rich-char "中") (rich-char "文"))) => ($ "中文" :to-vector))
 
-(check-false (((box "中文") :to-vector) :equals (rich-char "中")))
+(check-false (($ "中文" :to-vector) :equals (rich-char "中")))
 
 (let ((vec (rich-vector #(1 2 3 4 5))))
   (check (vec :forall (lambda (x) (> x 0))) => #t)
@@ -630,9 +610,9 @@
   (check (vec :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
 )
 
-(check (object->string (box #(1 2 3))) => "#(1 2 3)")
+(check (object->string ($ #(1 2 3))) => "#(1 2 3)")
 
-(let1 v (box #(1 2 3))
+(let1 v ($ #(1 2 3))
   (check (v :count) => 3)
   (check (v :count (cut > <> 1)) => 2)
   (check (v :make-string) => "123")
@@ -645,25 +625,37 @@
   (check-catch 'type-error (v :make-string "[" "," 123))
 )
 
-(check ((box #("a" "b" "c")) :make-string) => "abc")
+(check ($ #("a" "b" "c") :make-string) => "abc")
 
-(let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+(let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
               :collect)
     (check (r 'a) => 2)
     (check (r 'b) => 3)
     (check (r 'c) => 4)))
       
-(let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+(let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (check ((ht :get 'a) :get) => 1)
   (check ((ht :get 'd) :empty?) => #t))
 
-(let1 ht (box (hash-table 'a 1 'b 2 'c 3))
+(let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (check-true (ht :contains 'a))
   (check-false (ht :contains 'd)))
 
-(check (rich-hash-table :empty) => (box (hash-table)))
+(check (rich-hash-table :empty) => ($ (hash-table)))
 (check (rich-hash-table :empty :collect) => (hash-table))
+
+(check ($ 1 :to 3) => '(1 2 3))
+(check ($ "hello world" :replace "world" "suger" :index-of "suger" 0) => 6)
+(check ($ '(1 2 3) :empty?) => #f)
+
+(check
+ (($ 100 :to 128)
+  :take 10
+  :map (@ + _ 1)
+  :filter even?
+  :collect)
+  => '(102 104 106 108 110))
 
 (check-report)
 
