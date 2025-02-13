@@ -2550,6 +2550,8 @@
 
     (check ($ "qingyu@liii.pro" :split "@" :head) =\<gtr\> "qingyu") ; chain
 
+    (check ($ "127.0.0.1" :split "." :count) =\<gtr\> 4) ; chain
+
     \;
   </goldfish-chunk>
 
@@ -3998,6 +4000,32 @@
 
     \;
   </goldfish-chunk>
+
+  <paragraph|rich-vector%count>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    \ \ (define (%count . xs)
+
+    \ \ \ \ (cond ((null? xs) (vector-length data))
+
+    \ \ \ \ \ \ \ \ \ \ ((length=? 1 xs) (count (car xs) (vector-\<gtr\>list data)))
+
+    \ \ \ \ \ \ \ \ \ \ (else (error 'wrong-number-of-args "rich-vector%count" xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ #() :count) =\<gtr\> 0)
+
+    (check ($ #() :count (@ \<gtr\> _ 2)) =\<gtr\> 0)
+
+    (check ($ #(1 2 3 4 5) :count) =\<gtr\> 5)
+
+    (check ($ #(1 2 3 4 5) :count (@ \<gtr\> _ 2)) =\<gtr\> 3)
+
+    \;
+  </scm-chunk>
 
   <subsection|转换器>
 

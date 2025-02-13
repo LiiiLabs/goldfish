@@ -376,6 +376,7 @@
 (check ($ "你好，欢迎使用Liii STEM" :split "，") => #("你好" "欢迎使用Liii STEM"))
 (check ($ "中国智造，惠及全球" :split "") => #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
 (check ($ "qingyu@liii.pro" :split "@" :head) => "qingyu") ; chain
+(check ($ "127.0.0.1" :split "." :count) => 4) ; chain
 
 (check (rich-list :range 1 5) => ($ (list 1 2 3 4)))
 (check (rich-list :range 1 5 2) => ($ (list 1 3)))
@@ -611,6 +612,11 @@
   (check (vec :fold-right 0 +) => 15)
   (check (vec :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
 )
+
+(check ($ #() :count) => 0)
+(check ($ #() :count (@ > _ 2)) => 0)
+(check ($ #(1 2 3 4 5) :count) => 5)
+(check ($ #(1 2 3 4 5) :count (@ > _ 2)) => 3)
 
 (check (object->string ($ #(1 2 3))) => "#(1 2 3)")
 

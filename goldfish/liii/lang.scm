@@ -880,6 +880,11 @@
   (define (%fold-right initial f)
     (vector-fold-right f initial data))
 
+  (define (%count . xs)
+    (cond ((null? xs) (vector-length data))
+          ((length=? 1 xs) (count (car xs) (vector->list data)))
+          (else (error 'wrong-number-of-args "rich-vector%count" xs))))
+
 (define (%to-string)
   (object->string data))
 
