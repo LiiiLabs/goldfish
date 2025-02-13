@@ -55,8 +55,8 @@
   (check (bob 'name) => "Bob")
   (check (bob 'age) => 21)
   (check ((bob :name "hello") 'name) => "hello")
-  (check-catch '??? (bob 'sex))
-  (check-catch '??? (bob :sex))
+  (check-catch 'value-error (bob 'sex))
+  (check-catch 'value-error (bob :sex))
   (check-true (bob :is-instance-of 'person))
   (check (bob :to-string) => "(person :name \"Bob\" :age 21)"))
 
@@ -66,9 +66,9 @@
       (get-name (lambda (x)
                  (case* x
                    ((#<procedure?>) (x 'name))
-                   (else (???))))))
+                   (else (value-error))))))
   (check (get-name bob) => "Bob")
-  (check-catch '??? (get-name 1)))
+  (check-catch 'value-error (get-name 1)))
 
 (define-case-class jerson
   ((name string?)
@@ -95,7 +95,7 @@
 )
 
 (let1 hello (test-case-class "hello ")
-  (check-catch '??? (hello :this-is-a-static-method))
+  (check-catch 'value-error (hello :this-is-a-static-method))
   (check (test-case-class :this-is-a-static-method) => (test-case-class "static")))
 
 (check-false (case-class? (lambda (x) x)))
@@ -367,15 +367,15 @@
 (check ($ "hello" :replace "l" "L" :strip-prefix "he") => ($ "LLo")) ; chain
 
 
-(check ($ "da@liii.pro" :split "@") => ($ (vector "da" "liii.pro")))
-(check ($ "da@liii.pro" :split ".") => ($ (vector "da@liii" "pro")))
-(check (($ "da@liii.pro" :split "@") :collect) => (vector "da" "liii.pro"))
-(check ($ "test" :split "") => ($ (vector "t" "e" "s" "t")))
-(check ($ "aXXbXXcXX" :split "XX") => ($ (vector "a" "b" "c" "")))
-(check ($ "a||b||c" :split "||") => ($ (vector "a" "b" "c")))
-(check ($ "XXaXXb" :split "XX") => ($ (vector "" "a" "b")))
-(check ($ "你好，欢迎使用Liii STEM" :split "，") => ($ (vector "你好" "欢迎使用Liii STEM")))
-(check ($ "中国智造，惠及全球" :split "") => ($ (vector "中" "国" "智" "造" "，" "惠" "及" "全" "球")))
+(check ($ "da@liii.pro" :split "@") => #("da" "liii.pro"))
+(check ($ "da@liii.pro" :split ".") => #("da@liii" "pro"))
+(check ($ "test" :split "") => #("t" "e" "s" "t"))
+(check ($ "aXXbXXcXX" :split "XX") => #("a" "b" "c" ""))
+(check ($ "a||b||c" :split "||") => #("a" "b" "c"))
+(check ($ "XXaXXb" :split "XX") => #("" "a" "b"))
+(check ($ "你好，欢迎使用Liii STEM" :split "，") => #("你好" "欢迎使用Liii STEM"))
+(check ($ "中国智造，惠及全球" :split "") => #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
+(check ($ "qingyu@liii.pro" :split "@" :head) => "qingyu") ; chain
 
 (check (rich-list :range 1 5) => ($ (list 1 2 3 4)))
 (check (rich-list :range 1 5 2) => ($ (list 1 3)))

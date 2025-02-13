@@ -317,7 +317,7 @@
 
   define-case-class会自动生成这些内部方法：<scm|%equals>、<scm|%is-instance-of>、<scm|%to-string>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
 
-  样本类的默认构造函数有类型校验，不做任何值校验的。如果需要做值校验，那么需要使用同名的函数覆盖define-case-class生成的默认实现。改同名函数我们成为该样本类的伴生函数。
+  样本类的默认构造函数有类型校验，不做任何值校验的。如果需要做值校验，那么需要使用同名的函数覆盖define-case-class生成的默认实现。该同名函数为该样本类的伴生函数。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-macro (define-case-class class-name fields . methods)
@@ -406,21 +406,15 @@
 
     \ \ (define (%apply . args)
 
-    \ \ \ \ (when (null? args)
+    \ \ \ \ (cond ((null? args)
 
-    \ \ \ \ \ \ \ \ \ \ (??? ,class-name "apply on zero args is not implemented"))
+    \ \ \ \ \ \ \ \ \ \ \ (value-error ,class-name "Apply on zero args is not implemented"))
 
-    \ \ \ \ (cond ((equal? ((symbol-\<gtr\>string (car args)) 0) #\\:)
+    \ \ \ \ \ \ \ \ \ \ ((equal? ((symbol-\<gtr\>string (car args)) 0) #\\:)
 
-    \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "No such method: " (car args) "Please implement the method"))
+    \ \ \ \ \ \ \ \ \ \ \ (value-error ,class-name "No such method: " (car args)))
 
-    \ \ \ \ \ \ \ \ \ \ (else
-
-    \ \ \ \ \ \ \ \ \ \ \ (??? ,class-name "No such field: " (car args)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Please use the correct field name\\n"
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ "Or you may implement %apply to process " args))))
+    \ \ \ \ \ \ \ \ \ \ (else (value-error ,class-name "No such field: " (car args)))))
 
     \ \ \ \ \ \ \ \ \ 
 
@@ -542,9 +536,9 @@
 
     \ \ (check ((bob :name "hello") 'name) =\<gtr\> "hello")
 
-    \ \ (check-catch '??? (bob 'sex))
+    \ \ (check-catch 'value-error (bob 'sex))
 
-    \ \ (check-catch '??? (bob :sex))
+    \ \ (check-catch 'value-error (bob :sex))
 
     \ \ (check-true (bob :is-instance-of 'person))
 
@@ -564,11 +558,11 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((#\<less\>procedure?\<gtr\>) (x 'name))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (???))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (value-error))))))
 
     \ \ (check (get-name bob) =\<gtr\> "Bob")
 
-    \ \ (check-catch '??? (get-name 1)))
+    \ \ (check-catch 'value-error (get-name 1)))
 
     \;
   </goldfish-chunk>
@@ -630,7 +624,7 @@
 
     (let1 hello (test-case-class "hello ")
 
-    \ \ (check-catch '??? (hello :this-is-a-static-method))
+    \ \ (check-catch 'value-error (hello :this-is-a-static-method))
 
     \ \ (check (test-case-class :this-is-a-static-method) =\<gtr\> (test-case-class "static")))
 
@@ -742,11 +736,11 @@
 
     \ \ \ \ ((case-class? left)
 
-    \ \ \ \ \ (left :equals (box right)))
+    \ \ \ \ \ (left :equals ($ right)))
 
     \ \ \ \ ((case-class? right)
 
-    \ \ \ \ \ ((box left) :equals right))
+    \ \ \ \ \ ($ left :equals right))
 
     \ \ \ \ (else
 
@@ -2500,7 +2494,7 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     ;; Split string with sep.
 
-    (define (%split sep)
+    (define (%split sep . xs)
 
     \ \ (let ((str-len (string-length data))
 
@@ -2520,13 +2514,15 @@
 
     \ \ \ \ ; do split
 
-    \ \ \ \ (rich-vector
+    \ \ \ \ (let1 r (rich-vector
 
     \ \ \ \ \ \ (if (zero? sep-len)
 
     \ \ \ \ \ \ \ \ \ \ ((%to-vector) :map (lambda (c) (c :to-string)) :collect)
 
-    \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector (reverse (split-helper 0 '())))))))
+    \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector (reverse (split-helper 0 '())))))
+
+    \ \ \ \ \ \ \ \ \ \ (if (null? xs) r (apply r xs)))))
 
     \;
   </goldfish-chunk>
@@ -2536,23 +2532,23 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     \;
 
-    (check ($ "da@liii.pro" :split "@") =\<gtr\> ($ (vector "da" "liii.pro")))
+    (check ($ "da@liii.pro" :split "@") =\<gtr\> #("da" "liii.pro"))
 
-    (check ($ "da@liii.pro" :split ".") =\<gtr\> ($ (vector "da@liii" "pro")))
+    (check ($ "da@liii.pro" :split ".") =\<gtr\> #("da@liii" "pro"))
 
-    (check (($ "da@liii.pro" :split "@") :collect) =\<gtr\> (vector "da" "liii.pro"))
+    (check ($ "test" :split "") =\<gtr\> #("t" "e" "s" "t"))
 
-    (check ($ "test" :split "") =\<gtr\> ($ (vector "t" "e" "s" "t")))
+    (check ($ "aXXbXXcXX" :split "XX") =\<gtr\> #("a" "b" "c" ""))
 
-    (check ($ "aXXbXXcXX" :split "XX") =\<gtr\> ($ (vector "a" "b" "c" "")))
+    (check ($ "a\|\|b\|\|c" :split "\|\|") =\<gtr\> #("a" "b" "c"))
 
-    (check ($ "a\|\|b\|\|c" :split "\|\|") =\<gtr\> ($ (vector "a" "b" "c")))
+    (check ($ "XXaXXb" :split "XX") =\<gtr\> #("" "a" "b"))
 
-    (check ($ "XXaXXb" :split "XX") =\<gtr\> ($ (vector "" "a" "b")))
+    (check ($ "你好，欢迎使用Liii STEM" :split "，") =\<gtr\> #("你好" "欢迎使用Liii STEM"))
 
-    (check ($ "你好，欢迎使用Liii STEM" :split "，") =\<gtr\> ($ (vector "你好" "欢迎使用Liii STEM")))
+    (check ($ "中国智造，惠及全球" :split "") =\<gtr\> #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
 
-    (check ($ "中国智造，惠及全球" :split "") =\<gtr\> ($ (vector "中" "国" "智" "造" "，" "惠" "及" "全" "球")))
+    (check ($ "qingyu@liii.pro" :split "@" :head) =\<gtr\> "qingyu") ; chain
 
     \;
   </goldfish-chunk>

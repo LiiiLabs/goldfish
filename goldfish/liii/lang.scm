@@ -100,14 +100,11 @@
                 fields)))
          
   (define (%apply . args)
-    (when (null? args)
-          (??? ,class-name "apply on zero args is not implemented"))
-    (cond ((equal? ((symbol->string (car args)) 0) #\:)
-           (??? ,class-name "No such method: " (car args) "Please implement the method"))
-          (else
-           (??? ,class-name "No such field: " (car args)
-                "Please use the correct field name\n"
-                "Or you may implement %apply to process " args))))
+    (cond ((null? args)
+           (value-error ,class-name "Apply on zero args is not implemented"))
+          ((equal? ((symbol->string (car args)) 0) #\:)
+           (value-error ,class-name "No such method: " (car args)))
+          (else (value-error ,class-name "No such field: " (car args)))))
          
   (define (%to-string)
     (let ((field-strings
@@ -175,9 +172,9 @@
     ((and (case-class? left) (case-class? right))
      (left :equals right))
     ((case-class? left)
-     (left :equals (box right)))
+     (left :equals ($ right)))
     ((case-class? right)
-     ((box left) :equals right))
+     ($ left :equals right))
     (else
      (equal? left right))))
 
@@ -534,7 +531,7 @@
         (apply result xs))))
 
 ;; Split string with sep.
-(define (%split sep)
+(define (%split sep . xs)
   (let ((str-len (string-length data))
         (sep-len (string-length sep)))
     ; tail recursive auxiliary function
@@ -544,10 +541,11 @@
             (cons (substring data start) acc)
             (split-helper (+ next-pos sep-len) (cons (substring data start next-pos) acc)))))
     ; do split
-    (rich-vector
+    (let1 r (rich-vector
       (if (zero? sep-len)
           ((%to-vector) :map (lambda (c) (c :to-string)) :collect)
-          (list->vector (reverse (split-helper 0 '())))))))
+          (list->vector (reverse (split-helper 0 '())))))
+          (if (null? xs) r (apply r xs)))))
 
 )
 
