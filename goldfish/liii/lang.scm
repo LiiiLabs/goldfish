@@ -447,8 +447,9 @@
          (string-contains data (string elem)))
         (else (type-error "elem must be char or string"))))
 
-;; Find the index for the char or substring in rich-string from index start, else return -1
-(define (%index-of sub start)
+;; Find the index for the char or substring in rich-string (from start-index), else return -1
+(define (%index-of sub . start-index)
+  (let1 start (if (null? start-index) 0 (car start-index))
   (cond
     ((string? sub)
      (let ((str-len (string-length data))
@@ -463,7 +464,7 @@
        (cond
        ((null? lst) -1)
        ((char=? (car lst) sub) index)
-       (else (loop (cdr lst) (+ index 1))))))))
+       (else (loop (cdr lst) (+ index 1)))))))))
 
 (define (%map x . xs)
   (%apply-one x xs
@@ -522,12 +523,12 @@
 
 ;; Replace the occurrences of the substring old to new.
 (define (%replace old new . xs)
-  (define (replace-helper str old new)
-    (let ((next-pos ((rich-string str) :index-of old 0)))
+  (define (replace-helper str old new start)
+    (let ((next-pos ((rich-string str) :index-of old start)))
       (if (= next-pos -1)
           str
-          (replace-helper ((rich-string str) :replace-first old new :get) old new))))
-  (let ((result (rich-string (replace-helper data old new))))
+          (replace-helper ((rich-string str) :replace-first old new :get) old new next-pos))))
+  (let ((result (rich-string (replace-helper data old new 0))))
     (if (null? xs)
         result
         (apply result xs))))

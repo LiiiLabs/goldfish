@@ -309,18 +309,20 @@
   (check-true (str :contains "")))
 
 (let1 str (rich-string "hello world!")
-  (check (str :index-of "hello" 0) => 0)
+  (check (str :index-of "hello") => 0)
+  (check (str :index-of "hello") => (str :index-of "hello" 0))
   (check (str :index-of "hello" 1) => -1)
-  (check (str :index-of "world" 0) => 6)
+  (check (str :index-of "world") => 6)
   (check (str :index-of "world" 1) => 6)
-  (check (str :index-of "!" 0) => 11)
-  (check (str :index-of "scheme" 0) => -1)
-  (check (str :index-of #\h 0) => 0)
+  (check (str :index-of "!") => 11)
+  (check (str :index-of "scheme") => -1)
+  (check (str :index-of #\h) => 0)
+  (check (str :index-of #\h) => (str :index-of #\h 0))
   (check (str :index-of #\h 1) => -1)
-  (check (str :index-of #\w 0) => 6)
+  (check (str :index-of #\w) => 6)
   (check (str :index-of #\w 1) => 6)
-  (check (str :index-of #\! 0) => 11)
-  (check (str :index-of #\~ 0) => -1))
+  (check (str :index-of #\!) => 11)
+  (check (str :index-of #\~) => -1))
 
 (check ($ "abc" :map (lambda (c) (c :to-upper))) => "ABC")
 (check ($ "abc中文" :map (lambda (c) (c :to-upper))) => "ABC中文")
@@ -646,7 +648,7 @@
 (check (rich-hash-table :empty :collect) => (hash-table))
 
 (check ($ 1 :to 3) => '(1 2 3))
-(check ($ "hello world" :replace "world" "suger" :index-of "suger" 0) => 6)
+(check ($ "hello world" :replace "world" "suger" :index-of "suger") => 6)
 (check ($ '(1 2 3) :empty?) => #f)
 
 (check

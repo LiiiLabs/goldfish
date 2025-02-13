@@ -2141,12 +2141,14 @@
 
   <paragraph|rich-string%index-of>
 
-  查找字符串中指定的字符或子串的下标，找不到则返回 -1。
+  查找字符串中指定的字符或子串的下标，找不到则返回 -1。默认从字符串起始位置开始查找。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    ;; Find the index for the char or substring in rich-string from index start, else return -1
+    ;; Find the index for the char or substring in rich-string (from start-index), else return -1
 
-    (define (%index-of sub start)
+    (define (%index-of sub . start-index)
+
+    \ \ (let1 start (if (null? start-index) 0 (car start-index))
 
     \ \ (cond
 
@@ -2176,7 +2178,7 @@
 
     \ \ \ \ \ \ \ ((char=? (car lst) sub) index)
 
-    \ \ \ \ \ \ \ (else (loop (cdr lst) (+ index 1))))))))
+    \ \ \ \ \ \ \ (else (loop (cdr lst) (+ index 1)))))))))
 
     \;
   </goldfish-chunk>
@@ -2184,29 +2186,33 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 str (rich-string "hello world!")
 
-    \ \ (check (str :index-of "hello" 0) =\<gtr\> 0)
+    \ \ (check (str :index-of "hello") =\<gtr\> 0)
+
+    \ \ (check (str :index-of "hello") =\<gtr\> (str :index-of "hello" 0))
 
     \ \ (check (str :index-of "hello" 1) =\<gtr\> -1)
 
-    \ \ (check (str :index-of "world" 0) =\<gtr\> 6)
+    \ \ (check (str :index-of "world") =\<gtr\> 6)
 
     \ \ (check (str :index-of "world" 1) =\<gtr\> 6)
 
-    \ \ (check (str :index-of "!" 0) =\<gtr\> 11)
+    \ \ (check (str :index-of "!") =\<gtr\> 11)
 
-    \ \ (check (str :index-of "scheme" 0) =\<gtr\> -1)
+    \ \ (check (str :index-of "scheme") =\<gtr\> -1)
 
-    \ \ (check (str :index-of #\\h 0) =\<gtr\> 0)
+    \ \ (check (str :index-of #\\h) =\<gtr\> 0)
+
+    \ \ (check (str :index-of #\\h) =\<gtr\> (str :index-of #\\h 0))
 
     \ \ (check (str :index-of #\\h 1) =\<gtr\> -1)
 
-    \ \ (check (str :index-of #\\w 0) =\<gtr\> 6)
+    \ \ (check (str :index-of #\\w) =\<gtr\> 6)
 
     \ \ (check (str :index-of #\\w 1) =\<gtr\> 6)
 
-    \ \ (check (str :index-of #\\! 0) =\<gtr\> 11)
+    \ \ (check (str :index-of #\\!) =\<gtr\> 11)
 
-    \ \ (check (str :index-of #\\~ 0) =\<gtr\> -1))
+    \ \ (check (str :index-of #\\~) =\<gtr\> -1))
 
     \;
   </goldfish-chunk>
@@ -2456,17 +2462,17 @@
 
     (define (%replace old new . xs)
 
-    \ \ (define (replace-helper str old new)
+    \ \ (define (replace-helper str old new start)
 
-    \ \ \ \ (let ((next-pos ((rich-string str) :index-of old 0)))
+    \ \ \ \ (let ((next-pos ((rich-string str) :index-of old start)))
 
     \ \ \ \ \ \ (if (= next-pos -1)
 
     \ \ \ \ \ \ \ \ \ \ str
 
-    \ \ \ \ \ \ \ \ \ \ (replace-helper ((rich-string str) :replace-first old new :get) old new))))
+    \ \ \ \ \ \ \ \ \ \ (replace-helper ((rich-string str) :replace-first old new :get) old new next-pos))))
 
-    \ \ (let ((result (rich-string (replace-helper data old new))))
+    \ \ (let ((result (rich-string (replace-helper data old new 0))))
 
     \ \ \ \ (if (null? xs)
 
@@ -4272,7 +4278,7 @@
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ($ 1 :to 3) =\<gtr\> '(1 2 3))
 
-    (check ($ "hello world" :replace "world" "suger" :index-of "suger" 0) =\<gtr\> 6)
+    (check ($ "hello world" :replace "world" "suger" :index-of "suger") =\<gtr\> 6)
 
     (check ($ '(1 2 3) :empty?) =\<gtr\> #f)
 
