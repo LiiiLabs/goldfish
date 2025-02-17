@@ -1,0 +1,159 @@
+<TMU|<tuple|1.0.5|1.2.9.7>>
+
+<style|<tuple|generic|chinese|goldfish|literate|reduced-margins|python>>
+
+<\body>
+  <\hide-preamble>
+    <assign|r7rs|<flag|R7RS|dark cyan>>
+
+    <assign|srfi|<flag|SRFI|dark red>>
+
+    <assign|font|math=Latin Modern Math,cjk=Noto CJK SC,CMU>
+
+    <assign|typehint|<macro|body|<goldfish-lang|<arg|body>>>>
+  </hide-preamble>
+
+  <chapter|(liii threading)><label|chapter:liii_alist>
+
+  <section|概述>
+
+  clojure风格的管道宏，适当使用可以减少括号和嵌套层数。
+
+  <section|许可证>
+
+  <\goldfish-chunk|goldfish/liii/threading.scm|false|true>
+    ;
+
+    ; Copyright (C) 2024 The Goldfish Scheme Authors
+
+    ;
+
+    ; Licensed under the Apache License, Version 2.0 (the "License");
+
+    ; you may not use this file except in compliance with the License.
+
+    ; You may obtain a copy of the License at
+
+    ;
+
+    ; http://www.apache.org/licenses/LICENSE-2.0my-sqrt
+
+    ;
+
+    ; Unless required by applicable law or agreed to in writing, software
+
+    ; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+
+    ; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+
+    ; License for the specific language governing permissions and limitations
+
+    ; under the License.
+
+    ;
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <section|接口>
+
+  <\goldfish-chunk|goldfish/liii/threading.scm|true|true>
+    (define-library (liii threading)
+
+    (export ~\> ~\>\> lambda~\> lambda~\>\> thread inject-list-first-pos)
+
+    (import (liii list) (liii error))
+
+    (begin
+
+    \;
+  </goldfish-chunk>
+
+  <section|测试>
+
+  <\scm-chunk|tests/goldfish/liii/threading-test.scm|true|true>
+    (import (liii check) (liii threading) (liii list) (liii red-black-tree))
+
+    <next-line>
+
+    (check-set-mode! 'report-failed)
+
+    \;
+  </scm-chunk>
+
+  <section|实现>
+
+  <paragraph|(~\<gtr\> val (f args <text-dots>) rest<text-dots>)>
+
+  等价于(~\<gtr\> (f val args <text-dots>) rest <text-dots>).
+
+  使用示例
+
+  <\goldfish-chunk||true|true>
+    (define (square x) (* x x))
+
+    (~\<gtr\> 3 square (- 1)) ;; =\<gtr\> 8
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  \;
+
+  <subparagraph|(~» val (f args <text-dots>) rest <text-dots>)>
+
+  和~\<gtr\>类似，但是val的插入位置在args <text-dots>之前。通常用于对列表进行操作。
+
+  <\goldfish-chunk||true|true>
+    (~\<gtr\>\<gtr\> '(1 2 3 4) (map (lambda~\> (+ 1))) (filter even?) (fold-right + 0)) ;=\<gtr\> 2+4 = 6
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|lambda~\<gtr\>>
+
+  返回一个匿名函数，并对其进行列表操作，与~\<gtr\>对应。
+
+  <\goldfish-chunk||true|true>
+    (lambda ~\<gtr\> square (- 1)) ;; equals to (lambda (x) (~\<gtr\> x square (- 1)))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|lambda~\<gtr\>\<gtr\>>
+
+  与lambda~\<gtr\>类似，但是对应的管道操作是~»。
+
+  <section|结束>
+
+  <\goldfish-chunk|goldfish/liii/threading.scm|true|false>
+    ) ; end of begin
+
+    ) ; end of library
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/threading-test.scm|true|false>
+    (check-report)
+
+    \;
+  </scm-chunk>
+
+  \;
+</body>
+
+<\initial>
+  <\collection>
+    <associate|font-base-size|12>
+    <associate|page-height|auto>
+    <associate|page-orientation|landscape>
+    <associate|page-screen-margin|false>
+    <associate|page-type|a4>
+    <associate|page-width|auto>
+    <associate|save-aux|false>
+  </collection>
+</initial>
