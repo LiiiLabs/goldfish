@@ -928,6 +928,13 @@
          data)
       (rich-hash-table r))))
 
+(define (%find pred)
+  (let ((failure (lambda () (none))))
+    (let ((pair (hash-table-find pred data failure)))
+      (if (and (pair? pair) (not (none? pair)))
+          (option (cdr pair))
+          pair))))
+
 (define (%get k)
   (option (hash-table-ref/default data k '())))
 

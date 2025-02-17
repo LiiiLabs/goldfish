@@ -643,6 +643,10 @@
     (check (r 'c) => 4)))
       
 (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
+  (check (ht :find (lambda (k v) (and (symbol? k) (even? v)))) => 2)
+  (check ((ht :find (lambda (k v) (> v 4))) :empty?) => #t))
+
+(let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (check ((ht :get 'a) :get) => 1)
   (check ((ht :get 'd) :empty?) => #t))
 

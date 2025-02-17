@@ -4189,6 +4189,34 @@
     \ \ \ \ \ \ 
   </goldfish-chunk>
 
+  <paragraph|rich-hash-table%find>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%find pred)
+
+    \ \ (let ((failure (lambda () (none))))
+
+    \ \ \ \ (let ((pair (hash-table-find pred data failure)))
+
+    \ \ \ \ \ \ (if (and (pair? pair) (not (none? pair)))
+
+    \ \ \ \ \ \ \ \ \ \ (option (cdr pair))
+
+    \ \ \ \ \ \ \ \ \ \ pair))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
+
+    \ \ (check (ht :find (lambda (k v) (and (symbol? k) (even? v)))) =\<gtr\> 2)
+
+    \ \ (check ((ht :find (lambda (k v) (\<gtr\> v 4))) :empty?) =\<gtr\> #t))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-hash-table%get><typehint|((k any?)) =\<gtr\> option?>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
