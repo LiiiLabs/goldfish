@@ -19,19 +19,19 @@
 ```
 ### Unicode支持
 ``` scheme
-((box "你好，世界") 0) ; => 你
-((box "你好，世界") 4) ; => 界
-((box "你好，世界") :length) ; => 5
+($ "你好，世界" 0) ; => 你
+($ "你好，世界" 4) ; => 界
+($ "你好，世界" :length) ; => 5
 ```
 
 ### 函数式数据管道
 ```
-((box (list 1 2 3 4 5))
+($ (list 1 2 3 4 5)
  :map (lambda (x) (* x x))
  :filter even?
  :collect) ; => (list 4 16)
 
-((box (vector 1 2 3 4 5))
+($ (vector 1 2 3 4 5)
  :map (lambda (x) (* x x))
  :filter even?
  :collect) ; => (vector 4 16)

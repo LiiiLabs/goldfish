@@ -19,19 +19,19 @@ Goldfish Scheme is a Scheme interpreter with the following features:
 ```
 ### Unicode Support
 ``` scheme
-((box "你好，世界") 0) ; => 你
-((box "你好，世界") 4) ; => 界
-((box "你好，世界") :length) ; => 5
+($ "你好，世界" 0) ; => 你
+($ "你好，世界" 4) ; => 界
+($ "你好，世界" :length) ; => 5
 ```
 
 ### Functional Data Pipeline
 ```
-((box (list 1 2 3 4 5))
+($ (list 1 2 3 4 5)
  :map (lambda (x) (* x x))
  :filter even?
  :collect) ; => (list 4 16)
 
-((box (vector 1 2 3 4 5))
+($ (vector 1 2 3 4 5)
  :map (lambda (x) (* x x))
  :filter even?
  :collect) ; => (vector 4 16)
