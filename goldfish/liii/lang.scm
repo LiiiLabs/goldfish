@@ -22,7 +22,7 @@
   define-case-class case-class? == != display* object->string
   option none
   rich-integer rich-char rich-string
-  rich-list range
+  rich-list range stack
   rich-vector rich-hash-table
   box $
 )
@@ -730,6 +730,14 @@
   (or (and (> start end) (> step 0))
       (and (< start end) (< step 0))
       (and (= start end) (not inclusive?))))
+
+)
+
+(define-case-class stack ((data list?))
+
+(define (%length) (length data))
+
+(define (@empty) (stack (list )))
 
 )
 

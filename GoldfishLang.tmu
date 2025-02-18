@@ -104,7 +104,7 @@
 
     \ \ rich-integer rich-char rich-string
 
-    \ \ rich-list range
+    \ \ rich-list range stack
 
     \ \ rich-vector rich-hash-table
 
@@ -3404,6 +3404,58 @@
 
     \;
   </goldfish-chunk>
+
+  \;
+
+  <section|stack>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-case-class stack ((data list?))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|选择器>
+
+  <paragraph|stack%length>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%length) (length data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((stack (list 1 2 3)) :length) =\<gtr\> 3)
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|静态方法>
+
+  <paragraph|stack@empty>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@empty) (stack (list )))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((stack :empty) :length) =\<gtr\> 0)
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|结尾>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
+
+  \;
 
   <section|rich-vector>
 

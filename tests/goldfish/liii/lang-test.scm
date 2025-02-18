@@ -521,6 +521,10 @@
 (check-true ((range :inclusive 3 1) :empty?))
 (check-false ((range :inclusive 1 3 0) :empty?))
 
+(check ((stack (list 1 2 3)) :length) => 3)
+
+(check ((stack :empty) :length) => 0)
+
 (check (rich-vector :range 1 5) => ($ (vector 1 2 3 4)))
 (check (rich-vector :range 1 5 2) => ($ (vector 1 3)))
 (check (rich-vector :range 1 6 2) => ($ (vector 1 3 5)))
