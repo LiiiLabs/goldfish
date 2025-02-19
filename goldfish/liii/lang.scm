@@ -422,6 +422,30 @@
 (typed-define (%apply (i integer?))
   (%char-at i))
 
+(define (%slice from until)
+  (define from (max 0 from))
+  (define bv (string->utf8 data))
+  (define len (length bv))
+  (define p 0)
+
+  (let loop ((n 0))
+    (when (and (< n from) (< p len))
+      (let ((nextp (bytevector-advance-u8 bv p len)))
+        (when (== nextp p)
+          (error 'value-error "Invalid UTF-8 sequence at index: " p))
+        (set! p nextp)
+        (loop (+ n 1)))))
+
+  (define q p)
+  (let loop ((n from))
+    (when (and (< n until) (< q len))
+      (let ((nextp (bytevector-advance-u8 bv q len)))
+        (when (== nextp q)
+          (error 'value-error "Invalid UTF-8 sequence at index: " q))
+        (set! q nextp)
+        (loop (+ n 1)))))
+  (utf8->string bv p q))
+
 (define (%empty?)
   (string-null? data))
 

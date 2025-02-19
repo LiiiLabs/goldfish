@@ -293,6 +293,15 @@
    (check (str 0) => ($ #\H))
    (check (str 7) => (rich-char "界")))
 
+(let1 str ($ "Hello，世界")
+   (check (str :slice 0 5) => ($ "Hello"))
+   (check (str :slice -10 5) => ($ "Hello"))
+   (check (str :slice 6 100) => ($ "世界"))
+   (check (str :slice 6 2) => ($ ""))
+   (check (str :slice -3 -2) => ($ ""))
+   (check (str :slice 100 101) => ($ ""))
+   (check (str :slice -1 100) => ($ "Hello，世界")))
+
 (check ($ "42") => ($ "42"))
 (check-false ($ "41" :equals ($ "42")))
 

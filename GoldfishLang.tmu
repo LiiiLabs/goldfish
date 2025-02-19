@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.4>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -2009,6 +2009,78 @@
     \ \ \ (check (str 0) =\<gtr\> ($ #\\H))
 
     \ \ \ (check (str 7) =\<gtr\> (rich-char "界")))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-string%slice>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%slice from until)
+
+    \ \ (define from (max 0 from))
+
+    \ \ (define bv (string-\<gtr\>utf8 data))
+
+    \ \ (define len (length bv))
+
+    \ \ (define p 0)
+
+    \;
+
+    \ \ (let loop ((n 0))
+
+    \ \ \ \ (when (and (\<less\> n from) (\<less\> p len))
+
+    \ \ \ \ \ \ (let ((nextp (bytevector-advance-u8 bv p len)))
+
+    \ \ \ \ \ \ \ \ (when (== nextp p)
+
+    \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " p))
+
+    \ \ \ \ \ \ \ \ (set! p nextp)
+
+    \ \ \ \ \ \ \ \ (loop (+ n 1)))))
+
+    \;
+
+    \ \ (define q p)
+
+    \ \ (let loop ((n from))
+
+    \ \ \ \ (when (and (\<less\> n until) (\<less\> q len))
+
+    \ \ \ \ \ \ (let ((nextp (bytevector-advance-u8 bv q len)))
+
+    \ \ \ \ \ \ \ \ (when (== nextp q)
+
+    \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " q))
+
+    \ \ \ \ \ \ \ \ (set! q nextp)
+
+    \ \ \ \ \ \ \ \ (loop (+ n 1)))))
+
+    \ \ (utf8-\<gtr\>string bv p q))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 str ($ "Hello，世界")
+
+    \ \ \ (check (str :slice 0 5) =\<gtr\> ($ "Hello"))
+
+    \ \ \ (check (str :slice -10 5) =\<gtr\> ($ "Hello"))
+
+    \ \ \ (check (str :slice 6 100) =\<gtr\> ($ "世界"))
+
+    \ \ \ (check (str :slice 6 2) =\<gtr\> ($ ""))
+
+    \ \ \ (check (str :slice -3 -2) =\<gtr\> ($ ""))
+
+    \ \ \ (check (str :slice 100 101) =\<gtr\> ($ ""))
+
+    \ \ \ (check (str :slice -1 100) =\<gtr\> ($ "Hello，世界")))
 
     \;
   </goldfish-chunk>
