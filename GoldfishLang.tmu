@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.4>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -2009,6 +2009,38 @@
     \ \ \ (check (str 0) =\<gtr\> ($ #\\H))
 
     \ \ \ (check (str 7) =\<gtr\> (rich-char "界")))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-string%slice>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%slice from until)
+
+    \ \ \ \ \ \ \ \ (let ((from (max 0 from))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (until (min 0 until)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= from until)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-string "")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-string (substring data (max 0 from) (min until (length data)))))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 str ($ "Hello，世界")
+
+    \ \ \ (check (str :slice 0 5) =\<gtr\> ($ "Hello"))
+
+    \ \ \ (check (str :slice 6 10) =\<gtr\> ($ "世界"))
+
+    \ \ \ (check (str :slice 6 2) =\<gtr\> ($ ""))
+
+    \ \ \ (check (str :slice -1 100) =\<gtr\> str))
 
     \;
   </goldfish-chunk>

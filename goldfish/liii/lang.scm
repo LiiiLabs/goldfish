@@ -422,6 +422,13 @@
 (typed-define (%apply (i integer?))
   (%char-at i))
 
+(define (%slice from until)
+        (let ((from (max 0 from))
+                                (until (min 0 until)))
+                (if (>= from until)
+                        (rich-string "")
+                        (rich-string (substring data (max 0 from) (min until (length data)))))))
+
 (define (%empty?)
   (string-null? data))
 
