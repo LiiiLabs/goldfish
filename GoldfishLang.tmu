@@ -2018,49 +2018,17 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%slice from until)
 
-    \ \ (define from (max 0 from))
+    \ \ (let* ((len (u8-string-length data))
 
-    \ \ (define bv (string-\<gtr\>utf8 data))
+    \ \ \ \ \ \ \ \ \ (start (max 0 from))
 
-    \ \ (define len (length bv))
+    \ \ \ \ \ \ \ \ \ (end (min len until)))
 
-    \ \ (define p 0)
+    \ \ \ \ (if (\<less\> start end)
 
-    \;
+    \ \ \ \ \ \ ($ (u8-substring data start end))
 
-    \ \ (let loop ((n 0))
-
-    \ \ \ \ (when (and (\<less\> n from) (\<less\> p len))
-
-    \ \ \ \ \ \ (let ((nextp (bytevector-advance-u8 bv p len)))
-
-    \ \ \ \ \ \ \ \ (when (== nextp p)
-
-    \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " p))
-
-    \ \ \ \ \ \ \ \ (set! p nextp)
-
-    \ \ \ \ \ \ \ \ (loop (+ n 1)))))
-
-    \;
-
-    \ \ (define q p)
-
-    \ \ (let loop ((n from))
-
-    \ \ \ \ (when (and (\<less\> n until) (\<less\> q len))
-
-    \ \ \ \ \ \ (let ((nextp (bytevector-advance-u8 bv q len)))
-
-    \ \ \ \ \ \ \ \ (when (== nextp q)
-
-    \ \ \ \ \ \ \ \ \ \ (error 'value-error "Invalid UTF-8 sequence at index: " q))
-
-    \ \ \ \ \ \ \ \ (set! q nextp)
-
-    \ \ \ \ \ \ \ \ (loop (+ n 1)))))
-
-    \ \ (utf8-\<gtr\>string bv p q))
+    \ \ \ \ \ \ ($ ""))))
 
     \;
   </goldfish-chunk>
