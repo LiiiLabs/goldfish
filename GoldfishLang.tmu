@@ -4244,17 +4244,23 @@
   <paragraph|rich-hash-table%find>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%find pred)
+    (define (%find pred?)
 
-    \ \ (let ((failure (lambda () (none))))
+    \ \ (let ((all-kv (map identity data)))
 
-    \ \ \ \ (let ((pair (hash-table-find pred data failure)))
+    \ \ \ \ (let loop ((kvs all-kv))
 
-    \ \ \ \ \ \ (if (and (pair? pair) (not (none? pair)))
+    \ \ \ \ \ \ (if (null? kvs)
 
-    \ \ \ \ \ \ \ \ \ \ (option (cdr pair))
+    \ \ \ \ \ \ \ \ \ \ (none)
 
-    \ \ \ \ \ \ \ \ \ \ pair))))
+    \ \ \ \ \ \ \ \ \ \ (let1 kv (car kvs)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (pred? (car kv) (cdr kv))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option kv)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr kvs))))))))
 
     \;
   </goldfish-chunk>
@@ -4262,7 +4268,7 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
 
-    \ \ (check (ht :find (lambda (k v) (and (symbol? k) (even? v)))) =\<gtr\> 2)
+    \ \ (check (ht :find (lambda (k v) (and (symbol? k) (even? v)))) =\<gtr\> (option (cons 'b 2)))
 
     \ \ (check ((ht :find (lambda (k v) (\<gtr\> v 4))) :empty?) =\<gtr\> #t))
 
