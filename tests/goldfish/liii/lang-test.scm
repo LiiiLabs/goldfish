@@ -293,6 +293,10 @@
    (check (str 0) => ($ #\H))
    (check (str 7) => (rich-char "界")))
 
+(let ((str ($ "hello")))
+       (set! (str 0) #\H)
+       (check str => ($ "Hello")))
+
 (check ($ "42") => ($ "42"))
 (check-false ($ "41" :equals ($ "42")))
 
@@ -427,6 +431,10 @@
 (check ($ (list 1 2 3) :head-option) => (option 1))
 (check (rich-list :empty :head-option) => (none))
 
+(let ((lst ($ '(2 3 4))))
+       (set! (lst 2) 3)
+       (check lst => ($ '(2 3 3))))
+
 (check-true ($ (list) :empty?))
 (check-false ($ '(1 2 3) :empty?))
 
@@ -560,6 +568,10 @@
 (check-catch 'out-of-range (rich-vector :empty :last))
 (check ($ (vector 1 2 3) :last-option) => (option 3))
 (check (rich-vector :empty :last-option) => (none))
+
+(let ((vec ($ (vector 2 3 4))))
+       (set! (vec 2) 3)
+       (check vec => ($ (vector 2 3 3))))
 
 (check-true ($ (vector) :empty?))
 (check-false ($ #(1 2 3) :empty?))

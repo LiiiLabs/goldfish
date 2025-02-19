@@ -144,7 +144,9 @@
 
         (else (apply %apply (cons msg args))))))
 
-  (instance-dispatcher)
+  ,(if (in? '%setter instance-method-symbols)
+     '(dilambda (instance-dispatcher) %setter)
+     '(instance-dispatcher))
 ) ; end of the internal typed define
 
 (if (in? msg (list ,@static-messages))
@@ -422,6 +424,9 @@
 (typed-define (%apply (i integer?))
   (%char-at i))
 
+(define (%setter n v)
+  (set! (data n) v))
+
 (define (%empty?)
   (string-null? data))
 
@@ -604,6 +609,9 @@
       (none)
       (option (car data))))
 
+
+(define (%setter n v)
+  (set! (data n) v))
 
 (define (%empty?)
   (null? data))
@@ -802,6 +810,9 @@
     (if (> len 0)
       (option (vector-ref data (- len 1)))
       (none))))
+
+(define (%setter n v)
+  (set! (data n) v))
 
 (define (%empty?)
   (= (length data) 0))

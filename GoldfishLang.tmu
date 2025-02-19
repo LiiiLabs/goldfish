@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.4>>
+<TMU|<tuple|1.0.5|1.2.9.8>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -494,7 +494,11 @@
 
     \;
 
-    \ \ (instance-dispatcher)
+    \ \ ,(if (in? '%setter instance-method-symbols)
+
+    \ \ \ \ \ '(dilambda (instance-dispatcher) %setter)
+
+    \ \ \ \ \ '(instance-dispatcher))
 
     ) ; end of the internal typed define
 
@@ -2013,6 +2017,26 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-string%setter>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%setter n v)
+
+    \ \ (set! (data n) v))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((str ($ "hello")))
+
+    \ \ \ \ \ \ \ (set! (str 0) #\\H)
+
+    \ \ \ \ \ \ \ (check str =\<gtr\> ($ "Hello")))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|谓词>
 
   <paragraph|rich-string%equals>
@@ -2837,7 +2861,27 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-list%setter>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%setter n v)
+
+    \ \ (set! (data n) v))
+
+    \;
+  </scm-chunk>
+
   \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((lst ($ '(2 3 4))))
+
+    \ \ \ \ \ \ \ (set! (lst 2) 3)
+
+    \ \ \ \ \ \ \ (check lst =\<gtr\> ($ '(2 3 3))))
+
+    \;
+  </goldfish-chunk>
 
   <subsection|谓词>
 
@@ -3703,6 +3747,26 @@
     (check ($ (vector 1 2 3) :last-option) =\> (option 3))
 
     (check (rich-vector :empty :last-option) =\> (none))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|rich-vector%setter>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%setter n v)
+
+    \ \ (set! (data n) v))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((vec ($ (vector 2 3 4))))
+
+    \ \ \ \ \ \ \ (set! (vec 2) 3)
+
+    \ \ \ \ \ \ \ (check vec =\<gtr\> ($ (vector 2 3 3))))
 
     \;
   </scm-chunk>
