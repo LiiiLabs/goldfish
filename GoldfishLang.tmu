@@ -372,7 +372,15 @@
 
     ,@static-methods
 
-    \ \ \ 
+    \;
+
+    (define (is-normal-function? msg)
+
+    \ \ (and \ (symbol? msg)\ 
+
+    \ \ \ \ \ \ \ \ (char=? (string-ref (symbol-\<gtr\>string msg) 0) #\\:)))
+
+    \;
 
     (define (static-dispatcher msg . args)
 
@@ -424,7 +432,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ (list ,@(map (lambda (field key-field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(string-append
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(string-append
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(symbol-\<gtr\>string key-field) " "
 
@@ -460,13 +468,23 @@
 
     \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ ((eq? msg :is-instance-of) (apply %is-instance-of args))
+    \ \ \ \ \ \ \ \ ((is-normal-function? msg)
 
-    \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
+    \ \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :is-instance-of) (apply %is-instance-of args))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ 
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instance-method-symbols instance-messages)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (value-error ,class-name "No such method: " msg))))
+
+    \ \ \ \ \ \ \ \ 
 
     \ \ \ \ \ \ \ \ ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
 
@@ -481,12 +499,6 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields)
-
-    \;
-
-    \ \ \ \ \ \ \ \ ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instance-method-symbols instance-messages)
 
     \;
 
@@ -513,8 +525,6 @@
     ) ; end of let
 
     ) ; end of define-macro
-
-    \;
   </goldfish-chunk>
 
   测试：不带用户自定义方法的样本类person

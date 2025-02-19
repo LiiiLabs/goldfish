@@ -83,7 +83,11 @@
 `(define (,class-name msg . args)
 
 ,@static-methods
-   
+
+(define (is-normal-function? msg)
+  (and  (symbol? msg) 
+        (char=? (string-ref (symbol->string msg) 0) #\:)))
+
 (define (static-dispatcher msg . args)
     (cond
      ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
@@ -127,10 +131,15 @@
   (define (instance-dispatcher)
     (lambda (msg . args)
       (cond
-        ((eq? msg :is-instance-of) (apply %is-instance-of args))
-        ((eq? msg :equals) (apply %equals args))
-        ((eq? msg :to-string) (%to-string))
-             
+        ((is-normal-function? msg)
+          (cond
+              ((eq? msg :is-instance-of) (apply %is-instance-of args))
+              ((eq? msg :equals) (apply %equals args))
+              ((eq? msg :to-string) (%to-string))
+              ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
+               instance-method-symbols instance-messages)
+              (else (value-error ,class-name "No such method: " msg))))
+        
         ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
         ,@(map (lambda (field key-field)
                  `((eq? msg ,key-field)
@@ -138,9 +147,6 @@
                     ,@(map (lambda (f) (if (eq? (car f) (car field)) '(car args) (car f)))
                            fields))))
                fields key-fields)
-
-        ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
-               instance-method-symbols instance-messages)
 
         (else (apply %apply (cons msg args))))))
 
