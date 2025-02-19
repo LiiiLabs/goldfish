@@ -221,6 +221,46 @@
     (get-name da))
   => "Darcy")
 
+(check-true (number? 123))          ; 整数
+(check-true (number? 123.456))      ; 浮点数
+(check-true (number? 1/2))          ; 有理数
+(check-true (number? 1+2i))         ; 复数
+(check-false (number? "123"))       ; 字符串
+(check-false (number? #t))          ; 布尔值
+(check-false (number? 'symbol))     ; 符号
+(check-false (number? '(1 2 3)))    ; 列表
+(check-true (complex? 1+2i))        ; 复数
+(check-true (complex? 123))         ; 整数也是复数
+(check-true (complex? 123.456))     ; 浮点数也是复数
+(check-true (complex? 1/2))         ; 有理数也是复数
+(check-false (complex? "123"))      ; 字符串
+(check-false (complex? #t))         ; 布尔值
+(check-false (complex? 'symbol))    ; 符号
+(check-false (complex? '(1 2 3)))   ; 列表
+(check-true (real? 123))            ; 整数
+(check-true (real? 123.456))        ; 浮点数
+(check-true (real? 1/2))            ; 有理数
+(check-false (real? 1+2i))          ; 复数
+(check-false (real? "123"))         ; 字符串
+(check-false (real? #t))            ; 布尔值
+(check-false (real? 'symbol))       ; 符号
+(check-false (real? '(1 2 3)))      ; 列表
+(check-true (rational? 123))        ; 整数
+(check-true (rational? 1/2))        ; 有理数
+(check-false (rational? 123.456))   ; 浮点数
+(check-false (rational? 1+2i))      ; 复数
+(check-false (rational? "123"))     ; 字符串
+(check-false (rational? #t))        ; 布尔值
+(check-false (rational? 'symbol))   ; 符号
+(check-false (rational? '(1 2 3)))  ; 列表
+(check-true (integer? 123))         ; 整数
+(check-false (integer? 123.456))    ; 浮点数
+(check-false (integer? 1/2))        ; 有理数
+(check-false (integer? 1+2i))       ; 复数
+(check-false (integer? "123"))      ; 字符串
+(check-false (integer? #t))         ; 布尔值
+(check-false (integer? 'symbol))    ; 符号
+(check-false (integer? '(1 2 3)))   ; 列表
 (check-true (exact? 1))
 (check-true (exact? 1/2))
 (check-false (exact? 0.3))

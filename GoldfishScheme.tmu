@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.3>>
+<TMU|<tuple|1.1.0|2025.0.4>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python|elvish>>
 
@@ -47,7 +47,7 @@
 
   墨干一开始使用的是S7 Scheme，然而S7 Scheme并不严格遵循R7RS small标准，也没有提供常见的SRFI实现。故而我们决定在S7 Scheme的基础上，发布Goldfish Scheme，更加严格地遵循R7RS small标准，并提供常见的SRFI实现作为Goldfish Scheme的内置标准库。另外，无论是R7RS small还是SRFI都没有提供同时兼容macOS, GNU/Linux和Windows的类似于Python的os模块的标准库，故而我们模仿了Python的os模块，实现金鱼的内置标准库<scm|(liii os)>，以提供<scm|listdir>、<scm|mkdir>等常见功能。
 
-  <section|文学编程>
+  <section|文学编程><nbsp>
 
   Goldfish Scheme最初的三位作者是沈达、刘念和Yansong Li，项目立项时就是采用文学编程的方式实现Goldfish Scheme的Scheme部分。
 
@@ -1341,15 +1341,109 @@
 
   判断一个对象是否是数。
 
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <\code>
+      (check-true (number? 123)) \ \ \ \ \ \ \ \ \ ; 整数
+
+      (check-true (number? 123.456)) \ \ \ \ \ ; 浮点数
+
+      (check-true (number? 1/2)) \ \ \ \ \ \ \ \ \ ; 有理数
+
+      (check-true (number? 1+2i)) \ \ \ \ \ \ \ \ ; 复数
+
+      (check-false (number? "123")) \ \ \ \ \ \ ; 字符串
+
+      (check-false (number? #t)) \ \ \ \ \ \ \ \ \ ; 布尔值
+
+      (check-false (number? 'symbol)) \ \ \ \ ; 符号
+
+      (check-false (number? '(1 2 3))) \ \ \ ; 列表
+    </code>
+  </goldfish-chunk>
+
   <paragraph|complex?>
 
   判断一个对象是否是复数。
 
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <\code>
+      (check-true (complex? 1+2i)) \ \ \ \ \ \ \ ; 复数
+
+      (check-true (complex? 123)) \ \ \ \ \ \ \ \ ; 整数也是复数
+
+      (check-true (complex? 123.456)) \ \ \ \ ; 浮点数也是复数
+
+      (check-true (complex? 1/2)) \ \ \ \ \ \ \ \ ; 有理数也是复数
+
+      (check-false (complex? "123")) \ \ \ \ \ ; 字符串
+
+      (check-false (complex? #t)) \ \ \ \ \ \ \ \ ; 布尔值
+
+      (check-false (complex? 'symbol)) \ \ \ ; 符号
+
+      (check-false (complex? '(1 2 3))) \ \ ; 列表
+    </code>
+  </goldfish-chunk>
+
   <paragraph|real?>
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (real? 123)) \ \ \ \ \ \ \ \ \ \ \ ; 整数
+
+    (check-true (real? 123.456)) \ \ \ \ \ \ \ ; 浮点数
+
+    (check-true (real? 1/2)) \ \ \ \ \ \ \ \ \ \ \ ; 有理数
+
+    (check-false (real? 1+2i)) \ \ \ \ \ \ \ \ \ ; 复数
+
+    (check-false (real? "123")) \ \ \ \ \ \ \ \ ; 字符串
+
+    (check-false (real? #t)) \ \ \ \ \ \ \ \ \ \ \ ; 布尔值
+
+    (check-false (real? 'symbol)) \ \ \ \ \ \ ; 符号
+
+    (check-false (real? '(1 2 3))) \ \ \ \ \ ; 列表
+  </goldfish-chunk>
 
   <paragraph|rational?>
 
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (rational? 123)) \ \ \ \ \ \ \ ; 整数
+
+    (check-true (rational? 1/2)) \ \ \ \ \ \ \ ; 有理数
+
+    (check-false (rational? 123.456)) \ \ ; 浮点数
+
+    (check-false (rational? 1+2i)) \ \ \ \ \ ; 复数
+
+    (check-false (rational? "123")) \ \ \ \ ; 字符串
+
+    (check-false (rational? #t)) \ \ \ \ \ \ \ ; 布尔值
+
+    (check-false (rational? 'symbol)) \ \ ; 符号
+
+    (check-false (rational? '(1 2 3))) \ ; 列表
+  </goldfish-chunk>
+
   <paragraph|integer?>
+
+  <\goldfish-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (integer? 123)) \ \ \ \ \ \ \ \ ; 整数
+
+    (check-false (integer? 123.456)) \ \ \ ; 浮点数
+
+    (check-false (integer? 1/2)) \ \ \ \ \ \ \ ; 有理数
+
+    (check-false (integer? 1+2i)) \ \ \ \ \ \ ; 复数
+
+    (check-false (integer? "123")) \ \ \ \ \ ; 字符串
+
+    (check-false (integer? #t)) \ \ \ \ \ \ \ \ ; 布尔值
+
+    (check-false (integer? 'symbol)) \ \ \ ; 符号
+
+    (check-false (integer? '(1 2 3))) \ \ ; 列表
+  </goldfish-chunk>
 
   <subsection|数的准确性>
 
