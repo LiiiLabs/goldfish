@@ -422,6 +422,14 @@
 (typed-define (%apply (i integer?))
   (%char-at i))
 
+(define (%slice from until)
+  (let* ((len (u8-string-length data))
+         (start (max 0 from))
+         (end (min len until)))
+    (if (< start end)
+      (rich-string (u8-substring data start end))
+      (rich-string ""))))
+
 (define (%empty?)
   (string-null? data))
 

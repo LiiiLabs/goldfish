@@ -2013,6 +2013,46 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-string%slice>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%slice from until)
+
+    \ \ (let* ((len (u8-string-length data))
+
+    \ \ \ \ \ \ \ \ \ (start (max 0 from))
+
+    \ \ \ \ \ \ \ \ \ (end (min len until)))
+
+    \ \ \ \ (if (\<less\> start end)
+
+    \ \ \ \ \ \ (rich-string (u8-substring data start end))
+
+    \ \ \ \ \ \ (rich-string ""))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 str ($ "Hello，世界")
+
+    \ \ \ (check (str :slice 0 5) =\<gtr\> ($ "Hello"))
+
+    \ \ \ (check (str :slice -10 5) =\<gtr\> ($ "Hello"))
+
+    \ \ \ (check (str :slice 6 100) =\<gtr\> ($ "世界"))
+
+    \ \ \ (check (str :slice 6 2) =\<gtr\> ($ ""))
+
+    \ \ \ (check (str :slice -3 -2) =\<gtr\> ($ ""))
+
+    \ \ \ (check (str :slice 100 101) =\<gtr\> ($ ""))
+
+    \ \ \ (check (str :slice -1 100) =\<gtr\> ($ "Hello，世界")))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|谓词>
 
   <paragraph|rich-string%equals>
