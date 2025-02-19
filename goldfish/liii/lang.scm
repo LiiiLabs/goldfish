@@ -427,8 +427,8 @@
          (start (max 0 from))
          (end (min len until)))
     (if (< start end)
-      ($ (u8-substring data start end))
-      ($ ""))))
+      (rich-string (u8-substring data start end))
+      (rich-string ""))))
 
 (define (%empty?)
   (string-null? data))
