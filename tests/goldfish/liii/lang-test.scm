@@ -561,6 +561,16 @@
 (check ($ (vector 1 2 3) :last-option) => (option 3))
 (check (rich-vector :empty :last-option) => (none))
 
+(let1 vec (rich-vector #(1 2 3 4 5))
+  (check (vec :slice 0 2) => ($ #(1 2)))
+  (check (vec :slice -1 2) => ($ #(1 2)))
+  (check (vec :slice 2 -1) => ($ #()))
+  (check (vec :slice 2 2) => ($ #()))
+  (check (vec :slice 6 2) => ($ #()))
+  (check (vec :slice -1 10) => ($ #(1 2 3 4 5)))
+  (check (vec :slice 4 10) => ($ #(5)))
+  (check (vec :slice 2 4) => ($ #(3 4))))
+
 (check-true ($ (vector) :empty?))
 (check-false ($ #(1 2 3) :empty?))
 

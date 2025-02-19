@@ -803,6 +803,14 @@
       (option (vector-ref data (- len 1)))
       (none))))
 
+(define (%slice from until)
+  (let* ((len (vector-length data))
+         (start (max 0 from))
+         (end (min len until)))
+    (if (< start end)
+      (rich-vector (vector-copy data start end))
+      (rich-vector :empty))))
+
 (define (%empty?)
   (= (length data) 0))
 

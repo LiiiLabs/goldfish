@@ -3707,6 +3707,48 @@
     \;
   </scm-chunk>
 
+  <paragraph|rich-vector%slice>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%slice from until)
+
+    \ \ (let* ((len (vector-length data))
+
+    \ \ \ \ \ \ \ \ \ (start (max 0 from))
+
+    \ \ \ \ \ \ \ \ \ (end (min len until)))
+
+    \ \ \ \ (if (\<less\> start end)
+
+    \ \ \ \ \ \ (rich-vector (vector-copy data start end))
+
+    \ \ \ \ \ \ (rich-vector :empty))))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 vec (rich-vector #(1 2 3 4 5))
+
+    \ \ (check (vec :slice 0 2) =\<gtr\> ($ #(1 2)))
+
+    \ \ (check (vec :slice -1 2) =\<gtr\> ($ #(1 2)))
+
+    \ \ (check (vec :slice 2 -1) =\<gtr\> ($ #()))
+
+    \ \ (check (vec :slice 2 2) =\<gtr\> ($ #()))
+
+    \ \ (check (vec :slice 6 2) =\<gtr\> ($ #()))
+
+    \ \ (check (vec :slice -1 10) =\<gtr\> ($ #(1 2 3 4 5)))
+
+    \ \ (check (vec :slice 4 10) =\<gtr\> ($ #(5)))
+
+    \ \ (check (vec :slice 2 4) =\<gtr\> ($ #(3 4))))
+
+    \;
+  </scm-chunk>
+
   <subsection|谓词>
 
   <paragraph|rich-vector%empty?>
