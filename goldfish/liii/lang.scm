@@ -958,16 +958,14 @@
 
 )
 
-(define (box x . xs)
-  (let1 r
-      (cond ((integer? x) (rich-integer x))
+(define (box x)
+  (cond ((integer? x) (rich-integer x))
         ((char? x) (rich-char (char->integer x)))
         ((string? x) (rich-string x))
         ((list? x) (rich-list x))
         ((vector? x) (rich-vector x))
         ((hash-table? x) (rich-hash-table x))
-        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?")))
-       (if (null? xs) r (apply r xs))))
+        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
 
 (define ($ x . xs)
   (if (null? xs) (box x) (apply (box x) xs)))

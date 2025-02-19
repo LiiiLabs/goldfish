@@ -4348,11 +4348,9 @@
   <paragraph|box>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (box x . xs)
+    (define (box x)
 
-    \ \ (let1 r
-
-    \ \ \ \ \ \ (cond ((integer? x) (rich-integer x))
+    \ \ (cond ((integer? x) (rich-integer x))
 
     \ \ \ \ \ \ \ \ ((char? x) (rich-char (char-\<gtr\>integer x)))
 
@@ -4364,16 +4362,14 @@
 
     \ \ \ \ \ \ \ \ ((hash-table? x) (rich-hash-table x))
 
-    \ \ \ \ \ \ \ \ (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?")))
-
-    \ \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ \ \ \ \ \ \ (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
 
     \;
   </goldfish-chunk>
 
   <paragraph|$ 语法糖>
 
-  $“装饰”这个字面量，使其成为 rich 的。可以去掉box的括号，进一步简化语法。
+  $语法糖将第一个参数装箱（boxing），得到一个样本类，并将剩下的参数作为样本类的参数。该语法糖简化了语法，同时避免了隐式转换。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define ($ x . xs)
@@ -4382,8 +4378,6 @@
 
     \;
   </goldfish-chunk>
-
-  <paragraph|测试<math|> $ 语法糖>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ($ 1 :to 3) =\<gtr\> '(1 2 3))
