@@ -25,20 +25,17 @@ Goldfish Scheme is a Scheme interpreter with the following features:
 ```
 
 ### Functional Data Pipeline
-```
-($ (list 1 2 3 4 5)
- :map (lambda (x) (* x x))
- :filter even?
- :collect) ; => (list 4 16)
+![](r7rs_vs_goldfish.png)
 
-($ (vector 1 2 3 4 5)
- :map (lambda (x) (* x x))
- :filter even?
- :collect) ; => (vector 4 16)
+With `prime?` provided, filter prime numbers in this way:
+``` scheme
+(($ 1 to 100)
+ :filter prime?
+ :collect)
 ```
 
 ### Scala like case class
-```
+``` scheme
 (define-case-class person
   ((name string?)
    (age integer?))

@@ -25,20 +25,17 @@
 ```
 
 ### 函数式数据管道
-```
-($ (list 1 2 3 4 5)
- :map (lambda (x) (* x x))
- :filter even?
- :collect) ; => (list 4 16)
+![](r7rs_vs_goldfish.png)
 
-($ (vector 1 2 3 4 5)
- :map (lambda (x) (* x x))
- :filter even?
- :collect) ; => (vector 4 16)
+在`prime?`已提供的情况下，用如下方法过滤出1到100的质数：
+``` scheme
+(($ 1 to 100)
+ :filter prime?
+ :collect)
 ```
 
 ### 类似Scala的case class
-```
+``` scheme
 (define-case-class person
   ((name string?)
    (age integer?))
