@@ -1347,6 +1347,60 @@
     \;
   </goldfish-chunk>
 
+  \;
+
+  <subsection|其余函数>
+
+  <paragraph|rich-integer%sqrt>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    ;;return exact integer
+
+    (define (%sqrt)
+
+    \ \ (if (\<less\> data 0)
+
+    \ \ \ \ \ \ (value-error
+
+    \ \ \ \ \ \ \ \ (format #f "sqrt of negative integer is undefined! \ \ \ \ \ \ \ \ ** Got ~a **" data))
+
+    \ \ \ \ \ \ (inexact-\<gtr\>exact (floor (sqrt data)))))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 0 :sqrt) =\<gtr\> 0) \ \ \ \ \ \ 
+
+    (check ($ 1 :sqrt) =\<gtr\> 1) \ \ \ \ \ \ 
+
+    (check ($ 2 :sqrt) =\<gtr\> 1) \ \ \ \ \ \ 
+
+    (check ($ 9 :sqrt) =\<gtr\> 3) \ \ \ \ \ \ 
+
+    (check ($ 8 :sqrt) =\<gtr\> 2)
+
+    (check ($ 10 :sqrt) =\<gtr\> 3)
+
+    (check ($ 144 :sqrt) =\<gtr\> 12) \ \ \ \ \ \ 
+
+    (check ($ 289 :sqrt) =\<gtr\> 17) \ \ \ \ \ \ 
+
+    (check ($ 290 :sqrt) =\<gtr\> 17) \ \ \ \ \ \ 
+
+    (check ($ 10201 :sqrt) =\<gtr\> 101) \ \ \ \ \ \ 
+
+    (check ($ 10403 :sqrt) =\<gtr\> 101)\ 
+
+    (check ($ (rich-integer :max-value) :sqrt) =\<gtr\> 3037000499)
+
+    (check-catch 'value-error ($ -1 :sqrt))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

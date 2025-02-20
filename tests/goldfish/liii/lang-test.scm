@@ -203,6 +203,20 @@
 
 (check (- (rich-integer :min-value) 1) => (rich-integer :max-value))
 
+(check ($ 0 :sqrt) => 0)       
+(check ($ 1 :sqrt) => 1)       
+(check ($ 2 :sqrt) => 1)       
+(check ($ 9 :sqrt) => 3)       
+(check ($ 8 :sqrt) => 2)
+(check ($ 10 :sqrt) => 3)
+(check ($ 144 :sqrt) => 12)       
+(check ($ 289 :sqrt) => 17)       
+(check ($ 290 :sqrt) => 17)       
+(check ($ 10201 :sqrt) => 101)       
+(check ($ 10403 :sqrt) => 101) 
+(check ($ (rich-integer :max-value) :sqrt) => 3037000499)
+(check-catch 'value-error ($ -1 :sqrt))
+
 (check-true ((rich-char #x30) :equals (rich-char #x30)))
 (check-false ((rich-char #x31) :equals (rich-char #x30)))
 

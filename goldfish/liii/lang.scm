@@ -291,6 +291,13 @@
 
 (define (@min-value) -9223372036854775808)
 
+;;return exact integer
+(define (%sqrt)
+  (if (< data 0)
+      (value-error
+        (format #f "sqrt of negative integer is undefined!         ** Got ~a **" data))
+      (inexact->exact (floor (sqrt data)))))
+
 )
 
 (define-case-class rich-char ((code-point integer?))
