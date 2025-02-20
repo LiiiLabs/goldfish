@@ -89,9 +89,9 @@
 
 (check-false (or))
 
-(check-true (or 1 '() "non-empty" #t))
-(check-true (or #f '() "non-empty" #t))
-(check-true (or 1 '() "non-empty" #f))
+(check (or 1 '() "non-empty" #t) => 1)
+(check (or #f '() "non-empty" #t) => '())
+(check (or 1 '() "non-empty" #f) => 1)
 
 (check-true (or (> 5 3) (< 5 10)))
 (check-true (or (> 5 3) (> 5 10)))

@@ -664,11 +664,11 @@
   测试 <code*|or> 与混合类型参数的组合。
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
-    (check-true (or 1 '() "non-empty" #t))
+    (check (or 1 '() "non-empty" #t) =\<gtr\> 1)
 
-    (check-true (or #f '() "non-empty" #t))
+    (check (or #f '() "non-empty" #t) =\<gtr\> '())
 
-    (check-true (or 1 '() "non-empty" #f))
+    (check (or 1 '() "non-empty" #f) =\<gtr\> 1)
 
     \;
   </scm-chunk>
