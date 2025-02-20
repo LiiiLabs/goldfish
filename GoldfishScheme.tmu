@@ -639,6 +639,84 @@
 
   <value|r7rs><paragraph|or><index|or>
 
+  检查 <code*|or> 是否正确处理多个布尔表达式。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (or #t #t #t))
+
+    (check-true (or #t #f #t))
+
+    (check-true (or #f #t #f))
+
+    (check-false (or #f #f #f))
+
+    \;
+  </scm-chunk>
+
+  验证当 <code*|or> 没有参数时的行为。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-false (or))
+
+    \;
+  </scm-chunk>
+
+  测试 <code*|or> 与混合类型参数的组合。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (or 1 '() "non-empty" #t))
+
+    (check-true (or #f '() "non-empty" #t))
+
+    (check-true (or 1 '() "non-empty" #f))
+
+    \;
+  </scm-chunk>
+
+  检查 <code*|or> 在复合表达式中的行为。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-true (or (\<gtr\> 5 3) (\<less\> 5 10)))
+
+    (check-true (or (\<gtr\> 5 3) (\<gtr\> 5 10)))
+
+    (check-false (or (\<less\> 5 3) (\<gtr\> 5 10)))
+
+    \;
+  </scm-chunk>
+
+  验证 <code*|or> 的短路行为。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <\code>
+      (check-true (or #t (error "This should not be evaluated"))) \ ; 短路，不会执行error
+
+      (check-catch 'error-name
+
+      \ \ (or (error 'error-name "This should be evaluated") #f)) \ ; 第一个条件为error，不会短路
+
+      \;
+    </code>
+
+    \;
+  </scm-chunk>
+
+  验证 <verbatim|or> 返回值非布尔值的情况。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    <\code>
+      (check (or #f 1) =\> 1) \ ; 返回第一个为真的值
+
+      (check (or #f #f 2) =\> 2) \ ; 返回第一个为真的值
+
+      (check (or #f #f #f) =\> #f) \ ; 所有都为假，返回假
+
+      \;
+    </code>
+
+    \;
+  </scm-chunk>
+
   <value|r7rs><paragraph|when><index|when>
 
   测试 when 中条件为真的情况

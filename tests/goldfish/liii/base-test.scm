@@ -82,6 +82,31 @@
 
 (check (and #t 1) => 1)
 
+(check-true (or #t #t #t))
+(check-true (or #t #f #t))
+(check-true (or #f #t #f))
+(check-false (or #f #f #f))
+
+(check-false (or))
+
+(check-true (or 1 '() "non-empty" #t))
+(check-true (or #f '() "non-empty" #t))
+(check-true (or 1 '() "non-empty" #f))
+
+(check-true (or (> 5 3) (< 5 10)))
+(check-true (or (> 5 3) (> 5 10)))
+(check-false (or (< 5 3) (> 5 10)))
+
+(check-true (or #t (error "This should not be evaluated")))  ; 短路，不会执行error
+(check-catch 'error-name
+  (or (error 'error-name "This should be evaluated") #f))  ; 第一个条件为error，不会短路
+
+
+(check (or #f 1) => 1)  ; 返回第一个为真的值
+(check (or #f #f 2) => 2)  ; 返回第一个为真的值
+(check (or #f #f #f) => #f)  ; 所有都为假，返回假
+
+
 (check (when #t 1) => 1)
 
 (check (when #f 1 ) => #<unspecified>)
