@@ -96,7 +96,7 @@
 
     (export
 
-    \ \ @ cut_
+    \ \ @
 
     \ \ define-case-class case-class? == != display* object-\<gtr\>string
 

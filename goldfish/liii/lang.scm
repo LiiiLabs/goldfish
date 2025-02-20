@@ -18,7 +18,7 @@
 (import (liii base) (liii string) (liii vector) (liii sort)
         (liii list) (liii hash-table) (liii bitwise))
 (export
-  @ cut_
+  @
   define-case-class case-class? == != display* object->string
   option none
   rich-integer rich-char rich-string
