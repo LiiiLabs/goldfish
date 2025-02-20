@@ -300,7 +300,8 @@
    (check (str :slice 6 2) => ($ ""))
    (check (str :slice -3 -2) => ($ ""))
    (check (str :slice 100 101) => ($ ""))
-   (check (str :slice -1 100) => ($ "Hello，世界")))
+   (check (str :slice -1 100) => ($ "Hello，世界"))
+   (check (str :slice 0 5 :to-string) => "Hello"))
 
 (check ($ "42") => ($ "42"))
 (check-false ($ "41" :equals ($ "42")))

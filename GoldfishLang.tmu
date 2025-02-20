@@ -2024,7 +2024,7 @@
   <paragraph|rich-string%slice>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%slice from until)
+    (define (%slice from until . xs)
 
     \ \ (let* ((len (u8-string-length data))
 
@@ -2032,11 +2032,13 @@
 
     \ \ \ \ \ \ \ \ \ (end (min len until)))
 
-    \ \ \ \ (if (\<less\> start end)
+    \ \ \ \ (let ((res (if (\<less\> start end)
 
-    \ \ \ \ \ \ (rich-string (u8-substring data start end))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-string (u8-substring data start end))
 
-    \ \ \ \ \ \ (rich-string ""))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-string ""))))
+
+    \ \ \ \ \ \ (if (null? xs) res (apply res xs)))))
 
     \;
   </goldfish-chunk>
@@ -2056,7 +2058,9 @@
 
     \ \ \ (check (str :slice 100 101) =\<gtr\> ($ ""))
 
-    \ \ \ (check (str :slice -1 100) =\<gtr\> ($ "Hello，世界")))
+    \ \ \ (check (str :slice -1 100) =\<gtr\> ($ "Hello，世界"))
+
+    \ \ \ (check (str :slice 0 5 :to-string) =\<gtr\> "Hello"))
 
     \;
   </goldfish-chunk>
@@ -3822,7 +3826,7 @@
   <paragraph|rich-vector%slice>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%slice from until)
+    (define (%slice from until . xs)
 
     \ \ (let* ((len (vector-length data))
 
@@ -3830,11 +3834,13 @@
 
     \ \ \ \ \ \ \ \ \ (end (min len until)))
 
-    \ \ \ \ (if (\<less\> start end)
+    \ \ \ \ (let ((res (if (\<less\> start end)
 
-    \ \ \ \ \ \ (rich-vector (vector-copy data start end))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-vector (vector-copy data start end))
 
-    \ \ \ \ \ \ (rich-vector :empty))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-vector :empty))))
+
+    \ \ \ \ \ \ (if (null? xs) res (apply res xs)))))
 
     \;
   </scm-chunk>
