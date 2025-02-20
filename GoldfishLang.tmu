@@ -3265,6 +3265,70 @@
     \;
   </scm-chunk>
 
+  \;
+
+  <subparagraph|rich-list%sort-with>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|false>
+    (define (%sort-with less-p . xs)
+
+    \ \ (let*\ 
+
+    \ \ \ \ ((sorted-data (list-stable-sort less-p data))
+
+    \ \ \ \ (sorted-rich-list (rich-list sorted-data)))
+
+    \ \ \ \ (if (null? xs)\ 
+
+    \ \ \ \ \ \ \ \ sorted-rich-list\ 
+
+    \ \ \ \ \ \ \ \ (apply sorted-rich-list xs))))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|false>
+    (check ($ '(3 1 2 4 5)
+
+    \ \ \ \ \ \ \ \ :sort-with (lambda (x y) (\<less\> x y)))
+
+    \ \ \ \ =\<gtr\> ($ '(1 2 3 4 5)))
+
+    \;
+
+    (check ($ (list 1 3 4 2 5) :sort-with \<less\> :take 2) =\<gtr\> (list 1 2))
+
+    \;
+
+    (check\ 
+
+    \ \ ($ (list 1 3 4 2 5)\ 
+
+    \ \ \ \ \ :sort-with \<less\>
+
+    \ \ \ \ \ :take 2
+
+    \ \ \ \ \ :collect)
+
+    \ \ =\<gtr\> '(1 2))
+
+    \;
+
+    (check\ 
+
+    \ \ ($ '((3 . a) (1 . b) (2 . c) (1 . d))
+
+    \ \ \ \ \ :sort-with (lambda (x y) (\<less\> (car x) (car y))) \ ;; 按 car 排序
+
+    \ \ \ \ \ :collect)
+
+    \ \ =\<gtr\> '((1 . b) (1 . d) (2 . c) (3 . a)))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|转换器>
 
   <paragraph|rich-list%to-string>

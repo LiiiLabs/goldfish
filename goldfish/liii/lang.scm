@@ -15,7 +15,7 @@
 ;
 
 (define-library (liii lang)
-(import (liii base) (liii string) (liii vector)
+(import (liii base) (liii string) (liii vector) (liii sort)
         (liii list) (liii hash-table) (liii bitwise))
 (export
   @ 
@@ -704,6 +704,14 @@
 
   (define (%fold-right initial f)
     (fold-right f initial data))
+
+(define (%sort-with less-p . xs)
+  (let* 
+    ((sorted-data (list-stable-sort less-p data))
+    (sorted-rich-list (rich-list sorted-data)))
+    (if (null? xs) 
+        sorted-rich-list 
+        (apply sorted-rich-list xs))))
 
 (define (%to-string)
   (object->string data))
