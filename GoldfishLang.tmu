@@ -372,7 +372,15 @@
 
     ,@static-methods
 
-    \ \ \ 
+    \;
+
+    (define (is-normal-function? msg)
+
+    \ \ (and \ (symbol? msg)\ 
+
+    \ \ \ \ \ \ \ \ (char=? (string-ref (symbol-\<gtr\>string msg) 0) #\\:)))
+
+    \;
 
     (define (static-dispatcher msg . args)
 
@@ -424,7 +432,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ (list ,@(map (lambda (field key-field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ‘(string-append
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(string-append
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(symbol-\<gtr\>string key-field) " "
 
@@ -466,29 +474,31 @@
 
     \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
-
     \ \ \ \ \ \ \ \ ,@(map (lambda (field key-field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,key-field)
+    \ \ \ \ \ \ \ \ \ \ \ \ `((eq? msg ,key-field)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,class-name
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,class-name
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (f) (if (eq? (car f) (car field)) '(car args) (car f)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (f) (if (eq? (car f) (car field)) '(car args) (car f)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fields key-fields)
+    \ \ \ \ \ \ \ \ \ \ fields key-fields)
 
-    \;
+    \ \ \ \ \ \ \ \ ((is-normal-function? msg)
 
-    \ \ \ \ \ \ \ \ ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
+    \ \ \ \ \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ instance-method-symbols instance-messages)
 
-    \;
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (value-error ,class-name "No such method: " msg))))
+
+    \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
 
     \ \ \ \ \ \ \ \ (else (apply %apply (cons msg args))))))
 
@@ -513,8 +523,6 @@
     ) ; end of let
 
     ) ; end of define-macro
-
-    \;
   </goldfish-chunk>
 
   测试：不带用户自定义方法的样本类person

@@ -18,7 +18,7 @@
 (import (liii base) (liii string) (liii vector)
         (liii list) (liii hash-table) (liii bitwise))
 (export
-  @ cut_
+  @ 
   define-case-class case-class? == != display* object->string
   option none
   rich-integer rich-char rich-string
@@ -83,7 +83,11 @@
 `(define (,class-name msg . args)
 
 ,@static-methods
-   
+
+(define (is-normal-function? msg)
+  (and  (symbol? msg) 
+        (char=? (string-ref (symbol->string msg) 0) #\:)))
+
 (define (static-dispatcher msg . args)
     (cond
      ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
@@ -130,18 +134,19 @@
         ((eq? msg :is-instance-of) (apply %is-instance-of args))
         ((eq? msg :equals) (apply %equals args))
         ((eq? msg :to-string) (%to-string))
-             
-        ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
         ,@(map (lambda (field key-field)
-                 `((eq? msg ,key-field)
-                   (,class-name
-                    ,@(map (lambda (f) (if (eq? (car f) (car field)) '(car args) (car f)))
-                           fields))))
-               fields key-fields)
-
-        ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
+            `((eq? msg ,key-field)
+              (,class-name
+              ,@(map (lambda (f) (if (eq? (car f) (car field)) '(car args) (car f)))
+                      fields))))
+          fields key-fields)
+        ((is-normal-function? msg)
+          (cond
+              ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
                instance-method-symbols instance-messages)
-
+              (else (value-error ,class-name "No such method: " msg))))
+        
+        ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
         (else (apply %apply (cons msg args))))))
 
   (instance-dispatcher)
@@ -164,6 +169,7 @@
              (is-cond? (eq? (car body) 'cond))
              (pred1 ((body 1) 0))
              (pred2 ((body 2) 0)))
+
     (and (equal? pred1 '(eq? msg :is-instance-of))
          (equal? pred2 '(eq? msg :equals)))))
 
