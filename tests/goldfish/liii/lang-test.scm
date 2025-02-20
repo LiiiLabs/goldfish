@@ -498,6 +498,25 @@
   (check (lst :fold-right '() (lambda (x acc) (cons x acc))) => '(1 2 3 4 5))
 )
 
+(check ($ '(3 1 2 4 5)
+        :sort-with (lambda (x y) (< x y)))
+    => ($ '(1 2 3 4 5)))
+
+(check ($ (list 1 3 4 2 5) :sort-with < :take 2) => (list 1 2))
+
+(check 
+  ($ (list 1 3 4 2 5) 
+     :sort-with <
+     :take 2
+     :collect)
+  => '(1 2))
+
+(check 
+  ($ '((3 . a) (1 . b) (2 . c) (1 . d))
+     :sort-with (lambda (x y) (< (car x) (car y)))  ;; 按 car 排序
+     :collect)
+  => '((1 . b) (1 . d) (2 . c) (3 . a)))
+
 (check (object->string ($ '(1 2 3))) => "(1 2 3)")
 
 (let1 l (rich-list (list 1 2 3))
@@ -640,25 +659,6 @@
 (check ($ #() :count (@ > _ 2)) => 0)
 (check ($ #(1 2 3 4 5) :count) => 5)
 (check ($ #(1 2 3 4 5) :count (@ > _ 2)) => 3)
-
-(check ($ '(3 1 2 4 5)
-        :sort-with (lambda (x y) (< x y)))
-    => ($ '(1 2 3 4 5)))
-
-(check ($ (list 1 3 4 2 5) :sort-with < :take 2) => (list 1 2))
-
-(check 
-  ($ (list 1 3 4 2 5) 
-     :sort-with <
-     :take 2
-     :collect)
-  => '(1 2))
-
-(check 
-  ($ '((3 . a) (1 . b) (2 . c) (1 . d))
-     :sort-with (lambda (x y) (< (car x) (car y)))  ;; 按 car 排序
-     :collect)
-  => '((1 . b) (1 . d) (2 . c) (3 . a)))
 
 (check (object->string ($ #(1 2 3))) => "#(1 2 3)")
 

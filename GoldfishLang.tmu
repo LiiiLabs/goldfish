@@ -90,7 +90,7 @@
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define-library (liii lang)
 
-    (import (liii base) (liii string) (liii vector)
+    (import (liii base) (liii string) (liii vector) (liii sort)
 
     \ \ \ \ \ \ \ \ (liii list) (liii hash-table) (liii bitwise))
 
@@ -3269,7 +3269,7 @@
 
   <subparagraph|rich-list%sort-with>
 
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|false>
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%sort-with less-p . xs)
 
     \ \ (let*\ 
@@ -3289,7 +3289,7 @@
 
   \;
 
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|false>
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ($ '(3 1 2 4 5)
 
     \ \ \ \ \ \ \ \ :sort-with (lambda (x y) (\<less\> x y)))

@@ -18,7 +18,7 @@
 (import (liii base) (liii string) (liii vector) (liii sort)
         (liii list) (liii hash-table) (liii bitwise))
 (export
-  @ 
+  @ cut_
   define-case-class case-class? == != display* object->string
   option none
   rich-integer rich-char rich-string
@@ -159,7 +159,6 @@
 ) ; end of define
 ) ; end of let
 ) ; end of define-macro
-
 (define (case-class? x)
   (and-let* ((is-proc? (procedure? x))
              (source (procedure-source x))
@@ -169,7 +168,6 @@
              (is-cond? (eq? (car body) 'cond))
              (pred1 ((body 1) 0))
              (pred2 ((body 2) 0)))
-
     (and (equal? pred1 '(eq? msg :is-instance-of))
          (equal? pred2 '(eq? msg :equals)))))
 
