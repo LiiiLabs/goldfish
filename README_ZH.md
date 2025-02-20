@@ -27,10 +27,12 @@
 ### 函数式数据管道
 ![](r7rs_vs_goldfish.png)
 
-在`prime?`已提供的情况下，用如下方法过滤出1到100的质数：
+在`prime?`已提供的情况下，用如下方法过滤出1到100的孪生质数（致敬张益唐）：
 ``` scheme
-(($ 1 to 100)
+(($ 1 :to 100)
  :filter prime?
+ :filter (lambda (x) (prime? (+ x 2)))
+ :map (lambda (x) (cons x (+ x 2)))
  :collect)
 ```
 

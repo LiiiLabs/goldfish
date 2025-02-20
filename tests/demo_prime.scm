@@ -20,4 +20,6 @@
 
 (($ 1 :to 100)
  :filter prime?
+ :filter (lambda (x) (prime? (+ x 2)))
+ :map (lambda (x) (cons x (+ x 2)))
  :collect)

@@ -27,10 +27,12 @@ Goldfish Scheme is a Scheme interpreter with the following features:
 ### Functional Data Pipeline
 ![](r7rs_vs_goldfish.png)
 
-With `prime?` provided, filter prime numbers in this way:
+With `prime?` provided, filter twin prime numbers in this way:
 ``` scheme
-(($ 1 to 100)
+(($ 1 :to 100)
  :filter prime?
+ :filter (lambda (x) (prime? (+ x 2)))
+ :map (lambda (x) (cons x (+ x 2)))
  :collect)
 ```
 
