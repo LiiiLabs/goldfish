@@ -90,6 +90,8 @@
 
     Yifan Lu \<less\>yifan@liii.pro\<gtr\>
 
+    陈青羽 \<less\>qingyu@liii.pro\<gtr\>
+
     \;
 
     Yansong Li \<less\>haggittli@gmail.com\<gtr\>
@@ -757,24 +759,26 @@
 
   <value|r7rs><paragraph|let> <index|let>
 
-  let 是 Scheme 中用于局部变量绑定的语法结构。它允许在某个作用域内定义一组局部变量，并在该作用域内使用这些变量。let 表达式的特点是所有变量的初始值表达式是并行计算的，因此变量之间不能相互引用。
+  <scm|let>是 Scheme 中用于局部变量绑定的语法结构。它允许在某个作用域内定义一组局部变量，并在该作用域内使用这些变量。let 表达式的特点是所有变量的初始值表达式是并行计算的，因此变量之间不能相互引用。
 
-  let 的语法：
+  <scm|let>的语法：
 
-  \;
+  <\scm-code>
+    (let ((var1 init1)
 
-  (let ((var1 init1) (var2 init2) ...)
+    \ \ \ \ \ \ (var2 init2)
 
-  \ \ body)
+    \ \ \ \ \ \ ...)
 
-  \;
+    \ \ body)
+  </scm-code>
 
   <\itemize-minus>
     <item>var1, var2, ... ：局部变量的名称。
 
     <item>init1, init2, ... ：每个变量的初始值表达式。
 
-    <item>body：let 表达式的主体部分，可以包含多个表达式。body 中的表达式会按顺序执行，最后一个表达式的值作为整个 let 表达式的返回值
+    <item>body：<scm|let>表达式的主体部分，可以包含多个表达式。body中的表达式会按顺序执行，最后一个表达式的值作为整个<scm|let>表达式的返回值
   </itemize-minus>
 
   \;
