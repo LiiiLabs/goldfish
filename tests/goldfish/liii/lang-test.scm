@@ -568,6 +568,10 @@
 
 (check ((stack :empty) :length) => 0)
 
+(check ((stack (list 1 2)) :pop) => (stack (list 2)))
+(check ((stack (list 1 2 3)) :pop :pop) => (stack (list 3)))
+(check-catch 'out-of-range ((stack :empty) :pop))
+
 (check (rich-vector :range 1 5) => ($ (vector 1 2 3 4)))
 (check (rich-vector :range 1 5 2) => ($ (vector 1 3)))
 (check (rich-vector :range 1 6 2) => ($ (vector 1 3 5)))

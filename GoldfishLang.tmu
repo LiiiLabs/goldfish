@@ -3617,6 +3617,42 @@
     \;
   </goldfish-chunk>
 
+  <subsection|修改器>
+
+  <paragraph|stack%pop>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%pop . xs)
+
+    \ \ (let1 r
+
+    \ \ \ \ \ \ (if (null? data)
+
+    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range)
+
+    \ \ \ \ \ \ \ \ \ \ (stack (cdr data)))
+
+    \ \ \ \ (if (null? xs)
+
+    \ \ \ \ \ \ \ \ r
+
+    \ \ \ \ \ \ \ \ (apply r xs))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((stack (list 1 2)) :pop) =\<gtr\> (stack (list 2)))
+
+    (check ((stack (list 1 2 3)) :pop :pop) =\<gtr\> (stack (list 3)))
+
+    (check-catch 'out-of-range ((stack :empty) :pop))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
   <subsection|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

@@ -767,6 +767,15 @@
 
 (define (@empty) (stack (list )))
 
+(define (%pop . xs)
+  (let1 r
+      (if (null? data)
+          (error 'out-of-range)
+          (stack (cdr data)))
+    (if (null? xs)
+        r
+        (apply r xs))))
+
 )
 
 (define-case-class rich-vector ((data vector?))
