@@ -62,49 +62,49 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 ## Standard Library
 ### Python-like standard library and Scala-like collections
 
-| Library | Description | Example functions |
-|---|---|---|
-| [(liii lang)](goldfish/liii/lang.scm) | Scala-like Collection | `box` for functional api, `case-char`, `case-string` for unicode |
-| [(liii base)](goldfish/liii/base.scm) | Basic routines | `==`, `!=`, `display*` |
-| [(liii error)](goldfish/liii/error.scm) | Python like Errors  |  `os-error` to raise `'os-error` just like OSError in Python |
-| [(liii check)](goldfish/liii/check.scm) | Test framework based on SRFI-78 | `check`, `check-catch` |
-| [(liii case)](goldfish/liii/case.scm) | Pattern matching | `case*` |
-| [(liii list)](goldfish/liii/list.scm) | List Library | `list-view`, `fold` |
-| [(liii bitwise)](goldfish/liii/bitwise.scm) | Bitwise Library | `bitwise-and`, `bitwise-or` |
-| [(liii string)](goldfish/liii/string.scm) | String Library | `string-join` |
-| [(liii vector)](goldfish/liii/vector.scm) | Vector Library | `vector-index` |
-| [(liii stack)](goldfish/liii/stack.scm) | Stack Library | `stack-pop!`, `stack-push!` |
-| [(liii hash-table)](goldfish/liii/hash-table.scm) | Hash Table Library | `hash-table-empty?`, `hash-table-contains?` | 
-| [(liii sys)](goldfish/liii/sys.scm) | Library looks like Python sys module | `argv` |
-| [(liii os)](goldfish/liii/os.scm) | Library looks like Python os module | `getenv`, `mkdir` |
-| [(liii path)](goldfish/liii/path.scm) | Path Library | `path-dir?`, `path-file?` |
-| [(liii uuid)](goldfish/liii/uuid.scm) | UUID generation | `uuid4` |
+| Library                                           | Description                          | Example functions                                                |
+| ------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------- |
+| [(liii lang)](goldfish/liii/lang.scm)             | Scala-like Collection                | `box` for functional api, `case-char`, `case-string` for unicode |
+| [(liii base)](goldfish/liii/base.scm)             | Basic routines                       | `==`, `!=`, `display*`                                           |
+| [(liii error)](goldfish/liii/error.scm)           | Python like Errors                   | `os-error` to raise `'os-error` just like OSError in Python      |
+| [(liii check)](goldfish/liii/check.scm)           | Test framework based on SRFI-78      | `check`, `check-catch`                                           |
+| [(liii case)](goldfish/liii/case.scm)             | Pattern matching                     | `case*`                                                          |
+| [(liii list)](goldfish/liii/list.scm)             | List Library                         | `list-view`, `fold`                                              |
+| [(liii bitwise)](goldfish/liii/bitwise.scm)       | Bitwise Library                      | `bitwise-and`, `bitwise-or`                                      |
+| [(liii string)](goldfish/liii/string.scm)         | String Library                       | `string-join`                                                    |
+| [(liii vector)](goldfish/liii/vector.scm)         | Vector Library                       | `vector-index`                                                   |
+| [(liii stack)](goldfish/liii/stack.scm)           | Stack Library                        | `stack-pop!`, `stack-push!`                                      |
+| [(liii hash-table)](goldfish/liii/hash-table.scm) | Hash Table Library                   | `hash-table-empty?`, `hash-table-contains?`                      |
+| [(liii sys)](goldfish/liii/sys.scm)               | Library looks like Python sys module | `argv`                                                           |
+| [(liii os)](goldfish/liii/os.scm)                 | Library looks like Python os module  | `getenv`, `mkdir`                                                |
+| [(liii path)](goldfish/liii/path.scm)             | Path Library                         | `path-dir?`, `path-file?`                                        |
+| [(liii uuid)](goldfish/liii/uuid.scm)             | UUID generation                      | `uuid4`                                                          |
 
 
 ### SRFI
 
-| Library | Status | Description  |
-|------|------|-------|
-| `(srfi srfi-1)`   | Part | List Library |
-| `(srfi srfi-8)`   | Complete | Provide `receive` |
+| Library           | Status   | Description                  |
+| ----------------- | -------- | ---------------------------- |
+| `(srfi srfi-1)`   | Part     | List Library                 |
+| `(srfi srfi-8)`   | Complete | Provide `receive`            |
 | `(srfi srfi-9)`   | Complete | Provide `define-record-type` |
-| `(srfi srfi-13)`  | Complete | String Library | 
-| `(srfi srfi-16)`  | Complete | Provide `case-lambda` |
-| `(srfi srfi-39)`  | Complete | Parameter Objects |
-| `(srfi srfi-78)`  | Part | Lightweigted Test Framework |
-| `(srfi srfi-125)` | Part | Hash Table |
-| `(srfi srfi-133)` | Part | Vector |
-| `(srfi srfi-151)` | Part | Bitwise Operations |
-| `(srfi srfi-216)` | Part | SICP |
+| `(srfi srfi-13)`  | Complete | String Library               |
+| `(srfi srfi-16)`  | Complete | Provide `case-lambda`        |
+| `(srfi srfi-39)`  | Complete | Parameter Objects            |
+| `(srfi srfi-78)`  | Part     | Lightweigted Test Framework  |
+| `(srfi srfi-125)` | Part     | Hash Table                   |
+| `(srfi srfi-133)` | Part     | Vector                       |
+| `(srfi srfi-151)` | Part     | Bitwise Operations           |
+| `(srfi srfi-216)` | Part     | SICP                         |
 
 ### R7RS Standard Libraries
-| Library | Description | 
-|-----|-------|
-| `(scheme base)` | Base library |
+| Library                | Description           |
+| ---------------------- | --------------------- |
+| `(scheme base)`        | Base library          |
 | `(scheme case-lambda)` | Provide `case-lambda` |
-| `(scheme char)` | Character Library |
-| `(scheme file)` | File operations |
-| `(scheme time)` | Time library |
+| `(scheme char)`        | Character Library     |
+| `(scheme file)`        | File operations       |
+| `(scheme time)`        | Time library          |
 
 
 ## Installation
@@ -230,7 +230,7 @@ The reader can cite our work with the following BibTeX entry:
 
 ```
 @book{goldfish,
-    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He and Yingyao Zhou and Shuting Zhao and Shen Wei and Noctis Zhang and Andy Yu and Siyu Xing and Jiayi Dong and Yancheng Li and Xinyi Yu},
+    author = {Da Shen and Nian Liu and Yansong Li and Shuting Zhao and Shen Wei and Andy Yu and Siyu Xing and Jiayi Dong and Yancheng Li and Xinyi Yu and Zhiwen Fu and Duolei Wang and Leiyu He and Yingyao Zhou and Noctis Zhang},
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},

@@ -62,50 +62,50 @@
 ### 金鱼标准库
 形如`(liii xyz)`的是金鱼标准库，模仿Python标准库和Scala集合库的函数接口和实现方式，降低用户的学习成本。
 
-| 库 | 描述 | 示例函数 |
-| --- | --- | --- |
-| [(liii lang)](goldfish/liii/lang.scm) | 类似Scala的集合库 | `box`支持一致的函数式集合库, `case-char`和`case-string`支持Unicode |
-| [(liii base)](goldfish/liii/base.scm) | 基础库 | `==`, `!=`, `display*` |
-| [(liii error)](goldfish/liii/error.scm) | 提供类似Python的错误函数 | `os-error`函数抛出`'os-error`，类似Python的OSError |
-| [(liii check)](goldfish/liii/check.scm) | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch` |
-| [(liii case)](goldfish/liii/case.scm) | 模式匹配 | `case*` |
-| [(liii list)](goldfish/liii/list.scm) | 列表函数库 | `list-view`, `fold` |
-| [(liii bitwise)](goldfish/liii/bitwise.scm) | 位运算函数库 | `bitwise-and`, `bitwise-or` |
-| [(liii string)](goldfish/liii/string.scm) | 字符串函数库 | `string-join` |
-| [(liii vector)](goldfish/liii/vector.scm) | 向量函数库 | `vector-index` |
-| [(liii stack)](goldfish/liii/stack.scm) | 栈 | `stack-pop!`, `stack-push!` |
-| [(liii hash-table)](goldfish/liii/hash-table.scm) | 哈希表 | `hash-table-empty?`, `hash-table-contains?` | 
-| [(liii sys)](goldfish/liii/sys.scm) | 库类似于 Python 的 `sys` 模块 | `argv` |
-| [(liii os)](goldfish/liii/os.scm) | 库类似于 Python 的 `os` 模块 | `getenv`, `mkdir` |
-| [(liii path)](goldfish/liii/path.scm) | 路径函数库 | `path-dir?`, `path-file?` |
-| [(liii uuid)](goldfish/liii/uuid.scm) | UUID 生成 | `uuid4` |
+| 库                                                | 描述                            | 示例函数                                                           |
+| ------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------ |
+| [(liii lang)](goldfish/liii/lang.scm)             | 类似Scala的集合库               | `box`支持一致的函数式集合库, `case-char`和`case-string`支持Unicode |
+| [(liii base)](goldfish/liii/base.scm)             | 基础库                          | `==`, `!=`, `display*`                                             |
+| [(liii error)](goldfish/liii/error.scm)           | 提供类似Python的错误函数        | `os-error`函数抛出`'os-error`，类似Python的OSError                 |
+| [(liii check)](goldfish/liii/check.scm)           | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch`                                             |
+| [(liii case)](goldfish/liii/case.scm)             | 模式匹配                        | `case*`                                                            |
+| [(liii list)](goldfish/liii/list.scm)             | 列表函数库                      | `list-view`, `fold`                                                |
+| [(liii bitwise)](goldfish/liii/bitwise.scm)       | 位运算函数库                    | `bitwise-and`, `bitwise-or`                                        |
+| [(liii string)](goldfish/liii/string.scm)         | 字符串函数库                    | `string-join`                                                      |
+| [(liii vector)](goldfish/liii/vector.scm)         | 向量函数库                      | `vector-index`                                                     |
+| [(liii stack)](goldfish/liii/stack.scm)           | 栈                              | `stack-pop!`, `stack-push!`                                        |
+| [(liii hash-table)](goldfish/liii/hash-table.scm) | 哈希表                          | `hash-table-empty?`, `hash-table-contains?`                        |
+| [(liii sys)](goldfish/liii/sys.scm)               | 库类似于 Python 的 `sys` 模块   | `argv`                                                             |
+| [(liii os)](goldfish/liii/os.scm)                 | 库类似于 Python 的 `os` 模块    | `getenv`, `mkdir`                                                  |
+| [(liii path)](goldfish/liii/path.scm)             | 路径函数库                      | `path-dir?`, `path-file?`                                          |
+| [(liii uuid)](goldfish/liii/uuid.scm)             | UUID 生成                       | `uuid4`                                                            |
 
 ### SRFI
 
-| 库 | 状态 | 描述 |
-| --- | --- | --- |
-| `(srfi srfi-1)` | 部分 | 列表库 |
-| `(srfi srfi-8)` | 完整 | 提供 `receive` |
-| `(srfi srfi-9)` | 完整 | 提供 `define-record-type` |
-| `(srfi srfi-13)` | 完整 | 字符串库 |
-| `(srfi srfi-16)` | 完整 | 提供 `case-lambda` |
-| `(srfi srfi-39)` | 完整 | 参数对象 |
-| `(srfi srfi-78)` | 部分 | 轻量级测试框架 |
-| `(srfi srfi-125)` | 部分 | 哈希表 |
-| `(srfi srfi-133)` | 部分 | 向量 |
-| `(srfi srfi-151)` | 部分 | 位运算 |
-| `(srfi srfi-216)` | 部分 | SICP |
+| 库                | 状态 | 描述                      |
+| ----------------- | ---- | ------------------------- |
+| `(srfi srfi-1)`   | 部分 | 列表库                    |
+| `(srfi srfi-8)`   | 完整 | 提供 `receive`            |
+| `(srfi srfi-9)`   | 完整 | 提供 `define-record-type` |
+| `(srfi srfi-13)`  | 完整 | 字符串库                  |
+| `(srfi srfi-16)`  | 完整 | 提供 `case-lambda`        |
+| `(srfi srfi-39)`  | 完整 | 参数对象                  |
+| `(srfi srfi-78)`  | 部分 | 轻量级测试框架            |
+| `(srfi srfi-125)` | 部分 | 哈希表                    |
+| `(srfi srfi-133)` | 部分 | 向量                      |
+| `(srfi srfi-151)` | 部分 | 位运算                    |
+| `(srfi srfi-216)` | 部分 | SICP                      |
 
 
 ### R7RS 标准库
 
-| 库 | 描述 |
-| --- | --- |
-| `(scheme base)` | 基础库 |
+| 库                     | 描述               |
+| ---------------------- | ------------------ |
+| `(scheme base)`        | 基础库             |
 | `(scheme case-lambda)` | 提供 `case-lambda` |
-| `(scheme char)` | 字符函数库 |
-| `(scheme file)` | 文件操作 |
-| `(scheme time)` | 时间库 |
+| `(scheme char)`        | 字符函数库         |
+| `(scheme file)`        | 文件操作           |
+| `(scheme time)`        | 时间库             |
 
 ## 安装
 金鱼Scheme自 v1.2.8 起已集成在墨干理工套件中，只需[安装墨干](https://mogan.app/zh/guide/Install.html)即可安装 金鱼Scheme。
@@ -237,7 +237,7 @@ tests/demo_argv.scm => #\newline
 
 ```
 @book{goldfish,
-    author = {Da Shen and Nian Liu and Yansong Li and Duolei Wang and Leiyu He and Yingyao Zhou and Shuting Zhao and Shen Wei and Noctis Zhang and Andy Yu and Siyu Xing and Jiayi Dong and Yancheng Li and Xinyi Yu},
+    author = {Da Shen and Nian Liu and Yansong Li and Shuting Zhao and Shen Wei and Andy Yu and Siyu Xing and Jiayi Dong and Yancheng Li and Xinyi Yu and Zhiwen Fu and Duolei Wang and Leiyu He and Yingyao Zhou and Noctis Zhang},
     title = {Goldfish Scheme: A Scheme Interpreter with Python-Like Standard Library},
     publisher = {LIII NETWORK},
     year = {2024},
