@@ -106,7 +106,7 @@
 
     \ \ rich-list range stack
 
-    \ \ rich-vector rich-hash-table
+    \ \ rich-vector array rich-hash-table
 
     \ \ box $
 
@@ -3704,21 +3704,21 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check (rich-vector :range 1 5) =\<gtr\> ($ (vector 1 2 3 4)))
+    (check (array :range 1 5) =\<gtr\> ($ (vector 1 2 3 4)))
 
-    (check (rich-vector :range 1 5 2) =\<gtr\> ($ (vector 1 3)))
+    (check (array :range 1 5 2) =\<gtr\> ($ (vector 1 3)))
 
-    (check (rich-vector :range 1 6 2) =\<gtr\> ($ (vector 1 3 5)))
+    (check (array :range 1 6 2) =\<gtr\> ($ (vector 1 3 5)))
 
-    (check (rich-vector :range 5 1 -1) =\<gtr\> ($ (vector 5 4 3 2)))
-
-    \;
-
-    (check (rich-vector :range 5 1 1) =\<gtr\> ($ (vector )))
+    (check (array :range 5 1 -1) =\<gtr\> ($ (vector 5 4 3 2)))
 
     \;
 
-    (check-catch 'value-error (rich-vector :range 1 5 0))
+    (check (array :range 5 1 1) =\<gtr\> ($ (vector )))
+
+    \;
+
+    (check-catch 'value-error (array :range 1 5 0))
 
     \;
   </goldfish-chunk>
@@ -3736,9 +3736,9 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check (rich-vector :empty :empty?) =\<gtr\> #t)
+    (check (array :empty :empty?) =\<gtr\> #t)
 
-    (check (rich-vector :empty :head-option) =\<gtr\> (none))
+    (check (array :empty :head-option) =\<gtr\> (none))
 
     \;
   </goldfish-chunk>
@@ -3766,11 +3766,11 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check-true (rich-vector :fill 0 #\\a :empty?))
+    (check-true (array :fill 0 #\\a :empty?))
 
     \;
 
-    (check (rich-vector :fill 3 #\\a) =\<gtr\> ($ (vector #\\a #\\a #\\a)))
+    (check (array :fill 3 #\\a) =\<gtr\> ($ (vector #\\a #\\a #\\a)))
 
     \;
   </goldfish-chunk>
@@ -3804,23 +3804,23 @@
   <paragraph|rich-vector%find>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%find p)
+    (define (%find p)
 
-    \ \ \ \ (let loop ((i 0))
+    \ \ (let loop ((i 0))
 
-    \ \ \ \ \ \ (cond
+    \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ ((\<gtr\>= i (vector-length data)) (none))
+    \ \ \ \ \ ((\<gtr\>= i (vector-length data)) (none))
 
-    \ \ \ \ \ \ \ \ ((p (vector-ref data i)) (option (vector-ref data i)))
+    \ \ \ \ \ ((p (vector-ref data i)) (option (vector-ref data i)))
 
-    \ \ \ \ \ \ \ \ (else (loop (+ i 1))))))
+    \ \ \ \ \ (else (loop (+ i 1))))))
 
     \;
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (rich-vector #(1 2 3 4 5))))
+    (let ((vec (array #(1 2 3 4 5))))
 
     \ \ (check ((vec :find (lambda (x) (= x 3))) :get) =\<gtr\> 3)
 
@@ -3835,7 +3835,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|rich-vector%head><paragraph|rich-vector%head-option>
+  <paragraph|rich-vector%head>
+
+  <paragraph|rich-vector%head-option>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define (%head)
@@ -3862,11 +3864,11 @@
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ($ (vector 1 2 3) :head) =\> 1)
 
-    (check-catch 'out-of-range (rich-vector :empty :head))
+    (check-catch 'out-of-range (array :empty :head))
 
     (check ($ (vector 1 2 3) :head-option) =\> (option 1))
 
-    (check (rich-vector :empty :head-option) =\> (none))
+    (check (array :empty :head-option) =\> (none))
 
     \;
   </scm-chunk>
@@ -3904,11 +3906,11 @@
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ($ (vector 1 2 3) :last) =\> 3)
 
-    (check-catch 'out-of-range (rich-vector :empty :last))
+    (check-catch 'out-of-range (array :empty :last))
 
     (check ($ (vector 1 2 3) :last-option) =\> (option 3))
 
-    (check (rich-vector :empty :last-option) =\> (none))
+    (check (array :empty :last-option) =\> (none))
 
     \;
   </scm-chunk>
@@ -3936,7 +3938,7 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 vec (rich-vector #(1 2 3 4 5))
+    (let1 vec (array #(1 2 3 4 5))
 
     \ \ (check (vec :slice 0 2) =\<gtr\> ($ #(1 2)))
 
@@ -4014,7 +4016,7 @@
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (rich-vector #(1 2 3 4 5))))
+    (let ((vec (array #(1 2 3 4 5))))
 
     \ \ (check (vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t)
 
@@ -4022,7 +4024,7 @@
 
     \;
 
-    (let ((empty-vec (rich-vector #())))
+    (let ((empty-vec (array #())))
 
     \ \ (check (empty-vec :forall (lambda (x) (\<gtr\> x 0))) =\<gtr\> #t))
 
@@ -4108,7 +4110,7 @@
   </scm-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (rich-vector #(1 2 3 4 5))))
+    (let ((vec (array #(1 2 3 4 5))))
 
     \ \ (check (vec :take -1 :collect) =\<gtr\> #())
 
@@ -4162,7 +4164,7 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (rich-vector #(1 2 3 4 5))))
+    (let ((vec (array #(1 2 3 4 5))))
 
     \ \ (check (vec :take-right -1 :collect) =\<gtr\> #())
 
@@ -4206,7 +4208,7 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (rich-vector #(1 2 3 4 5))))
+    (let ((vec (array #(1 2 3 4 5))))
 
     \ \ (check (vec :drop -1 :collect) =\<gtr\> #(1 2 3 4 5))
 
@@ -4250,7 +4252,7 @@
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (rich-vector #(1 2 3 4 5))))
+    (let ((vec (array #(1 2 3 4 5))))
 
     \ \ (check (vec :drop-right -1 :collect) =\<gtr\> #(1 2 3 4 5))\ 
 
@@ -4286,7 +4288,7 @@
   </scm-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let ((vec (rich-vector #(1 2 3 4 5))))
+    (let ((vec (array #(1 2 3 4 5))))
 
     \ \ (check (vec :fold 0 +) =\<gtr\> 15)
 
@@ -4348,9 +4350,9 @@
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((vec (rich-vector #(3 1 4 2 5))))
 
-    \ \ (check (vec :sort-with \<less\>) =\<gtr\> (rich-vector #(1 2 3 4 5)))
+    \ \ (check (vec :sort-with \<less\>) =\<gtr\> (array #(1 2 3 4 5)))
 
-    \ \ (check (vec :sort-with \<gtr\>) =\<gtr\> (rich-vector #(5 4 3 2 1)))
+    \ \ (check (vec :sort-with \<gtr\>) =\<gtr\> (array #(5 4 3 2 1)))
 
     \ \ (check (vec :sort-with \<less\> :collect) =\<gtr\> #(1 2 3 4 5)))
 
@@ -4372,6 +4374,8 @@
   <subsection|转换器>
 
   <paragraph|rich-vector%to-string>
+
+  将Rich Vector转换为基础类型的字符串。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%to-string)
@@ -4502,7 +4506,7 @@
 
     \;
 
-    (check-catch 'out-of-range (rich-vector :empty :set! 0 1))
+    (check-catch 'out-of-range (array :empty :set! 0 1))
 
     \;
   </goldfish-chunk>
@@ -4511,6 +4515,16 @@
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     )
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|array>
+
+  在Scala语言中，和Rich Vector等价的数据结构是Array，我们这里为rich-vector设置一个名为array的别名。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define array rich-vector)
 
     \;
   </goldfish-chunk>

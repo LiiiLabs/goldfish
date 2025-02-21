@@ -572,26 +572,26 @@
 (check ((stack (list 1 2 3)) :pop :pop) => (stack (list 3)))
 (check-catch 'out-of-range ((stack :empty) :pop))
 
-(check (rich-vector :range 1 5) => ($ (vector 1 2 3 4)))
-(check (rich-vector :range 1 5 2) => ($ (vector 1 3)))
-(check (rich-vector :range 1 6 2) => ($ (vector 1 3 5)))
-(check (rich-vector :range 5 1 -1) => ($ (vector 5 4 3 2)))
+(check (array :range 1 5) => ($ (vector 1 2 3 4)))
+(check (array :range 1 5 2) => ($ (vector 1 3)))
+(check (array :range 1 6 2) => ($ (vector 1 3 5)))
+(check (array :range 5 1 -1) => ($ (vector 5 4 3 2)))
 
-(check (rich-vector :range 5 1 1) => ($ (vector )))
+(check (array :range 5 1 1) => ($ (vector )))
 
-(check-catch 'value-error (rich-vector :range 1 5 0))
+(check-catch 'value-error (array :range 1 5 0))
 
-(check (rich-vector :empty :empty?) => #t)
-(check (rich-vector :empty :head-option) => (none))
+(check (array :empty :empty?) => #t)
+(check (array :empty :head-option) => (none))
 
-(check-true (rich-vector :fill 0 #\a :empty?))
+(check-true (array :fill 0 #\a :empty?))
 
-(check (rich-vector :fill 3 #\a) => ($ (vector #\a #\a #\a)))
+(check (array :fill 3 #\a) => ($ (vector #\a #\a #\a)))
 
 (check ($ #(1 2 3) :apply 1) => 2)
 (check ($ #(1 2 3) 1) => 2)
 
-(let ((vec (rich-vector #(1 2 3 4 5))))
+(let ((vec (array #(1 2 3 4 5))))
   (check ((vec :find (lambda (x) (= x 3))) :get) => 3)
   (check ((vec :find (lambda (x) (> x 2))) :get) => 3)
   (check ((vec :find (lambda (x) (> x 10))) :empty?) => #t)
@@ -599,16 +599,16 @@
   (check ((vec :find (lambda (x) (< x 0))) :empty?) => #t))
 
 (check ($ (vector 1 2 3) :head) => 1)
-(check-catch 'out-of-range (rich-vector :empty :head))
+(check-catch 'out-of-range (array :empty :head))
 (check ($ (vector 1 2 3) :head-option) => (option 1))
-(check (rich-vector :empty :head-option) => (none))
+(check (array :empty :head-option) => (none))
 
 (check ($ (vector 1 2 3) :last) => 3)
-(check-catch 'out-of-range (rich-vector :empty :last))
+(check-catch 'out-of-range (array :empty :last))
 (check ($ (vector 1 2 3) :last-option) => (option 3))
-(check (rich-vector :empty :last-option) => (none))
+(check (array :empty :last-option) => (none))
 
-(let1 vec (rich-vector #(1 2 3 4 5))
+(let1 vec (array #(1 2 3 4 5))
   (check (vec :slice 0 2) => ($ #(1 2)))
   (check (vec :slice -1 2) => ($ #(1 2)))
   (check (vec :slice 2 -1) => ($ #()))
@@ -627,14 +627,14 @@
 
 (check-false (($ "中文" :to-vector) :equals (rich-char "中")))
 
-(let ((vec (rich-vector #(1 2 3 4 5))))
+(let ((vec (array #(1 2 3 4 5))))
   (check (vec :forall (lambda (x) (> x 0))) => #t)
   (check (vec :forall (lambda (x) (> x 3))) => #f))
 
-(let ((empty-vec (rich-vector #())))
+(let ((empty-vec (array #())))
   (check (empty-vec :forall (lambda (x) (> x 0))) => #t))
 
-(let ((vec (rich-vector #(1 2 3 4 5))))
+(let ((vec (array #(1 2 3 4 5))))
   (check (vec :take -1 :collect) => #())
   (check (vec :take 0 :collect) => #())
   (check (vec :take 3 :collect) => #(1 2 3))
@@ -642,7 +642,7 @@
   (check (vec :take 10 :collect) => #(1 2 3 4 5))
 )
 
-(let ((vec (rich-vector #(1 2 3 4 5))))
+(let ((vec (array #(1 2 3 4 5))))
   (check (vec :take-right -1 :collect) => #())
   (check (vec :take-right 0 :collect) => #())
   (check (vec :take-right 3 :collect) => #(3 4 5))
@@ -650,7 +650,7 @@
   (check (vec :take-right 10 :collect) => #(1 2 3 4 5))
 )
 
-(let ((vec (rich-vector #(1 2 3 4 5))))
+(let ((vec (array #(1 2 3 4 5))))
   (check (vec :drop -1 :collect) => #(1 2 3 4 5))
   (check (vec :drop 0 :collect) => #(1 2 3 4 5))
   (check (vec :drop 3 :collect) => #(4 5))
@@ -658,7 +658,7 @@
   (check (vec :drop 10 :collect) => #())
 )
 
-(let ((vec (rich-vector #(1 2 3 4 5))))
+(let ((vec (array #(1 2 3 4 5))))
   (check (vec :drop-right -1 :collect) => #(1 2 3 4 5)) 
   (check (vec :drop-right 0 :collect) => #(1 2 3 4 5)) 
   (check (vec :drop-right 3 :collect) => #(1 2)) 
@@ -666,7 +666,7 @@
   (check (vec :drop-right 10 :collect) => #()) 
 )
 
-(let ((vec (rich-vector #(1 2 3 4 5))))
+(let ((vec (array #(1 2 3 4 5))))
   (check (vec :fold 0 +) => 15)
   (check (vec :fold '() (lambda (x acc) (cons x acc))) => '(5 4 3 2 1))
 
@@ -680,8 +680,8 @@
 (check ($ #(1 2 3 4 5) :count (@ > _ 2)) => 3)
 
 (let ((vec (rich-vector #(3 1 4 2 5))))
-  (check (vec :sort-with <) => (rich-vector #(1 2 3 4 5)))
-  (check (vec :sort-with >) => (rich-vector #(5 4 3 2 1)))
+  (check (vec :sort-with <) => (array #(1 2 3 4 5)))
+  (check (vec :sort-with >) => (array #(5 4 3 2 1)))
   (check (vec :sort-with < :collect) => #(1 2 3 4 5)))
 
 (let ((vec (rich-vector #((2 . 1) (3 . 3) (1 . 3) (1 . 2) (3 . 2)))))
@@ -713,7 +713,7 @@
   (check-catch 'out-of-range (v -1))
   (check-catch 'out-of-range (v 3)))
 
-(check-catch 'out-of-range (rich-vector :empty :set! 0 1))
+(check-catch 'out-of-range (array :empty :set! 0 1))
 
 (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (let1 r (ht :map (lambda (k v) (values k (+ v 1)))

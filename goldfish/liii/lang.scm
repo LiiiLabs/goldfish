@@ -23,7 +23,7 @@
   option none
   rich-integer rich-char rich-string
   rich-list range stack
-  rich-vector rich-hash-table
+  rich-vector array rich-hash-table
   box $
 )
 (begin
@@ -811,12 +811,12 @@
 (define (%apply n)
   (vector-ref data n))
 
-  (define (%find p)
-    (let loop ((i 0))
-      (cond
-        ((>= i (vector-length data)) (none))
-        ((p (vector-ref data i)) (option (vector-ref data i)))
-        (else (loop (+ i 1))))))
+(define (%find p)
+  (let loop ((i 0))
+    (cond
+     ((>= i (vector-length data)) (none))
+     ((p (vector-ref data i)) (option (vector-ref data i)))
+     (else (loop (+ i 1))))))
 
 (define (%head)
   (if (> (vector-length data) 0)
@@ -979,6 +979,8 @@
   (vector-set! data i x))
 
 )
+
+(define array rich-vector)
 
 (define-case-class rich-hash-table ((data hash-table?))
   (define (%collect) data)
