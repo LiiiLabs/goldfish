@@ -939,6 +939,12 @@
           ((length=? 1 xs) (count (car xs) (vector->list data)))
           (else (error 'wrong-number-of-args "rich-vector%count" xs))))
 
+(define (%sort-with less-p . xs)
+  (let ((res (rich-vector (vector-stable-sort less-p data))))
+    (if (null? xs)
+      res
+      (apply res xs))))
+
 (define (%to-string)
   (object->string data))
 

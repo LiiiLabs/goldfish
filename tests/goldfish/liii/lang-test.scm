@@ -679,6 +679,17 @@
 (check ($ #(1 2 3 4 5) :count) => 5)
 (check ($ #(1 2 3 4 5) :count (@ > _ 2)) => 3)
 
+(let ((vec (rich-vector #(3 1 4 2 5))))
+  (check (vec :sort-with <) => (rich-vector #(1 2 3 4 5)))
+  (check (vec :sort-with >) => (rich-vector #(5 4 3 2 1)))
+  (check (vec :sort-with < :collect) => #(1 2 3 4 5)))
+
+(let ((vec (rich-vector #((2 . 1) (3 . 3) (1 . 3) (1 . 2) (3 . 2)))))
+  (check (vec :sort-with (lambda (x y) (< (car x) (car y))))
+         => (rich-vector #((1 . 3) (1 . 2) (2 . 1) (3 . 3) (3 . 2))))
+  (check (vec :sort-with (lambda (x y) (< (cdr x) (cdr y))))
+         => (rich-vector #((2 . 1) (1 . 2) (3 . 2) (3 . 3) (1 . 3)))))
+
 (check (object->string ($ #(1 2 3))) => "#(1 2 3)")
 
 (let1 v ($ #(1 2 3))
