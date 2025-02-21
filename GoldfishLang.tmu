@@ -3601,6 +3601,28 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|stack%top>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%top)
+
+    \ \ \ \ \ \ (if (null? data)
+
+    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range)
+
+    \ \ \ \ \ \ \ \ \ \ (car data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((stack (list 1 2)) :top) =\<gtr\> 1)
+
+    (check-catch 'out-of-range ((stack (list )) :top))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|静态方法>
 
   <paragraph|stack@empty>
@@ -3647,6 +3669,32 @@
     (check ((stack (list 1 2 3)) :pop :pop) =\<gtr\> (stack (list 3)))
 
     (check-catch 'out-of-range ((stack :empty) :pop))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|stack%push>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%push element . es)\ 
+
+    \ \ (let1 r (stack (cons element data))
+
+    \ \ \ \ \ \ (if (null? es)
+
+    \ \ \ \ \ \ \ \ \ \ r
+
+    \ \ \ \ \ \ \ \ \ \ (apply r es))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 t (stack (list 1 2 3))
+
+    \ \ \ \ \ \ (check (t :push 1) =\<gtr\> (stack (list 1 1 2 3)))
+
+    \ \ \ \ \ \ (check (t :push 1 :push 1) =\<gtr\> (stack (list 1 1 1 2 3))))
 
     \;
   </goldfish-chunk>
