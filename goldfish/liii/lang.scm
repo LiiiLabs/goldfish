@@ -967,6 +967,11 @@
            (middle (string-join (map as-string (vector->list data)) sep)))
       (string-append start middle end))))
 
+(define (%set! i x)
+  (when (or (< i 0) (>= i (length data)))
+    (error 'out-of-range "rich-vector%set! out of range at index" i))
+  (vector-set! data i x))
+
 )
 
 (define-case-class rich-hash-table ((data hash-table?))

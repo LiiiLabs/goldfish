@@ -696,6 +696,14 @@
 
 (check ($ #("a" "b" "c") :make-string) => "abc")
 
+(let1 v ($ #(1 2 3))
+  (v :set! 0 2)
+  (check (v 0) => 2)
+  (check-catch 'out-of-range (v -1))
+  (check-catch 'out-of-range (v 3)))
+
+(check-catch 'out-of-range (rich-vector :empty :set! 0 1))
+
 (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
               :collect)

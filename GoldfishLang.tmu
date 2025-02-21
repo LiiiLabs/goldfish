@@ -4433,7 +4433,41 @@
     \;
   </goldfish-chunk>
 
-  <section|结尾>
+  <subsection|修改器>
+
+  <paragraph|rich-vector%set!>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%set! i x)
+
+    \ \ (when (or (\<less\> i 0) (\<gtr\>= i (length data)))
+
+    \ \ \ \ (error 'out-of-range "rich-vector%set! out of range at index" i))
+
+    \ \ (vector-set! data i x))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 v ($ #(1 2 3))
+
+    \ \ (v :set! 0 2)
+
+    \ \ (check (v 0) =\<gtr\> 2)
+
+    \ \ (check-catch 'out-of-range (v -1))
+
+    \ \ (check-catch 'out-of-range (v 3)))
+
+    \;
+
+    (check-catch 'out-of-range (rich-vector :empty :set! 0 1))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     )
