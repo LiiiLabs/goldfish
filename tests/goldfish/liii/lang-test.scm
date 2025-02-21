@@ -576,8 +576,8 @@
 (check-catch 'out-of-range ((stack :empty) :pop))
 
 (let1 t (stack (list 1 2 3))
-      (check (t :push 1) => (stack (list 1 1 2 3)))
-      (check (t :push 1 :push 1) => (stack (list 1 1 1 2 3))))
+  (check (t :push 1) => (stack (list 1 1 2 3)))
+  (check (t :push 1 :push 1) => (stack (list 1 1 1 2 3))))
 
 (check (rich-vector :range 1 5) => ($ (vector 1 2 3 4)))
 (check (rich-vector :range 1 5 2) => ($ (vector 1 3)))

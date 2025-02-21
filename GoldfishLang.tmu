@@ -3606,11 +3606,11 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%top)
 
-    \ \ \ \ \ \ (if (null? data)
+    \ \ (if (null? data)
 
-    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range)
+    \ \ \ \ \ \ (error 'out-of-range)
 
-    \ \ \ \ \ \ \ \ \ \ (car data)))
+    \ \ \ \ \ \ (car data)))
 
     \;
   </goldfish-chunk>
@@ -3680,11 +3680,11 @@
 
     \ \ (let1 r (stack (cons element data))
 
-    \ \ \ \ \ \ (if (null? es)
+    \ \ \ \ (if (null? es)
 
-    \ \ \ \ \ \ \ \ \ \ r
+    \ \ \ \ \ \ \ \ r
 
-    \ \ \ \ \ \ \ \ \ \ (apply r es))))
+    \ \ \ \ \ \ \ \ (apply r es))))
 
     \;
   </goldfish-chunk>
@@ -3692,9 +3692,9 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let1 t (stack (list 1 2 3))
 
-    \ \ \ \ \ \ (check (t :push 1) =\<gtr\> (stack (list 1 1 2 3)))
+    \ \ (check (t :push 1) =\<gtr\> (stack (list 1 1 2 3)))
 
-    \ \ \ \ \ \ (check (t :push 1 :push 1) =\<gtr\> (stack (list 1 1 1 2 3))))
+    \ \ (check (t :push 1 :push 1) =\<gtr\> (stack (list 1 1 1 2 3))))
 
     \;
   </goldfish-chunk>

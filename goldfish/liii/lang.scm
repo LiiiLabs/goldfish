@@ -766,9 +766,9 @@
 (define (%length) (length data))
 
 (define (%top)
-      (if (null? data)
-          (error 'out-of-range)
-          (car data)))
+  (if (null? data)
+      (error 'out-of-range)
+      (car data)))
 
 (define (@empty) (stack (list )))
 
@@ -783,9 +783,9 @@
 
 (define (%push element . es) 
   (let1 r (stack (cons element data))
-      (if (null? es)
-          r
-          (apply r es))))
+    (if (null? es)
+        r
+        (apply r es))))
 
 )
 
