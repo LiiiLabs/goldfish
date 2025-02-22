@@ -756,5 +756,29 @@
   :collect)
   => '(102 104 106 108 110))
 
+(let ((arb (array-buffer :from-list '(3 1 2 5 4))))
+  (check (arb :get) => #(3 1 2 5 4))
+  (check (arb :to-rich-vector) => (rich-vector #(3 1 2 5 4)))
+  (check (arb :to-rich-list) => (rich-list '(3 1 2 5 4)))
+  (arb :add-one! 0)
+  (check (arb :to-rich-vector) => (rich-vector #(3 1 2 5 4 0)))
+  (check (arb :to-rich-list) => (rich-list '(3 1 2 5 4 0)))
+  (arb :insert! 0 0)
+  (check (arb :to-rich-vector) => (rich-vector #(0 3 1 2 5 4 0)))
+  (check (arb :to-rich-list) => (rich-list '(0 3 1 2 5 4 0)))
+  (check (arb :resize! 4 :to-rich-list :collect) => '(0 3 1 2))
+  (check (arb :resize! 3 :to-rich-vector :collect) => #(0 3 1))
+  (check (arb :insert! 1 2 :to-rich-list :collect) => '(0 2 3 1))
+  (check (arb 0) => 0)
+  (check (arb 1) => 2)
+  (check-catch 'key-error (arb 5))
+  )
+
+(check-true (== (array-buffer :from-list '(1 2 3))
+                (array-buffer :from-list '(1 2) :add-one! 3)))
+
+(check-true (== (array-buffer :from-list '(1 2 3))
+                (array-buffer :from-list '(1 2 3) :extend! 10)))
+
 (check-report)
 

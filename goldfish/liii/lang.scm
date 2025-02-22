@@ -24,6 +24,7 @@
   rich-integer rich-char rich-string
   rich-list range stack
   rich-vector array rich-hash-table
+  array-buffer
   box $
 )
 (begin
@@ -56,6 +57,14 @@
         (lambda ,slots-sym-list 
                 ,(parse exprs-sym-list slots-sym-list paras)))))
 
+(define-macro (chained-define head . body)
+  (let ((xs (gensym))
+        (result (gensym)))
+    `(define ,(append head xs)
+       (let ((,result (begin ,@body)))
+         (if (null? ,xs)
+           ,result
+           (apply ,result ,xs))))))
 
 (define-macro (define-case-class class-name fields . methods)
   (let* ((key-fields
@@ -78,7 +87,8 @@
           (map (lambda (method)
                  (let1 name (string-remove-prefix (symbol->string method) "@")
                    (string->symbol (string-append ":" name))))
-               static-method-symbols)))
+               static-method-symbols))
+         (this-symbol (gensym)))
 
 `(define (,class-name msg . args)
 
@@ -95,6 +105,12 @@
      (else (value-error "No such static method " msg))))
 
 (typed-define (create-instance ,@fields)
+  (define ,this-symbol #f)
+  (define (%this . xs)
+    (if (null? xs)
+      ,this-symbol
+      (apply ,this-symbol xs)))
+
   (define (%is-instance-of x)
     (eq? x ',class-name))
          
@@ -149,7 +165,8 @@
         ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
         (else (apply %apply (cons msg args))))))
 
-  (instance-dispatcher)
+  (set! ,this-symbol (instance-dispatcher))
+  ,this-symbol
 ) ; end of the internal typed define
 
 (if (in? msg (list ,@static-messages))
@@ -1027,6 +1044,89 @@
     (if (null? xs) r (apply r xs))))
 
 )
+
+;(define-macro (define-case-class/this this . body)
+;  (let ((arg (gensym))
+;        (name (car body)))
+;    `(define ,name
+;       (lambda ,arg
+;         (define-case-class ,@body)
+;         (let ((,this (apply ,name ,arg))))))))
+
+(define-case-class array-buffer ((data vector?) (size integer?) (capacity integer?))
+
+(chained-define (@from-vector vec)
+  (let ((len (vector-length vec)))
+    (array-buffer (copy vec) len len)))
+
+(chained-define (@from-list lst)
+  (let ((len (length lst)))
+    (array-buffer (copy lst (make-vector len)) len len)))
+
+(chained-define (%get) data)
+
+(chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
+
+(chained-define (%to-rich-list) (rich-list (vector->list (copy data (make-vector size)))))
+
+(typed-define (%equals (that case-class?))
+  (and (that :is-instance-of 'array-buffer)
+       ((%this :to-rich-vector) :equals (that :to-rich-vector))))
+
+(chained-define (%extend! n)
+  (when (< capacity n)
+    (if (= capacity 0)
+      (set! capacity n)
+      (let loop ()
+        (when (< capacity n)
+          (set! capacity (* 2 capacity))
+          (loop))))
+    (set! data (copy data (make-vector capacity) 0 size)))
+  (%this))
+
+(define (%check-bound n)
+  (when (or (not (integer? n)) (< n 0) (>= n size))
+    (key-error "array-buffer out of bound")))
+
+(chained-define (%resize! n)
+  (%extend! n)
+  (set! size n)
+  (%this))
+
+(chained-define (%add-one! x)
+  (%extend! (+ size 1))
+  (vector-set! data size x)
+  (set! size (+ size 1))
+  (%this))
+
+(chained-define (%clear!)
+  (set! size 0)
+  (%this))
+
+(chained-define (%clear/shrink!)
+  (set! size 0)
+  (set! capacity 1)
+  (set! data (make-vector 1))
+  (%this))
+
+(chained-define (%insert! index elem)
+  (%extend! (+ size 1))
+  (set! size (+ size 1))
+  (%check-bound index)
+  (let loop ((p (- size 1)))
+    (when (> p index)
+      (vector-set! data p (vector-ref data (- p 1)))
+      (loop (- p 1))))
+  (vector-set! data index elem)
+  (%this))
+
+(define (%length) size)
+
+(chained-define (%apply n)
+  (%check-bound n)
+  (vector-ref data n))
+
+) ; end of array-buffer
 
 (define (box x)
   (cond ((integer? x) (rich-integer x))
