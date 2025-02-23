@@ -362,7 +362,9 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-\<gtr\>symbol (string-append ":" name))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static-method-symbols)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static-method-symbols))
+
+    \ \ \ \ \ \ \ \ \ (this-symbol (gensym)))
 
     \;
 
@@ -395,6 +397,18 @@
     \;
 
     (typed-define (create-instance ,@fields)
+
+    \ \ (define ,this-symbol #f)
+
+    \ \ (define (%this . xs)
+
+    \ \ \ \ (if (null? xs)
+
+    \ \ \ \ \ \ ,this-symbol
+
+    \ \ \ \ \ \ (apply ,this-symbol xs)))
+
+    \;
 
     \ \ (define (%is-instance-of x)
 
@@ -504,7 +518,9 @@
 
     \;
 
-    \ \ (instance-dispatcher)
+    \ \ (set! ,this-symbol (instance-dispatcher))
+
+    \ \ ,this-symbol
 
     ) ; end of the internal typed define
 
@@ -635,6 +651,52 @@
     \ \ (check-catch 'value-error (hello :this-is-a-static-method))
 
     \ \ (check (test-case-class :this-is-a-static-method) =\<gtr\> (test-case-class "static")))
+
+    \;
+  </goldfish-chunk>
+
+  测试：使用 %this 引用实例本身
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ()
+
+    \ \ (define-case-class person ((name string?) (country string?))
+
+    \ \ \ \ (define (@default)
+
+    \ \ \ \ \ \ (person "Andy" "China"))
+
+    \ \ \ \ (define (%set-country! c . xs)
+
+    \ \ \ \ \ \ (set! country c)
+
+    \ \ \ \ \ \ (apply (%this) (if (null? xs) '(:this) xs)))
+
+    \ \ \ \ (define (%set-name! n . xs)
+
+    \ \ \ \ \ \ (set! name n)
+
+    \ \ \ \ \ \ (apply (%this) (if (null? xs) '(:this) xs)))
+
+    \ \ \ \ (define (%to-string)
+
+    \ \ \ \ \ \ (format #f "Hello ~a from ~a" name country)))
+
+    \ \ (define Andy (person :default))
+
+    \ \ (check-catch 'wrong-type-arg (person :this))
+
+    \ \ (check (Andy :to-string) =\<gtr\> "Hello Andy from China")
+
+    \ \ (check (Andy :set-country! "USA" :to-string) =\<gtr\> "Hello Andy from USA")
+
+    \ \ (check (Andy :to-string) =\<gtr\> "Hello Andy from USA")
+
+    \ \ (check (Andy :set-country! "China" :set-name! "Ancker-0" :to-string) =\<gtr\> "Hello Ancker-0 from China")
+
+    \ \ (check (Andy :set-country! "China") =\<gtr\> (person "Ancker-0" "China"))
+
+    \ \ (check (Andy :this :set-country! "USA" :this :set-name! "Andy" :this :to-string) =\<gtr\> "Hello Andy from USA"))
 
     \;
   </goldfish-chunk>
