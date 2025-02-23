@@ -78,7 +78,8 @@
           (map (lambda (method)
                  (let1 name (string-remove-prefix (symbol->string method) "@")
                    (string->symbol (string-append ":" name))))
-               static-method-symbols)))
+               static-method-symbols))
+         (this-symbol (gensym)))
 
 `(define (,class-name msg . args)
 
@@ -95,6 +96,12 @@
      (else (value-error "No such static method " msg))))
 
 (typed-define (create-instance ,@fields)
+  (define ,this-symbol #f)
+  (define (%this . xs)
+    (if (null? xs)
+      ,this-symbol
+      (apply ,this-symbol xs)))
+
   (define (%is-instance-of x)
     (eq? x ',class-name))
          
@@ -134,6 +141,7 @@
         ((eq? msg :is-instance-of) (apply %is-instance-of args))
         ((eq? msg :equals) (apply %equals args))
         ((eq? msg :to-string) (%to-string))
+        ((eq? msg :this) (apply %this args))
         ,@(map (lambda (field key-field)
             `((eq? msg ,key-field)
               (,class-name
@@ -149,7 +157,8 @@
         ,@(map (lambda (field) `((eq? msg ',(car field)) ,(car field))) fields)
         (else (apply %apply (cons msg args))))))
 
-  (instance-dispatcher)
+  (set! ,this-symbol (instance-dispatcher))
+  ,this-symbol
 ) ; end of the internal typed define
 
 (if (in? msg (list ,@static-messages))
