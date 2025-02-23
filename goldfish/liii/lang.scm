@@ -217,10 +217,6 @@
       (x :to-string)
       (s7-object->string x)))
 
-(define (%apply-one x xs r)
-  (let1 result r
-    (if (null? xs) r (apply r xs))))
-
 (define-case-class option ((value any?))
 
 (define (%get)
@@ -263,11 +259,10 @@
   (when (not (null? value))
         (f value)))
 
-(define (%map f . xs)
-  (%apply-one f xs
-    (if (null? value)
-        (option '())
-        (option (f value)))))
+(chained-define (%map f)
+  (if (null? value)
+      (option '())
+      (option (f value))))
 
 (define (%flat-map f . xs)
   (let1 r (if (null? value)
@@ -451,14 +446,13 @@
 (typed-define (%apply (i integer?))
   (%char-at i))
 
-(define (%slice from until . xs)
+(chained-define (%slice from until)
   (let* ((len (u8-string-length data))
          (start (max 0 from))
          (end (min len until)))
-    (let ((res (if (< start end)
-                 (rich-string (u8-substring data start end))
-                 (rich-string ""))))
-      (if (null? xs) res (apply res xs)))))
+    (if (< start end)
+        (rich-string (u8-substring data start end))
+        (rich-string ""))))
 
 (define (%empty?)
   (string-null? data))
@@ -501,13 +495,11 @@
        ((char=? (car lst) sub) index)
        (else (loop (cdr lst) (+ index 1)))))))))
 
-(define (%map x . xs)
-  (%apply-one x xs
-    (rich-string
-     ((%to-vector)
-      :map x
-      :map (lambda (c) (c :to-string))
-      :make-string))))
+(chained-define (%map f)
+  (rich-string
+    (%to-vector :map f
+                :map (@ _ :to-string)
+                :make-string)))
 
 (define (%count pred?)
   ((%to-vector) :count pred?))
@@ -515,7 +507,7 @@
 (define (%to-string)
   data)
 
-(define (%to-vector)
+(chained-define (%to-vector)
   (if (string-null? data)
       (rich-vector :empty)
       (let* ((bv (string->utf8 data))
@@ -1014,15 +1006,14 @@
 (define-case-class rich-hash-table ((data hash-table?))
   (define (%collect) data)
 
-(define (%map f . xs)
-  (%apply-one f xs
-    (let1 r (make-hash-table)
-      (hash-table-for-each
-         (lambda (k v)
-           (receive (k1 v1) (f k v)
-             (hash-table-set! r k1 v1)))
-         data)
-      (rich-hash-table r))))
+(chained-define (%map f)
+  (let1 r (make-hash-table)
+    (hash-table-for-each
+       (lambda (k v)
+         (receive (k1 v1) (f k v)
+           (hash-table-set! r k1 v1)))
+       data)
+    (rich-hash-table r)))
 
 (define (%find pred?)
   (let ((all-kv (map identity data)))

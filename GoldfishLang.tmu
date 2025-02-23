@@ -1001,18 +1001,6 @@
     \;
   </goldfish-chunk>
 
-  <section|公共子函数>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%apply-one x xs r)
-
-    \ \ (let1 result r
-
-    \ \ \ \ (if (null? xs) r (apply r xs))))
-
-    \;
-  </goldfish-chunk>
-
   <section|option>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -1286,15 +1274,13 @@
   <paragraph|option%map>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%map f . xs)
+    (chained-define (%map f)
 
-    \ \ (%apply-one f xs
+    \ \ (if (null? value)
 
-    \ \ \ \ (if (null? value)
+    \ \ \ \ \ \ (option '())
 
-    \ \ \ \ \ \ \ \ (option '())
-
-    \ \ \ \ \ \ \ \ (option (f value)))))
+    \ \ \ \ \ \ (option (f value))))
 
     \;
   </goldfish-chunk>
@@ -2224,7 +2210,7 @@
   <paragraph|rich-string%slice>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%slice from until . xs)
+    (chained-define (%slice from until)
 
     \ \ (let* ((len (u8-string-length data))
 
@@ -2232,13 +2218,11 @@
 
     \ \ \ \ \ \ \ \ \ (end (min len until)))
 
-    \ \ \ \ (let ((res (if (\<less\> start end)
+    \ \ \ \ (if (\<less\> start end)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-string (u8-substring data start end))
+    \ \ \ \ \ \ \ \ (rich-string (u8-substring data start end))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-string ""))))
-
-    \ \ \ \ \ \ (if (null? xs) res (apply res xs)))))
+    \ \ \ \ \ \ \ \ (rich-string ""))))
 
     \;
   </goldfish-chunk>
@@ -2468,19 +2452,15 @@
   <paragraph|rich-string%map><typehint|((p procedure?)) =\<gtr\> rich-string?>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%map x . xs)
+    (chained-define (%map f)
 
-    \ \ (%apply-one x xs
+    \ \ (rich-string
 
-    \ \ \ \ (rich-string
+    \ \ \ \ (%to-vector :map f
 
-    \ \ \ \ \ ((%to-vector)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :map (@ _ :to-string)
 
-    \ \ \ \ \ \ :map x
-
-    \ \ \ \ \ \ :map (lambda (c) (c :to-string))
-
-    \ \ \ \ \ \ :make-string))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :make-string)))
 
     \;
   </goldfish-chunk>
@@ -2536,7 +2516,7 @@
   <paragraph|rich-string%to-vector>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%to-vector)
+    (chained-define (%to-vector)
 
     \ \ (if (string-null? data)
 
@@ -4736,23 +4716,21 @@
   <paragraph|rich-hash-table%map>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%map f . xs)
+    (chained-define (%map f)
 
-    \ \ (%apply-one f xs
+    \ \ (let1 r (make-hash-table)
 
-    \ \ \ \ (let1 r (make-hash-table)
+    \ \ \ \ (hash-table-for-each
 
-    \ \ \ \ \ \ (hash-table-for-each
+    \ \ \ \ \ \ \ (lambda (k v)
 
-    \ \ \ \ \ \ \ \ \ (lambda (k v)
+    \ \ \ \ \ \ \ \ \ (receive (k1 v1) (f k v)
 
-    \ \ \ \ \ \ \ \ \ \ \ (receive (k1 v1) (f k v)
+    \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! r k1 v1)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! r k1 v1)))
+    \ \ \ \ \ \ \ data)
 
-    \ \ \ \ \ \ \ \ \ data)
-
-    \ \ \ \ \ \ (rich-hash-table r))))
+    \ \ \ \ (rich-hash-table r)))
 
     \;
   </goldfish-chunk>
