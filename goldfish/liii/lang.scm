@@ -19,7 +19,7 @@
         (liii list) (liii hash-table) (liii bitwise))
 (export
   @
-  define-case-class case-class? == != display* object->string
+  define-case-class case-class? == != chained-define display* object->string
   option none
   rich-integer rich-char rich-string
   rich-list range stack
@@ -193,6 +193,15 @@
 
 (define (!= left right)
   (not (== left right)))
+
+(define-macro (chained-define head . body)
+  (let ((xs (gensym))
+        (result (gensym)))
+    `(define ,(append head xs)
+       (let ((,result (begin ,@body)))
+         (if (null? ,xs)
+           ,result
+           (apply ,result ,xs))))))
 
 (define (display* . params)
   (define (%display x)

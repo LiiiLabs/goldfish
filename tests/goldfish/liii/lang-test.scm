@@ -137,6 +137,24 @@
 (check (!= (list 1 2) (list 1 2)) => #f)
 (check-true (!= (person "Bob" 20) (person "Bob" 21)))
 
+(let ()
+  (define-case-class person ((name string?) (country string?))
+    (chained-define (@default)
+      (person "Andy" "China"))
+    (chained-define (%set-country! c)
+      (set! country c)
+      (%this))
+    (chained-define (%set-name! n)
+      (set! name n)
+      (%this))
+    (chained-define (%set-both! n c)
+      (%this :set-name! n :set-country! c))
+    (chained-define (%to-string)
+      (rich-string (format #f "Hello ~a from ~a" name country))))
+  (check (person :default :to-string :get) => "Hello Andy from China")
+  (check (person :default :set-both! "Bob" "Russia" :to-string :get) => "Hello Bob from Russia")
+  (check ((person "Alice" "Japan") :set-name! "Lily" :to-string :get) => "Hello Lily from Japan"))
+
 (check
   (with-output-to-string
     (lambda ()
