@@ -3831,6 +3831,20 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|stack%size>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%size) (length data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((stack (list 1 2 3)) :size) =\<gtr\> 3)
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|stack%top>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

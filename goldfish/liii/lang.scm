@@ -781,6 +781,8 @@
 
 (define (%length) (length data))
 
+(define (%size) (length data))
+
 (define (%top)
   (if (null? data)
       (error 'out-of-range)

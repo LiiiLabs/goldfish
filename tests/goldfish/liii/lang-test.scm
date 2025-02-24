@@ -625,6 +625,8 @@
 
 (check ((stack (list 1 2 3)) :length) => 3)
 
+(check ((stack (list 1 2 3)) :size) => 3)
+
 (check ((stack (list 1 2)) :top) => 1)
 (check-catch 'out-of-range ((stack (list )) :top))
 
