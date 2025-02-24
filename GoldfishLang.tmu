@@ -4903,6 +4903,34 @@
     \;
   </goldfish-chunk>
 
+  \;
+
+  <paragraph|rich-hash-table%count>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%count pred)
+
+    \ \ (hash-table-count pred data))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (define ht\ 
+
+    \ \ ($ (hash-table 'a 2 'b 5 'c 8 'd 10 'e 1 'f "test" 'g -2)))
+
+    \;
+
+    (check (ht :count (lambda(k v) (and (number? v) (even? v)))) =\<gtr\> 4)
+
+    (check (ht :count (lambda(k v) (and (number? v) (odd? v)))) =\<gtr\> 2)
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-hash-table%get><typehint|((k any?)) =\<gtr\> option?>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

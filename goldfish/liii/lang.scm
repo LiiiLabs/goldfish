@@ -1033,6 +1033,9 @@
                     (option kv)
                     (loop (cdr kvs))))))))
 
+(define (%count pred)
+  (hash-table-count pred data))
+
 (define (%get k)
   (option (hash-table-ref/default data k '())))
 

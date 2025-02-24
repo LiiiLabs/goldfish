@@ -794,6 +794,12 @@
   (check (ht :find (lambda (k v) (and (symbol? k) (even? v)))) => (option (cons 'b 2)))
   (check ((ht :find (lambda (k v) (> v 4))) :empty?) => #t))
 
+(define ht 
+  ($ (hash-table 'a 2 'b 5 'c 8 'd 10 'e 1 'f "test" 'g -2)))
+
+(check (ht :count (lambda(k v) (and (number? v) (even? v)))) => 4)
+(check (ht :count (lambda(k v) (and (number? v) (odd? v)))) => 2)
+
 (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (check ((ht :get 'a) :get) => 1)
   (check ((ht :get 'd) :empty?) => #t))
