@@ -1037,6 +1037,16 @@
 (define (%contains k)
   (hash-table-contains? data k))
 
+(define (%forall pred?)
+  (let ((all-kv (map identity data)))
+    (let loop ((kvs all-kv))  
+      (if (null? kvs)
+          #t  
+          (let1 kv (car kvs)
+            (if (pred? (car kv) (cdr kv))
+                (loop (cdr kvs))  
+                #f))))))  
+
 (define (@empty . xs)
   (let1 r (rich-hash-table (make-hash-table))
     (if (null? xs) r (apply r xs))))

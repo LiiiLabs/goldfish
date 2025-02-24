@@ -800,6 +800,45 @@
   (check-true (ht :contains 'a))
   (check-false (ht :contains 'd)))
 
+(let1 ht ($ (hash-table 'a 5 'b 8 'c 10 'd 12))
+    (check (ht :forall (lambda (k v) (> v 4)))         => #t)  
+    (check (ht :forall (lambda (k v) (< v 13)))        => #t)  
+    (check (ht :forall (lambda (k v) (even? v)))       => #f)  
+  
+    (check (ht :forall (lambda (k v)                 
+                    (and (symbol? k) (> v 4))))        => #t)  
+
+    (check (ht :forall (lambda (k v)                 
+                    (symbol? k)))                      => #t)  
+  
+    (check (ht :forall (lambda (k v) (eq? k v)))       => #f)  
+)
+
+(let1 ht-empty ($ (hash-table))
+    (check (ht-empty :forall (lambda (k v) (string? v))) => #t)
+)
+
+(let1 ht-mixed ($ (hash-table 'id 10 'score 85 3.14 "pi"))
+    (check (ht-mixed :forall (lambda (k v) (number? v))) => #f) 
+    (check (ht-mixed :forall (lambda (k v) (and (integer? v) (even? v)))) => #f) 
+)
+
+(let1 ht-fail ($ (hash-table 'valid 42 'invalid "string"))
+    (check (ht-fail :forall (lambda (k v) (number? v)))    => #f) 
+
+    (check (ht-fail :forall (lambda (k v) 
+                         (and (symbol? k) (number? v) (positive? v)))) => #f)
+)
+
+;; nested hash table test
+(let1 ht-nested ($ (hash-table 
+                    'a ($ (hash-table 'x 10)) 
+                    'b ($ (hash-table 'y 20))))
+  (check (ht-nested :forall 
+                   (lambda (k sub-ht) 
+                     (sub-ht :forall (lambda (k v) (> v 9))))) => #t)
+)
+
 (check (rich-hash-table :empty) => ($ (hash-table)))
 (check (rich-hash-table :empty :collect) => (hash-table))
 
