@@ -79,6 +79,10 @@
                  (let1 name (string-remove-prefix (symbol->string method) "@")
                    (string->symbol (string-append ":" name))))
                static-method-symbols))
+         (internal-methods
+           (filter (lambda (method) (not (or (string-starts? (symbol->string (caadr method)) "%")
+                                             (string-starts? (symbol->string (caadr method)) "@"))))
+                   methods))
          (this-symbol (gensym)))
 
 `(define (,class-name msg . args)
@@ -133,6 +137,7 @@
                       (car strings)
                       (string-append acc " " (car strings))))))))
 
+  ,@internal-methods
   ,@instance-methods
  
   (define (instance-dispatcher)
@@ -168,6 +173,7 @@
 ) ; end of define
 ) ; end of let
 ) ; end of define-macro
+
 (define (case-class? x)
   (and-let* ((is-proc? (procedure? x))
              (source (procedure-source x))
