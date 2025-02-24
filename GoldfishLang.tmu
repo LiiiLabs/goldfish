@@ -303,12 +303,14 @@
 
   <scm|define-case-class>用于在Goldfish Scheme定义类似Scala的样本类。
 
-  样本类对象实际上是函数，该函数的第一个参数可以是字段或者是方法，字段统一使用<scm|'field>表示，方法统一使用<scm|:method>表示。实例方法采用<scm|%>作为前缀，静态方法采用<scm|@>作为前缀，内部方法没有<scm|@>和<scm|%>前缀。比如<scm|(bob :to-string)>实际上调用的是bob对象的实例方法<scm|%to-string>。静态方法只能通过样本类名调用，例如<scm|(person :default)>。实例方法只能通过该样本类实例调用，例如 <scm|(bob :to-string)>。内部方法只能在定义实例方法时调用。例如
+  样本类对象实际上是函数，该函数的第一个参数可以是字段或者是方法，字段统一使用<scm|'field>表示，方法统一使用<scm|:method>表示。实例方法采用<scm|%>作为前缀，静态方法采用<scm|@>作为前缀，内部方法没有<scm|@>和<scm|%>前缀。比如<scm|(bob :to-string)>实际上调用的是bob对象的实例方法<scm|%to-string>。静态方法只能通过样本类名调用，例如<scm|(person :default)>。实例方法只能通过该样本类构造的实例调用，例如 <scm|(bob :to-string)>。内部方法只能在定义实例方法时调用。例如
 
-  <\scm>
+  <\scm-code>
     (define-case-class my-vector ((vec vector?) (size integer?))
 
     \ \ (define (@empty) (my-vector #() 0))
+
+    \;
 
     \ \ (define (check-bound n)
 
@@ -316,11 +318,15 @@
 
     \ \ \ \ \ \ (value-error "out of bound")))
 
+    \;
+
     \ \ (define (%at n)
 
     \ \ \ \ (check-bound n)
 
     \ \ \ \ (vector-ref vec n)))
+
+    \;
 
     (let1 vec (my-vector #(1 2 3) 3)
 
@@ -329,7 +335,7 @@
     \ \ (check (vec :at 0) =\<gtr\> 1)
 
     \ \ (check-catch 'value-error (vec :at 3)))
-  </scm>
+  </scm-code>
 
   在此例中，<scm|@empty> 是一个静态方法，<scm|%at> 是一个实例方法，<scm|check-bound> 是一个内部方法。
 
@@ -343,11 +349,21 @@
 
   在这个filter方法的实现中，<scm|%filter>这个实例方法只处理第一个参数，得到的结果仍旧是一个样本类对象，再使用得到的样本类对象处理剩余的参数。
 
-  define-case-class会自动生成这些实例方法：<scm|%equals>、<scm|%is-instance-of>、<scm|%to-string>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
+  <scm|define-case-class>会自动生成两种实例方法。
 
-  \;
+  其中一种是固定命名的实例方法：<scm|%equals>、<scm|%is-instance-of>、<scm|%to-string>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
 
-  样本类的默认构造函数有类型校验，不做任何值校验的。如果需要做值校验，那么需要使用同名的函数覆盖define-case-class生成的默认实现。该同名函数为该样本类的伴生函数。
+  另外一种是将字段名用做实例方法名，表示拷贝一个对象，并修改相应的字段。在下面的示例中，<scm|bob_2024>这个对象的实例方法接受一个整数作为输入，返回的是新的对象<scm|bob_2025>，这两个对象是完全不同的对象，他们的区别仅仅在于age字段的值。
+
+  <\scm-code>
+    (define person ((name string?) (age integer?)))
+
+    (define bob_2024 (person "Bob" 24))
+
+    (define bob_2025 (bob_2024 :age (+ 1 (bob_2024 'age))))
+  </scm-code>
+
+  样本类的默认构造函数有类型校验，但不做任何值校验。如果需要做值校验，那么需要使用同名的函数覆盖<scm|define-case-class>生成的默认实现。该同名函数可称为该样本类的伴生函数。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-macro (define-case-class class-name fields . methods)
