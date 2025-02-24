@@ -303,9 +303,37 @@
 
   <scm|define-case-class>用于在Goldfish Scheme定义类似Scala的样本类。
 
-  样本类对象实际上是函数，该函数的第一个参数可以是字段或者是方法，字段统一使用<scm|'field>表示，方法统一使用<scm|:method>表示，方法的实现统一采用<scm|%>作为前缀。比如<scm|(person :to-string)>实际上调用的是person对象的内部方法<scm|%to-string>。
+  样本类对象实际上是函数，该函数的第一个参数可以是字段或者是方法，字段统一使用<scm|'field>表示，方法统一使用<scm|:method>表示。实例方法采用<scm|%>作为前缀，静态方法采用<scm|@>作为前缀，内部方法没有<scm|@>和<scm|%>前缀。比如<scm|(bob :to-string)>实际上调用的是bob对象的实例方法<scm|%to-string>。静态方法只能通过样本类名调用，例如<scm|(person :default)>。实例方法只能通过该样本类实例调用，例如 <scm|(bob :to-string)>。内部方法只能在定义实例方法时调用。例如
 
-  内部方法将第一个参数之外剩下的参数作为参数传入，我们通过只处理部分参数，递归处理未处理参数的方式，可以实现方法调用链。比如
+  <\scm>
+    (define-case-class my-vector ((vec vector?) (size integer?))
+
+    \ \ (define (@empty) (my-vector #() 0))
+
+    \ \ (define (check-bound n)
+
+    \ \ \ \ (when (or (\<less\> n 0) (\<gtr\>= n size))
+
+    \ \ \ \ \ \ (value-error "out of bound")))
+
+    \ \ (define (%at n)
+
+    \ \ \ \ (check-bound n)
+
+    \ \ \ \ (vector-ref vec n)))
+
+    (let1 vec (my-vector #(1 2 3) 3)
+
+    \ \ (check (my-vector :empty) =\<gtr\> (my-vector #() 0))
+
+    \ \ (check (vec :at 0) =\<gtr\> 1)
+
+    \ \ (check-catch 'value-error (vec :at 3)))
+  </scm>
+
+  在此例中，<scm|@empty> 是一个静态方法，<scm|%at> 是一个实例方法，<scm|check-bound> 是一个内部方法。
+
+  实例方法将第一个参数之外剩下的参数作为参数传入，我们通过只处理部分参数，递归处理未处理参数的方式，可以实现方法调用链。比如
 
   <\goldfish-code>
     (l :filter positive? :filter zero?)
@@ -313,9 +341,11 @@
     =\<gtr\> ((l :filter positve?) :filter zero?)
   </goldfish-code>
 
-  在这个filter方法的实现中，<scm|%filter>这个内部方法只处理第一个参数，得到的结果仍旧是一个样本类对象，再使用得到的样本类对象处理剩余的参数。
+  在这个filter方法的实现中，<scm|%filter>这个实例方法只处理第一个参数，得到的结果仍旧是一个样本类对象，再使用得到的样本类对象处理剩余的参数。
 
-  define-case-class会自动生成这些内部方法：<scm|%equals>、<scm|%is-instance-of>、<scm|%to-string>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
+  define-case-class会自动生成这些实例方法：<scm|%equals>、<scm|%is-instance-of>、<scm|%to-string>和<scm|%apply>。其中<scm|%apply>是一个特殊方法，如果第一个参数没有命中字段或者方法，那么<scm|(person 1 2 3)>实际等价于<scm|(person :apply 1 2 3)>。
+
+  \;
 
   样本类的默认构造函数有类型校验，不做任何值校验的。如果需要做值校验，那么需要使用同名的函数覆盖define-case-class生成的默认实现。该同名函数为该样本类的伴生函数。
 
@@ -363,6 +393,14 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-\<gtr\>symbol (string-append ":" name))))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ static-method-symbols))
+
+    \ \ \ \ \ \ \ \ \ (internal-methods
+
+    \ \ \ \ \ \ \ \ \ \ \ (filter (lambda (method) (not (or (string-starts? (symbol-\<gtr\>string (caadr method)) "%")
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (string-starts? (symbol-\<gtr\>string (caadr method)) "@"))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ methods))
 
     \ \ \ \ \ \ \ \ \ (this-symbol (gensym)))
 
@@ -472,6 +510,8 @@
 
     \;
 
+    \ \ ,@internal-methods
+
     \ \ ,@instance-methods
 
     \ 
@@ -487,6 +527,8 @@
     \ \ \ \ \ \ \ \ ((eq? msg :equals) (apply %equals args))
 
     \ \ \ \ \ \ \ \ ((eq? msg :to-string) (%to-string))
+
+    \ \ \ \ \ \ \ \ ((eq? msg :this) (apply %this args))
 
     \ \ \ \ \ \ \ \ ,@(map (lambda (field key-field)
 
@@ -539,6 +581,8 @@
     ) ; end of let
 
     ) ; end of define-macro
+
+    \;
   </goldfish-chunk>
 
   测试：不带用户自定义方法的样本类person
@@ -697,6 +741,50 @@
     \ \ (check (Andy :set-country! "China") =\<gtr\> (person "Ancker-0" "China"))
 
     \ \ (check (Andy :this :set-country! "USA" :this :set-name! "Andy" :this :to-string) =\<gtr\> "Hello Andy from USA"))
+
+    \;
+  </goldfish-chunk>
+
+  测试：内部方法
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ()
+
+    \ \ (define-case-class person ((name string?) (country string?))
+
+    \ \ \ \ (chained-define (@default)
+
+    \ \ \ \ \ \ (person "Andy" "China"))
+
+    \ \ \ \ (chained-define (set-country! c)
+
+    \ \ \ \ \ \ (set! country c)
+
+    \ \ \ \ \ \ (%this))
+
+    \ \ \ \ (chained-define (set-name! n)
+
+    \ \ \ \ \ \ (set! name n)
+
+    \ \ \ \ \ \ (%this))
+
+    \ \ \ \ (chained-define (%set-both! n c)
+
+    \ \ \ \ \ \ (set-country! c)
+
+    \ \ \ \ \ \ (set-name! n)
+
+    \ \ \ \ \ \ (%this))
+
+    \ \ \ \ (chained-define (%to-string)
+
+    \ \ \ \ \ \ (rich-string (format #f "Hello ~a from ~a" name country))))
+
+    \ \ (check (person :default :to-string :get) =\<gtr\> "Hello Andy from China")
+
+    \ \ (check (person :default :set-both! "Bob" "Russia" :to-string :get) =\<gtr\> "Hello Bob from Russia")
+
+    \ \ (check-catch 'value-error (person :default :set-country! "French")))
 
     \;
   </goldfish-chunk>
