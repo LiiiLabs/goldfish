@@ -630,6 +630,8 @@
 (check ((stack (list 1 2)) :top) => 1)
 (check-catch 'out-of-range ((stack (list )) :top))
 
+(check ((stack (list 1 2 3)) :to-list) => ($ (list 1 2 3)))
+
 (check ((stack :empty) :length) => 0)
 
 (check ((stack (list 1 2)) :pop) => (stack (list 2)))

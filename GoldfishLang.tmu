@@ -3867,6 +3867,22 @@
     \;
   </goldfish-chunk>
 
+  <subsection|转换器>
+
+  <paragraph|stack%to-list>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-list) (rich-list data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((stack (list 1 2 3)) :to-list) =\<gtr\> ($ (list 1 2 3)))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|静态方法>
 
   <paragraph|stack@empty>

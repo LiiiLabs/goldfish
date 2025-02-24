@@ -788,6 +788,8 @@
       (error 'out-of-range)
       (car data)))
 
+(define (%to-list) (rich-list data))
+
 (define (@empty) (stack (list )))
 
 (define (%pop . xs)
