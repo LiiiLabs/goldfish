@@ -73,7 +73,6 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 | [(liii bitwise)](goldfish/liii/bitwise.scm)       | Bitwise Library                      | `bitwise-and`, `bitwise-or`                                      |
 | [(liii string)](goldfish/liii/string.scm)         | String Library                       | `string-join`                                                    |
 | [(liii vector)](goldfish/liii/vector.scm)         | Vector Library                       | `vector-index`                                                   |
-| [(liii stack)](goldfish/liii/stack.scm)           | Stack Library                        | `stack-pop!`, `stack-push!`                                      |
 | [(liii hash-table)](goldfish/liii/hash-table.scm) | Hash Table Library                   | `hash-table-empty?`, `hash-table-contains?`                      |
 | [(liii sys)](goldfish/liii/sys.scm)               | Library looks like Python sys module | `argv`                                                           |
 | [(liii os)](goldfish/liii/os.scm)                 | Library looks like Python os module  | `getenv`, `mkdir`                                                |

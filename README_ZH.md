@@ -73,7 +73,6 @@
 | [(liii bitwise)](goldfish/liii/bitwise.scm)       | 位运算函数库                    | `bitwise-and`, `bitwise-or`                                        |
 | [(liii string)](goldfish/liii/string.scm)         | 字符串函数库                    | `string-join`                                                      |
 | [(liii vector)](goldfish/liii/vector.scm)         | 向量函数库                      | `vector-index`                                                     |
-| [(liii stack)](goldfish/liii/stack.scm)           | 栈                              | `stack-pop!`, `stack-push!`                                        |
 | [(liii hash-table)](goldfish/liii/hash-table.scm) | 哈希表                          | `hash-table-empty?`, `hash-table-contains?`                        |
 | [(liii sys)](goldfish/liii/sys.scm)               | 库类似于 Python 的 `sys` 模块   | `argv`                                                             |
 | [(liii os)](goldfish/liii/os.scm)                 | 库类似于 Python 的 `os` 模块    | `getenv`, `mkdir`                                                  |
