@@ -1021,14 +1021,12 @@
     (if (null? xs) r (apply r xs))))
 
 (define (%find pred?)
-  (let ((all-kv (map identity data)))
-    (let loop ((kvs all-kv))
-      (if (null? kvs)
-          (none)
-          (let1 kv (car kvs)
-                (if (pred? (car kv) (cdr kv))
-                    (option kv)
-                    (loop (cdr kvs))))))))
+  (define iter (make-iterator data))
+  (let loop ((kv (iter)))
+    (cond 
+        ((eof-object? kv) (none))
+        ((and (pair? kv) (pred? (car kv) (cdr kv))) (option kv))
+        (else (loop (iter))))))
 
 (define (%get k)
   (option (hash-table-ref/default data k '())))

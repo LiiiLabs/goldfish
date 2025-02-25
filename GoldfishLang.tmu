@@ -4880,21 +4880,17 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%find pred?)
 
-    \ \ (let ((all-kv (map identity data)))
+    \ \ (define iter (make-iterator data))
 
-    \ \ \ \ (let loop ((kvs all-kv))
+    \ \ (let loop ((kv (iter)))
 
-    \ \ \ \ \ \ (if (null? kvs)
+    \ \ \ \ (cond\ 
 
-    \ \ \ \ \ \ \ \ \ \ (none)
+    \ \ \ \ \ \ \ \ ((eof-object? kv) (none))
 
-    \ \ \ \ \ \ \ \ \ \ (let1 kv (car kvs)
+    \ \ \ \ \ \ \ \ ((and (pair? kv) (pred? (car kv) (cdr kv))) (option kv))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (pred? (car kv) (cdr kv))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option kv)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr kvs))))))))
+    \ \ \ \ \ \ \ \ (else (loop (iter))))))
 
     \;
   </goldfish-chunk>
