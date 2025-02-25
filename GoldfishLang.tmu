@@ -4847,43 +4847,33 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|rich-hash-table%map>
+  \;
+
+  <subsection|静态方法>
+
+  <paragraph|rich-hash-table@empty>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%map f)
+    (define (@empty . xs)
 
-    \ \ (let1 r (make-hash-table)
+    \ \ (let1 r (rich-hash-table (make-hash-table))
 
-    \ \ \ \ (hash-table-for-each
-
-    \ \ \ \ \ \ \ (lambda (k v)
-
-    \ \ \ \ \ \ \ \ \ (receive (k1 v1) (f k v)
-
-    \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! r k1 v1)))
-
-    \ \ \ \ \ \ \ data)
-
-    \ \ \ \ (rich-hash-table r)))
+    \ \ \ \ (if (null? xs) r (apply r xs))))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
+    (check (rich-hash-table :empty) =\<gtr\> ($ (hash-table)))
 
-    \ \ (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
+    (check (rich-hash-table :empty :collect) =\<gtr\> (hash-table))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ :collect)
-
-    \ \ \ \ (check (r 'a) =\<gtr\> 2)
-
-    \ \ \ \ (check (r 'b) =\<gtr\> 3)
-
-    \ \ \ \ (check (r 'c) =\<gtr\> 4)))
-
-    \ \ \ \ \ \ 
+    \;
   </goldfish-chunk>
+
+  \;
+
+  <subsection|选择器>
 
   <paragraph|rich-hash-table%find>
 
@@ -4921,32 +4911,6 @@
 
   \;
 
-  <paragraph|rich-hash-table%count>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%count pred)
-
-    \ \ (hash-table-count pred data))
-
-    \;
-  </goldfish-chunk>
-
-  \;
-
-  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (define ht\ 
-
-    \ \ ($ (hash-table 'a 2 'b 5 'c 8 'd 10 'e 1 'f "test" 'g -2)))
-
-    \;
-
-    (check (ht :count (lambda(k v) (and (number? v) (even? v)))) =\<gtr\> 4)
-
-    (check (ht :count (lambda(k v) (and (number? v) (odd? v)))) =\<gtr\> 2)
-
-    \;
-  </goldfish-chunk>
-
   <paragraph|rich-hash-table%get><typehint|((k any?)) =\<gtr\> option?>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -4966,6 +4930,10 @@
 
     \;
   </goldfish-chunk>
+
+  \;
+
+  <subsection|谓词>
 
   <paragraph|rich-hash-table%contains><typehint|((k any?)) =\<gtr\> boolean?>
 
@@ -5097,22 +5065,154 @@
 
   \;
 
-  <paragraph|rich-hash-table@empty>
+  <subsection|高阶函数>
+
+  <paragraph|rich-hash-table%map>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty . xs)
+    (chained-define (%map f)
 
-    \ \ (let1 r (rich-hash-table (make-hash-table))
+    \ \ (let1 r (make-hash-table)
 
-    \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ \ \ (hash-table-for-each
+
+    \ \ \ \ \ \ \ (lambda (k v)
+
+    \ \ \ \ \ \ \ \ \ (receive (k1 v1) (f k v)
+
+    \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! r k1 v1)))
+
+    \ \ \ \ \ \ \ data)
+
+    \ \ \ \ (rich-hash-table r)))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check (rich-hash-table :empty) =\<gtr\> ($ (hash-table)))
+    (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
 
-    (check (rich-hash-table :empty :collect) =\<gtr\> (hash-table))
+    \ \ (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ :collect)
+
+    \ \ \ \ (check (r 'a) =\<gtr\> 2)
+
+    \ \ \ \ (check (r 'b) =\<gtr\> 3)
+
+    \ \ \ \ (check (r 'c) =\<gtr\> 4)))
+
+    \ \ \ \ \ \ 
+  </goldfish-chunk>
+
+  \;
+
+  \;
+
+  <paragraph|rich-hash-table%count>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%count pred)
+
+    \ \ (hash-table-count pred data))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (define ht\ 
+
+    \ \ ($ (hash-table 'a 2 'b 5 'c 8 'd 10 'e 1 'f "test" 'g -2)))
+
+    \;
+
+    (check (ht :count (lambda(k v) (and (number? v) (even? v)))) =\<gtr\> 4)
+
+    (check (ht :count (lambda(k v) (and (number? v) (odd? v)))) =\<gtr\> 2)
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <paragraph|rich-hash-table%foreach>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%foreach proc)
+
+    \ \ (hash-table-for-each proc data))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let \ ((ht ($ (hash-table 'x 10 'y 20 'z 30 'new 40))) \ \ \ \ 
+
+    \ \ \ \ \ \ (sum 0)) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ (ht :foreach (lambda (k v)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! sum (+ sum v)))) \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ (check sum =\<gtr\> 100) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    )
+
+    \;
+
+    ;; Empty hash table
+
+    (let ((ht ($ (make-hash-table))) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ (call-counter 0)) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ 
+
+    \ \ (ht :foreach (lambda (k v)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set! call-counter (+ call-counter 1))))
+
+    \ \ 
+
+    \ \ (check call-counter =\<gtr\> 0) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    )
+
+    \;
+
+    ;; Nested hash tables
+
+    (let* ((inner ($ (hash-table 'x 100 'y 200))) \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ (outer ($ (hash-table 'a inner 'b 42))) \ \ \ \ 
+
+    \ \ \ \ \ \ \ (total 0)) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ 
+
+    \ \ (outer :foreach\ 
+
+    \ \ \ \ (lambda (k v)
+
+    \ \ \ \ \ \ (if (case-class? v)
+
+    \ \ \ \ \ \ \ \ (v \ :foreach
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (lambda (k v)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (set! total (+ total v))))
+
+    \ \ \ \ \ \ \ \ (set! total (+ total v)))))
+
+    \ \ 
+
+    \ \ (check total =\<gtr\> 342) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    )
 
     \;
   </goldfish-chunk>

@@ -785,22 +785,12 @@
 
 (check-catch 'out-of-range (array :empty :set! 0 1))
 
-(let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
-  (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
-              :collect)
-    (check (r 'a) => 2)
-    (check (r 'b) => 3)
-    (check (r 'c) => 4)))
-      
+(check (rich-hash-table :empty) => ($ (hash-table)))
+(check (rich-hash-table :empty :collect) => (hash-table))
+
 (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (check (ht :find (lambda (k v) (and (symbol? k) (even? v)))) => (option (cons 'b 2)))
   (check ((ht :find (lambda (k v) (> v 4))) :empty?) => #t))
-
-(define ht 
-  ($ (hash-table 'a 2 'b 5 'c 8 'd 10 'e 1 'f "test" 'g -2)))
-
-(check (ht :count (lambda(k v) (and (number? v) (even? v)))) => 4)
-(check (ht :count (lambda(k v) (and (number? v) (odd? v)))) => 2)
 
 (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (check ((ht :get 'a) :get) => 1)
@@ -849,8 +839,51 @@
                      (sub-ht :forall (lambda (k v) (> v 9))))) => #t)
 )
 
-(check (rich-hash-table :empty) => ($ (hash-table)))
-(check (rich-hash-table :empty :collect) => (hash-table))
+(let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
+  (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
+              :collect)
+    (check (r 'a) => 2)
+    (check (r 'b) => 3)
+    (check (r 'c) => 4)))
+      
+(define ht 
+  ($ (hash-table 'a 2 'b 5 'c 8 'd 10 'e 1 'f "test" 'g -2)))
+
+(check (ht :count (lambda(k v) (and (number? v) (even? v)))) => 4)
+(check (ht :count (lambda(k v) (and (number? v) (odd? v)))) => 2)
+
+(let  ((ht ($ (hash-table 'x 10 'y 20 'z 30 'new 40)))     
+      (sum 0))                                  
+  (ht :foreach (lambda (k v) 
+               (set! sum (+ sum v))))             
+  (check sum => 100)                             
+)
+
+;; Empty hash table
+(let ((ht ($ (make-hash-table)))                      
+      (call-counter 0))                          
+  
+  (ht :foreach (lambda (k v) 
+               (set! call-counter (+ call-counter 1))))
+  
+  (check call-counter => 0)                      
+)
+
+;; Nested hash tables
+(let* ((inner ($ (hash-table 'x 100 'y 200)))      
+       (outer ($ (hash-table 'a inner 'b 42)))     
+       (total 0))                                  
+  
+  (outer :foreach 
+    (lambda (k v)
+      (if (case-class? v)
+        (v  :foreach
+            (lambda (k v)
+            (set! total (+ total v))))
+        (set! total (+ total v)))))
+  
+  (check total => 342)                          
+)
 
 (check ($ 1 :to 3) => '(1 2 3))
 (check ($ "hello world" :replace "world" "suger" :index-of "suger") => 6)

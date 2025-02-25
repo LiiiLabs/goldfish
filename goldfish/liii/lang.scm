@@ -1016,14 +1016,9 @@
 (define-case-class rich-hash-table ((data hash-table?))
   (define (%collect) data)
 
-(chained-define (%map f)
-  (let1 r (make-hash-table)
-    (hash-table-for-each
-       (lambda (k v)
-         (receive (k1 v1) (f k v)
-           (hash-table-set! r k1 v1)))
-       data)
-    (rich-hash-table r)))
+(define (@empty . xs)
+  (let1 r (rich-hash-table (make-hash-table))
+    (if (null? xs) r (apply r xs))))
 
 (define (%find pred?)
   (let ((all-kv (map identity data)))
@@ -1034,9 +1029,6 @@
                 (if (pred? (car kv) (cdr kv))
                     (option kv)
                     (loop (cdr kvs))))))))
-
-(define (%count pred)
-  (hash-table-count pred data))
 
 (define (%get k)
   (option (hash-table-ref/default data k '())))
@@ -1054,9 +1046,20 @@
                 (loop (cdr kvs))  
                 #f))))))  
 
-(define (@empty . xs)
-  (let1 r (rich-hash-table (make-hash-table))
-    (if (null? xs) r (apply r xs))))
+(chained-define (%map f)
+  (let1 r (make-hash-table)
+    (hash-table-for-each
+       (lambda (k v)
+         (receive (k1 v1) (f k v)
+           (hash-table-set! r k1 v1)))
+       data)
+    (rich-hash-table r)))
+
+(define (%count pred)
+  (hash-table-count pred data))
+
+(define (%foreach proc)
+  (hash-table-for-each proc data))
 
 )
 
