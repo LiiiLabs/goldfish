@@ -1044,6 +1044,14 @@
                 (loop (cdr kvs))  
                 #f))))))  
 
+(define (%exists pred?)
+  (define iter (make-iterator data))
+  (let loop ((kv (iter)))
+    (cond 
+        ((eof-object? kv) #f)
+        ((and (pair? kv) (pred? (car kv) (cdr kv))) #t)
+        (else (loop (iter))))))
+
 (chained-define (%map f)
   (let1 r (make-hash-table)
     (hash-table-for-each

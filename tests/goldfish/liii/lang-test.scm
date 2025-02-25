@@ -839,6 +839,15 @@
                      (sub-ht :forall (lambda (k v) (> v 9))))) => #t)
 )
 
+(let ((ht ($ (hash-table 'a 1 'b "2" 'c 3))))
+  (check (ht :exists (lambda (k v) (string? v))) => #t))
+
+(let ((ht ($ (hash-table "a" 1 'b 2 3 'c))))
+  (check (ht :exists (lambda (k v) (number? k))) => #t))
+
+(let ((ht ($ (hash-table))))
+  (check (ht :exists (lambda (k v) #t)) => #f))
+
 (let1 ht ($ (hash-table 'a 1 'b 2 'c 3))
   (let1 r (ht :map (lambda (k v) (values k (+ v 1)))
               :collect)

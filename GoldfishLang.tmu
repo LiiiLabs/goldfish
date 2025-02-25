@@ -5061,6 +5061,48 @@
 
   \;
 
+  <paragraph|rich-hash-table%exists>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%exists pred?)
+
+    \ \ (define iter (make-iterator data))
+
+    \ \ (let loop ((kv (iter)))
+
+    \ \ \ \ (cond\ 
+
+    \ \ \ \ \ \ \ \ ((eof-object? kv) #f)
+
+    \ \ \ \ \ \ \ \ ((and (pair? kv) (pred? (car kv) (cdr kv))) #t)
+
+    \ \ \ \ \ \ \ \ (else (loop (iter))))))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((ht ($ (hash-table 'a 1 'b "2" 'c 3))))
+
+    \ \ (check (ht :exists (lambda (k v) (string? v))) =\<gtr\> #t))
+
+    \;
+
+    (let ((ht ($ (hash-table "a" 1 'b 2 3 'c))))
+
+    \ \ (check (ht :exists (lambda (k v) (number? k))) =\<gtr\> #t))
+
+    \;
+
+    (let ((ht ($ (hash-table))))
+
+    \ \ (check (ht :exists (lambda (k v) #t)) =\<gtr\> #f))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|高阶函数>
 
   <paragraph|rich-hash-table%map>
