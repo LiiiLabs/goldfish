@@ -23,7 +23,7 @@
   option none
   rich-integer rich-char rich-string
   rich-list range stack
-  rich-vector array rich-hash-table
+  rich-vector array rich-hash-table array-buffer
   box $
 )
 (begin
@@ -763,6 +763,92 @@
           (string-append start (string-join (map as-string data) sep) end))))
 
 )
+
+(define-case-class array-buffer ((data vector?) (size integer?) (capacity integer?))
+
+(chained-define (@from-vector vec)
+  (let ((len (vector-length vec)))
+    (array-buffer (copy vec) len len)))
+
+(chained-define (@from-list lst)
+  (let ((len (length lst)))
+    (array-buffer (copy lst (make-vector len)) len len)))
+
+(define (check-bound n)
+  (when (or (not (integer? n)) (< n 0) (>= n size))
+    (key-error "array-buffer out of bound")))
+
+(chained-define (%get) data)
+
+(chained-define (%collect) data)
+
+(chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
+
+(chained-define (%to-rich-list) (rich-list (vector->list (copy data (make-vector size)))))
+
+(define (%length) size)
+
+(chained-define (%apply n)
+  (check-bound n)
+  (vector-ref data n))
+
+(chained-define (%set! n v)
+  (check-bound n)
+  (vector-set! data n v))
+
+(define (%update! . args)
+  (apply %set! args))
+
+(chained-define (%extend! n)
+  (when (< capacity n)
+    (if (= capacity 0)
+      (set! capacity n)
+      (let loop ()
+        (when (< capacity n)
+          (set! capacity (* 2 capacity))
+          (loop))))
+    (set! data (copy data (make-vector capacity) 0 size)))
+  (%this))
+
+(define (%size-hint! . args) (apply %extend! args))
+
+(chained-define (%resize! n)
+  (%extend! n)
+  (set! size n)
+  (%this))
+
+(chained-define (%add-one! x)
+  (%extend! (+ size 1))
+  (vector-set! data size x)
+  (set! size (+ size 1))
+  (%this))
+
+(chained-define (%clear!)
+  (set! size 0)
+  (%this))
+
+(chained-define (%clear/shrink!)
+  (set! size 0)
+  (set! capacity 1)
+  (set! data (make-vector 1))
+  (%this))
+
+(chained-define (%insert! index elem)
+  (%extend! (+ size 1))
+  (set! size (+ size 1))
+  (check-bound index)
+  (let loop ((p (- size 1)))
+    (when (> p index)
+      (vector-set! data p (vector-ref data (- p 1)))
+      (loop (- p 1))))
+  (vector-set! data index elem)
+  (%this))
+
+(typed-define (%equals (that case-class?))
+  (and (that :is-instance-of 'array-buffer)
+       ((%this :to-rich-vector) :equals (that :to-rich-vector))))
+
+) ; end of array-buffer
 
 (define-case-class range
   ((start integer?) (end integer?) (step integer?) (inclusive? boolean?))
