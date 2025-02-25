@@ -3904,21 +3904,13 @@
   <paragraph|stack%pop>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%pop . xs)
+    (chained-define (%pop)
 
-    \ \ (let1 r
+    \ \ (if (null? data)
 
-    \ \ \ \ \ \ (if (null? data)
+    \ \ \ \ \ \ (error 'out-of-range "Cannot pop from an empty stack")
 
-    \ \ \ \ \ \ \ \ \ \ (error 'out-of-range)
-
-    \ \ \ \ \ \ \ \ \ \ (stack (cdr data)))
-
-    \ \ \ \ (if (null? xs)
-
-    \ \ \ \ \ \ \ \ r
-
-    \ \ \ \ \ \ \ \ (apply r xs))))
+    \ \ \ \ \ \ (stack (cdr data))))
 
     \;
   </goldfish-chunk>

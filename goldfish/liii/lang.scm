@@ -792,14 +792,10 @@
 
 (define (@empty) (stack (list )))
 
-(define (%pop . xs)
-  (let1 r
-      (if (null? data)
-          (error 'out-of-range)
-          (stack (cdr data)))
-    (if (null? xs)
-        r
-        (apply r xs))))
+(chained-define (%pop)
+  (if (null? data)
+      (error 'out-of-range "Cannot pop from an empty stack")
+      (stack (cdr data))))
 
 (define (%push element . es) 
   (let1 r (stack (cons element data))
