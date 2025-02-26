@@ -782,13 +782,14 @@
 
 (define (%length) size)
 
-(chained-define (%apply n)
+(define (%apply n)
   (check-bound n)
   (vector-ref data n))
 
 (chained-define (%set! n v)
   (check-bound n)
-  (vector-set! data n v))
+  (vector-set! data n v)
+  (%this))
 
 (define (%update! . args)
   (apply %set! args))
@@ -809,6 +810,14 @@
 (chained-define (%resize! n)
   (%extend! n)
   (set! size n)
+  (%this))
+
+(chained-define (%trim-to-size! n)
+  (%extend! n)
+  (set! size n)
+  (when (> capacity (* 2 size))
+    (set! data (copy data (make-vector size)))
+    (set! capacity size))
   (%this))
 
 (chained-define (%add-one! x)
@@ -840,11 +849,11 @@
 
 (typed-define (%equals (that case-class?))
   (and (that :is-instance-of 'array-buffer)
-       ((%this :to-rich-vector) :equals (that :to-rich-vector))))
+       ((%to-vector) :equals (that :to-vector))))
 
-(chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
+(define (%to-vector) (rich-vector (copy data (make-vector size))))
 
-(chained-define (%to-rich-list) (rich-list (vector->list (copy data (make-vector size)))))
+(define (%to-list) (rich-list (vector->list (copy data (make-vector size)))))
 
 ) ; end of array-buffer
 

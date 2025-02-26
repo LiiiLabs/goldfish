@@ -3749,6 +3749,12 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (array-buffer :from-vector #(1 2 3) :collect) =\<gtr\> #(1 2 3))
+
+    \;
+  </scm-chunk>
+
   <paragraph|array-buffer@from-list>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -3760,6 +3766,12 @@
 
     \;
   </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (array-buffer :from-list '(1 2 3) :collect) =\<gtr\> #(1 2 3))
+
+    \;
+  </scm-chunk>
 
   <subsection|内部方法>
 
@@ -3794,7 +3806,7 @@
   <paragraph|array-buffer%apply>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%apply n)
+    (define (%apply n)
 
     \ \ (check-bound n)
 
@@ -3802,6 +3814,22 @@
 
     \;
   </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((arr (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :length) =\<gtr\> 3)
+
+    \ \ (check (arr 0) =\<gtr\> 1)
+
+    \ \ (check (arr 1) =\<gtr\> 2)
+
+    \ \ (check (arr 2) =\<gtr\> 3)
+
+    \ \ (check-catch 'key-error (arr 3)))
+
+    \;
+  </scm-chunk>
 
   <subsection|修改器>
 
@@ -3812,7 +3840,9 @@
 
     \ \ (check-bound n)
 
-    \ \ (vector-set! data n v))
+    \ \ (vector-set! data n v)
+
+    \ \ (%this))
 
     \;
   </goldfish-chunk>
@@ -3828,6 +3858,16 @@
 
     \;
   </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((arr (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :set! 0 4 :collect) =\<gtr\> #(4 2 3))
+
+    \ \ (check (arr :update! 1 5 :collect) =\<gtr\> #(4 5 3)))
+
+    \;
+  </scm-chunk>
 
   <paragraph|array-buffer%extend!>
 
@@ -3867,9 +3907,27 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((arr (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :extend! 5 :length) =\<gtr\> 3)
+
+    \ \ (check-true (== (arr :extend! 10)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :size-hint! 15 :length) =\<gtr\> 3)
+
+    \ \ (check-true (== (arr :size-hint! 20)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (array-buffer :from-list '(1 2 3)))))
+
+    \;
+  </scm-chunk>
+
   <paragraph|array-buffer%resize!>
 
-  修改数组大小为 <scm|n>。
+  修改数组大小为 <scm|n>，该操作不会影响内部预留的空间。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (chained-define (%resize! n)
@@ -3877,6 +3935,28 @@
     \ \ (%extend! n)
 
     \ \ (set! size n)
+
+    \ \ (%this))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|array-buffer%trim-to-size!>
+
+  修改数组大小为 <scm|n>，该操作可以释放多余的预留空间。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%trim-to-size! n)
+
+    \ \ (%extend! n)
+
+    \ \ (set! size n)
+
+    \ \ (when (\<gtr\> capacity (* 2 size))
+
+    \ \ \ \ (set! data (copy data (make-vector size)))
+
+    \ \ \ \ (set! capacity size))
 
     \ \ (%this))
 
@@ -3900,6 +3980,20 @@
 
     \;
   </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((arr (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :add-one! 4 :collect) =\<gtr\> #(1 2 3 4))
+
+    \ \ (check (arr :add-one! 5 :length) =\<gtr\> 5)
+
+    \ \ (check-true (== (arr :add-one! 6)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (array-buffer :from-list '(1 2 3 4 5 6)))))
+
+    \;
+  </scm-chunk>
 
   <paragraph|array-buffer%clear!>
 
@@ -3933,6 +4027,32 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((arr (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :clear! :length) =\<gtr\> 0)
+
+    \ \ (check (arr :add-one! 4 :collect) =\<gtr\> #(4))
+
+    \ \ (check-true (== (arr :clear!)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (array-buffer :from-list '()))))
+
+    \;
+
+    (let ((arr (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :clear/shrink! :length) =\<gtr\> 0)
+
+    \ \ (check (arr :add-one! 4 :collect) =\<gtr\> #(4))
+
+    \ \ (check-true (== (arr :clear/shrink!)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (array-buffer :from-list '()))))
+
+    \;
+  </scm-chunk>
+
   <paragraph|array-buffer%insert!>
 
   在指定位置插入元素。
@@ -3961,6 +4081,24 @@
     \;
   </goldfish-chunk>
 
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((arr (array-buffer :from-list '(1 2 3))))
+
+    \ \ (check (arr :insert! 0 0 :collect) ==\<gtr\> #(0 1 2 3))
+
+    \ \ (check (arr :insert! 2 5 :collect) ==\<gtr\> #(0 1 5 2 3))
+
+    \ \ (check (arr :insert! 5 6 :length) ==\<gtr\> 6)
+
+    \ \ (check-true (== (arr :insert! 3 4)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (array-buffer :from-list '(0 1 5 4 2 3 6))))
+
+    \ \ (check-catch 'key-error (arr :insert! 8 9)))
+
+    \;
+  </scm-chunk>
+
   <subsection|谓词>
 
   <paragraph|array-buffer%equals>
@@ -3970,7 +4108,7 @@
 
     \ \ (and (that :is-instance-of 'array-buffer)
 
-    \ \ \ \ \ \ \ ((%this :to-rich-vector) :equals (that :to-rich-vector))))
+    \ \ \ \ \ \ \ ((%to-vector) :equals (that :to-vector))))
 
     \;
   </goldfish-chunk>
@@ -3991,18 +4129,18 @@
 
   <subsection|转换器>
 
-  <paragraph|array-buffer%to-rich-vector>
+  <paragraph|array-buffer%to-vector>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
+    (define (%to-vector) (rich-vector (copy data (make-vector size))))
 
     \;
   </goldfish-chunk>
 
-  <paragraph|array-buffer%to-rich-list>
+  <paragraph|array-buffer%to-list>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%to-rich-list) (rich-list (vector-\<gtr\>list (copy data (make-vector size)))))
+    (define (%to-list) (rich-list (vector-\<gtr\>list (copy data (make-vector size)))))
 
     \;
   </goldfish-chunk>
@@ -4022,31 +4160,31 @@
 
     \ \ (check (arb :collect) =\<gtr\> #(3 1 2 5 4))
 
-    \ \ (check (arb :to-rich-vector) =\<gtr\> (rich-vector #(3 1 2 5 4)))
+    \ \ (check (arb :to-vector) =\<gtr\> (rich-vector #(3 1 2 5 4)))
 
-    \ \ (check (arb :to-rich-list) =\<gtr\> (rich-list '(3 1 2 5 4)))
+    \ \ (check (arb :to-list) =\<gtr\> (rich-list '(3 1 2 5 4)))
 
     \ \ (arb :add-one! 0)
 
     \ \ (check (arb :collect) =\<gtr\> #(3 1 2 5 4 0))
 
-    \ \ (check (arb :to-rich-vector) =\<gtr\> (rich-vector #(3 1 2 5 4 0)))
+    \ \ (check (arb :to-vector) =\<gtr\> (rich-vector #(3 1 2 5 4 0)))
 
-    \ \ (check (arb :to-rich-list) =\<gtr\> (rich-list '(3 1 2 5 4 0)))
+    \ \ (check (arb :to-list) =\<gtr\> (rich-list '(3 1 2 5 4 0)))
 
     \ \ (arb :insert! 0 0)
 
     \ \ (check (arb :collect) =\<gtr\> #(0 3 1 2 5 4 0))
 
-    \ \ (check (arb :to-rich-vector) =\<gtr\> (rich-vector #(0 3 1 2 5 4 0)))
+    \ \ (check (arb :to-vector) =\<gtr\> (rich-vector #(0 3 1 2 5 4 0)))
 
-    \ \ (check (arb :to-rich-list) =\<gtr\> (rich-list '(0 3 1 2 5 4 0)))
+    \ \ (check (arb :to-list) =\<gtr\> (rich-list '(0 3 1 2 5 4 0)))
 
-    \ \ (check (arb :resize! 4 :to-rich-list :collect) =\<gtr\> '(0 3 1 2))
+    \ \ (check (arb :resize! 4 :to-list) =\<gtr\> (rich-list '(0 3 1 2)))
 
-    \ \ (check (arb :resize! 3 :to-rich-vector :collect) =\<gtr\> #(0 3 1))
+    \ \ (check (arb :resize! 3 :to-vector) =\<gtr\> (rich-vector #(0 3 1)))
 
-    \ \ (check (arb :insert! 1 2 :to-rich-list :collect) =\<gtr\> '(0 2 3 1))
+    \ \ (check (arb :insert! 1 2 :to-list) =\<gtr\> (rich-list '(0 2 3 1)))
 
     \ \ (check (arb :collect) =\<gtr\> #(0 2 3 1))
 
