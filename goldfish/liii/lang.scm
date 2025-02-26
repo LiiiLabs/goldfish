@@ -735,6 +735,19 @@
         sorted-rich-list 
         (apply sorted-rich-list xs))))
 
+(define (%group-by func)
+  (let ((group (make-hash-table)))
+    (for-each
+      (lambda (elem) 
+        (let ((key (func elem)))
+          (hash-table-update!/default
+            group
+            key
+            (lambda (current-list) (append current-list (list elem)))
+            '())))
+      data)
+  (rich-hash-table group)))
+
 (define (%to-string)
   (object->string data))
 

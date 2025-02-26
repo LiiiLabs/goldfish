@@ -15773,6 +15773,48 @@
     \;
   </scm-chunk>
 
+  \;
+
+  <paragraph|hash-table-update!/default><index|hash-table-update!><todo|typehint>
+
+  <subparagraph|实现>
+
+  <\scm-chunk|goldfish/srfi/srfi-125.scm|true|true>
+    (define (hash-table-update!/default ht key updater default)
+
+    \ \ (hash-table-set! ht key (updater (hash-table-ref/default ht key default))))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/hash-table-test.scm|true|true>
+    (let1 ht (make-hash-table)
+
+    \ \ (hash-table-update!/default ht 'key1 (lambda (x) (+ x 1)) 10) \ 
+
+    \ \ (check (ht 'key1) =\<gtr\> 11)
+
+    \ \ (hash-table-update!/default ht 'key1 (lambda (x) (+ x 1)) 10) \ 
+
+    \ \ (check (ht 'key1) =\<gtr\> 12)
+
+    \ \ (hash-table-update!/default ht 'key2 (lambda (x) (* x 2)) 5) \ 
+
+    \ \ (check (ht 'key2) =\<gtr\> 10)\ 
+
+    \ \ (hash-table-update!/default ht 'key2 (lambda (x) (+ x 2)) 5) \ 
+
+    \ \ (check (ht 'key2) =\<gtr\> 12)
+
+    \ \ (hash-table-update!/default ht 'key2 (lambda (x) #f) 5) \ 
+
+    \ \ (check (ht 'key2) =\<gtr\> #f))
+
+    \;
+  </scm-chunk>
+
   <paragraph|hash-table-clear!><index|hash-table-clear!><todo|typehint>
 
   <subparagraph|实现>

@@ -111,6 +111,18 @@
   (check (ht 'key) => #f))
 
 (let1 ht (make-hash-table)
+  (hash-table-update!/default ht 'key1 (lambda (x) (+ x 1)) 10)  
+  (check (ht 'key1) => 11)
+  (hash-table-update!/default ht 'key1 (lambda (x) (+ x 1)) 10)  
+  (check (ht 'key1) => 12)
+  (hash-table-update!/default ht 'key2 (lambda (x) (* x 2)) 5)  
+  (check (ht 'key2) => 10) 
+  (hash-table-update!/default ht 'key2 (lambda (x) (+ x 2)) 5)  
+  (check (ht 'key2) => 12)
+  (hash-table-update!/default ht 'key2 (lambda (x) #f) 5)  
+  (check (ht 'key2) => #f))
+
+(let1 ht (make-hash-table)
   (hash-table-update! ht 'key 'value)
   (hash-table-update! ht 'key1 'value1)
   (hash-table-update! ht 'key2 'value2)
