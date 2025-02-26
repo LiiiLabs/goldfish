@@ -3775,18 +3775,10 @@
 
   <subsection|选择器>
 
-  <paragraph|array-buffer%get>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%get) data)
-
-    \;
-  </goldfish-chunk>
-
   <paragraph|array-buffer%collect>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%collect) data)
+    (define (%collect) (copy data (make-vector size)))
 
     \;
   </goldfish-chunk>
@@ -4028,7 +4020,7 @@
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ((arb (array-buffer :from-list '(3 1 2 5 4))))
 
-    \ \ (check (arb :get) =\<gtr\> #(3 1 2 5 4))
+    \ \ (check (arb :collect) =\<gtr\> #(3 1 2 5 4))
 
     \ \ (check (arb :to-rich-vector) =\<gtr\> (rich-vector #(3 1 2 5 4)))
 
@@ -4036,11 +4028,15 @@
 
     \ \ (arb :add-one! 0)
 
+    \ \ (check (arb :collect) =\<gtr\> #(3 1 2 5 4 0))
+
     \ \ (check (arb :to-rich-vector) =\<gtr\> (rich-vector #(3 1 2 5 4 0)))
 
     \ \ (check (arb :to-rich-list) =\<gtr\> (rich-list '(3 1 2 5 4 0)))
 
     \ \ (arb :insert! 0 0)
+
+    \ \ (check (arb :collect) =\<gtr\> #(0 3 1 2 5 4 0))
 
     \ \ (check (arb :to-rich-vector) =\<gtr\> (rich-vector #(0 3 1 2 5 4 0)))
 
@@ -4051,6 +4047,8 @@
     \ \ (check (arb :resize! 3 :to-rich-vector :collect) =\<gtr\> #(0 3 1))
 
     \ \ (check (arb :insert! 1 2 :to-rich-list :collect) =\<gtr\> '(0 2 3 1))
+
+    \ \ (check (arb :collect) =\<gtr\> #(0 2 3 1))
 
     \ \ (check (arb 0) =\<gtr\> 0)
 

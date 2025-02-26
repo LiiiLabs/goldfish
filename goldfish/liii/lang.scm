@@ -778,9 +778,7 @@
   (when (or (not (integer? n)) (< n 0) (>= n size))
     (key-error "array-buffer out of bound")))
 
-(chained-define (%get) data)
-
-(chained-define (%collect) data)
+(define (%collect) (copy data (make-vector size)))
 
 (chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
 
