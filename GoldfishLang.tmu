@@ -3723,6 +3723,66 @@
     \;
   </goldfish-chunk>
 
+  \;
+
+  \;
+
+  <paragraph|rich-list%distinct>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%distinct)
+
+    \ \ (let loop
+
+    \ \ \ \ \ \ ((result '())\ 
+
+    \ \ \ \ \ \ (data data)\ 
+
+    \ \ \ \ \ \ (ht (make-hash-table)))
+
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((null? data) (rich-list (reverse result))) \ 
+
+    \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ (let ((elem (car data)))
+
+    \ \ \ \ \ \ \ \ \ (if (eq? (hash-table-ref ht elem) #f)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! ht elem #t) \ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cons elem result) (cdr data) ht))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ (loop result (cdr data) ht)))))))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check \ ($ '(a a b c b) :distinct :collect)\ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> '(a b c))
+
+    \;
+
+    (check \ ($ '(1 1 1 2 2 3 3 3 3 5 5 5) :distinct :collect)\ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> '(1 2 3 5))
+
+    \;
+
+    (check \ ($ '() :distinct :collect)\ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> '())
+
+    \;
+  </goldfish-chunk>
+
   <subsection|转换器>
 
   <paragraph|rich-list%to-string>

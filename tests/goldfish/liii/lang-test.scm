@@ -613,6 +613,15 @@
 (check  ($ '(1 1 2 2 2 3 4 5 6 7) :zip-with-index :collect)
         => '((0 . 1) (1 . 1) (2 . 2) (3 . 2) (4 . 2) (5 . 3) (6 . 4) (7 . 5) (8 . 6) (9 . 7)))
 
+(check  ($ '(a a b c b) :distinct :collect) 
+        => '(a b c))
+
+(check  ($ '(1 1 1 2 2 3 3 3 3 5 5 5) :distinct :collect) 
+        => '(1 2 3 5))
+
+(check  ($ '() :distinct :collect) 
+        => '())
+
 (check (object->string ($ '(1 2 3))) => "(1 2 3)")
 
 (let1 l (rich-list (list 1 2 3))

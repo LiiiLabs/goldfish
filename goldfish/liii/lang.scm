@@ -757,6 +757,21 @@
               (cons (cons idx (car lst)) save))))
   (rich-list (loop data 0 '())))
 
+(chained-define (%distinct)
+  (let loop
+      ((result '()) 
+      (data data) 
+      (ht (make-hash-table)))
+    (cond
+      ((null? data) (rich-list (reverse result)))  
+      (else
+       (let ((elem (car data)))
+         (if (eq? (hash-table-ref ht elem) #f) 
+             (begin
+               (hash-table-set! ht elem #t)  
+               (loop (cons elem result) (cdr data) ht))
+             (loop result (cdr data) ht)))))))
+
 (define (%to-string)
   (object->string data))
 
