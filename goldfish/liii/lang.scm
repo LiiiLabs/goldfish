@@ -985,6 +985,22 @@
       res
       (apply res xs))))
 
+(define (%group-by func)
+  (let ((group (make-hash-table)))
+    (for-each
+      (lambda (elem) 
+        (let ((key (func elem)))
+          (hash-table-update!/default
+            group
+            key
+            (lambda (current-list) (append current-list (list elem)))
+            '())))
+      (vector->list data))
+    (hash-table-for-each 
+      (lambda (k v) (hash-table-set! group k (list->vector v))) 
+      group)
+    (rich-hash-table group)))
+
 (define (%to-string)
   (object->string data))
 

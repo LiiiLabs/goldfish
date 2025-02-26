@@ -773,6 +773,19 @@
   (check (vec :sort-with (lambda (x y) (< (cdr x) (cdr y))))
          => (rich-vector #((2 . 1) (1 . 2) (3 . 2) (3 . 3) (1 . 3)))))
 
+(check  (($ #(1 2 3 4 5 6) :group-by (@ modulo _ 2)) :collect)
+        =>  (hash-table 0 #(2 4 6) 1 #(1 3 5)))
+
+(check  (($ #(1 2 3 4 5 6) :group-by (@ modulo _ 3)) :collect)
+        =>  (hash-table 0 #(3 6) 1 #(1 4) 2 #(2 5)))
+
+(check  (($ #(1 2 3 4 5 6 7) :group-by (@ modulo _ 3)) :collect)
+        =>  (hash-table 0 #(3 6) 1 #(1 4 7) 2 #(2 5)))
+
+(let ((result ($ #("apple" "banana" "cat" "dog") :group-by (@ string-length _))))
+  (check (result :collect) 
+          => (hash-table 3 #("cat" "dog") 5 #("apple") 6 #("banana"))))
+
 (check (object->string ($ #(1 2 3))) => "#(1 2 3)")
 
 (let1 v ($ #(1 2 3))
