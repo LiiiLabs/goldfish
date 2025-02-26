@@ -1010,6 +1010,16 @@
       group)
     (rich-hash-table group)))
 
+(chained-define (%zip-with-index)
+  (chained-define (loop lst idx save)
+    (if (null? lst)
+        (reverse (list->vector save))  
+        (loop (cdr lst) 
+              (+ idx 1) 
+              (cons (cons idx (car lst)) save))))
+
+  (rich-vector (loop (vector->list data) 0 '())))
+
 (define (%to-string)
   (object->string data))
 
