@@ -604,6 +604,15 @@
   (check (result :collect) 
           => (hash-table 3 '("cat" "dog") 5 '("apple") 6 '("banana"))))
 
+(check  ($ '(a b c) :zip-with-index :collect)  
+        => '((0 . a) (1 . b) (2 . c)))
+
+(check  ($ '() :zip-with-index :collect) 
+        => '())
+
+(check  ($ '(1 1 2 2 2 3 4 5 6 7) :zip-with-index :collect)
+        => '((0 . 1) (1 . 1) (2 . 2) (3 . 2) (4 . 2) (5 . 3) (6 . 4) (7 . 5) (8 . 6) (9 . 7)))
+
 (check (object->string ($ '(1 2 3))) => "(1 2 3)")
 
 (let1 l (rich-list (list 1 2 3))

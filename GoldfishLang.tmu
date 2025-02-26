@@ -3677,6 +3677,52 @@
     \;
   </goldfish-chunk>
 
+  \;
+
+  <paragraph|rich-list%zip-with-index>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%zip-with-index)
+
+    \ \ (chained-define (loop lst idx save)
+
+    \ \ \ \ (if (null? lst)
+
+    \ \ \ \ \ \ \ \ (reverse save) \ 
+
+    \ \ \ \ \ \ \ \ (loop (cdr lst)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ idx 1)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons idx (car lst)) save))))
+
+    \ \ (rich-list (loop data 0 '())))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check \ ($ '(a b c) :zip-with-index :collect) \ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> '((0 . a) (1 . b) (2 . c)))
+
+    \;
+
+    (check \ ($ '() :zip-with-index :collect)\ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> '())
+
+    \;
+
+    (check \ ($ '(1 1 2 2 2 3 4 5 6 7) :zip-with-index :collect)
+
+    \ \ \ \ \ \ \ \ =\<gtr\> '((0 . 1) (1 . 1) (2 . 2) (3 . 2) (4 . 2) (5 . 3) (6 . 4) (7 . 5) (8 . 6) (9 . 7)))
+
+    \;
+  </goldfish-chunk>
+
   <subsection|转换器>
 
   <paragraph|rich-list%to-string>
