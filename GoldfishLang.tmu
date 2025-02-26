@@ -3783,22 +3783,6 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|array-buffer%to-rich-vector>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
-
-    \;
-  </goldfish-chunk>
-
-  <paragraph|array-buffer%to-rich-list>
-
-  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%to-rich-list) (rich-list (vector-\<gtr\>list (copy data (make-vector size)))))
-
-    \;
-  </goldfish-chunk>
-
   <paragraph|array-buffer%length>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -4006,6 +3990,22 @@
   <subsection|高阶函数>
 
   <subsection|转换器>
+
+  <paragraph|array-buffer%to-rich-vector>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|array-buffer%to-rich-list>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%to-rich-list) (rich-list (vector-\<gtr\>list (copy data (make-vector size)))))
+
+    \;
+  </goldfish-chunk>
 
   <subsection|结尾>
 

@@ -780,10 +780,6 @@
 
 (define (%collect) (copy data (make-vector size)))
 
-(chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
-
-(chained-define (%to-rich-list) (rich-list (vector->list (copy data (make-vector size)))))
-
 (define (%length) size)
 
 (chained-define (%apply n)
@@ -845,6 +841,10 @@
 (typed-define (%equals (that case-class?))
   (and (that :is-instance-of 'array-buffer)
        ((%this :to-rich-vector) :equals (that :to-rich-vector))))
+
+(chained-define (%to-rich-vector) (rich-vector (copy data (make-vector size))))
+
+(chained-define (%to-rich-list) (rich-list (vector->list (copy data (make-vector size)))))
 
 ) ; end of array-buffer
 
