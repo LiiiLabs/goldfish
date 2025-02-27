@@ -530,6 +530,15 @@
   (check-false (l :contains 4)))
 
 (let ((lst (rich-list '(1 2 3 4 5))))
+  (check (lst :reverse :collect) => '(5 4 3 2 1)))
+
+(let ((lst (rich-list '(a b c d e))))
+  (check (lst :reverse :collect) => '(e d c b a)))
+
+(let ((lst (rich-list '())))
+  (check (lst :reverse :collect) => '()))
+
+(let ((lst (rich-list '(1 2 3 4 5))))
   (check (lst :take -1 :collect) => '())
   (check (lst :take 0 :collect) => '())
   (check (lst :take 3 :collect) => '(1 2 3))

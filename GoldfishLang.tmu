@@ -3329,6 +3329,36 @@
     \;
   </scm-chunk>
 
+  <paragraph|rich-list%reverse>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    \ \ (chained-define (%reverse)
+
+    \ \ \ \ (rich-list (reverse data)))
+
+    \ \ \ \ 
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((lst (rich-list '(1 2 3 4 5))))
+
+    \ \ (check (lst :reverse :collect) =\<gtr\> '(5 4 3 2 1)))
+
+    \;
+
+    (let ((lst (rich-list '(a b c d e))))
+
+    \ \ (check (lst :reverse :collect) =\<gtr\> '(e d c b a)))
+
+    \;
+
+    (let ((lst (rich-list '())))
+
+    \ \ (check (lst :reverse :collect) =\<gtr\> '()))
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-list%take>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>

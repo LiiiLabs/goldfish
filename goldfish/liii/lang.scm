@@ -680,6 +680,9 @@
   (define (%for-each x)
     (for-each x data))
 
+  (chained-define (%reverse)
+    (rich-list (reverse data)))
+    
   (define (%take x . xs)
     (typed-define (scala-take (data list?) (n integer?))
       (cond ((< n 0) '())
