@@ -912,34 +912,6 @@
 
 )
 
-(define-case-class stack ((data list?))
-
-(define (%length) (length data))
-
-(define (%size) (length data))
-
-(define (%top)
-  (if (null? data)
-      (error 'out-of-range)
-      (car data)))
-
-(define (%to-list) (rich-list data))
-
-(define (@empty) (stack (list )))
-
-(chained-define (%pop)
-  (if (null? data)
-      (error 'out-of-range "Cannot pop from an empty stack")
-      (stack (cdr data))))
-
-(define (%push element . es) 
-  (let1 r (stack (cons element data))
-    (if (null? es)
-        r
-        (apply r es))))
-
-)
-
 (define-case-class rich-vector ((data vector?))
 
 (define (@range start end . step)

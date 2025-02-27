@@ -737,25 +737,6 @@
 (check-true ((range :inclusive 3 1) :empty?))
 (check-false ((range :inclusive 1 3 0) :empty?))
 
-(check ((stack (list 1 2 3)) :length) => 3)
-
-(check ((stack (list 1 2 3)) :size) => 3)
-
-(check ((stack (list 1 2)) :top) => 1)
-(check-catch 'out-of-range ((stack (list )) :top))
-
-(check ((stack (list 1 2 3)) :to-list) => ($ (list 1 2 3)))
-
-(check ((stack :empty) :length) => 0)
-
-(check ((stack (list 1 2)) :pop) => (stack (list 2)))
-(check ((stack (list 1 2 3)) :pop :pop) => (stack (list 3)))
-(check-catch 'out-of-range ((stack :empty) :pop))
-
-(let1 t (stack (list 1 2 3))
-  (check (t :push 1) => (stack (list 1 1 2 3)))
-  (check (t :push 1 :push 1) => (stack (list 1 1 1 2 3))))
-
 (check (array :range 1 5) => ($ (vector 1 2 3 4)))
 (check (array :range 1 5 2) => ($ (vector 1 3)))
 (check (array :range 1 6 2) => ($ (vector 1 3 5)))
