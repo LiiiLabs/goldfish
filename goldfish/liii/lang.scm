@@ -1121,14 +1121,17 @@
     (rich-hash-table group)))
 
 (chained-define (%zip-with-index)
-  (chained-define (loop lst idx save)
-    (if (null? lst)
-        (reverse (list->vector save))  
-        (loop (cdr lst) 
-              (+ idx 1) 
-              (cons (cons idx (car lst)) save))))
-
-  (rich-vector (loop (vector->list data) 0 '())))
+  (let* ((n (vector-length data))
+         (result (make-vector n)))
+    (let loop ((idx 0))
+      (if (>= idx n)
+          (rich-vector result)
+          (begin
+            (vector-set! 
+                result 
+                idx 
+                (cons idx (vector-ref data idx)))
+            (loop (+ idx 1)))))))
 
 (chained-define (%distinct)
   (let ((ht (make-hash-table))

@@ -5388,21 +5388,27 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (chained-define (%zip-with-index)
 
-    \ \ (chained-define (loop lst idx save)
+    \ \ (let* ((n (vector-length data))
 
-    \ \ \ \ (if (null? lst)
+    \ \ \ \ \ \ \ \ \ (result (make-vector n)))
 
-    \ \ \ \ \ \ \ \ (reverse (list-\<gtr\>vector save)) \ 
+    \ \ \ \ (let loop ((idx 0))
 
-    \ \ \ \ \ \ \ \ (loop (cdr lst)\ 
+    \ \ \ \ \ \ (if (\<gtr\>= idx n)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ idx 1)\ 
+    \ \ \ \ \ \ \ \ \ \ (rich-vector result)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons (cons idx (car lst)) save))))
+    \ \ \ \ \ \ \ \ \ \ (begin
 
-    \;
+    \ \ \ \ \ \ \ \ \ \ \ \ (vector-set!\ 
 
-    \ \ (rich-vector (loop (vector-\<gtr\>list data) 0 '())))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ result\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ idx\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cons idx (vector-ref data idx)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ idx 1)))))))
 
     \;
   </goldfish-chunk>
