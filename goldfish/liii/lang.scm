@@ -1128,6 +1128,20 @@
 
   (rich-vector (loop (vector->list data) 0 '())))
 
+(chained-define (%distinct)
+  (let ((ht (make-hash-table))
+        (length (vector-length data)))
+    (let loop ((result '())
+              (index 0))
+      (if (>= index length)
+          (rich-vector (list->vector (reverse result)))
+          (let ((elem (vector-ref data index)))
+            (if (eq? (hash-table-ref ht elem) #f)
+                (begin
+                  (hash-table-set! ht elem #t)
+                  (loop (cons elem result) (+ index 1)))
+                (loop result (+ index 1))))))))
+
 (define (%to-string)
   (object->string data))
 

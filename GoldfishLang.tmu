@@ -5425,6 +5425,64 @@
     \;
   </goldfish-chunk>
 
+  \;
+
+  <paragraph|rich-vector%distinct>
+
+  \;
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%distinct)
+
+    \ \ (let ((ht (make-hash-table))
+
+    \ \ \ \ \ \ \ \ (length (vector-length data)))
+
+    \ \ \ \ (let loop ((result '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (index 0))
+
+    \ \ \ \ \ \ (if (\<gtr\>= index length)
+
+    \ \ \ \ \ \ \ \ \ \ (rich-vector (list-\<gtr\>vector (reverse result)))
+
+    \ \ \ \ \ \ \ \ \ \ (let ((elem (vector-ref data index)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (if (eq? (hash-table-ref ht elem) #f)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (hash-table-set! ht elem #t)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cons elem result) (+ index 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop result (+ index 1))))))))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check \ ($ #(a a b c b) :distinct :collect)\ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> #(a b c))
+
+    \;
+
+    (check \ ($ #(1 1 1 2 2 3 3 3 3 5 5 5) :distinct :collect)\ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> #(1 2 3 5))
+
+    \;
+
+    (check \ ($ #() :distinct :collect)\ 
+
+    \ \ \ \ \ \ \ \ =\<gtr\> #())
+
+    \;
+  </goldfish-chunk>
+
   <subsection|转换器>
 
   <paragraph|rich-vector%to-string>
