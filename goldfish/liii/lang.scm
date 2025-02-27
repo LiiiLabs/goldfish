@@ -752,13 +752,12 @@
   (rich-hash-table group)))
 
 (chained-define (%zip-with-index)
-  (chained-define (loop lst idx save)
+  (let loop ((lst data) (idx 0) (result '()))
     (if (null? lst)
-        (reverse save)  
+        (rich-list (reverse result))  
         (loop (cdr lst) 
               (+ idx 1) 
-              (cons (cons idx (car lst)) save))))
-  (rich-list (loop data 0 '())))
+              (cons (cons idx (car lst)) result)))))
 
 (chained-define (%distinct)
   (let loop
