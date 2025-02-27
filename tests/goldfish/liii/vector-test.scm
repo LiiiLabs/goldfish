@@ -28,7 +28,7 @@
    vector-count
    vector-any vector-every vector-copy vector-copy!
    vector-index vector-index-right vector-partition
-   vector-swap! vector-cumulate reverse-list->vector
+   vector-swap! vector-reverse! vector-cumulate reverse-list->vector
    vector=))
 
 (check-true (vector? (int-vector 1 2 3)))
@@ -231,6 +231,49 @@
 
 (check-catch 'out-of-range
   (vector-swap! my-vector 1 (vector-length my-vector)))
+
+(let ((vec (vector 1 2 3 4)))
+  (vector-reverse! vec)
+  (check vec => #(4 3 2 1)))
+
+(let ((vec (vector 'a 'b 'c 'd)))
+  (vector-reverse! vec 1 3)
+  (check vec => #(a c b d)))
+
+(let ((vec (vector 10 20 30)))
+  (vector-reverse! vec 2 2)
+  (check vec => #(10 20 30)))
+
+(check-catch 'wrong-number-of-args 
+  (vector-reverse! (vector 1 2) 0 2 3)) 
+
+(check-catch 'type-error 
+  (vector-reverse! (vector 1 2) 'a 2)) 
+
+(check-catch 'type-error 
+  (vector-reverse! (vector 1 2) 0 'b)) 
+
+(check-catch 'out-of-range 
+  (vector-reverse! (vector 1 2) -1 2)) 
+
+(check-catch 'out-of-range 
+  (vector-reverse! (vector 1 2) 0 5)) 
+
+(check-catch 'out-of-range 
+  (vector-reverse! (vector 1 2) 2 1))
+
+(let ((vec (vector)))
+  (vector-reverse! vec 0 0)
+  (check vec => #()))
+
+(let ((vec (vector 100)))
+  (vector-reverse! vec)
+  (check vec => #(100)))
+
+(let ((vec (vector 1 2 3)))
+  (vector-reverse! vec)
+  (vector-reverse! vec)
+  (check vec => #(1 2 3)))
 
 (define my-vector (vector 0 1 2 3 4))
 (fill! my-vector #f)
