@@ -743,9 +743,12 @@
           (hash-table-update!/default
             group
             key
-            (lambda (current-list) (append current-list (list elem)))
+            (lambda (current-list) (cons elem current-list))
             '())))
       data)
+    (hash-table-for-each 
+      (lambda (k v) (hash-table-set! group k (reverse v))) 
+      group)
   (rich-hash-table group)))
 
 (chained-define (%zip-with-index)
