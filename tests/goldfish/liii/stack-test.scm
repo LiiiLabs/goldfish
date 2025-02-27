@@ -16,6 +16,8 @@
 
 (import (liii stack) (liii check))
 
+(check-set-mode! 'report-failed)
+
 (check ((stack (list 1 2 3)) :length) => 3)
 
 (check ((stack (list 1 2 3)) :size) => 3)
