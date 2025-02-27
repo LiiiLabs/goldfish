@@ -1113,11 +1113,11 @@
           (hash-table-update!/default
             group
             key
-            (lambda (current-list) (append current-list (list elem)))
+            (lambda (current-list) (cons elem current-list))
             '())))
       (vector->list data))
     (hash-table-for-each 
-      (lambda (k v) (hash-table-set! group k (list->vector v))) 
+      (lambda (k v) (hash-table-set! group k (reverse-list->vector v))) 
       group)
     (rich-hash-table group)))
 
