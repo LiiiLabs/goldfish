@@ -223,68 +223,17 @@
       (x :to-string)
       (s7-object->string x)))
 
-(define-case-class option ((value any?))
+(define (box x)
+  (cond ((integer? x) (rich-integer x))
+        ((char? x) (rich-char (char->integer x)))
+        ((string? x) (rich-string x))
+        ((list? x) (rich-list x))
+        ((vector? x) (rich-vector x))
+        ((hash-table? x) (rich-hash-table x))
+        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
 
-(define (%get)
-  (if (null? value)
-      (value-error "option is empty, cannot get value")
-      value))
-
-(define (%get-or-else default)
-  (cond ((not (null? value)) value)
-        ((and (procedure? default) (not (case-class? default)))
-         (default))
-        (else default)))
-
-(typed-define (%or-else (default case-class?))
-  (when (not (default :is-instance-of 'option))
-    (type-error "The first parameter of option%or-else must be a option case class"))
-
-  (if (null? value)
-      default
-      (option value)))
-
-(define (%equals that)
-  (== value (that 'value)))
-
-(define (%defined?) (not (null? value)))
-  
-(define (%empty?) (null? value))
-
-(define (%forall f)
-  (if (null? value)
-      #f
-      (f value)))
-
-(define (%exists f)
-  (if (null? value)
-      #f
-      (f value)))
-
-(define (%for-each f)
-  (when (not (null? value))
-        (f value)))
-
-(chained-define (%map f)
-  (if (null? value)
-      (option '())
-      (option (f value))))
-
-(define (%flat-map f . xs)
-  (let1 r (if (null? value)
-              (option '())
-              (f value))
-    (if (null? xs) r (apply r xs))))
-
-(define (%filter pred . xs)
-    (let1 r (if (or (null? value) (not (pred value)))
-               (option '())
-               (option value))
-      (if (null? xs) r (apply r xs))))
-
-)
-
-(define (none) (option '()))
+(define ($ x . xs)
+  (if (null? xs) (box x) (apply (box x) xs)))
 
 (define-case-class rich-integer ((data integer?))
 
@@ -584,6 +533,69 @@
           (if (null? xs) r (apply r xs)))))
 
 )
+
+(define-case-class option ((value any?))
+
+(define (%get)
+  (if (null? value)
+      (value-error "option is empty, cannot get value")
+      value))
+
+(define (%get-or-else default)
+  (cond ((not (null? value)) value)
+        ((and (procedure? default) (not (case-class? default)))
+         (default))
+        (else default)))
+
+(typed-define (%or-else (default case-class?))
+  (when (not (default :is-instance-of 'option))
+    (type-error "The first parameter of option%or-else must be a option case class"))
+
+  (if (null? value)
+      default
+      (option value)))
+
+(define (%equals that)
+  (== value (that 'value)))
+
+(define (%defined?) (not (null? value)))
+  
+(define (%empty?) (null? value))
+
+(define (%forall f)
+  (if (null? value)
+      #f
+      (f value)))
+
+(define (%exists f)
+  (if (null? value)
+      #f
+      (f value)))
+
+(define (%for-each f)
+  (when (not (null? value))
+        (f value)))
+
+(chained-define (%map f)
+  (if (null? value)
+      (option '())
+      (option (f value))))
+
+(define (%flat-map f . xs)
+  (let1 r (if (null? value)
+              (option '())
+              (f value))
+    (if (null? xs) r (apply r xs))))
+
+(define (%filter pred . xs)
+    (let1 r (if (or (null? value) (not (pred value)))
+               (option '())
+               (option value))
+      (if (null? xs) r (apply r xs))))
+
+)
+
+(define (none) (option '()))
 
 (define-case-class rich-list ((data list?))
 
@@ -1121,18 +1133,6 @@
   (hash-table-for-each proc data))
 
 )
-
-(define (box x)
-  (cond ((integer? x) (rich-integer x))
-        ((char? x) (rich-char (char->integer x)))
-        ((string? x) (rich-string x))
-        ((list? x) (rich-list x))
-        ((vector? x) (rich-vector x))
-        ((hash-table? x) (rich-hash-table x))
-        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
-
-(define ($ x . xs)
-  (if (null? xs) (box x) (apply (box x) xs)))
 
 ) ; end of begin
 ) ; end of library

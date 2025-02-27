@@ -181,67 +181,17 @@
       (display* "hello world" "\n")))
   => "hello world\n")
 
-(let ((opt1 (option 42))
-      (opt2 (option '())))
-  (check (opt1 :map (lambda (x) (+ x 1))
-               :map (lambda (x) (* x 2))
-               :get) => 86)
-  (check (opt2 :map (lambda (x) (+ x 1))
-               :map (lambda (x) (* x 2))
-               :empty?) => #t)
+(check ($ 1 :to 3) => '(1 2 3))
+(check ($ "hello world" :replace "world" "suger" :index-of "suger") => 6)
+(check ($ '(1 2 3) :empty?) => #f)
 
-  (check (opt1 :flat-map (lambda (x) (option (+ x 1)))
-               :flat-map (lambda (x) (option (* x 2)))
-               :get) => 86)
-  (check (opt2 :flat-map (lambda (x) (option (+ x 1)))
-               :flat-map (lambda (x) (option (* x 2)))
-               :empty?) => #t)
-
-  (check (opt1 :filter (lambda (x) (> x 40))
-               :filter (lambda (x) (< x 50))
-               :get) => 42)
-  (check (opt1 :filter (lambda (x) (> x 50))
-               :filter (lambda (x) (< x 60))
-               :empty?) => #t)
-  (check (opt2 :filter (lambda (x) (> x 40))
-               :filter (lambda (x) (< x 50))
-               :empty?) => #t)
-
-  (check (opt1 :defined?) => #t)
-  (check (opt1 :empty?) => #f)
-  (check (opt2 :defined?) => #f)
-  (check (opt2 :empty?) => #t)
-)
-
-(let ((opt1 (option 42)) (opt2 (option '())))
-  (check (opt1 :get) => 42)
-  (check-catch 'value-error (opt2 :get)))
-
-(let ((opt1 (option 42)) (opt2 (option '())))
-  (check (opt1 :get-or-else 0) => 42)
-  (check (opt2 :get-or-else 0) => 0)
-
-  (check (opt1 :get-or-else (lambda () 0)) => 42)
-  (check (opt2 :get-or-else (lambda () 0)) => 0)
-)
-
-(check ((none) :get-or-else ($ 1)) => ($ 1))
-
-(let ((opt1 (option 42)) (opt2 (option '())))
-  (check (opt1 :or-else (option 0)) => (option 42))
-  (check (opt2 :or-else (option 0)) => (option 0))
-  (check-catch 'type-error (opt1 :or-else 0))
-)
-
-(check-true ((option "str") :equals (option "str")))
-
-(let ((opt1 (option 42)) (opt2 (option '())))
-  (check-true (opt1 :forall (lambda (x) (== x 42))))
-  (check-false (opt2 :forall (lambda (x) (== x 42)))))
-
-(let ((opt1 (option 42)) (opt2 (option '())))
-  (check-true (opt1 :exists (lambda (x) (== x 42))))
-  (check-false (opt2 :exists (lambda (x) (== x 42)))))
+(check
+ (($ 100 :to 128)
+  :take 10
+  :map (@ + _ 1)
+  :filter even?
+  :collect)
+  => '(102 104 106 108 110))
 
 (check-true ($ 42 :equals ($ 42)))
 (check-false ($ 41 :equals ($ 42)))
@@ -460,6 +410,68 @@
 (check ($ "中国智造，惠及全球" :split "") => #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
 (check ($ "qingyu@liii.pro" :split "@" :head) => "qingyu") ; chain
 (check ($ "127.0.0.1" :split "." :count) => 4) ; chain
+
+(let ((opt1 (option 42))
+      (opt2 (option '())))
+  (check (opt1 :map (lambda (x) (+ x 1))
+               :map (lambda (x) (* x 2))
+               :get) => 86)
+  (check (opt2 :map (lambda (x) (+ x 1))
+               :map (lambda (x) (* x 2))
+               :empty?) => #t)
+
+  (check (opt1 :flat-map (lambda (x) (option (+ x 1)))
+               :flat-map (lambda (x) (option (* x 2)))
+               :get) => 86)
+  (check (opt2 :flat-map (lambda (x) (option (+ x 1)))
+               :flat-map (lambda (x) (option (* x 2)))
+               :empty?) => #t)
+
+  (check (opt1 :filter (lambda (x) (> x 40))
+               :filter (lambda (x) (< x 50))
+               :get) => 42)
+  (check (opt1 :filter (lambda (x) (> x 50))
+               :filter (lambda (x) (< x 60))
+               :empty?) => #t)
+  (check (opt2 :filter (lambda (x) (> x 40))
+               :filter (lambda (x) (< x 50))
+               :empty?) => #t)
+
+  (check (opt1 :defined?) => #t)
+  (check (opt1 :empty?) => #f)
+  (check (opt2 :defined?) => #f)
+  (check (opt2 :empty?) => #t)
+)
+
+(let ((opt1 (option 42)) (opt2 (option '())))
+  (check (opt1 :get) => 42)
+  (check-catch 'value-error (opt2 :get)))
+
+(let ((opt1 (option 42)) (opt2 (option '())))
+  (check (opt1 :get-or-else 0) => 42)
+  (check (opt2 :get-or-else 0) => 0)
+
+  (check (opt1 :get-or-else (lambda () 0)) => 42)
+  (check (opt2 :get-or-else (lambda () 0)) => 0)
+)
+
+(check ((none) :get-or-else ($ 1)) => ($ 1))
+
+(let ((opt1 (option 42)) (opt2 (option '())))
+  (check (opt1 :or-else (option 0)) => (option 42))
+  (check (opt2 :or-else (option 0)) => (option 0))
+  (check-catch 'type-error (opt1 :or-else 0))
+)
+
+(check-true ((option "str") :equals (option "str")))
+
+(let ((opt1 (option 42)) (opt2 (option '())))
+  (check-true (opt1 :forall (lambda (x) (== x 42))))
+  (check-false (opt2 :forall (lambda (x) (== x 42)))))
+
+(let ((opt1 (option 42)) (opt2 (option '())))
+  (check-true (opt1 :exists (lambda (x) (== x 42))))
+  (check-false (opt2 :exists (lambda (x) (== x 42)))))
 
 (check (rich-list :range 1 5) => ($ (list 1 2 3 4)))
 (check (rich-list :range 1 5 2) => ($ (list 1 3)))
@@ -945,18 +957,6 @@
   
   (check total => 342)                          
 )
-
-(check ($ 1 :to 3) => '(1 2 3))
-(check ($ "hello world" :replace "world" "suger" :index-of "suger") => 6)
-(check ($ '(1 2 3) :empty?) => #f)
-
-(check
- (($ 100 :to 128)
-  :take 10
-  :map (@ + _ 1)
-  :filter even?
-  :collect)
-  => '(102 104 106 108 110))
 
 (check-report)
 
