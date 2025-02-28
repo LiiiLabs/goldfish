@@ -39,11 +39,21 @@
       (error 'out-of-range "Cannot pop from an empty stack")
       (stack (cdr data))))
 
+(chained-define (%pop!)
+  (if (null? data)
+      (error 'out-of-range)
+      (stack (set! data (cdr data))))
+  (%this))
+
 (define (%push element . es) 
   (let1 r (stack (cons element data))
     (if (null? es)
         r
         (apply r es))))
+
+(chained-define (%push! element) 
+                (stack (set! data (cons element data))) 
+                (%this))
 
 ) ; end of define-case-class
 ) ; end of begin

@@ -6361,6 +6361,34 @@
     \;
   </scm-chunk>
 
+  <paragraph|stack%pop!>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (chained-define (%pop!)
+
+    \ \ (if (null? data)
+
+    \ \ \ \ \ \ (error 'out-of-range)
+
+    \ \ \ \ \ \ (stack (set! data (cdr data))))
+
+    \ \ (%this))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/stack-test.scm|true|true>
+    (let1 t (stack (list 1 2 3))
+
+    \ \ (check (t :pop!) =\<gtr\> (stack (list 2 3)))
+
+    \ \ (check (t :pop! :pop!) =\<gtr\> (stack (list )))
+
+    \ \ (check-catch 'out-of-range ((stack :empty) :pop!)))
+
+    \;
+  </scm-chunk>
+
   <paragraph|stack%push>
 
   <\scm-chunk|goldfish/liii/stack.scm|true|true>
@@ -6383,6 +6411,30 @@
     \ \ (check (t :push 1) =\<gtr\> (stack (list 1 1 2 3)))
 
     \ \ (check (t :push 1 :push 1) =\<gtr\> (stack (list 1 1 1 2 3))))
+
+    \;
+  </scm-chunk>
+
+  <paragraph|stack%push!>
+
+  <\scm-chunk|goldfish/liii/stack.scm|true|true>
+    (chained-define (%push! element)\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (stack (set! data (cons element data)))\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (%this))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/stack-test.scm|true|true>
+    (let1 t (stack (list 1 2 3))
+
+    \ \ (check (t :push! 1) =\<gtr\> (stack (list 1 1 2 3)))
+
+    \ \ (check (t :push! 1 :push! 1) =\<gtr\> (stack (list 1 1 1 1 2 3)))
+
+    \ \ (check (t :pop! :push! 2) =\<gtr\> (stack (list 2 1 1 1 2 3))))
 
     \;
   </scm-chunk>

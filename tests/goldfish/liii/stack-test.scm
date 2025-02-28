@@ -34,8 +34,18 @@
 (check-catch 'out-of-range ((stack :empty) :pop))
 
 (let1 t (stack (list 1 2 3))
+  (check (t :pop!) => (stack (list 2 3)))
+  (check (t :pop! :pop!) => (stack (list )))
+  (check-catch 'out-of-range ((stack :empty) :pop!)))
+
+(let1 t (stack (list 1 2 3))
   (check (t :push 1) => (stack (list 1 1 2 3)))
   (check (t :push 1 :push 1) => (stack (list 1 1 1 2 3))))
+
+(let1 t (stack (list 1 2 3))
+  (check (t :push! 1) => (stack (list 1 1 2 3)))
+  (check (t :push! 1 :push! 1) => (stack (list 1 1 1 1 2 3)))
+  (check (t :pop! :push! 2) => (stack (list 2 1 1 1 2 3))))
 
 (check-report)
 
