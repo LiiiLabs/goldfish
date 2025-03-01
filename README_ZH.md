@@ -7,7 +7,7 @@
 + 提供类似 Python 的功能丰富的标准库
 + 小巧且快速
 
-<img src="goldfish_scheme_logo.png" alt="示例图片" style="width: 360pt;">
+<img src="GoldfishScheme-logo.png" alt="示例图片" style="width: 360pt;">
 
 ## 示例代码
 ### 具名参数
