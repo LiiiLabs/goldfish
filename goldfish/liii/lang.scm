@@ -21,7 +21,7 @@
   @
   define-case-class case-class? == != chained-define display* object->string
   option none
-  rich-integer rich-char rich-string
+  rich-integer rich-float rich-char rich-string
   rich-list range stack
   rich-vector array rich-hash-table array-buffer
   box $
@@ -225,12 +225,13 @@
 
 (define (box x)
   (cond ((integer? x) (rich-integer x))
+        ((float? x) (rich-float x))
         ((char? x) (rich-char (char->integer x)))
         ((string? x) (rich-string x))
         ((list? x) (rich-list x))
         ((vector? x) (rich-vector x))
         ((hash-table? x) (rich-hash-table x))
-        (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
+        (else (type-error "box: x must be integer?, float?, char?, string?, list?, vector?, hash-table?"))))
 
 (define ($ x . xs)
   (if (null? xs) (box x) (apply (box x) xs)))
@@ -265,6 +266,12 @@
       (value-error
         (format #f "sqrt of negative integer is undefined!         ** Got ~a **" data))
       (inexact->exact (floor (sqrt data)))))
+
+)
+
+(define-case-class rich-float ((data float?))
+                   
+(define (%get) data)
 
 )
 

@@ -102,7 +102,7 @@
 
     \ \ option none
 
-    \ \ rich-integer rich-char rich-string
+    \ \ rich-integer rich-float rich-char rich-string
 
     \ \ rich-list range stack
 
@@ -1112,6 +1112,8 @@
 
     \ \ (cond ((integer? x) (rich-integer x))
 
+    \ \ \ \ \ \ \ \ ((float? x) (rich-float x))
+
     \ \ \ \ \ \ \ \ ((char? x) (rich-char (char-\<gtr\>integer x)))
 
     \ \ \ \ \ \ \ \ ((string? x) (rich-string x))
@@ -1122,7 +1124,7 @@
 
     \ \ \ \ \ \ \ \ ((hash-table? x) (rich-hash-table x))
 
-    \ \ \ \ \ \ \ \ (else (type-error "box: x must be integer?, char?, string?, list?, vector?, hash-table?"))))
+    \ \ \ \ \ \ \ \ (else (type-error "box: x must be integer?, float?, char?, string?, list?, vector?, hash-table?"))))
 
     \;
   </goldfish-chunk>
@@ -1363,6 +1365,38 @@
     (check ($ (rich-integer :max-value) :sqrt) =\<gtr\> 3037000499)
 
     (check-catch 'value-error ($ -1 :sqrt))
+
+    \;
+  </goldfish-chunk>
+
+  <subsection|结尾>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <section|rich-float>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-case-class rich-float ((data float?))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+  </goldfish-chunk>
+
+  <subsection|选择器>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%get) data)
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 12.2 :get) =\<gtr\> 12.2)
 
     \;
   </goldfish-chunk>

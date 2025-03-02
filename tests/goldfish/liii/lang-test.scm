@@ -226,6 +226,8 @@
 (check ($ (rich-integer :max-value) :sqrt) => 3037000499)
 (check-catch 'value-error ($ -1 :sqrt))
 
+(check ($ 12.2 :get) => 12.2)
+
 (check-true ((rich-char #x30) :equals (rich-char #x30)))
 (check-false ((rich-char #x31) :equals (rich-char #x30)))
 
