@@ -755,6 +755,20 @@
 (check-catch 'division-by-zero (quotient 0 0))
 (check-catch 'wrong-type-arg (quotient 1+i 2))
 
+(check (modulo 13 4) => 1)    
+(check (modulo -13 4) => 3)    
+(check (modulo 13 -4) => -3)   
+(check (modulo -13 -4) => -1)  
+(check (modulo 0 5) => 0)    
+(check (modulo 0 -5) => 0)    
+
+(check (modulo 13 4.0) => 1.0)     
+(check (modulo -13.0 4) => 3.0)    
+(check (modulo 13.0 -4.0) => -3.0) 
+(check (modulo 1000000 7) => 1)    
+
+;(check-catch 'division-by-zero (modulo 1 0)) 
+
 (check (gcd) => 0)
 (check (gcd 0) => 0)
 (check (gcd 1) => 1)

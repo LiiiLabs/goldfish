@@ -2883,6 +2883,36 @@
 
   <paragraph|modulo>
 
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|false>
+    (check (modulo 13 4) =\<gtr\> 1) \ \ \ 
+
+    (check (modulo -13 4) =\<gtr\> 3) \ \ \ 
+
+    (check (modulo 13 -4) =\<gtr\> -3) \ \ 
+
+    (check (modulo -13 -4) =\<gtr\> -1) \ 
+
+    (check (modulo 0 5) =\<gtr\> 0) \ \ \ 
+
+    (check (modulo 0 -5) =\<gtr\> 0) \ \ \ 
+
+    \;
+
+    (check (modulo 13 4.0) =\<gtr\> 1.0) \ \ \ \ 
+
+    (check (modulo -13.0 4) =\<gtr\> 3.0) \ \ \ 
+
+    (check (modulo 13.0 -4.0) =\<gtr\> -3.0)\ 
+
+    (check (modulo 1000000 7) =\<gtr\> 1) \ \ \ 
+
+    \;
+
+    ;(check-catch 'division-by-zero (modulo 1 0))\ 
+
+    \;
+  </scm-chunk>
+
   <value|r7rs><paragraph|gcd><index|gcd><scm|(x ...) =\<gtr\> (y positive?)>
 
   求n个数的最大公约数。
