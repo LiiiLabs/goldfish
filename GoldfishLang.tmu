@@ -2558,15 +2558,13 @@
   <paragraph|rich-string%split>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    ;; Split string with sep.
-
-    (define (%split sep . xs)
+    (define (%split sep)
 
     \ \ (let ((str-len (string-length data))
 
     \ \ \ \ \ \ \ \ (sep-len (string-length sep)))
 
-    \ \ \ \ ; tail recursive auxiliary function
+    \;
 
     \ \ \ \ (define (split-helper start acc)
 
@@ -2578,26 +2576,18 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ (split-helper (+ next-pos sep-len) (cons (substring data start next-pos) acc)))))
 
-    \ \ \ \ ; do split
+    \ \ \ \ 
 
-    \ \ \ \ (let1 r (rich-vector
+    \ \ \ \ (if (zero? sep-len)
 
-    \ \ \ \ \ \ (if (zero? sep-len)
+    \ \ \ \ \ \ \ \ ((%to-vector) :map (@ _ :to-string))
 
-    \ \ \ \ \ \ \ \ \ \ ((%to-vector) :map (lambda (c) (c :to-string)) :collect)
-
-    \ \ \ \ \ \ \ \ \ \ (list-\<gtr\>vector (reverse (split-helper 0 '())))))
-
-    \ \ \ \ \ \ \ \ \ \ (if (null? xs) r (apply r xs)))))
+    \ \ \ \ \ \ \ \ (rich-vector (reverse-list-\<gtr\>vector (split-helper 0 '()))))))
 
     \;
   </goldfish-chunk>
 
-  SRFI 文档（<hlink|SRFI 135: Immutable Texts|https://srfi.schemers.org/srfi-135/srfi-135.html#ReplicationSplitting>，<hlink|SRFI 140: Immutable Strings|https://srfi.schemers.org/srfi-140/srfi-140.html>）指出：<cite*|The returned list will have one more item than the number of non-overlapping occurrences of the delimiter in the string.>
-
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    \;
-
     (check ($ "da@liii.pro" :split "@") =\<gtr\> #("da" "liii.pro"))
 
     (check ($ "da@liii.pro" :split ".") =\<gtr\> #("da@liii" "pro"))
@@ -2614,9 +2604,13 @@
 
     (check ($ "中国智造，惠及全球" :split "") =\<gtr\> #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
 
-    (check ($ "qingyu@liii.pro" :split "@" :head) =\<gtr\> "qingyu") ; chain
+    \;
 
-    (check ($ "127.0.0.1" :split "." :count) =\<gtr\> 4) ; chain
+    (check (($ "qingyu@liii.pro" :split "@") :head) =\<gtr\> "qingyu")
+
+    (check (($ "127.0.0.1" :split ".") :count) =\<gtr\> 4)
+
+    (check-catch 'wrong-number-of-args ($ "127.0.0.1" :split "." :count))
 
     \;
   </goldfish-chunk>

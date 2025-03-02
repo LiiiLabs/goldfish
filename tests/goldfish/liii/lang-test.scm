@@ -399,7 +399,6 @@
 (check ($ "hello" :replace "world" "") => ($ "hello"))
 (check ($ "hello" :replace "l" "L" :strip-prefix "he") => ($ "LLo")) ; chain
 
-
 (check ($ "da@liii.pro" :split "@") => #("da" "liii.pro"))
 (check ($ "da@liii.pro" :split ".") => #("da@liii" "pro"))
 (check ($ "test" :split "") => #("t" "e" "s" "t"))
@@ -408,8 +407,10 @@
 (check ($ "XXaXXb" :split "XX") => #("" "a" "b"))
 (check ($ "你好，欢迎使用Liii STEM" :split "，") => #("你好" "欢迎使用Liii STEM"))
 (check ($ "中国智造，惠及全球" :split "") => #("中" "国" "智" "造" "，" "惠" "及" "全" "球"))
-(check ($ "qingyu@liii.pro" :split "@" :head) => "qingyu") ; chain
-(check ($ "127.0.0.1" :split "." :count) => 4) ; chain
+
+(check (($ "qingyu@liii.pro" :split "@") :head) => "qingyu")
+(check (($ "127.0.0.1" :split ".") :count) => 4)
+(check-catch 'wrong-number-of-args ($ "127.0.0.1" :split "." :count))
 
 (let ((opt1 (option 42))
       (opt2 (option '())))

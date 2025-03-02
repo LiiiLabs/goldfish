@@ -515,22 +515,19 @@
         result
         (apply result xs))))
 
-;; Split string with sep.
-(define (%split sep . xs)
+(define (%split sep)
   (let ((str-len (string-length data))
         (sep-len (string-length sep)))
-    ; tail recursive auxiliary function
+
     (define (split-helper start acc)
       (let ((next-pos (%index-of sep start)))
         (if (= next-pos -1)
             (cons (substring data start) acc)
             (split-helper (+ next-pos sep-len) (cons (substring data start next-pos) acc)))))
-    ; do split
-    (let1 r (rich-vector
-      (if (zero? sep-len)
-          ((%to-vector) :map (lambda (c) (c :to-string)) :collect)
-          (list->vector (reverse (split-helper 0 '())))))
-          (if (null? xs) r (apply r xs)))))
+    
+    (if (zero? sep-len)
+        ((%to-vector) :map (@ _ :to-string))
+        (rich-vector (reverse-list->vector (split-helper 0 '()))))))
 
 )
 
