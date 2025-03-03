@@ -1017,13 +1017,6 @@
 (check (add3 1 2 3) => 6)
 (check-catch 'type-error (add3 1.2 2 3))
 
-(typed-define (person (name string? "Bob") (age integer?))
-  (string-append name " is " (number->string age) " years old"))
-
-(check (person :age 21) => "Bob is 21 years old")
-(check (person :name "Alice" :age 25) => "Alice is 25 years old")
-(check-catch 'type-error (person :name 123 :age 25))
-
 (check-report)
 
 (check (make-list 3 #\a) => (list #\a #\a #\a))

@@ -47,6 +47,13 @@
 (check ((@ (@ + _ 1) _) 2) => 3)
 (check ((@ _ _) (@ * _ 2) 3) => 6)
 
+(typed-define (person (name string? "Bob") (age integer?))
+  (string-append name " is " (number->string age) " years old"))
+
+(check (person :age 21) => "Bob is 21 years old")
+(check (person :name "Alice" :age 25) => "Alice is 25 years old")
+(check-catch 'type-error (person :name 123 :age 25))
+
 (define-case-class person
   ((name string? "Bob")
    (age integer?)))

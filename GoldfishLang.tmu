@@ -96,7 +96,7 @@
 
     (export
 
-    \ \ @
+    \ \ @ typed-define
 
     \ \ define-case-class case-class? == != chained-define display* object-\<gtr\>string
 
@@ -357,6 +357,112 @@
     \;
   </goldfish-chunk>
 
+  <section|typed-define>
+
+  <paragraph|typed-define>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-macro (typed-define name-and-params body . rest)
+
+    \ \ (let* ((name (car name-and-params))
+
+    \ \ \ \ \ \ \ \ \ \ (params (cdr name-and-params))
+
+    \ \ \ \ \ \ \ \ \ \ (param-names (map car params)))
+
+    \;
+
+    \ \ \ \ \ \ \ \ `(define*\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (,name\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ,@(map \ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (lambda (param)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let \ ((param-name (car param))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-pred (cadr param))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (default-value (cddr param)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? default-value)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ param-name
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(,param-name ,(car default-value)))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ params))
+
+    \;
+
+    \ \ \ \ \ \ \ \ ;; Runtime type check \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ ,@(map (lambda (param)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let* ((param-name (car param))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-pred (cadr param))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;;remove the '?' in 'type?'
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-name-str\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (let ((s (symbol-\<gtr\>string type-pred)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (and (positive? (string-length s))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (char=? (string-ref s (- (string-length s) 1)) #\\?))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring s 0 (- (string-length s) 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ s))))
+
+    \;
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ `(unless\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (,type-pred ,param-name)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (type-error\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (format #f "In funtion #\<less\>~a ~a\<gtr\>: argument *~a* must be *~a*! \ \ \ **Got ~a**"
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,name
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ',param-names
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ',param-name
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,type-name-str
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (object-\<gtr\>string ,param-name))))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ params)
+
+    \ \ \ \ \ \ \ ,body
+
+    \ \ \ \ \ \ \ ,@rest)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (typed-define (person (name string? "Bob") (age integer?))
+
+    \ \ (string-append name " is " (number-\<gtr\>string age) " years old"))
+
+    \;
+
+    (check (person :age 21) =\<gtr\> "Bob is 21 years old")
+
+    (check (person :name "Alice" :age 25) =\<gtr\> "Alice is 25 years old")
+
+    (check-catch 'type-error (person :name 123 :age 25))
+
+    \;
+  </goldfish-chunk>
+
   <section|样本类>
 
   <paragraph|define-case-class><index|define-case-class>
@@ -478,7 +584,9 @@
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ methods))
 
-    \ \ \ \ \ \ \ \ \ (this-symbol (gensym)))
+    \ \ \ \ \ \ \ \ \ (this-symbol (gensym))
+
+    \ \ \ \ \ \ \ \ \ (f-make-case-class (string-\<gtr\>symbol (string-append "make-case-class-" (symbol-\<gtr\>string class-name)))))
 
     \;
 
@@ -510,7 +618,7 @@
 
     \;
 
-    (typed-define (create-instance ,@fields)
+    (typed-define (,f-make-case-class ,@fields)
 
     \ \ (define ,this-symbol #f)
 
@@ -648,7 +756,7 @@
 
     \ \ \ \ (apply static-dispatcher (cons msg args))
 
-    \ \ \ \ (apply create-instance (cons msg args)))
+    \ \ \ \ (apply ,f-make-case-class (cons msg args)))
 
     \;
 

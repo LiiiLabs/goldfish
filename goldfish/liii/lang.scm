@@ -18,7 +18,7 @@
 (import (liii base) (liii string) (liii vector) (liii sort)
         (liii list) (liii hash-table) (liii bitwise))
 (export
-  @
+  @ typed-define
   define-case-class case-class? == != chained-define display* object->string
   option none
   rich-integer rich-float rich-char rich-string
@@ -56,6 +56,48 @@
         (lambda ,slots-sym-list 
                 ,(parse exprs-sym-list slots-sym-list paras)))))
 
+(define-macro (typed-define name-and-params body . rest)
+  (let* ((name (car name-and-params))
+          (params (cdr name-and-params))
+          (param-names (map car params)))
+
+        `(define* 
+            (,name 
+            ,@(map  
+              (lambda (param)
+                (let  ((param-name (car param))
+                      (type-pred (cadr param))
+                      (default-value (cddr param)))
+                      (if (null? default-value)
+                          param-name
+                          `(,param-name ,(car default-value)))))
+              params))
+
+        ;; Runtime type check                    
+        ,@(map (lambda (param)
+                (let* ((param-name (car param))
+                      (type-pred (cadr param))
+                      ;;remove the '?' in 'type?'
+                      (type-name-str 
+                         (let ((s (symbol->string type-pred)))
+                           (if (and (positive? (string-length s))
+                                    (char=? (string-ref s (- (string-length s) 1)) #\?))
+                               (substring s 0 (- (string-length s) 1))
+                               s))))
+
+                  `(unless 
+                      (,type-pred ,param-name)
+                      (type-error 
+                          (format #f "In funtion #<~a ~a>: argument *~a* must be *~a*!    **Got ~a**"
+                                ,name
+                                ',param-names
+                                ',param-name
+                                ,type-name-str
+                                (object->string ,param-name))))))
+              params)
+       ,body
+       ,@rest)))
+
 (define-macro (define-case-class class-name fields . methods)
   (let* ((key-fields
          (map (lambda (field) (string->symbol (string-append ":" (symbol->string (car field)))))
@@ -82,7 +124,8 @@
            (filter (lambda (method) (not (or (string-starts? (symbol->string (caadr method)) "%")
                                              (string-starts? (symbol->string (caadr method)) "@"))))
                    methods))
-         (this-symbol (gensym)))
+         (this-symbol (gensym))
+         (f-make-case-class (string->symbol (string-append "make-case-class-" (symbol->string class-name)))))
 
 `(define (,class-name msg . args)
 
@@ -98,7 +141,7 @@
             static-method-symbols static-messages)
      (else (value-error "No such static method " msg))))
 
-(typed-define (create-instance ,@fields)
+(typed-define (,f-make-case-class ,@fields)
   (define ,this-symbol #f)
   (define (%this . xs)
     (if (null? xs)
@@ -167,7 +210,7 @@
 
 (if (in? msg (list ,@static-messages))
     (apply static-dispatcher (cons msg args))
-    (apply create-instance (cons msg args)))
+    (apply ,f-make-case-class (cons msg args)))
 
 ) ; end of define
 ) ; end of let
