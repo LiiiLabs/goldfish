@@ -277,6 +277,9 @@
 
 (define-case-class rich-char ((code-point integer?))
 
+(define (%ascii?)
+  (and (>= code-point 0) (<= code-point 127)))
+
 (define (%digit?)
   (or
    (and (>= code-point 48) (<= code-point 57))
@@ -340,7 +343,9 @@
      (value-error "Invalid code point"))))
 
 (define (%to-string)
-  (utf8->string (%to-bytevector)))
+  (if (%ascii?)
+      (object->string (integer->char code-point))
+      (string-append "#\\" (utf8->string (%to-bytevector)))))
 
 )
 
@@ -392,6 +397,11 @@
         (else (type-error "rich-char: must be integer, string, bytevector"))))
 
 (define-case-class rich-string ((data string?))
+
+(define (@value-of c) 
+  (if (case-class? c)
+      (utf8->string (c :to-bytevector))
+      c))
 
 (define (%get) data)
 
@@ -460,7 +470,7 @@
 (chained-define (%map f)
   (rich-string
     (%to-vector :map f
-                :map (@ _ :to-string)
+                :map (lambda (c) (rich-string :value-of c))
                 :make-string)))
 
 (define (%count pred?)
@@ -533,7 +543,7 @@
             (split-helper (+ next-pos sep-len) (cons (substring data start next-pos) acc)))))
     
     (if (zero? sep-len)
-        ((%to-vector) :map (@ _ :to-string))
+          ((%to-vector) :map (lambda (c) (rich-string :value-of c)) :collect)
         (rich-vector (reverse-list->vector (split-helper 0 '()))))))
 
 )
@@ -1046,7 +1056,12 @@
                 (loop result (+ index 1))))))))
 
 (define (%to-string)
-  (object->string data))
+  (let ((elements-vector
+          (vector-map 
+            (lambda (x) (object->string x))             
+          data)))
+
+  ($ elements-vector :make-string "#(" " " ")")))
 
 (define (%make-string . xs)
   (define (parse-args xs)

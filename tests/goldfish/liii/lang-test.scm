@@ -231,6 +231,13 @@
 (check-true ((rich-char #x30) :equals (rich-char #x30)))
 (check-false ((rich-char #x31) :equals (rich-char #x30)))
 
+(check-true ((rich-char #x0) :ascii?))
+(check-true ((rich-char #x7f) :ascii?))
+(check-false ((rich-char #x8f) :ascii?))
+
+(check-true ($ #\a :ascii?))
+(check-true ($ #\Z :ascii?))
+
 (let ((char1 (rich-char 48))  ;; ASCII '0'
       (char2 (rich-char #xFF10))  ;; 全角 '０'
       (char3 (rich-char #x0660))  ;; 阿拉伯数字 '٠'
@@ -290,15 +297,18 @@
 
 (check ($ #\z :to-lower :to-upper) => #\Z) ; chain
 
-(check ((rich-char #x41) :to-string) => "A")
-(check-true ($ #\A :equals (rich-char #x41)))
+(check ($ #\space :to-string) => "#\\space")
+(check ($ #\return :to-string) => "#\\return")
 
-(check ((rich-char #xA3) :to-string) => "£")
+(check ($ #\a :to-string) => "#\\a")
+(check ($ #\A :to-string) => "#\\A")
 
-(check ((rich-char #x4E2D) :to-string) => "中")
-(check (object->string (rich-char #x4E2D)) => "中")
+(check ((rich-char #xA3) :to-string) => "#\\£")
 
-(check ((rich-char #x1F600) :to-string) => "😀")
+(check ((rich-char #x4E2D) :to-string) => "#\\中")
+(check (object->string (rich-char #x4E2D)) => "#\\中")
+
+(check ((rich-char #x1F600) :to-string) => "#\\😀")
 
 (check ($ "abc" :get) => "abc")
 (check ($ "" :get) => "")
@@ -828,6 +838,15 @@
         => #())
 
 (check (object->string ($ #(1 2 3))) => "#(1 2 3)")
+
+(let ((vec ($ #("Hello" "World"))))
+  (check (vec :to-string) => "#(\"Hello\" \"World\")"))
+
+(let ((vec ($ #())))
+  (check (vec :to-string) => "#()"))
+
+(let ((vec ($ "test123 你好" :to-vector)))
+  (check (vec :to-string) => "#(#\\t #\\e #\\s #\\t #\\1 #\\2 #\\3 #\\space #\\你 #\\好)"))
 
 (let1 v ($ #(1 2 3))
   (check (v :count) => 3)

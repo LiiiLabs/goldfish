@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.4>>
+<TMU|<tuple|1.1.0|2025.0.5>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -1431,6 +1431,38 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-char%ascii?>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%ascii?)
+
+    \ \ (and (\<gtr\>= code-point 0) (\<less\>= code-point 127)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true ((rich-char #x0) :ascii?))
+
+    (check-true ((rich-char #x7f) :ascii?))
+
+    (check-false ((rich-char #x8f) :ascii?))
+
+    \;
+
+    (check-true ($ #\\a :ascii?))
+
+    (check-true ($ #\\Z :ascii?))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-char%numeric?>
+
+  <paragraph|rich-char%upper-case?>
+
+  <paragraph|rich-char%lower-case?>
+
   <paragraph|rich-char%digit?>
 
   判断一个字符是否为数字。它支持所有 Unicode 标准中定义的数字字符，包括以下范围：
@@ -1825,32 +1857,106 @@
 
   <paragraph|rich-char%to-string>
 
+  在Scheme中，有一些表示字符的特殊规则，这种特殊的规则，解决了那些无法显示的字符的显示问题，比如：
+
+  <\session|goldfish|default>
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      #\\space
+    <|unfolded-io>
+      <goldfish-result|#\\space>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (object-\<gtr\>string (integer-\<gtr\>char 32))
+    <|unfolded-io>
+      <goldfish-result|"#\\space">
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      #\\return
+    <|unfolded-io>
+      <goldfish-result|#\\return>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (char-\<gtr\>integer #\\return)
+    <|unfolded-io>
+      <goldfish-result|13>
+    </unfolded-io>
+
+    <\unfolded-io>
+      \<gtr\>\ 
+    <|unfolded-io>
+      (object-\<gtr\>string (integer-\<gtr\>char 13))
+    <|unfolded-io>
+      <goldfish-result|"#\\return">
+    </unfolded-io>
+
+    <\input>
+      \<gtr\>\ 
+    <|input>
+      \;
+    </input>
+  </session>
+
+  <subparagraph|实现>
+
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%to-string)
 
-    \ \ (utf8-\<gtr\>string (%to-bytevector)))
+    \ \ (if (%ascii?)
+
+    \ \ \ \ \ \ (object-\<gtr\>string (integer-\<gtr\>char code-point))
+
+    \ \ \ \ \ \ (string-append "#\\\\" (utf8-\>string (%to-bytevector)))))
 
     \;
   </goldfish-chunk>
 
+  <subparagraph|测试>
+
+  不可见的ASCII字符
+
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check ((rich-char #x41) :to-string) =\<gtr\> "A")
+    (check ($ #\\space :to-string) =\<gtr\> "#\\\\space")
 
-    (check-true ($ #\\A :equals (rich-char #x41)))
+    (check ($ #\\return :to-string) =\<gtr\> "#\\\\return")
+
+    \;
+  </goldfish-chunk>
+
+  普通的字母
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ #\\a :to-string) =\<gtr\> "#\\\\a")
+
+    (check ($ #\\A :to-string) =\<gtr\> "#\\\\A")
+
+    \;
+  </goldfish-chunk>
+
+  ASCII范围外的字符：希腊字母、中文、表情符：
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((rich-char #xA3) :to-string) =\<gtr\> "#\\\\£")
 
     \;
 
-    (check ((rich-char #xA3) :to-string) =\<gtr\> "£")
+    (check ((rich-char #x4E2D) :to-string) =\<gtr\> "#\\\\<code|中>")
+
+    (check (object-\<gtr\>string (rich-char #x4E2D)) =\<gtr\> "#\\\\中")
 
     \;
 
-    (check ((rich-char #x4E2D) :to-string) =\<gtr\> "<code|中>")
-
-    (check (object-\<gtr\>string (rich-char #x4E2D)) =\<gtr\> "中")
-
-    \;
-
-    (check ((rich-char #x1F600) :to-string) =\<gtr\> "<code|😀>")
+    (check ((rich-char #x1F600) :to-string) =\<gtr\> "#\\\\<code|😀>")
 
     \;
   </goldfish-chunk>
@@ -1982,6 +2088,24 @@
 
     \;
   </scm-chunk>
+
+  \;
+
+  <subsection|静态方法>
+
+  <paragraph|rich-string@value-of>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (@value-of c)\ 
+
+    \ \ (if (case-class? c)
+
+    \ \ \ \ \ \ (utf8-\<gtr\>string (c :to-bytevector))
+
+    \ \ \ \ \ \ c))
+
+    \;
+  </goldfish-chunk>
 
   <subsection|选择器>
 
@@ -2326,7 +2450,7 @@
 
     \ \ \ \ (%to-vector :map f
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :map (@ _ :to-string)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :map (lambda (c) (rich-string :value-of c))
 
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :make-string)))
 
@@ -2380,6 +2504,8 @@
 
     \;
   </goldfish-chunk>
+
+  \;
 
   <paragraph|rich-string%to-vector>
 
@@ -2614,7 +2740,7 @@
 
     \ \ \ \ (if (zero? sep-len)
 
-    \ \ \ \ \ \ \ \ ((%to-vector) :map (@ _ :to-string))
+    \ \ \ \ \ \ \ \ \ \ ((%to-vector) :map (lambda (c) (rich-string :value-of c)) :collect)
 
     \ \ \ \ \ \ \ \ (rich-vector (reverse-list-\<gtr\>vector (split-helper 0 '()))))))
 
@@ -4996,13 +5122,41 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%to-string)
 
-    \ \ (object-\<gtr\>string data))
+    \ \ (let ((elements-vector
+
+    \ \ \ \ \ \ \ \ \ \ (vector-map\ 
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (lambda (x) (object-\<gtr\>string x)) \ \ \ \ \ \ \ \ \ \ \ \ 
+
+    \ \ \ \ \ \ \ \ \ \ data)))
+
+    \;
+
+    \ \ ($ elements-vector :make-string "#(" " " ")")))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check (object-\<gtr\>string ($ #(1 2 3))) =\<gtr\> "#(1 2 3)")
+
+    \;
+
+    (let ((vec ($ #("Hello" "World"))))
+
+    \ \ (check (vec :to-string) =\<gtr\> "#(\\"Hello\\" \\"World\\")"))
+
+    \;
+
+    (let ((vec ($ #())))
+
+    \ \ (check (vec :to-string) =\<gtr\> "#()"))
+
+    \;
+
+    (let ((vec ($ "test123 你好" :to-vector)))
+
+    \ \ (check (vec :to-string) =\<gtr\> "#(#\\\\t #\\\\e #\\\\s #\\\\t #\\\\1 #\\\\2 #\\\\3 #\\\\space #\\\\你 #\\\\好)"))
 
     \;
   </goldfish-chunk>
