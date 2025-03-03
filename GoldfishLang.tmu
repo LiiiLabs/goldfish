@@ -2021,7 +2021,7 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|rich-string%make-string><typehint|() =\<gtr\> rich-string>
+  <paragraph|rich-char%make-string><typehint|() =\<gtr\> rich-string>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%make-string)
@@ -5250,17 +5250,9 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%to-string)
 
-    \ \ (let ((elements-vector
+    \ \ ((%map object-\<gtr\>string)
 
-    \ \ \ \ \ \ \ \ \ \ (vector-map\ 
-
-    \ \ \ \ \ \ \ \ \ \ \ \ (lambda (x) (object-\<gtr\>string x)) \ \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ \ \ data)))
-
-    \;
-
-    \ \ ($ elements-vector :make-string "#(" " " ")")))
+    \ \ \ :make-string "#(" " " ")"))
 
     \;
   </goldfish-chunk>

@@ -1062,12 +1062,8 @@
                 (loop result (+ index 1))))))))
 
 (define (%to-string)
-  (let ((elements-vector
-          (vector-map 
-            (lambda (x) (object->string x))             
-          data)))
-
-  ($ elements-vector :make-string "#(" " " ")")))
+  ((%map object->string)
+   :make-string "#(" " " ")"))
 
 (define (%make-string . xs)
   (define (parse-args xs)
