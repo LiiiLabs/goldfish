@@ -398,10 +398,14 @@
 
 (define-case-class rich-string ((data string?))
 
-(define (@value-of c) 
-  (if (case-class? c)
-      (utf8->string (c :to-bytevector))
-      c))
+(chained-define (@value-of v) 
+  (cond ((char? v) (rich-string (string v)))
+        ((number? v) (rich-string (number->string v)))
+        ((symbol? v) (rich-string (symbol->string v)))
+        ((string? v) (rich-string v))
+        ((and (case-class? v) (v :is-instance-of 'rich-char))
+         ($ (v :to-string) :strip-prefix "#\\"))
+        (else (type-error "Expected types are char, rich-char, number, symbol or string"))))
 
 (define (%get) data)
 
@@ -543,7 +547,7 @@
             (split-helper (+ next-pos sep-len) (cons (substring data start next-pos) acc)))))
     
     (if (zero? sep-len)
-          ((%to-vector) :map (lambda (c) (rich-string :value-of c)) :collect)
+        ((%to-vector) :map (lambda (c) (rich-string :value-of c :get)) :collect)
         (rich-vector (reverse-list->vector (split-helper 0 '()))))))
 
 )

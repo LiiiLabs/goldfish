@@ -2156,13 +2156,37 @@
   <paragraph|rich-string@value-of>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@value-of c)\ 
+    (chained-define (@value-of v)\ 
 
-    \ \ (if (case-class? c)
+    \ \ (cond ((char? v) (rich-string (string v)))
 
-    \ \ \ \ \ \ (utf8-\<gtr\>string (c :to-bytevector))
+    \ \ \ \ \ \ \ \ ((number? v) (rich-string (number-\<gtr\>string v)))
 
-    \ \ \ \ \ \ c))
+    \ \ \ \ \ \ \ \ ((symbol? v) (rich-string (symbol-\<gtr\>string v)))
+
+    \ \ \ \ \ \ \ \ ((string? v) (rich-string v))
+
+    \ \ \ \ \ \ \ \ ((and (case-class? v) (v :is-instance-of 'rich-char))
+
+    \ \ \ \ \ \ \ \ \ ($ (v :to-string) :strip-prefix "#\\\\"))
+
+    \ \ \ \ \ \ \ \ (else (type-error "Expected types are char, rich-char, number, symbol or string"))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (rich-string :value-of #\\a) =\<gtr\> "a")
+
+    (check (rich-string :value-of 'a) =\<gtr\> "a")
+
+    (check (rich-string :value-of 123) =\<gtr\> "123")
+
+    (check (rich-string :value-of 1.0) =\<gtr\> "1.0")
+
+    (check (rich-string :value-of "abc") =\<gtr\> "abc")
+
+    (check (rich-string :value-of (rich-char #x4E2D)) =\<gtr\> "中")
 
     \;
   </goldfish-chunk>
@@ -2800,7 +2824,7 @@
 
     \ \ \ \ (if (zero? sep-len)
 
-    \ \ \ \ \ \ \ \ \ \ ((%to-vector) :map (lambda (c) (rich-string :value-of c)) :collect)
+    \ \ \ \ \ \ \ \ ((%to-vector) :map (lambda (c) (rich-string :value-of c :get)) :collect)
 
     \ \ \ \ \ \ \ \ (rich-vector (reverse-list-\<gtr\>vector (split-helper 0 '()))))))
 
