@@ -474,10 +474,10 @@
        (else (loop (cdr lst) (+ index 1)))))))))
 
 (chained-define (%map f)
-  (rich-string
-    (%to-vector :map f
-                :map (lambda (c) (rich-string :value-of c))
-                :make-string)))
+  ((%to-vector)
+   :map f
+   :map (@ _ :make-string)
+   :make-string))
 
 (define (%count pred?)
   ((%to-vector) :count pred?))
@@ -485,7 +485,7 @@
 (define (%to-string)
   data)
 
-(chained-define (%to-vector)
+(define (%to-vector)
   (if (string-null? data)
       (rich-vector :empty)
       (let* ((bv (string->utf8 data))
@@ -1092,7 +1092,7 @@
   (receive (start sep end) (parse-args xs)
     (let* ((as-string (lambda (x) (if (string? x) x (object->string x))))
            (middle (string-join (map as-string (vector->list data)) sep)))
-      (string-append start middle end))))
+      (rich-string (string-append start middle end)))))
 
 (define (%set! i x)
   (when (or (< i 0) (>= i (length data)))

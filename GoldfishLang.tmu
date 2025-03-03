@@ -2576,13 +2576,13 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (chained-define (%map f)
 
-    \ \ (rich-string
+    \ \ ((%to-vector)
 
-    \ \ \ \ (%to-vector :map f
+    \ \ \ :map f
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :map (lambda (c) (rich-string :value-of c))
+    \ \ \ :map (@ _ :make-string)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :make-string)))
+    \ \ \ :make-string))
 
     \;
   </goldfish-chunk>
@@ -2635,12 +2635,10 @@
     \;
   </goldfish-chunk>
 
-  \;
-
   <paragraph|rich-string%to-vector>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (chained-define (%to-vector)
+    (define (%to-vector)
 
     \ \ (if (string-null? data)
 
@@ -5340,7 +5338,7 @@
 
     \ \ \ \ \ \ \ \ \ \ \ (middle (string-join (map as-string (vector-\<gtr\>list data)) sep)))
 
-    \ \ \ \ \ \ (string-append start middle end))))
+    \ \ \ \ \ \ (rich-string (string-append start middle end)))))
 
     \;
   </scm-chunk>
