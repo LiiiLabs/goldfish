@@ -137,23 +137,93 @@
 
   <section|部分应用>
 
-  宏@提供类似Scala语法的部分应用（Partial Application）功能，详情参考SFRI 26中宏cute的说明，宏@与宏cute的区别在于@不支持类似\<less\><text-dots>\<gtr\>的未定参数，且用_表示占位符。
+  <paragraph*|@>
 
-  宏@的特点，简短的来说，@只在宏展开时求值并绑定占位符，而不是每次被调用时重新求值：
+  宏<scm|@>提供类似Scala语法的部分应用（Partial Application）功能，详情参考SFRI 26中宏<scm|cute>的说明。
 
-  <\goldfish-lang>
-    <\code>
+  宏<scm|@>的关键在于<strong|宏展开时的静态求值>，而非运行时的动态绑定。简短的来说，<scm|@>只在宏展开时求值并绑定占位符，而不是每次被调用时重新求值。
+
+  \;
+
+  <strong|通过示例和机制分步解释>
+
+  <\goldfish-code>
+    (let ((a 10))
+
+    \ \ (define add10 (@ + a _)) \ ; a 在宏展开时被求值为 10
+
+    \ \ (set! a 100)
+
+    \ \ (add10 5)) ; =\<gtr\> 15（而不是 105）
+  </goldfish-code>
+
+  <\enumerate>
+    <item><strong|宏展开阶段>：
+
+    当 <scm|(@ + a _)> 被展开时，宏会立即对非占位符参数（此处为 <scm|a>）进行求值。此时 <scm|a> 的值为 <scm|10>，所以宏生成的代码类似：
+
+    <\goldfish-code>
+      (define add10 (lambda (x) (+ 10 x))) ; a 被替换为固定值 10
+    </goldfish-code>
+
+    占位符 <scm|_> 对应后续传入的参数。
+
+    <item><strong|运行时阶段>：
+
+    即使后续通过 <scm|(set! a 100)> 修改了 <code*|<scm|a>>，<scm|add10> 内部已经固定为 <scm|10>，因此 <scm|(add10 5)> 等价于 <scm|(+ 10 5)>，结果为 <scm|15>。
+  </enumerate>
+
+  \;
+
+  <strong|与普通闭包的区别>
+
+  <\itemize>
+    若不用 <scm|@>，直接使用 <scm|lambda>：
+
+    <\goldfish-code>
       (let ((a 10))
 
-      \ \ (define add10 (@ + a _)) \ ; a 在宏展开时被求值为 10
+      \ \ (define add10 (lambda (x) (+ a x))) ; 闭包捕获变量 a 的引用
 
       \ \ (set! a 100)
 
-      \ \ (add10 5)) ; =\<gtr\> 15（而不是 105）
-    </code>
-  </goldfish-lang>
+      \ \ (add10 5)) ; 结果为 105
+    </goldfish-code>
+
+    <strong|闭包行为>：<scm|lambda> 捕获的是变量 <scm|a> 的引用，而非其当前值。因此 <scm|a><verbatim|> 的修改会影响闭包的结果。
+  </itemize>
 
   \;
+
+  <strong|宏 <scm|@> 的核心机制>
+
+  <\enumerate>
+    <item><strong|静态求值>：
+
+    在宏展开阶段，所有非占位符参数（如 <code*|<scm|a>>）会被立即求值，结果直接嵌入生成的代码中。这类似于 <strong|“值捕获”>。
+
+    <item><strong|占位符 <scm|_>>：
+
+    表示参数位置由后续调用时传入的值填充，类似 Scala 的 <scm|_> 占位符。例如 <scm|(@ f _ b _)> 会生成一个接受两个参数的函数。
+
+    <item><strong|与 <scm|cute> 宏的区别>：
+
+    <scm|cute> 宏支持更复杂的模式（如 <scm|\<...\>> 表示未定参数序列），而 <scm|@> 仅支持固定位置的 <scm|_>，且不延迟求值。
+  </enumerate>
+
+  \;
+
+  <strong|设计意义>
+
+  <\itemize>
+    <item><strong|性能优化>：若部分参数是常量或昂贵的计算，<scm|@> 可避免重复求值。
+
+    <item><strong|语义确定性>：部分应用的结果在定义时即固定，不受后续环境变化影响。
+  </itemize>
+
+  \;
+
+  <strong|实现函数>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-macro (@ . paras)
@@ -211,11 +281,9 @@
     \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,(parse exprs-sym-list slots-sym-list paras)))))
 
     \;
-
-    \;
   </goldfish-chunk>
 
-  \;
+  <strong|测试用例>
 
   测试：基本部分应用
 
@@ -228,8 +296,6 @@
 
     \;
   </goldfish-chunk>
-
-  \;
 
   测试：只宏展开时求值并绑定占位符
 
@@ -259,8 +325,6 @@
     \;
   </goldfish-chunk>
 
-  \;
-
   测试：无占位符时生成的函数无参数
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
@@ -270,8 +334,6 @@
 
     \;
   </goldfish-chunk>
-
-  \;
 
   测试：函数作为占位符参数
 
@@ -285,9 +347,7 @@
     \;
   </goldfish-chunk>
 
-  \;
-
-  测试：嵌套@宏
+  测试：嵌套<scm|@>宏
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ((@ (@ + _ 1) _) 2) =\<gtr\> 3)
