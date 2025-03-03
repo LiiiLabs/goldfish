@@ -310,12 +310,23 @@
 
 (check ((rich-char #x1F600) :to-string) => "#\\😀")
 
+(check ($ #\space :make-string) => " ")
+(check ($ #\return :make-string) => (string #\return))
+
+(check ($ #\a :make-string) => "a")
+(check ($ #\A :make-string) => "A")
+
+(check ((rich-char #xA3) :make-string) => "£")
+(check ((rich-char #x4E2D) :make-string) => "中")
+(check ((rich-char #x1F600) :make-string) => "😀")
+
 (check (rich-string :value-of #\a) => "a")
 (check (rich-string :value-of 'a) => "a")
 (check (rich-string :value-of 123) => "123")
 (check (rich-string :value-of 1.0) => "1.0")
 (check (rich-string :value-of "abc") => "abc")
 (check (rich-string :value-of (rich-char #x4E2D)) => "中")
+(check (rich-string :value-of #\ ) => " ")
 
 (check ($ "abc" :get) => "abc")
 (check ($ "" :get) => "")

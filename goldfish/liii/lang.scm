@@ -346,6 +346,9 @@
       (object->string (integer->char code-point))
       (string-append "#\\" (utf8->string (%to-bytevector)))))
 
+(define (%make-string)
+  (rich-string (utf8->string (%to-bytevector))))
+
 )
 
 (define make-rich-char rich-char)
@@ -403,7 +406,7 @@
         ((symbol? v) (rich-string (symbol->string v)))
         ((string? v) (rich-string v))
         ((and (case-class? v) (v :is-instance-of 'rich-char))
-         ($ (v :to-string) :strip-prefix "#\\"))
+         (v :make-string))
         (else (type-error "Expected types are char, rich-char, number, symbol or string"))))
 
 (define (%get) data)

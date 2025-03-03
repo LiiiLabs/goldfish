@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.5>>
+<TMU|<tuple|1.1.0|2025.0.4>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -1519,9 +1519,9 @@
 
   <paragraph|rich-char%numeric?>
 
-  <paragraph|rich-char%upper-case?>
+  <paragraph|rich-char%upper?>
 
-  <paragraph|rich-char%lower-case?>
+  <paragraph|rich-char%lower?>
 
   <paragraph|rich-char%digit?>
 
@@ -2021,6 +2021,50 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-string%make-string><typehint|() =\<gtr\> rich-string>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%make-string)
+
+    \ \ (rich-string (utf8-\>string (%to-bytevector))))
+
+    \;
+  </goldfish-chunk>
+
+  <subparagraph|测试>
+
+  不可见的ASCII字符
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ #\\space :make-string) =\<gtr\> " ")
+
+    (check ($ #\\return :make-string) =\<gtr\> (string #\\return))
+
+    \;
+  </goldfish-chunk>
+
+  普通的字母
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ #\\a :make-string) =\<gtr\> "a")
+
+    (check ($ #\\A :make-string) =\<gtr\> "A")
+
+    \;
+  </goldfish-chunk>
+
+  ASCII范围外的字符：希腊字母、中文、表情符：
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ((rich-char #xA3) :make-string) =\<gtr\> "£")
+
+    (check ((rich-char #x4E2D) :make-string) =\<gtr\> "<code|中>")
+
+    (check ((rich-char #x1F600) :make-string) =\<gtr\> "<code|😀>")
+
+    \;
+  </goldfish-chunk>
+
   <subsection|结尾>
 
   \;
@@ -2168,7 +2212,7 @@
 
     \ \ \ \ \ \ \ \ ((and (case-class? v) (v :is-instance-of 'rich-char))
 
-    \ \ \ \ \ \ \ \ \ ($ (v :to-string) :strip-prefix "#\\\\"))
+    \ \ \ \ \ \ \ \ \ (v :make-string))
 
     \ \ \ \ \ \ \ \ (else (type-error "Expected types are char, rich-char, number, symbol or string"))))
 
@@ -2187,6 +2231,8 @@
     (check (rich-string :value-of "abc") =\<gtr\> "abc")
 
     (check (rich-string :value-of (rich-char #x4E2D)) =\<gtr\> "中")
+
+    (check (rich-string :value-of #\\ ) =\<gtr\> " ")
 
     \;
   </goldfish-chunk>
