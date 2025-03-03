@@ -208,7 +208,7 @@
 
     \ \ \ \ \ \ - name: cache xmake
 
-    \ \ \ \ \ \ \ \ uses: actions/cache@v2
+    \ \ \ \ \ \ \ \ uses: actions/cache@v4
 
     \ \ \ \ \ \ \ \ with:
 
@@ -246,7 +246,7 @@
 
     \ \ \ \ \ \ - name: cache packages from xrepo
 
-    \ \ \ \ \ \ \ \ uses: actions/cache@v3
+    \ \ \ \ \ \ \ \ uses: actions/cache@v4
 
     \ \ \ \ \ \ \ \ with:
 
@@ -372,7 +372,7 @@
 
     \ \ \ \ \ \ - name: cache xmake
 
-    \ \ \ \ \ \ \ \ uses: actions/cache@v2
+    \ \ \ \ \ \ \ \ uses: actions/cache@v4
 
     \ \ \ \ \ \ \ \ with:
 
