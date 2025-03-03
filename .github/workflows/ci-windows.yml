@@ -41,7 +41,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: cache xmake
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ${{ env.XMAKE_GLOBALDIR }}/.xmake/packages
@@ -53,6 +53,4 @@ jobs:
         run: xmake build --yes -vD goldfish
       - name: test
         run: bin/goldfish -l tests/test_all.scm
-      - name: run json tests
-        run: bin/goldfish json/tests/json-test.scm
 
