@@ -56,7 +56,6 @@
         (lambda ,slots-sym-list 
                 ,(parse exprs-sym-list slots-sym-list paras)))))
 
-
 (define-macro (define-case-class class-name fields . methods)
   (let* ((key-fields
          (map (lambda (field) (string->symbol (string-append ":" (symbol->string (car field)))))
@@ -832,7 +831,7 @@
 
   (receive (start sep end) (parse-args xs)
     (let1 as-string (lambda (x) (if (string? x) x (object->string x)))
-          (string-append start (string-join (map as-string data) sep) end))))
+          (rich-string (string-append start (string-join (map as-string data) sep) end)))))
 
 )
 
