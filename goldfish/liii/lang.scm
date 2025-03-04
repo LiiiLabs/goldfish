@@ -315,6 +315,11 @@
                    
 (define (%get) data)
 
+(define (%abs) 
+  (if (< data 0)
+      (- 0 data)
+      data))
+  
 )
 
 (define-case-class rich-char ((code-point integer?))

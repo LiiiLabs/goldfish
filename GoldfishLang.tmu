@@ -1569,6 +1569,32 @@
     \;
   </goldfish-chunk>
 
+  <subsection|谓词>
+
+  <paragraph|rich-float%abs>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%abs)\ 
+
+    \ \ (if (\<less\> data 0)
+
+    \ \ \ \ \ \ (- 0 data)
+
+    \ \ \ \ \ \ data))
+
+    \ \ 
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 1.1 :abs) =\<gtr\> 1.1)
+
+    (check ($ 0.0 :abs) =\<gtr\> 0.0)
+
+    (check ($ -1.1 :abs) =\<gtr\> 1.1)
+
+    \;
+  </goldfish-chunk>
+
   <subsection|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

@@ -235,6 +235,10 @@
 
 (check ($ 12.2 :get) => 12.2)
 
+(check ($ 1.1 :abs) => 1.1)
+(check ($ 0.0 :abs) => 0.0)
+(check ($ -1.1 :abs) => 1.1)
+
 (check-true ((rich-char #x30) :equals (rich-char #x30)))
 (check-false ((rich-char #x31) :equals (rich-char #x30)))
 
