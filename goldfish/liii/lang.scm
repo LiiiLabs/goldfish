@@ -22,8 +22,7 @@
   define-case-class case-class? == != chained-define display* object->string
   option none
   rich-integer rich-float rich-char rich-string
-  rich-list range stack
-  rich-vector array rich-hash-table array-buffer
+  rich-list rich-vector array rich-hash-table
   box $
 )
 (begin
@@ -905,19 +904,6 @@
   (receive (start sep end) (parse-args xs)
     (let1 as-string (lambda (x) (if (string? x) x (object->string x)))
           (rich-string (string-append start (string-join (map as-string data) sep) end)))))
-
-)
-
-(define-case-class range
-  ((start integer?) (end integer?) (step integer?) (inclusive? boolean?))
-
-(define* (@inclusive start end (step 1))
-  (range start end step #t))
-
-(define (%empty?)
-  (or (and (> start end) (> step 0))
-      (and (< start end) (< step 0))
-      (and (= start end) (not inclusive?))))
 
 )
 
