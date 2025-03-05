@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.4>>
+<TMU|<tuple|1.1.0|2025.0.5>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python|elvish>>
 
@@ -10822,85 +10822,63 @@
   <scm|string-trim>是一个函数，用于去除字符串左端的空白字符。空白字符通常包括空格、制表符、换行符等。当原字符串只包含空白字符，返回空字符串。
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-    (define (%trim-do str string-trim-sub criterion+start+end)
+    (define (string-trim str . opt)
 
-    \ \ (cond ((null-list? criterion+start+end)
+    \ \ (let ((predicate (cond
 
-    \ \ \ \ \ \ \ \ \ (string-trim-sub str #\\ ))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((null? opt) char-whitespace?)
 
-    \ \ \ \ \ \ \ \ ((list? criterion+start+end)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((char? (car opt)) (lambda (c) (char=? c (car opt))))
 
-    \ \ \ \ \ \ \ \ \ (if (char? (car criterion+start+end))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((procedure? (car opt)) (car opt))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (string-trim-sub
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (type-error "Invalid second argument: expected character or predicate" (car opt))))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str (cdr criterion+start+end))
+    \ \ \ \ (let* ((start (if (and (\<gtr\> (length opt) 1) (number? (cadr opt))) (cadr opt) 0))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (car criterion+start+end))
+    \ \ \ \ \ \ \ \ \ \ \ (end (if (and (\<gtr\> (length opt) 2) (number? (caddr opt))) (caddr opt) (string-length str)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (string-trim-sub
+    \ \ \ \ \ \ \ \ \ \ \ (str (substring str start end)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (%string-from-range str criterion+start+end)
+    \ \ \ \ \ \ (let loop ((i 0)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #\\ )))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (len (string-length str)))
 
-    \ \ \ \ \ \ \ \ (else (error 'wrong-type-arg "string-trim"))))
+    \ \ \ \ \ \ \ \ (if (or (\<gtr\>= i len) (not (predicate (string-ref str i))))
 
-    \;
+    \ \ \ \ \ \ \ \ \ \ \ \ (substring str i len)
 
-    (define (string-trim str . criterion+start+end)
-
-    \ \ (define (string-trim-sub str space-or-char)
-
-    \ \ \ \ (let loop ((i 0)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (len (string-length str)))
-
-    \ \ \ \ \ \ \ \ \ (if (or (= i len) (not (char=? space-or-char (string-ref str i))))
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (substring str i len)
-
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) len))))
-
-    \ \ (%trim-do str string-trim-sub criterion+start+end))
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1) len))))))
 
     \;
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check (string-trim " \ 2 4 \ ") =\<gtr\> "2 4 \ ")
+    (check (string-trim " \ hello \ ") =\<gtr\> "hello \ ")
 
-    (check (string-trim " \ 2 4 \ " 2) =\<gtr\> "2 4 \ ")
+    (check (string-trim "---hello---" #\\-) =\<gtr\> "hello---")
 
-    (check (string-trim " \ 2 4 \ " 3) =\<gtr\> "4 \ ")
+    (check (string-trim "123hello123" char-numeric?) =\<gtr\> "hello123")
 
-    (check (string-trim " \ 2 4 \ " 4) =\<gtr\> "4 \ ")
+    (check (string-trim " \ \ ") =\<gtr\> "")
 
-    (check (string-trim " \ 2 4 \ " 5) =\<gtr\> "")
+    (check (string-trim "") =\<gtr\> "")
 
-    \;
+    (check (string-trim "hello" #\\-) =\<gtr\> "hello")
 
-    (check-catch 'out-of-range (string-trim " \ 2 4 \ " 8))
+    (check (string-trim "abcABC123" char-upper-case?) =\<gtr\> "abcABC123")
 
-    \;
+    (check (string-trim " \ hello \ " #\\space 2 7) =\<gtr\> "hello")
 
-    (check (string-trim " \ 2 4 \ " 0 4) =\<gtr\> "2 ")
+    (check (string-trim " \ \ hello \ \ " #\\space 3) =\<gtr\> "hello \ \ ")
 
-    (check (string-trim " \ 2 4 \ " 0 7) =\<gtr\> "2 4 \ ")
+    (check (string-trim " \ \ hello \ \ " #\\space 3 8) =\<gtr\> "hello")
 
-    \;
+    (check (string-trim "---hello---" #\\- 3 8) =\<gtr\> "hello")
 
-    (check-catch 'out-of-range (string-trim " \ 2 4 \ " 0 8))
+    (check (string-trim "123hello123" char-numeric? 3 8) =\<gtr\> "hello")
 
-    \;
-
-    (check (string-trim " \ 2 4 \ " #\\ ) =\<gtr\> "2 4 \ ")
-
-    (check (string-trim "-- 2 4 --" #\\-) =\<gtr\> " 2 4 --")
-
-    (check (string-trim " - 345" #\\- 1) =\<gtr\> " 345")
-
-    (check (string-trim " - 345" #\\- 1 4) =\<gtr\> " 3")
+    (check (string-trim "123hello123" char-numeric? 3) =\<gtr\> "hello123")
 
     \;
   </scm-chunk>
@@ -10910,101 +10888,133 @@
   <scm|string-trim-right>是一个函数，用于去除字符串右端的空白字符。当原字符串只包含空白字符，返回空字符串。
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-    (define (string-trim-right str . criterion+start+end)
+    (define (string-trim-right str . opt)
 
-    \ \ (define (string-trim-right-sub str space-or-char)
+    \ \ (let ((predicate (cond
 
-    \ \ \ \ (let loop ((i (- (string-length str) 1)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((null? opt) char-whitespace?)
 
-    \ \ \ \ \ \ (cond ((negative? i) "")
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((char? (car opt)) (lambda (c) (char=? c (car opt))))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ ((char=? space-or-char (string-ref str i)) (loop (- i 1)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((procedure? (car opt)) (car opt))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (else (substring str 0 (+ i 1))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (type-error "Invalid second argument: expected character or predicate" (car opt))))))
 
-    \ \ (%trim-do str string-trim-right-sub criterion+start+end))
+    \ \ \ \ (let* ((start (if (and (\<gtr\> (length opt) 1) (number? (cadr opt))) (cadr opt) 0))
+
+    \ \ \ \ \ \ \ \ \ \ \ (end (if (and (\<gtr\> (length opt) 2) (number? (caddr opt))) (caddr opt) (string-length str)))
+
+    \ \ \ \ \ \ \ \ \ \ \ (str (substring str start end)))
+
+    \ \ \ \ \ \ (let loop ((j (- (string-length str) 1)))
+
+    \ \ \ \ \ \ \ \ (if (or (\<less\> j 0) (not (predicate (string-ref str j))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (substring str 0 (+ j 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (- j 1)))))))
 
     \;
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check (string-trim-right " \ 2 4 \ ") =\<gtr\> " \ 2 4")
+    (check (string-trim-right " \ hello \ ") =\<gtr\> " \ hello")
 
-    (check (string-trim-right " \ 2 4 \ " 1) =\<gtr\> " 2 4")
+    (check (string-trim-right "---hello---" #\\-) =\<gtr\> "---hello")
 
-    (check (string-trim-right " \ 2 4 \ " 2) =\<gtr\> "2 4")
+    (check (string-trim-right "123hello123" char-numeric?) =\<gtr\> "123hello")
 
-    (check (string-trim-right " \ 2 4 \ " 3) =\<gtr\> " 4")
+    (check (string-trim-right " \ \ ") =\<gtr\> "")
 
-    (check (string-trim-right " \ 2 4 \ " 4) =\<gtr\> "4")
+    (check (string-trim-right "") =\<gtr\> "")
 
-    (check (string-trim-right " \ 2 4 \ " 5) =\<gtr\> "")
+    (check (string-trim-right "hello" #\\-) =\<gtr\> "hello")
 
-    (check (string-trim-right " \ 2 4 \ " 6) =\<gtr\> "")
+    (check (string-trim-right "abcABC123" char-upper-case?) =\<gtr\> "abcABC123")
 
-    (check (string-trim-right " \ 2 4 \ " 7) =\<gtr\> "")
+    (check (string-trim-right " \ hello \ " #\\space 2 7) =\<gtr\> "hello")
 
-    \;
+    (check (string-trim-right " \ \ hello \ \ " #\\space 3) =\<gtr\> "hello")
 
-    (check-catch 'out-of-range (string-trim-right " \ 2 4 \ " 8))
+    (check (string-trim-right " \ \ hello \ \ " #\\space 3 8) =\<gtr\> "hello")
 
-    \;
+    (check (string-trim-right "---hello---" #\\- 3 8) =\<gtr\> "hello")
 
-    (check (string-trim-right " \ 2 4 \ " 0 4) =\<gtr\> " \ 2")
+    (check (string-trim-right "123hello123" char-numeric? 3 8) =\<gtr\> "hello")
 
-    (check (string-trim-right " \ 2 4 \ " 0 7) =\<gtr\> " \ 2 4")
-
-    \;
-
-    (check-catch 'out-of-range (string-trim-right " \ 2 4 \ " 0 8))
-
-    \;
-
-    (check (string-trim-right " \ 2 4 \ " #\\ ) =\<gtr\> " \ 2 4")
-
-    (check (string-trim-right "-- 2 4 --" #\\-) =\<gtr\> "-- 2 4 ")
-
-    (check (string-trim-right "012-" #\\- 1) =\<gtr\> "12")
-
-    (check (string-trim-right "012-4" #\\- 0 4) =\<gtr\> "012")
+    (check (string-trim-right "123hello123" char-numeric? 3) =\<gtr\> "hello")
 
     \;
   </scm-chunk>
 
   <paragraph|string-trim-both><index|string-trim-both>
 
-  <scm|string-trim-both>是一个函数，用于去除字符串两端的空白字符。当原字符串只包含空白字符，报错。
+  <scm|string-trim-both>是一个函数，用于去除字符串两端的空白字符。
 
   <\scm-chunk|goldfish/srfi/srfi-13.scm|true|true>
-    (define (string-trim-both str . criterion+start+end)
+    (define (string-trim-both str . opt)
 
-    \ \ (define (string-trim-both-sub str space-or-char)
+    \ \ (let ((predicate (cond
 
-    \ \ \ \ (let loop ((i 0)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((null? opt) char-whitespace?)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ (len (string-length str)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((char? (car opt)) (lambda (c) (char=? c (car opt))))
 
-    \ \ \ \ (if (or (= i len) (not (char=? space-or-char (string-ref str i))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((procedure? (car opt)) (car opt))
 
-    \ \ \ \ \ \ \ \ (let loop-end ((j (- len 1)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else (type-error "Invalid second argument: expected character or predicate" (car opt))))))
 
-    \ \ \ \ \ \ \ \ \ \ (if (or (\<less\> j 0) (not (char=? space-or-char (string-ref str j))))
+    \ \ \ \ (let* ((start (if (and (\<gtr\> (length opt) 1) (number? (cadr opt))) (cadr opt) 0))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring str i (+ j 1))
+    \ \ \ \ \ \ \ \ \ \ \ (end (if (and (\<gtr\> (length opt) 2) (number? (caddr opt))) (caddr opt) (string-length str)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop-end (- j 1))))
+    \ \ \ \ \ \ \ \ \ \ \ (str (substring str start end)))
 
-    \ \ \ \ \ \ \ \ (loop (+ i 1) len))))
+    \ \ \ \ \ \ (let loop-left ((i 0)
 
-    \ \ (%trim-do str string-trim-both-sub criterion+start+end))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (len (string-length str)))
+
+    \ \ \ \ \ \ \ \ (if (or (\<gtr\>= i len) (not (predicate (string-ref str i))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let loop-right ((j (- len 1)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (or (\<less\> j i) (not (predicate (string-ref str j))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (substring str i (+ j 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop-right (- j 1))))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop-left (+ i 1) len))))))
 
     \;
   </scm-chunk>
 
   <\scm-chunk|tests/goldfish/liii/string-test.scm|true|true>
-    (check (string-trim-both " \ 2 4 \ ") =\<gtr\> "2 4")
+    (check (string-trim-both " \ hello \ ") =\<gtr\> "hello")
 
-    (check (string-trim-both "--2 4--" #\\-) =\<gtr\> "2 4")
+    (check (string-trim-both "---hello---" #\\-) =\<gtr\> "hello")
+
+    (check (string-trim-both "123hello123" char-numeric?) =\<gtr\> "hello")
+
+    (check (string-trim-both " \ \ ") =\<gtr\> "")
+
+    (check (string-trim-both "") =\<gtr\> "")
+
+    (check (string-trim-both "hello" #\\-) =\<gtr\> "hello")
+
+    (check (string-trim-both "abcABC123" char-upper-case?) =\<gtr\> "abcABC123")
+
+    (check (string-trim-both " \ hello \ " #\\space 2 7) =\<gtr\> "hello")
+
+    (check (string-trim-both " \ \ hello \ \ " #\\space 3) =\<gtr\> "hello")
+
+    (check (string-trim-both " \ \ hello \ \ " #\\space 3 8) =\<gtr\> "hello")
+
+    (check (string-trim-both "---hello---" #\\- 3 8) =\<gtr\> "hello")
+
+    (check (string-trim-both "123hello123" char-numeric? 3 8) =\<gtr\> "hello")
+
+    (check (string-trim-both "123hello123" char-numeric? 3) =\<gtr\> "hello")
 
     \;
   </scm-chunk>
