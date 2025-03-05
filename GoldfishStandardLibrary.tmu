@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.8>>
+<TMU|<tuple|1.1.0|2025.0.4>>
 
 <style|<tuple|book|chinese|literate|goldfish|reduced-margins|guile|smart-ref|preview-ref|python>>
 
@@ -1472,7 +1472,7 @@
 
     \ \ os-sep pathsep
 
-    \ \ os-call system
+    \ \ os-call ; system
 
     \ \ mkdir chdir rmdir getenv unsetenv getcwd listdir access getlogin getpid)
 
@@ -1497,6 +1497,8 @@
     \ \ \ \ \ \ \ \ (liii string)
 
     \ \ \ \ \ \ \ \ (liii os)
+
+    \ \ \ \ \ \ \ \ (liii sys)
 
     \ \ \ \ \ \ \ \ (liii uuid)
 
@@ -1876,7 +1878,7 @@
 
     \ \ (check-false (access "/root" 'W_OK))
 
-    \ \ (check-true (access "bin/goldfish" 'X_OK)))
+    \ \ (check-true (access (executable) 'X_OK)))
 
     \;
   </scm-chunk>
@@ -1930,9 +1932,15 @@
   <paragraph|getenv>
 
   <\goldfish-chunk|goldfish/liii/os.scm|true|true>
-    (define (getenv key)
+    (define* (getenv key (default #f))
 
-    \ \ (get-environment-variable key))
+    \ \ (let ((val (get-environment-variable key)))
+
+    \ \ \ \ (if val
+
+    \ \ \ \ \ \ \ \ val
+
+    \ \ \ \ \ \ \ \ default)))
 
     \;
   </goldfish-chunk>
@@ -1953,6 +1961,12 @@
     (unsetenv "PATH")
 
     (check (getenv "PATH") =\<gtr\> #f)
+
+    (unsetenv "home")
+
+    (check (getenv "home") =\<gtr\> #f)
+
+    (check (getenv "home" "value does not found") =\<gtr\> "value does not found")
 
     \;
   </scm-chunk>
@@ -2718,7 +2732,7 @@
 
     )
 
-    (import (liii error) (liii vector) (liii string) (liii list))
+    (import (liii base) (liii error) (liii vector) (liii string) (liii list))
 
     (begin
 

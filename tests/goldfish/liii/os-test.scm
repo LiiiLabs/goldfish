@@ -17,6 +17,7 @@
 (import (liii check)
         (liii string)
         (liii os)
+        (liii sys)
         (liii uuid)
         (scheme time))
 
@@ -41,11 +42,14 @@
   (check-true (access "/root" 'F_OK))
   (check-false (access "/root" 'R_OK))
   (check-false (access "/root" 'W_OK))
-  (check-true (access "bin/goldfish" 'X_OK)))
+  (check-true (access (executable) 'X_OK)))
 
 (check (string-null? (getenv "PATH")) => #f)
 (unsetenv "PATH")
 (check (getenv "PATH") => #f)
+(unsetenv "home")
+(check (getenv "home") => #f)
+(check (getenv "home" "value does not found") => "value does not found")
 
 (when (os-windows?)
   (check (string-starts? (os-temp-dir) "C:") => #t))
