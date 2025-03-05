@@ -2945,18 +2945,92 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-string%strip-left>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%strip-left)
+
+    \ \ (rich-string (string-trim data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ " abc " :strip-left) =\<gtr\> "abc ")
+
+    (check ($ " \ \ abc" :strip-left) =\<gtr\> "abc")
+
+    (check ($ "\\t\\n abc" :strip-left) =\<gtr\> "abc")
+
+    (check ($ " \\t \\n abc \\t \\n " :strip-left) =\<gtr\> "abc \\t \\n ")
+
+    (check ($ "" :strip-left) =\<gtr\> "")
+
+    (check ($ " \ \ " :strip-left) =\<gtr\> "")
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-string%strip-right>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%strip-right)
+
+    \ \ (rich-string (string-trim-right data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ " abc " :strip-right) =\<gtr\> " abc")
+
+    (check ($ "abc \ \ " :strip-right) =\<gtr\> "abc")
+
+    (check ($ "abc \\t\\n" :strip-right) =\<gtr\> "abc")
+
+    (check ($ " \\t \\n abc \\t \\n " :strip-right) =\<gtr\> " \\t \\n abc")
+
+    (check ($ "" :strip-right) =\<gtr\> "")
+
+    (check ($ " \ \ " :strip-right) =\<gtr\> "")
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-string%strip-both>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%strip-both)
+
+    \ \ (rich-string (string-trim-both data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ " abc " :strip-both) =\<gtr\> "abc")
+
+    (check ($ " \ \ abc \ \ " :strip-both) =\<gtr\> "abc")
+
+    (check ($ "\\t\\n abc \\t\\n" :strip-both) =\<gtr\> "abc")
+
+    (check ($ " \\t \\n abc \\t \\n " :strip-both) =\<gtr\> "abc")
+
+    (check ($ "" :strip-both) =\<gtr\> "")
+
+    (check ($ " \ \ " :strip-both) =\<gtr\> "")
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
   <paragraph|rich-string%strip-prefix>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%strip-prefix prefix . xs)
+    (chained-define (%strip-prefix prefix)
 
-    \ \ (let ((result (rich-string (string-remove-prefix data prefix))))
-
-    \ \ \ \ (if (null? xs) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ result
-
-    \ \ \ \ \ \ \ \ (apply result xs))))\ 
+    \ \ (rich-string (string-remove-prefix data prefix)))
 
     \;
   </goldfish-chunk>
@@ -2990,15 +3064,11 @@
   <paragraph|rich-string%strip-suffix>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%strip-suffix suffix . xs)
+    (chained-define (%strip-suffix suffix)
 
-    \ \ (let ((result (rich-string (string-remove-suffix data suffix))))
+    \ \ (rich-string (string-remove-suffix data suffix)))
 
-    \ \ \ \ (if (null? xs) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
-
-    \ \ \ \ \ \ \ \ result
-
-    \ \ \ \ \ \ \ \ (apply result xs))))\ 
+    \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>

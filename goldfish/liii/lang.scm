@@ -567,17 +567,21 @@
     (else
       (type-error (string-append (object->string s) "is not string or rich-string")))))
 
-(define (%strip-prefix prefix . xs)
-  (let ((result (rich-string (string-remove-prefix data prefix))))
-    (if (null? xs)                                 
-        result
-        (apply result xs)))) 
+(chained-define (%strip-left)
+  (rich-string (string-trim data)))
 
-(define (%strip-suffix suffix . xs)
-  (let ((result (rich-string (string-remove-suffix data suffix))))
-    (if (null? xs)                                 
-        result
-        (apply result xs)))) 
+(chained-define (%strip-right)
+  (rich-string (string-trim-right data)))
+
+(chained-define (%strip-both)
+  (rich-string (string-trim-both data)))
+
+(chained-define (%strip-prefix prefix)
+  (rich-string (string-remove-prefix data prefix)))
+
+(chained-define (%strip-suffix suffix)
+  (rich-string (string-remove-suffix data suffix)))
+
 ;; Replace the first occurrence of the substring old to new.
 (define (%replace-first old new . xs)
   (define (replace-helper str old new start)

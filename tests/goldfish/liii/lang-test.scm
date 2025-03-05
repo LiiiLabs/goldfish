@@ -447,6 +447,27 @@
 (check ($ "hello " :+ (box "world")) => "hello world")
 (check-catch 'type-error ($ "hello" :+ 1))
 
+(check ($ " abc " :strip-left) => "abc ")
+(check ($ "   abc" :strip-left) => "abc")
+(check ($ "\t\n abc" :strip-left) => "abc")
+(check ($ " \t \n abc \t \n " :strip-left) => "abc \t \n ")
+(check ($ "" :strip-left) => "")
+(check ($ "   " :strip-left) => "")
+
+(check ($ " abc " :strip-right) => " abc")
+(check ($ "abc   " :strip-right) => "abc")
+(check ($ "abc \t\n" :strip-right) => "abc")
+(check ($ " \t \n abc \t \n " :strip-right) => " \t \n abc")
+(check ($ "" :strip-right) => "")
+(check ($ "   " :strip-right) => "")
+
+(check ($ " abc " :strip-both) => "abc")
+(check ($ "   abc   " :strip-both) => "abc")
+(check ($ "\t\n abc \t\n" :strip-both) => "abc")
+(check ($ " \t \n abc \t \n " :strip-both) => "abc")
+(check ($ "" :strip-both) => "")
+(check ($ "   " :strip-both) => "")
+
 (check ($ "" :strip-prefix "") => ($ ""))
 (check ($ "hello" :strip-prefix "") => ($ "hello"))
 (check ($ "hello" :strip-prefix "he") => ($ "llo"))
