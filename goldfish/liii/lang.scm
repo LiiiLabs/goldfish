@@ -878,6 +878,9 @@
                (loop (cons elem result) (cdr data) ht))
              (loop result (cdr data) ht)))))))
 
+(define (%reduce f init)
+  (reduce f init data))
+
 (define (%to-string)
   (object->string data))
 
