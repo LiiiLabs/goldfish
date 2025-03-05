@@ -249,6 +249,32 @@
 (check-true ($ #\a :ascii?))
 (check-true ($ #\Z :ascii?))
 
+;; 大写字母
+(check-true ($ #\A :upper?))
+(check-true ($ #\Z :upper?))
+
+;; 小写字母
+(check-false ($ #\a :upper?))
+(check-false ($ #\z :upper?))
+
+;; 非字母字符
+(check-false ($ #\0 :upper?))
+(check-false ($ #\@ :upper?))  ;; @ 符号 (ASCII 64)
+(check-false ($ #\[ :upper?))  ;; 左方括号 (ASCII 91)
+
+;; 小写字母
+(check-true ($ #\a :lower?))
+(check-true ($ #\z :lower?))
+
+;; 大写字母
+(check-false ($ #\A :lower?))
+(check-false ($ #\Z :lower?))
+
+;; 非字母字符
+(check-false ($ #\0 :lower?))
+(check-false ($ #\` :lower?))  ;; 反引号 (ASCII 96)
+(check-false ($ #\{ :lower?))  ;; 左花括号 (ASCII 123)
+
 (let ((char1 (rich-char 48))  ;; ASCII '0'
       (char2 (rich-char #xFF10))  ;; 全角 '０'
       (char3 (rich-char #x0660))  ;; 阿拉伯数字 '٠'

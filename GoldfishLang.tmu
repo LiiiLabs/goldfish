@@ -1,4 +1,4 @@
-<TMU|<tuple|1.1.0|2025.0.4>>
+<TMU|<tuple|1.1.0|2025.0.5>>
 
 <style|<tuple|book|goldfish|literate|reduced-margins|python|padded-paragraphs|chinese>>
 
@@ -1655,7 +1655,83 @@
 
   <paragraph|rich-char%upper?>
 
+  用于判断字符是否为大写字母，基于 ASCII 字符集的范围（<scm|#x41> 到 <scm|#x5A>）。
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%upper?)
+
+    \ \ (and (\<gtr\>= code-point #x41) (\<less\>= code-point #x5A)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    ;; 大写字母
+
+    (check-true ($ #\\A :upper?))
+
+    (check-true ($ #\\Z :upper?))
+
+    \;
+
+    ;; 小写字母
+
+    (check-false ($ #\\a :upper?))
+
+    (check-false ($ #\\z :upper?))
+
+    \;
+
+    ;; 非字母字符
+
+    (check-false ($ #\\0 :upper?))
+
+    (check-false ($ #\\@ :upper?)) \ ;; @ 符号 (ASCII 64)
+
+    (check-false ($ #\\[ :upper?)) \ ;; 左方括号 (ASCII 91)
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-char%lower?>
+
+  用于判断字符是否为小写字母，基于ASCII字符集的范围（<scm|#x61>到<scm|#x7A>）
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%lower?)
+
+    \ \ (and (\<gtr\>= code-point #x61) (\<less\>= code-point #x7A)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    ;; 小写字母
+
+    (check-true ($ #\\a :lower?))
+
+    (check-true ($ #\\z :lower?))
+
+    \;
+
+    ;; 大写字母
+
+    (check-false ($ #\\A :lower?))
+
+    (check-false ($ #\\Z :lower?))
+
+    \;
+
+    ;; 非字母字符
+
+    (check-false ($ #\\0 :lower?))
+
+    (check-false ($ #\\` :lower?)) \ ;; 反引号 (ASCII 96)
+
+    (check-false ($ #\\{ :lower?)) \ ;; 左花括号 (ASCII 123)
+
+    \;
+  </goldfish-chunk>
 
   <paragraph|rich-char%digit?>
 

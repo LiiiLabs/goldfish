@@ -327,6 +327,12 @@
 (define (%ascii?)
   (and (>= code-point 0) (<= code-point 127)))
 
+(define (%upper?)
+  (and (>= code-point #x41) (<= code-point #x5A)))
+
+(define (%lower?)
+  (and (>= code-point #x61) (<= code-point #x7A)))
+
 (define (%digit?)
   (or
    (and (>= code-point 48) (<= code-point 57))
