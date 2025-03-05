@@ -768,23 +768,20 @@
 (define (%contains elem)
   (%exists (lambda (x) (equal? x elem))))
 
-  (define (%map x . xs)
-    (let1 r (rich-list (map x data))
-      (if (null? xs) r (apply r xs))))
-  
-  (define (%flat-map x . xs)
-    (let1 r (rich-list (flat-map x data))
-      (if (null? xs) r (apply r xs))))
-  
-  (define (%filter x . xs)
-    (let1 r (rich-list (filter x data))
-      (if (null? xs) r (apply r xs))))
+(chained-define (%map x)
+  (rich-list (map x data)))
 
-  (define (%for-each x)
-    (for-each x data))
+(chained-define (%flat-map x)
+  (rich-list (flat-map x data)))
 
-  (chained-define (%reverse)
-    (rich-list (reverse data)))
+(chained-define (%filter x)
+  (rich-list (filter x data)))
+
+(define (%for-each x)
+  (for-each x data))
+
+(chained-define (%reverse)
+  (rich-list (reverse data)))
     
   (define (%take x . xs)
     (typed-define (scala-take (data list?) (n integer?))
@@ -886,6 +883,11 @@
   (if (null? data)
       (value-error "rich-list%reduce: empty list is not allowed to reduce")
       (reduce f '() data)))
+
+(define (%reduce-option f)
+  (if (null? data)
+      (none)
+      (option (reduce f '() data))))
 
 (define (%to-string)
   (object->string data))

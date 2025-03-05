@@ -3975,36 +3975,42 @@
 
   <section|高阶函数>
 
-  \;
+  <paragraph|rich-list%map>
 
-  <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%map x . xs)
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%map x)
 
-    \ \ \ \ (let1 r (rich-list (map x data))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
-
-    \ \ 
-
-    \ \ (define (%flat-map x . xs)
-
-    \ \ \ \ (let1 r (rich-list (flat-map x data))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
-
-    \ \ 
-
-    \ \ (define (%filter x . xs)
-
-    \ \ \ \ (let1 r (rich-list (filter x data))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-list (map x data)))
 
     \;
+  </goldfish-chunk>
 
-    \ \ (define (%for-each x)
+  <paragraph|rich-list%flat-map>
 
-    \ \ \ \ (for-each x data))
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%flat-map x)
+
+    \ \ (rich-list (flat-map x data)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-list%filter>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%filter x)
+
+    \ \ (rich-list (filter x data)))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-list%for-each>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%for-each x)
+
+    \ \ (for-each x data))
 
     \;
   </scm-chunk>
@@ -4012,9 +4018,9 @@
   <paragraph|rich-list%reverse>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (chained-define (%reverse)
+    (chained-define (%reverse)
 
-    \ \ \ \ (rich-list (reverse data)))
+    \ \ (rich-list (reverse data)))
 
     \ \ \ \ 
   </goldfish-chunk>
@@ -4539,6 +4545,34 @@
     (check ($ '(2 3 4) :reduce *) =\<gtr\> 24) \ 
 
     (check ($ '(5) :reduce (lambda (x y) (+ x y 10))) =\<gtr\> 5)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-list%reduce-option>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%reduce-option f)
+
+    \ \ (if (null? data)
+
+    \ \ \ \ \ \ (none)
+
+    \ \ \ \ \ \ (option (reduce f '() data))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ '() :reduce-option +) =\<gtr\> (none))
+
+    \;
+
+    (check ($ '(1 2 3) :reduce-option +) =\<gtr\> (option 6)) \ 
+
+    (check ($ '(2 3 4) :reduce-option *) =\<gtr\> (option 24)) \ 
+
+    (check ($ '(5) :reduce-option (lambda (x y) (+ x y 10))) =\<gtr\> (option 5))
 
     \;
   </goldfish-chunk>

@@ -751,6 +751,12 @@
 (check ($ '(2 3 4) :reduce *) => 24)  
 (check ($ '(5) :reduce (lambda (x y) (+ x y 10))) => 5)
 
+(check ($ '() :reduce-option +) => (none))
+
+(check ($ '(1 2 3) :reduce-option +) => (option 6))  
+(check ($ '(2 3 4) :reduce-option *) => (option 24))  
+(check ($ '(5) :reduce-option (lambda (x y) (+ x y 10))) => (option 5))
+
 (check (object->string ($ '(1 2 3))) => "(1 2 3)")
 
 (let1 l (rich-list (list 1 2 3))
