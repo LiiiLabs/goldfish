@@ -4563,6 +4563,24 @@
 
   <section|静态方法>
 
+  <paragraph|rich-vector@is-type-of>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check-true (rich-vector :is-type-of (rich-vector :empty)))
+
+    (check-true (rich-vector :is-type-of (rich-vector #(1 2 3))))
+
+    \;
+
+    (check-false (rich-vector :is-type-of #(1 2 3)))
+
+    (check-false (rich-vector :is-type-of 1))
+
+    \;
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|rich-vector@range>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
@@ -4669,6 +4687,42 @@
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%collect) data)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-vector%length>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%length)
+
+    \ \ (vector-length data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ #() :length) =\<gtr\> 0)
+
+    (check ($ #(1 2 3) :length) =\<gtr\> 3)
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|rich-vector%size>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%size)
+
+    \ \ (vector-length data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ #() :size) =\<gtr\> 0)
+
+    (check ($ #(1 2 3) :size) =\<gtr\> 3)
 
     \;
   </goldfish-chunk>

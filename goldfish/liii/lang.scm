@@ -937,6 +937,12 @@
 
 (define (%collect) data)
 
+(define (%length)
+  (vector-length data))
+
+(define (%size)
+  (vector-length data))
+
 (define (%apply n)
   (vector-ref data n))
 

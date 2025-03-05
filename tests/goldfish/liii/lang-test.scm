@@ -740,6 +740,13 @@
 (check ($ (list "a" "b") :make-string) => "ab")
 (check ($ (list "a" "b") :make-string " ") => "a b")
 
+(check-true (rich-vector :is-type-of (rich-vector :empty)))
+(check-true (rich-vector :is-type-of (rich-vector #(1 2 3))))
+
+(check-false (rich-vector :is-type-of #(1 2 3)))
+(check-false (rich-vector :is-type-of 1))
+
+
 (check (array :range 1 5) => ($ (vector 1 2 3 4)))
 (check (array :range 1 5 2) => ($ (vector 1 3)))
 (check (array :range 1 6 2) => ($ (vector 1 3 5)))
@@ -755,6 +762,12 @@
 (check-true (array :fill 0 #\a :empty?))
 
 (check (array :fill 3 #\a) => ($ (vector #\a #\a #\a)))
+
+(check ($ #() :length) => 0)
+(check ($ #(1 2 3) :length) => 3)
+
+(check ($ #() :size) => 0)
+(check ($ #(1 2 3) :size) => 3)
 
 (check ($ #(1 2 3) :apply 1) => 2)
 (check ($ #(1 2 3) 1) => 2)
