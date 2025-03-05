@@ -64,7 +64,7 @@
 
 | 库                                                | 描述                            | 示例函数                                                           |
 | ------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------ |
-| [(liii lang)](goldfish/liii/lang.scm)             | 类似Scala的集合库               | `box`支持一致的函数式集合库, `case-char`和`case-string`支持Unicode |
+| [(liii lang)](goldfish/liii/lang.scm)             | 类似Scala的集合库               | `box`支持一致的函数式集合库, `rich-char`和`rich-string`支持Unicode |
 | [(liii base)](goldfish/liii/base.scm)             | 基础库                          | `==`, `!=`, `display*`                                             |
 | [(liii error)](goldfish/liii/error.scm)           | 提供类似Python的错误函数        | `os-error`函数抛出`'os-error`，类似Python的OSError                 |
 | [(liii check)](goldfish/liii/check.scm)           | 基于SRFI 78的轻量级测试库加强版 | `check`, `check-catch`                                             |

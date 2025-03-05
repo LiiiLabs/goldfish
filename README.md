@@ -64,7 +64,7 @@ Just like S7 Scheme, [src/goldfish.hpp](src/goldfish.hpp) and [src/goldfish.cpp]
 
 | Library                                           | Description                          | Example functions                                                |
 | ------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------- |
-| [(liii lang)](goldfish/liii/lang.scm)             | Scala-like Collection                | `box` for functional api, `case-char`, `case-string` for unicode |
+| [(liii lang)](goldfish/liii/lang.scm)             | Scala-like Collection                | `box` for functional api, `rich-char`, `rich-string` for unicode |
 | [(liii base)](goldfish/liii/base.scm)             | Basic routines                       | `==`, `!=`, `display*`                                           |
 | [(liii error)](goldfish/liii/error.scm)           | Python like Errors                   | `os-error` to raise `'os-error` just like OSError in Python      |
 | [(liii check)](goldfish/liii/check.scm)           | Test framework based on SRFI-78      | `check`, `check-catch`                                           |
