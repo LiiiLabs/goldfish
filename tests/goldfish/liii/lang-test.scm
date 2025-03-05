@@ -724,10 +724,11 @@
 (check  ($ '() :distinct :collect) 
         => '())
 
-(check ($ '() :reduce + 0) => 0)
-(check ($ '(1 2 3) :reduce + 0) => 6)  
-(check ($ '(2 3 4) :reduce * 1) => 24)  
-(check ($ '(5) :reduce (lambda (x y) (+ x y 10)) 0) => 5)
+(check-catch 'value-error ($ '() :reduce +))
+
+(check ($ '(1 2 3) :reduce +) => 6)  
+(check ($ '(2 3 4) :reduce *) => 24)  
+(check ($ '(5) :reduce (lambda (x y) (+ x y 10))) => 5)
 
 (check (object->string ($ '(1 2 3))) => "(1 2 3)")
 

@@ -4448,21 +4448,27 @@
   <paragraph|rich-list%reduce>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%reduce f init)
+    (define (%reduce f)
 
-    \ \ (reduce f init data))
+    \ \ (if (null? data)
+
+    \ \ \ \ \ \ (value-error "rich-list%reduce: empty list is not allowed to reduce")
+
+    \ \ \ \ \ \ (reduce f '() data)))
 
     \;
   </goldfish-chunk>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check ($ '() :reduce + 0) =\<gtr\> 0)
+    (check-catch 'value-error ($ '() :reduce +))
 
-    (check ($ '(1 2 3) :reduce + 0) =\<gtr\> 6) \ 
+    \;
 
-    (check ($ '(2 3 4) :reduce * 1) =\<gtr\> 24) \ 
+    (check ($ '(1 2 3) :reduce +) =\<gtr\> 6) \ 
 
-    (check ($ '(5) :reduce (lambda (x y) (+ x y 10)) 0) =\<gtr\> 5)
+    (check ($ '(2 3 4) :reduce *) =\<gtr\> 24) \ 
+
+    (check ($ '(5) :reduce (lambda (x y) (+ x y 10))) =\<gtr\> 5)
 
     \;
   </goldfish-chunk>
