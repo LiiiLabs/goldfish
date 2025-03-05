@@ -357,6 +357,12 @@
 (check ((rich-char #x4E2D) :make-string) => "中")
 (check ((rich-char #x1F600) :make-string) => "😀")
 
+(check-true (rich-string :is-type-of ($ "Hello")))
+
+(check-false (rich-string :is-type-of "hello"))
+(check-false (rich-string :is-type-of 1))
+(check-false (rich-string :is-type-of (box 1)))
+
 (check (rich-string :value-of #\a) => "a")
 (check (rich-string :value-of 'a) => "a")
 (check (rich-string :value-of 123) => "123")
@@ -436,6 +442,10 @@
 (let1 v ($ "中文" :to-vector)
   (check (v 0) => (rich-char "中"))
   (check (v 1) => (rich-char "文")))
+
+(check ($ "Hello" :+ " " :+ "World") => "Hello World")
+(check ($ "hello " :+ (box "world")) => "hello world")
+(check-catch 'type-error ($ "hello" :+ 1))
 
 (check ($ "" :strip-prefix "") => ($ ""))
 (check ($ "hello" :strip-prefix "") => ($ "hello"))

@@ -129,6 +129,10 @@
 
 `(define (,class-name msg . args)
 
+(define (@is-type-of obj)
+  (and (case-class? obj)
+       (obj :is-instance-of ',class-name)))
+   
 ,@static-methods
 
 (define (is-normal-function? msg)
@@ -137,6 +141,7 @@
 
 (define (static-dispatcher msg . args)
     (cond
+     ((eq? msg :is-type-of) (apply @is-type-of args))
      ,@(map (lambda (method expected) `((eq? msg ,expected) (apply ,method args)))
             static-method-symbols static-messages)
      (else (value-error "No such static method " msg))))
@@ -208,7 +213,7 @@
   ,this-symbol
 ) ; end of the internal typed define
 
-(if (in? msg (list ,@static-messages))
+(if (in? msg (list ,@static-messages :is-type-of))
     (apply static-dispatcher (cons msg args))
     (apply ,f-make-case-class (cons msg args)))
 
@@ -553,6 +558,15 @@
                         (code (utf8-byte-sequence->code-point (bytevector-copy bv j next-j))))
                    (vector-set! result i (rich-char code))
                    (loop (+ i 1) next-j)))))))
+
+(chained-define (%+ s)
+  (cond
+    ((string? s)
+     (rich-string (string-append data s)))
+    ((rich-string :is-type-of s)
+     (rich-string (string-append data (s :get))))
+    (else
+      (type-error (string-append (object->string s) "is not string or rich-string")))))
 
 (define (%strip-prefix prefix . xs)
   (let ((result (rich-string (string-remove-prefix data prefix))))
