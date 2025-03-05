@@ -667,6 +667,9 @@
   (check (result :collect) 
           => (hash-table 3 '("cat" "dog") 5 '("apple") 6 '("banana"))))
 
+(check (($ '(1 2 3)) :zip '(a b c) :collect) => '((1 . a) (2 . b) (3 . c)))
+(check (($ '(1 2 3)) :zip '(a b) :collect) => '((1 . a) (2 . b)))
+
 (check  ($ '(a b c) :zip-with-index :collect)  
         => '((0 . a) (1 . b) (2 . c)))
 

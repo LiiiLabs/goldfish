@@ -4193,6 +4193,22 @@
     \;
   </goldfish-chunk>
 
+  <paragraph|rich-list%zip>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (chained-define (%zip l) (box (apply map cons (list data l))))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (($ '(1 2 3)) :zip '(a b c) :collect) =\<gtr\> '((1 . a) (2 . b) (3 . c)))
+
+    (check (($ '(1 2 3)) :zip '(a b) :collect) =\<gtr\> '((1 . a) (2 . b)))
+
+    \;
+  </goldfish-chunk>
+
   \;
 
   <paragraph|rich-list%zip-with-index>

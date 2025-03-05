@@ -834,6 +834,8 @@
       group)
   (rich-hash-table group)))
 
+(chained-define (%zip l) (box (apply map cons (list data l))))
+
 (chained-define (%zip-with-index)
   (let loop ((lst data) (idx 0) (result '()))
     (if (null? lst)
