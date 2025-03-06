@@ -2004,17 +2004,15 @@
   目前只支持将英文字母的a-z转换为A-Z，其它字符保持不变。
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%to-upper . xs)
+    (chained-define (%to-upper)
 
-    \ \ (let1 r (rich-char
+    \ \ (rich-char
 
     \ \ \ \ (if (and (\<gtr\>= code-point #x61) (\<less\>= code-point #x7A))
 
-    \ \ \ \ \ \ (bitwise-and code-point #b11011111)
+    \ \ \ \ \ \ \ \ (bitwise-and code-point #b11011111)
 
-    \ \ \ \ \ \ code-point))
-
-    \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ \ \ \ \ \ \ code-point)))
 
     \;
   </goldfish-chunk>
@@ -2040,17 +2038,15 @@
   <paragraph|rich-char%to-lower>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%to-lower . xs)
+    (chained-define (%to-lower)
 
-    \ \ (let1 r (rich-char
+    \ \ (rich-char
 
     \ \ \ \ (if (and (\<gtr\>= code-point #x41) (\<less\>= code-point #x5A))
 
-    \ \ \ \ \ \ (bitwise-ior code-point #b00100000)
+    \ \ \ \ \ \ \ \ (bitwise-ior code-point #b00100000)
 
-    \ \ \ \ \ \ code-point))
-
-    \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ \ \ \ \ \ \ code-point)))
 
     \;
   </goldfish-chunk>
