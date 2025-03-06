@@ -708,13 +708,11 @@
        (let1 cnt (ceiling (/ (- end start) step-size))
          (rich-list (iota cnt start step-size)))))))
 
-(define (@empty . xs)
-  (let1 r (rich-list (list ))
-    (if (null? xs) r (apply r xs))))
+(chained-define (@empty)
+  (rich-list (list )))
 
-(define (@concat lst1 lst2 . xs)
-  (let1 r (rich-list (append (lst1 :collect) (lst2 :collect)))
-    (if (null? xs) r (apply r xs))))
+(chained-define (@concat lst1 lst2)
+  (rich-list (append (lst1 :collect) (lst2 :collect))))
 
 (define (@fill n elem)
   (cond
@@ -788,42 +786,34 @@
 (chained-define (%reverse)
   (rich-list (reverse data)))
     
-  (define (%take x . xs)
-    (typed-define (scala-take (data list?) (n integer?))
-      (cond ((< n 0) '())
-            ((>= n (length data)) data)
-            (else (take data n))))
+(chained-define (%take x)
+  (typed-define (scala-take (data list?) (n integer?))
+    (cond ((< n 0) '())
+          ((>= n (length data)) data)
+          (else (take data n))))
+  (rich-list (scala-take data x)))
 
-    (let1 r (rich-list (scala-take data x))
-      (if (null? xs) r (apply r xs))))
+(chained-define (%drop x)
+  (typed-define (scala-drop (data list?) (n integer?))
+    (cond ((< n 0) data)
+          ((>= n (length data)) '())
+          (else (drop data n))))
+  (rich-list (scala-drop data x)))
 
-(define (%drop x . xs)
-    (typed-define (scala-drop (data list?) (n integer?))
-      (cond ((< n 0) data)
-            ((>= n (length data)) '())
-            (else (drop data n))))
+(chained-define (%take-right x)
+  (typed-define (scala-take-right (data list?) (n integer?))
+    (cond ((< n 0) '())
+          ((>= n (length data)) data)
+          (else (take-right data n))))
+  (rich-list (scala-take-right data x)))
 
-    (let1 r (rich-list (scala-drop data x))
-      (if (null? xs) r (apply r xs))))
+(chained-define (%drop-right x)
+  (typed-define (scala-drop-right (data list?) (n integer?))
+    (cond ((< n 0) data)
+          ((>= n (length data)) '())
+          (else (drop-right data n))))
+  (rich-list (scala-drop-right data x)))
 
-  (define (%take-right x . xs)
-    (typed-define (scala-take-right (data list?) (n integer?))
-      (cond ((< n 0) '())
-            ((>= n (length data)) data)
-            (else (take-right data n))))
-
-    (let1 r (rich-list (scala-take-right data x))
-      (if (null? xs) r (apply r xs))))
-
- (define (%drop-right x . xs)
-    (typed-define (scala-drop-right (data list?) (n integer?))
-      (cond ((< n 0) data)
-            ((>= n (length data)) '())
-            (else (drop-right data n))))
-
-    (let1 r (rich-list (scala-drop-right data x))
-      (if (null? xs) r (apply r xs))))
- 
   (define (%count . xs)
     (cond ((null? xs) (length data))
           ((length=? 1 xs) (count (car xs) data))
@@ -835,13 +825,9 @@
   (define (%fold-right initial f)
     (fold-right f initial data))
 
-(define (%sort-with less-p . xs)
-  (let* 
-    ((sorted-data (list-stable-sort less-p data))
-    (sorted-rich-list (rich-list sorted-data)))
-    (if (null? xs) 
-        sorted-rich-list 
-        (apply sorted-rich-list xs))))
+(chained-define (%sort-with less-p)
+  (let ((sorted-data (list-stable-sort less-p data)))
+        (rich-list sorted-data)))
 
 (define (%group-by func)
   (let ((group (make-hash-table)))
