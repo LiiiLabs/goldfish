@@ -324,6 +324,12 @@
       (- 0 data)
       data))
   
+(define (%sqrt)
+  (if (< data 0)
+      (value-error
+        (format #f "sqrt of negative float is undefined!         ** Got ~a **" data))
+      (sqrt data)))
+
 )
 
 (define-case-class rich-char ((code-point integer?))

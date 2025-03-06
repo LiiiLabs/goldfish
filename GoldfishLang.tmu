@@ -1599,6 +1599,40 @@
     \;
   </goldfish-chunk>
 
+  <section|其余函数>
+
+  <paragraph|rich-float%sqrt>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%sqrt)
+
+    \ \ (if (\<less\> data 0)
+
+    \ \ \ \ \ \ (value-error
+
+    \ \ \ \ \ \ \ \ (format #f "sqrt of negative float is undefined! \ \ \ \ \ \ \ \ ** Got ~a **" data))
+
+    \ \ \ \ \ \ (sqrt data)))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 0.0 :sqrt) =\<gtr\> 0.0) \ \ \ \ \ \ 
+
+    (check ($ 1.0 :sqrt) =\<gtr\> 1.0) \ \ \ \ \ \ 
+
+    (check ($ 1.44 :sqrt) =\<gtr\> 1.2) \ \ \ \ \ \ 
+
+    (check ($ 1.69 :sqrt) =\<gtr\> 1.3) \ \ \ \ \ \ 
+
+    (check-catch 'value-error ($ -1.5 :sqrt))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
   <section|结尾>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>

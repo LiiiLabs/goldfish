@@ -239,6 +239,12 @@
 (check ($ 0.0 :abs) => 0.0)
 (check ($ -1.1 :abs) => 1.1)
 
+(check ($ 0.0 :sqrt) => 0.0)       
+(check ($ 1.0 :sqrt) => 1.0)       
+(check ($ 1.44 :sqrt) => 1.2)       
+(check ($ 1.69 :sqrt) => 1.3)       
+(check-catch 'value-error ($ -1.5 :sqrt))
+
 (check-true ((rich-char #x30) :equals (rich-char #x30)))
 (check-false ((rich-char #x31) :equals (rich-char #x30)))
 
