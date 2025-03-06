@@ -258,15 +258,9 @@
   <paragraph|stack%push>
 
   <\scm-chunk|goldfish/liii/stack.scm|true|true>
-    (define (%push element . es)\ 
+    (chained-define (%push element)
 
-    \ \ (let1 r (stack (cons element data))
-
-    \ \ \ \ (if (null? es)
-
-    \ \ \ \ \ \ \ \ r
-
-    \ \ \ \ \ \ \ \ (apply r es))))
+    \ \ (stack (cons element data)))
 
     \;
   </scm-chunk>

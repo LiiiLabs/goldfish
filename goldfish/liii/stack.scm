@@ -45,11 +45,8 @@
       (stack (set! data (cdr data))))
   (%this))
 
-(define (%push element . es) 
-  (let1 r (stack (cons element data))
-    (if (null? es)
-        r
-        (apply r es))))
+(chained-define (%push element)
+  (stack (cons element data)))
 
 (chained-define (%push! element) 
                 (stack (set! data (cons element data))) 
