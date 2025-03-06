@@ -3094,11 +3094,11 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     ;; Replace the first occurrence of the substring old to new.
 
-    (define (%replace-first old new . xs)
+    (chained-define (%replace-first old new)
 
     \ \ (define (replace-helper str old new start)
 
-    \ \ \ \ (let ((next-pos (%index-of old start)))
+    \ \ \ \ (let \ ((next-pos (%index-of old start)))
 
     \ \ \ \ \ \ (if (= next-pos -1)
 
@@ -3106,19 +3106,13 @@
 
     \ \ \ \ \ \ \ \ \ \ (string-append
 
-    \ \ \ \ \ \ \ \ \ \ \ (substring str 0 next-pos)
+    \ \ \ \ \ \ \ \ \ \ \ \ (substring str 0 next-pos)
 
-    \ \ \ \ \ \ \ \ \ \ \ new
+    \ \ \ \ \ \ \ \ \ \ \ \ new
 
-    \ \ \ \ \ \ \ \ \ \ \ (substring str (+ next-pos (string-length old)))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (substring str (+ next-pos (string-length old)))))))
 
-    \ \ (let ((result (rich-string (replace-helper data old new 0))))
-
-    \ \ \ \ (if (null? xs)
-
-    \ \ \ \ \ \ \ \ result
-
-    \ \ \ \ \ \ \ \ (apply result xs))))
+    \ \ (rich-string (replace-helper data old new 0)))
 
     \;
   </goldfish-chunk>
@@ -3138,7 +3132,7 @@
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     ;; Replace the occurrences of the substring old to new.
 
-    (define (%replace old new . xs)
+    (chained-define (%replace old new)
 
     \ \ (define (replace-helper str old new start)
 
@@ -3148,15 +3142,11 @@
 
     \ \ \ \ \ \ \ \ \ \ str
 
-    \ \ \ \ \ \ \ \ \ \ (replace-helper ((rich-string str) :replace-first old new :get) old new next-pos))))
+    \ \ \ \ \ \ \ \ \ \ (replace-helper ((rich-string str) :replace-first old new :get)
 
-    \ \ (let ((result (rich-string (replace-helper data old new 0))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ old new next-pos))))
 
-    \ \ \ \ (if (null? xs)
-
-    \ \ \ \ \ \ \ \ result
-
-    \ \ \ \ \ \ \ \ (apply result xs))))
+    \ \ (rich-string (replace-helper data old new 0)))
 
     \;
   </goldfish-chunk>

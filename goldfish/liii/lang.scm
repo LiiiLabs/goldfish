@@ -581,31 +581,26 @@
   (rich-string (string-remove-suffix data suffix)))
 
 ;; Replace the first occurrence of the substring old to new.
-(define (%replace-first old new . xs)
+(chained-define (%replace-first old new)
   (define (replace-helper str old new start)
-    (let ((next-pos (%index-of old start)))
+    (let  ((next-pos (%index-of old start)))
       (if (= next-pos -1)
           str
           (string-append
-           (substring str 0 next-pos)
-           new
-           (substring str (+ next-pos (string-length old)))))))
-  (let ((result (rich-string (replace-helper data old new 0))))
-    (if (null? xs)
-        result
-        (apply result xs))))
+            (substring str 0 next-pos)
+            new
+            (substring str (+ next-pos (string-length old)))))))
+  (rich-string (replace-helper data old new 0)))
 
 ;; Replace the occurrences of the substring old to new.
-(define (%replace old new . xs)
+(chained-define (%replace old new)
   (define (replace-helper str old new start)
     (let ((next-pos ((rich-string str) :index-of old start)))
       (if (= next-pos -1)
           str
-          (replace-helper ((rich-string str) :replace-first old new :get) old new next-pos))))
-  (let ((result (rich-string (replace-helper data old new 0))))
-    (if (null? xs)
-        result
-        (apply result xs))))
+          (replace-helper ((rich-string str) :replace-first old new :get)
+                          old new next-pos))))
+  (rich-string (replace-helper data old new 0)))
 
 (define* (%pad-left len (char #\space) . args)
   (let ((result (rich-string (string-pad data len char))))
