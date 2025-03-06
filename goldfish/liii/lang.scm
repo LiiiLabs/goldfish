@@ -930,18 +930,15 @@
        (let1 cnt (ceiling (/ (- end start) step-size))
          (rich-vector (list->vector (iota cnt start step-size))))))))
 
-(define (@empty . xs)
-  (let1 r (rich-vector #())
-    (if (null? xs) r (apply r xs))))
+(chained-define (@empty)
+  (rich-vector #()))
 
-(define (@fill n elem . xs)
+(chained-define (@fill n elem)
   (unless (integer? n)
     (type-error "n must be integer" n))
   (when (< n 0)
     (value-error "n must be non-negative" n))
-
-  (let1 r (rich-vector (make-vector n elem))
-        (if (null? xs) r (apply r xs))))
+  (rich-vector (make-vector n elem)))
 
 (define (%collect) data)
 
@@ -983,14 +980,13 @@
       (option (vector-ref data (- len 1)))
       (none))))
 
-(define (%slice from until . xs)
+(chained-define (%slice from until)
   (let* ((len (vector-length data))
          (start (max 0 from))
          (end (min len until)))
-    (let ((res (if (< start end)
-                 (rich-vector (vector-copy data start end))
-                 (rich-vector :empty))))
-      (if (null? xs) res (apply res xs)))))
+    (if (< start end)
+        (rich-vector (vector-copy data start end))
+        (rich-vector :empty))))
 
 (define (%empty?)
   (= (length data) 0))
@@ -1005,13 +1001,11 @@
 (define (%exists p)
   (vector-any p data))
 
-  (define (%map x . xs)
-    (let1 r (rich-vector (vector-map x data))
-      (if (null? xs) r (apply r xs))))
-  
-  (define (%filter x . xs)
-    (let1 r (rich-vector (vector-filter x data))
-      (if (null? xs) r (apply r xs))))
+  (chained-define (%map x)
+    (rich-vector (vector-map x data)))
+
+  (chained-define (%filter x)
+    (rich-vector (vector-filter x data)))
 
   (define (%for-each x)
     (vector-for-each x data))
@@ -1021,55 +1015,51 @@
           ((length=? 1 xs) (vector-count (car xs) data))
           (else (error 'wrong-number-of-args "rich-vector%count" xs))))
 
-  (define (%take x . xs)
-    (typed-define (scala-take (data vector?) (n integer?))
+(chained-define (%take n)
+  (typed-define (scala-take (data vector?) (n integer?))
+    (cond
+      ((< n 0) (vector))
+      ((>= n (vector-length data)) data)
+      (else
+        (let ((new-vec (make-vector n)))
+          (do ((i 0 (+ i 1)))
+              ((>= i n) new-vec)
+            (vector-set! new-vec i (vector-ref data i)))))))
+  
+  (rich-vector (scala-take data n)))
+
+(chained-define (%take-right n)
+  (typed-define (scala-take-right (data vector?) (n integer?))
+    (let ((len (vector-length data)))
       (cond
         ((< n 0) (vector))
-        ((>= n (vector-length data)) data)
+        ((>= n len) data)
         (else
           (let ((new-vec (make-vector n)))
-            (do ((i 0 (+ i 1)))
-                ((>= i n) new-vec)
-              (vector-set! new-vec i (vector-ref data i)))))))
+            (do ((i (- len n) (+ i 1))
+                 (j 0 (+ j 1)))
+                ((>= j n) new-vec)
+              (vector-set! new-vec j (vector-ref data i))))))))
 
-    (let1 r (rich-vector (scala-take data x))
-      (if (null? xs) r (apply r xs))))
+  (rich-vector (scala-take-right data n)))
 
-  (define (%take-right x . xs)
-    (typed-define (scala-take-right (data vector?) (n integer?))
-      (let ((len (vector-length data)))
-        (cond
-          ((< n 0) (vector))
-          ((>= n len) data)
-          (else
-            (let ((new-vec (make-vector n)))
-              (do ((i (- len n) (+ i 1))
-                   (j 0 (+ j 1)))
-                  ((>= j n) new-vec)
-                (vector-set! new-vec j (vector-ref data i))))))))
+(chained-define (%drop n)
+  (typed-define (scala-drop (data vector?) (n integer?))
+    (cond
+      ((< n 0) data)
+      ((>= n (vector-length data)) (vector))
+      (else (vector-copy data n))))
+  
+  (rich-vector (scala-drop data n)))
 
-    (let1 r (rich-vector (scala-take-right data x))
-      (if (null? xs) r (apply r xs))))
-
-(define (%drop x . xs)
-    (typed-define (scala-drop (data vector?) (n integer?))
-      (cond
-        ((< n 0) data)
-        ((>= n (vector-length data)) (vector))
-        (else (vector-copy data n))))
-        
-    (let1 r (rich-vector (scala-drop data x))
-      (if (null? xs) r (apply r xs))))
-
-(define (%drop-right x . xs)
+(chained-define (%drop-right n)
   (typed-define (scala-drop-right (data vector?) (n integer?))
     (cond
-      ((< n 0) data) 
-      ((>= n (vector-length data)) (vector)) 
-      (else (vector-copy data 0 (- (vector-length data) n))))) 
-
-  (let1 r (rich-vector (scala-drop-right data x))  
-    (if (null? xs) r (apply r xs))))
+      ((< n 0) data)
+      ((>= n (vector-length data)) (vector))
+      (else (vector-copy data 0 (- (vector-length data) n)))))
+  
+  (rich-vector (scala-drop-right data n)))
 
   (define (%fold initial f)
     (vector-fold f initial data))
@@ -1082,11 +1072,8 @@
           ((length=? 1 xs) (count (car xs) (vector->list data)))
           (else (error 'wrong-number-of-args "rich-vector%count" xs))))
 
-(define (%sort-with less-p . xs)
-  (let ((res (rich-vector (vector-stable-sort less-p data))))
-    (if (null? xs)
-      res
-      (apply res xs))))
+(chained-define (%sort-with less-p)
+  (rich-vector (vector-stable-sort less-p data)))
 
 (define (%group-by func)
   (let ((group (make-hash-table)))

@@ -4890,11 +4890,9 @@
   <paragraph|rich-vector@empty>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty . xs)
+    (chained-define (@empty)
 
-    \ \ (let1 r (rich-vector #())
-
-    \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-vector #()))
 
     \;
   </goldfish-chunk>
@@ -4910,7 +4908,7 @@
   <paragraph|rich-vector@fill>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@fill n elem . xs)
+    (chained-define (@fill n elem)
 
     \ \ (unless (integer? n)
 
@@ -4920,11 +4918,7 @@
 
     \ \ \ \ (value-error "n must be non-negative" n))
 
-    \;
-
-    \ \ (let1 r (rich-vector (make-vector n elem))
-
-    \ \ \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-vector (make-vector n elem)))
 
     \;
   </goldfish-chunk>
@@ -5118,7 +5112,7 @@
   <paragraph|rich-vector%slice>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%slice from until . xs)
+    (chained-define (%slice from until)
 
     \ \ (let* ((len (vector-length data))
 
@@ -5126,13 +5120,11 @@
 
     \ \ \ \ \ \ \ \ \ (end (min len until)))
 
-    \ \ \ \ (let ((res (if (\<less\> start end)
+    \ \ \ \ (if (\<less\> start end)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-vector (vector-copy data start end))
+    \ \ \ \ \ \ \ \ (rich-vector (vector-copy data start end))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (rich-vector :empty))))
-
-    \ \ \ \ \ \ (if (null? xs) res (apply res xs)))))
+    \ \ \ \ \ \ \ \ (rich-vector :empty))))
 
     \;
   </scm-chunk>
@@ -5244,19 +5236,15 @@
   <section|高阶函数>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%map x . xs)
+    \ \ (chained-define (%map x)
 
-    \ \ \ \ (let1 r (rich-vector (vector-map x data))
+    \ \ \ \ (rich-vector (vector-map x data)))
 
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \;
 
-    \ \ 
+    \ \ (chained-define (%filter x)
 
-    \ \ (define (%filter x . xs)
-
-    \ \ \ \ (let1 r (rich-vector (vector-filter x data))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ \ \ (rich-vector (vector-filter x data)))
 
     \;
 
@@ -5280,31 +5268,29 @@
   <paragraph|rich-vector%take>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%take x . xs)
+    (chained-define (%take n)
 
-    \ \ \ \ (typed-define (scala-take (data vector?) (n integer?))
+    \ \ (typed-define (scala-take (data vector?) (n integer?))
 
-    \ \ \ \ \ \ (cond
+    \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ ((\<less\> n 0) (vector))
+    \ \ \ \ \ \ ((\<less\> n 0) (vector))
 
-    \ \ \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) data)
+    \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) data)
 
-    \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ (else
 
-    \ \ \ \ \ \ \ \ \ \ (let ((new-vec (make-vector n)))
+    \ \ \ \ \ \ \ \ (let ((new-vec (make-vector n)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (do ((i 0 (+ i 1)))
+    \ \ \ \ \ \ \ \ \ \ (do ((i 0 (+ i 1)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= i n) new-vec)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= i n) new-vec)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-vec i (vector-ref data i)))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-vec i (vector-ref data i)))))))
 
-    \;
+    \ \ 
 
-    \ \ \ \ (let1 r (rich-vector (scala-take data x))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-vector (scala-take data n)))
 
     \;
   </scm-chunk>
@@ -5330,35 +5316,33 @@
   <paragraph|rich-vector%take-right>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    \ \ (define (%take-right x . xs)
+    (chained-define (%take-right n)
 
-    \ \ \ \ (typed-define (scala-take-right (data vector?) (n integer?))
+    \ \ (typed-define (scala-take-right (data vector?) (n integer?))
 
-    \ \ \ \ \ \ (let ((len (vector-length data)))
+    \ \ \ \ (let ((len (vector-length data)))
 
-    \ \ \ \ \ \ \ \ (cond
+    \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ ((\<less\> n 0) (vector))
+    \ \ \ \ \ \ \ \ ((\<less\> n 0) (vector))
 
-    \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= n len) data)
+    \ \ \ \ \ \ \ \ ((\<gtr\>= n len) data)
 
-    \ \ \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ (else
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (let ((new-vec (make-vector n)))
+    \ \ \ \ \ \ \ \ \ \ (let ((new-vec (make-vector n)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (do ((i (- len n) (+ i 1))
+    \ \ \ \ \ \ \ \ \ \ \ \ (do ((i (- len n) (+ i 1))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (j 0 (+ j 1)))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (j 0 (+ j 1)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= j n) new-vec)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\<gtr\>= j n) new-vec)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-vec j (vector-ref data i))))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (vector-set! new-vec j (vector-ref data i))))))))
 
     \;
 
-    \ \ \ \ (let1 r (rich-vector (scala-take-right data x))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-vector (scala-take-right data n)))
 
     \;
   </goldfish-chunk>
@@ -5386,23 +5370,21 @@
   <paragraph|rich-vector%drop>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%drop x . xs)
+    (chained-define (%drop n)
 
-    \ \ \ \ (typed-define (scala-drop (data vector?) (n integer?))
+    \ \ (typed-define (scala-drop (data vector?) (n integer?))
 
-    \ \ \ \ \ \ (cond
+    \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ ((\<less\> n 0) data)
+    \ \ \ \ \ \ ((\<less\> n 0) data)
 
-    \ \ \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) (vector))
+    \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) (vector))
 
-    \ \ \ \ \ \ \ \ (else (vector-copy data n))))
+    \ \ \ \ \ \ (else (vector-copy data n))))
 
-    \ \ \ \ \ \ \ \ 
+    \ \ 
 
-    \ \ \ \ (let1 r (rich-vector (scala-drop data x))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-vector (scala-drop data n)))
 
     \;
   </goldfish-chunk>
@@ -5430,23 +5412,21 @@
   <paragraph|rich-vector%drop-right>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%drop-right x . xs)
+    (chained-define (%drop-right n)
 
     \ \ (typed-define (scala-drop-right (data vector?) (n integer?))
 
     \ \ \ \ (cond
 
-    \ \ \ \ \ \ ((\<less\> n 0) data)\ 
+    \ \ \ \ \ \ ((\<less\> n 0) data)
 
-    \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) (vector))\ 
+    \ \ \ \ \ \ ((\<gtr\>= n (vector-length data)) (vector))
 
-    \ \ \ \ \ \ (else (vector-copy data 0 (- (vector-length data) n)))))\ 
+    \ \ \ \ \ \ (else (vector-copy data 0 (- (vector-length data) n)))))
 
-    \;
+    \ \ 
 
-    \ \ (let1 r (rich-vector (scala-drop-right data x)) \ 
-
-    \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-vector (scala-drop-right data n)))
 
     \;
   </goldfish-chunk>
@@ -5534,15 +5514,9 @@
   <paragraph|rich-vector%sort-with>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%sort-with less-p . xs)
+    (chained-define (%sort-with less-p)
 
-    \ \ (let ((res (rich-vector (vector-stable-sort less-p data))))
-
-    \ \ \ \ (if (null? xs)
-
-    \ \ \ \ \ \ res
-
-    \ \ \ \ \ \ (apply res xs))))
+    \ \ (rich-vector (vector-stable-sort less-p data)))
 
     \;
   </goldfish-chunk>
