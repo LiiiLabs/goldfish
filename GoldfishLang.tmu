@@ -3175,6 +3175,136 @@
     \;
   </goldfish-chunk>
 
+  \;
+
+  <paragraph|rich-string%<code|pad-left>>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define* (%pad-left len (char #\\space) . args)
+
+    \ \ (let ((result (rich-string (string-pad data len char))))
+
+    \ \ \ \ (if (null? args)
+
+    \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ (apply result args))))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((s (rich-string "test")))
+
+    \ \ (check (s :pad-left 5 #\\# :pad-left 6) =\<gtr\> (rich-string " #test")))
+
+    \;
+
+    (let ((s (rich-string "325")))
+
+    \ \ (check (s :pad-left 5) =\<gtr\> (rich-string " \ 325")))
+
+    \;
+
+    (let ((s (rich-string "8871325")))
+
+    \ \ (check (s :pad-left 5) =\<gtr\> (rich-string "71325")))
+
+    \;
+
+    (check \ ($ "abcdef" :slice 2 5 :pad-left 8 #\\-)
+
+    \ \ \ \ \ \ \ \ =\<gtr\> (rich-string "-----cde"))
+
+    \;
+
+    (let ((s (rich-string "12345")))
+
+    \ \ (check (s :pad-left 5) =\<gtr\> (rich-string "12345")))
+
+    \;
+
+    (let ((s (rich-string "")))
+
+    \ \ (check (s :pad-left 3 #\\*) =\<gtr\> (rich-string "***")))
+
+    \;
+
+    (check-catch 'wrong-number-of-args ($ "test" :pad-left 10 #\\- 0 3 5))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <paragraph|rich-string%<code|pad-right>>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define* (%pad-right len (char #\\space) . args)
+
+    \ \ (let ((result (rich-string (string-pad-right data len char))))
+
+    \ \ \ \ (if (null? args)
+
+    \ \ \ \ \ \ \ \ result
+
+    \ \ \ \ \ \ \ \ (apply result args))))
+
+    \;
+  </goldfish-chunk>
+
+  \;
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let ((s (rich-string "test")))
+
+    \ \ (check (s :pad-right 5 #\\# :pad-right 6) =\<gtr\> (rich-string "test# ")))
+
+    \;
+
+    (let ((s (rich-string "abc")))
+
+    \ \ (check (s :pad-right 5) =\<gtr\> (rich-string "abc \ "))) \ 
+
+    \;
+
+    (let ((s (rich-string "123")))
+
+    \ \ (check (s :pad-right 6 #\\*) =\<gtr\> (rich-string "123***"))) \ 
+
+    \;
+
+    (let ((s (rich-string "test")))
+
+    \ \ (check (s :pad-right 4) =\<gtr\> (rich-string "test"))) \ 
+
+    \;
+
+    (let ((s (rich-string "overlength")))
+
+    \ \ (check (s :pad-right 5) =\<gtr\> (rich-string "overl"))) \ 
+
+    \;
+
+    (check \ ($ "abcdefgh" :slice 3 6 :pad-right 6 #\\.)
+
+    \ \ \ \ \ \ \ \ =\<gtr\> (rich-string "def..."))
+
+    \;
+
+    (let ((s (rich-string "")))
+
+    \ \ (check (s :pad-right 3 #\\#) =\<gtr\> (rich-string "###")))
+
+    \;
+
+    (check-catch 'wrong-number-of-args ($ "test" :pad-right 10 #\\- 0 3 5))
+
+    \;
+  </goldfish-chunk>
+
   <section|其余函数>
 
   <paragraph|rich-string%split>

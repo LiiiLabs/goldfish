@@ -497,6 +497,49 @@
 (check ($ "hello" :replace "world" "") => ($ "hello"))
 (check ($ "hello" :replace "l" "L" :strip-prefix "he") => ($ "LLo")) ; chain
 
+(let ((s (rich-string "test")))
+  (check (s :pad-left 5 #\# :pad-left 6) => (rich-string " #test")))
+
+(let ((s (rich-string "325")))
+  (check (s :pad-left 5) => (rich-string "  325")))
+
+(let ((s (rich-string "8871325")))
+  (check (s :pad-left 5) => (rich-string "71325")))
+
+(check  ($ "abcdef" :slice 2 5 :pad-left 8 #\-)
+        => (rich-string "-----cde"))
+
+(let ((s (rich-string "12345")))
+  (check (s :pad-left 5) => (rich-string "12345")))
+
+(let ((s (rich-string "")))
+  (check (s :pad-left 3 #\*) => (rich-string "***")))
+
+(check-catch 'wrong-number-of-args ($ "test" :pad-left 10 #\- 0 3 5))
+
+(let ((s (rich-string "test")))
+  (check (s :pad-right 5 #\# :pad-right 6) => (rich-string "test# ")))
+
+(let ((s (rich-string "abc")))
+  (check (s :pad-right 5) => (rich-string "abc  ")))  
+
+(let ((s (rich-string "123")))
+  (check (s :pad-right 6 #\*) => (rich-string "123***")))  
+
+(let ((s (rich-string "test")))
+  (check (s :pad-right 4) => (rich-string "test")))  
+
+(let ((s (rich-string "overlength")))
+  (check (s :pad-right 5) => (rich-string "overl")))  
+
+(check  ($ "abcdefgh" :slice 3 6 :pad-right 6 #\.)
+        => (rich-string "def..."))
+
+(let ((s (rich-string "")))
+  (check (s :pad-right 3 #\#) => (rich-string "###")))
+
+(check-catch 'wrong-number-of-args ($ "test" :pad-right 10 #\- 0 3 5))
+
 (check ($ "da@liii.pro" :split "@") => #("da" "liii.pro"))
 (check ($ "da@liii.pro" :split ".") => #("da@liii" "pro"))
 (check ($ "test" :split "") => #("t" "e" "s" "t"))

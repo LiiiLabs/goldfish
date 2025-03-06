@@ -609,6 +609,18 @@
         result
         (apply result xs))))
 
+(define* (%pad-left len (char #\space) . args)
+  (let ((result (rich-string (string-pad data len char))))
+    (if (null? args)
+        result
+        (apply result args))))
+
+(define* (%pad-right len (char #\space) . args)
+  (let ((result (rich-string (string-pad-right data len char))))
+    (if (null? args)
+        result
+        (apply result args))))
+
 (define (%split sep)
   (let ((str-len (string-length data))
         (sep-len (string-length sep)))
