@@ -1599,6 +1599,30 @@
     \;
   </goldfish-chunk>
 
+  <section|转换器>
+
+  <paragraph|rich-float%to-string>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%to-string)
+
+    \ \ (number-\<gtr\>string data))
+
+    \;
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 1.1 :to-string) =\<gtr\> "1.1")
+
+    (check ($ 0.0 :to-string) =\<gtr\> "0.0")
+
+    (check ($ -1.2 :to-string) =\<gtr\> "-1.2")
+
+    (check ($ 1.0 :to-string) =\<gtr\> "1.0")
+
+    \;
+  </goldfish-chunk>
+
   <section|其余函数>
 
   <paragraph|rich-float%sqrt>

@@ -324,6 +324,9 @@
       (- 0 data)
       data))
   
+(define (%to-string)
+  (number->string data))
+
 (define (%sqrt)
   (if (< data 0)
       (value-error

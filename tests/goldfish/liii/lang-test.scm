@@ -239,6 +239,11 @@
 (check ($ 0.0 :abs) => 0.0)
 (check ($ -1.1 :abs) => 1.1)
 
+(check ($ 1.1 :to-string) => "1.1")
+(check ($ 0.0 :to-string) => "0.0")
+(check ($ -1.2 :to-string) => "-1.2")
+(check ($ 1.0 :to-string) => "1.0")
+
 (check ($ 0.0 :sqrt) => 0.0)       
 (check ($ 1.0 :sqrt) => 1.0)       
 (check ($ 1.44 :sqrt) => 1.2)       
