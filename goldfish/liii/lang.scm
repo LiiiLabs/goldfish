@@ -686,17 +686,15 @@
       (option '())
       (option (f value))))
 
-(define (%flat-map f . xs)
-  (let1 r (if (null? value)
-              (option '())
-              (f value))
-    (if (null? xs) r (apply r xs))))
+(chained-define (%flat-map f)
+  (if (null? value)
+      (option '())
+      (f value)))
 
-(define (%filter pred . xs)
-    (let1 r (if (or (null? value) (not (pred value)))
-               (option '())
-               (option value))
-      (if (null? xs) r (apply r xs))))
+(chained-define (%filter pred)
+  (if (or (null? value) (not (pred value)))
+      (option '())
+      (option value)))
 
 )
 

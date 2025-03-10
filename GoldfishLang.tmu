@@ -3708,15 +3708,13 @@
   <paragraph|option%flatmap>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%flat-map f . xs)
+    (chained-define (%flat-map f)
 
-    \ \ (let1 r (if (null? value)
+    \ \ (if (null? value)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
+    \ \ \ \ \ \ (option '())
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (f value))
-
-    \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ \ \ \ \ (f value)))
 
     \;
   </goldfish-chunk>
@@ -3724,15 +3722,13 @@
   <paragraph|option%filter>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (%filter pred . xs)
+    (chained-define (%filter pred)
 
-    \ \ \ \ (let1 r (if (or (null? value) (not (pred value)))
+    \ \ (if (or (null? value) (not (pred value)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option '())
+    \ \ \ \ \ \ (option '())
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (option value))
-
-    \ \ \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ \ \ \ \ (option value)))
 
     \;
   </goldfish-chunk>
