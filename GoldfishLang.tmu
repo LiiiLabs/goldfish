@@ -4383,7 +4383,33 @@
     \;
   </scm-chunk>
 
-  \;
+  <paragraph|rich-list%length>
+
+  <\scm-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%length)
+
+    \ \ (length data))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    <code|<\code*>
+      (check ($ '() :length) =\> 0)
+
+      (check ($ '(1) :length) =\> 1)
+
+      (check ($ '(1 2) :length) =\> 2)
+
+      (check ($ '(1 2 3) :length) =\> 3)
+
+      (check ($ '(1 2 3 4 5) :length) =\> 5)
+
+      (check ($ '(1 2 3 4 5 6 7 8 9 10) :length) =\> 10)
+
+      \;
+    </code*>>
+  </scm-chunk>
 
   <paragraph|rich-list%fold>
 

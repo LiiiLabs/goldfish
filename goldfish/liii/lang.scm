@@ -826,6 +826,9 @@
           ((length=? 1 xs) (count (car xs) data))
           (else (error 'wrong-number-of-args "rich-list%count" xs))))
 
+(define (%length)
+  (length data))
+
   (define (%fold initial f)
     (fold f initial data))
 

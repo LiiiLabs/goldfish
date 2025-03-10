@@ -738,6 +738,13 @@
 (check ((rich-list (list 1 2 3)) :count) => 3)
 (check ((rich-list (list 1 2 3)) :count (cut > <> 1)) => 2)
 
+(check ($ '() :length) => 0)
+(check ($ '(1) :length) => 1)
+(check ($ '(1 2) :length) => 2)
+(check ($ '(1 2 3) :length) => 3)
+(check ($ '(1 2 3 4 5) :length) => 5)
+(check ($ '(1 2 3 4 5 6 7 8 9 10) :length) => 10)
+
 (let ((lst (rich-list '(1 2 3 4 5))))
   (check (lst :fold 0 +) => 15)
   (check (lst :fold '() (lambda (x acc) (cons x acc))) => '(5 4 3 2 1))
