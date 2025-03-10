@@ -5944,11 +5944,9 @@
   <paragraph|rich-hash-table@empty>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
-    (define (@empty . xs)
+    (chained-define (@empty)
 
-    \ \ (let1 r (rich-hash-table (make-hash-table))
-
-    \ \ \ \ (if (null? xs) r (apply r xs))))
+    \ \ (rich-hash-table (make-hash-table)))
 
     \;
   </goldfish-chunk>

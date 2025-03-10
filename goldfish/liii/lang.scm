@@ -1162,9 +1162,8 @@
 (define-case-class rich-hash-table ((data hash-table?))
   (define (%collect) data)
 
-(define (@empty . xs)
-  (let1 r (rich-hash-table (make-hash-table))
-    (if (null? xs) r (apply r xs))))
+(chained-define (@empty)
+  (rich-hash-table (make-hash-table)))
 
 (define (%find pred?)
   (define iter (make-iterator data))
