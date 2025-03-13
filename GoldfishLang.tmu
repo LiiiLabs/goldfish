@@ -137,6 +137,10 @@
 
   <paragraph*|@>
 
+  \;
+
+  <strong|概述>
+
   宏<scm|@>提供类似Scala语法的部分应用（Partial Application）功能，详情参考SFRI 26中宏<scm|cute>的说明。
 
   宏<scm|@>的关键在于<strong|宏展开时的静态求值>，而非运行时的动态绑定。简短的来说，<scm|@>只在宏展开时求值并绑定占位符，而不是每次被调用时重新求值。
@@ -213,11 +217,11 @@
 
   <strong|设计意义>
 
-  <\itemize>
+  <\itemize-minus>
     <item><strong|性能优化>：若部分参数是常量或昂贵的计算，<scm|@> 可避免重复求值。
 
     <item><strong|语义确定性>：部分应用的结果在定义时即固定，不受后续环境变化影响。
-  </itemize>
+  </itemize-minus>
 
   \;
 
@@ -355,9 +359,69 @@
     \;
   </goldfish-chunk>
 
-  <section|typed-define>
+  <section|定义函数>
 
   <paragraph|typed-define>
+
+  \;
+
+  <strong|概述>
+
+  <scm|typed-define> 是一个宏，用于在 Goldfish Scheme 中定义带有类型检查和默认值的函数。它允许你在定义函数时指定每个参数的类型和可选的默认值，并在函数调用时自动进行类型检查。如果参数类型不匹配，<scm|typed-define> 会抛出一个类型错误。
+
+  \;
+
+  <strong|语法>
+
+  <\goldfish-code>
+    (typed-define (name (param1 type1? [default1]) (param2 type2? [default2]) ...) body ...)
+  </goldfish-code>
+
+  <\itemize-minus>
+    <item><strong|name>: 函数的名称。
+
+    <item><strong|param1, param2, ...>: 函数的参数名。
+
+    <item><strong|type1?, type2?, ...>: 参数的谓词函数，用于检查参数的类型。例如，<scm|integer?> 用于检查参数是否为整数。
+
+    <item><strong|[default1], [default2], ...>: 可选的默认值。如果调用函数时未提供该参数，则使用默认值。
+
+    <item><strong|body>: 函数的主体部分。
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <\enumerate-numeric>
+    <item><with|font-series|bold|类型检查>: 在函数调用时，<scm|typed-define> 会自动检查每个参数的类型是否符合预期。如果不符合，会抛出一个类型错误。
+
+    <item><with|font-series|bold|默认值>: 如果参数有默认值，调用函数时可以省略该参数，函数会自动使用默认值。
+
+    <item><with|font-series|bold|错误信息>: 如果类型检查失败，<scm|typed-define> 会生成详细的错误信息，指出哪个参数的类型不匹配。
+  </enumerate-numeric>
+
+  \;
+
+  <strong|设计意义>\ 
+
+  <\itemize-minus>
+    <item><strong|类型安全>: <scm|typed-define> 提供了编译时的类型检查，确保函数在运行时不会因为类型错误而崩溃。
+
+    <item><strong|灵活性>: 通过支持默认值，<scm|typed-define> 使得函数调用更加灵活，减少了冗余代码。
+
+    <item><strong|可读性>: 通过显式地指定参数类型和默认值，代码的可读性和可维护性得到了提升。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现细节>\ 
+
+  <scm|typed-define> 在宏展开时会生成类型检查代码，并在运行时对每个参数进行类型验证。如果参数类型不匹配，会抛出一个类型错误，错误信息中会包含参数名、期望的类型和实际的值。
+
+  \;
+
+  <strong|实现函数>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-macro (typed-define name-and-params body . rest)
@@ -445,6 +509,8 @@
     \;
   </goldfish-chunk>
 
+  <strong|测试用例>
+
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (typed-define (person (name string? "Bob") (age integer?))
 
@@ -465,11 +531,51 @@
 
   <paragraph|define-case-class><index|define-case-class>
 
-  <scm|define-case-class>用于在Goldfish Scheme定义类似Scala的样本类。
+  \;
 
-  样本类对象实际上是函数，该函数的第一个参数可以是字段或者是方法，字段统一使用<scm|'field>表示，方法统一使用<scm|:method>表示。实例方法采用<scm|%>作为前缀，静态方法采用<scm|@>作为前缀，内部方法没有<scm|@>和<scm|%>前缀。比如<scm|(bob :to-string)>实际上调用的是bob对象的实例方法<scm|%to-string>。静态方法只能通过样本类名调用，例如<scm|(person :default)>。实例方法只能通过该样本类构造的实例调用，例如 <scm|(bob :to-string)>。内部方法只能在定义实例方法时调用。例如
+  <strong|概述>
 
-  <\scm-code>
+  <scm|define-case-class>是一个宏，用于在 Goldfish Scheme 中定义类似 Scala 的样本类（Case Class）。样本类是不可变的数据结构，支持字段访问、方法调用、链式操作以及自动生成的实例方法（如 <with|font-family|tt|equals>、<with|font-family|tt|to-string> 等）。
+
+  样本类对象实际上是函数，该函数的第一个参数可以是字段或者是方法，字段统一使用<scm|'field>表示，方法统一使用<scm|:method>表示。实例方法采用<scm|%>作为前缀，静态方法采用<scm|@>作为前缀，内部方法没有<scm|@>和<scm|%>前缀。比如<scm|(bob :to-string)>实际上调用的是bob对象的实例方法<scm|%to-string>。静态方法只能通过样本类名调用，例如<scm|(person :default)>。实例方法只能通过该样本类构造的实例调用，例如 <scm|(bob :to-string)>。内部方法只能在定义实例方法时调用。
+
+  \;
+
+  <strong|语法>
+
+  <\goldfish-code>
+    (define-case-class class-name ((field1 type1?) (field2 type2?) ...)
+
+    \ \ (define (@static-method-name ...) ...) \ ; 静态方法
+
+    \ \ (define (%instance-method-name ...) ...) \ ; 实例方法
+
+    \ \ (define (internal-method-name ...) ...) \ ; 内部方法
+
+    \ \ ...
+
+    )
+  </goldfish-code>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|class-name>: 样本类的名称。
+
+    <item><with|font-series|bold|field1, field2, ...>: 样本类的字段名。
+
+    <item><with|font-series|bold|type1?, type2?, ...>: 字段的类型谓词函数，用于类型检查。例如，<scm|string?> 用于检查字段是否为字符串。
+
+    <item><with|font-series|bold|@static-method-name>: 静态方法，以 <scm|@> 开头，只能通过类名调用。
+
+    <item><with|font-series|bold|%instance-method-name>: 实例方法，以 <scm|%> 开头，只能通过实例调用。
+
+    <item><with|font-series|bold|internal-method-name>: 内部方法，没有前缀，只能在样本类内部调用。
+  </itemize-minus>
+
+  \;
+
+  <strong|示例>
+
+  <\goldfish-code>
     (define-case-class my-vector ((vec vector?) (size integer?))
 
     \ \ (define (@empty) (my-vector #() 0))
@@ -499,7 +605,7 @@
     \ \ (check (vec :at 0) =\<gtr\> 1)
 
     \ \ (check-catch 'value-error (vec :at 3)))
-  </scm-code>
+  </goldfish-code>
 
   在此例中，<scm|@empty> 是一个静态方法，<scm|%at> 是一个实例方法，<scm|check-bound> 是一个内部方法。
 
@@ -528,6 +634,56 @@
   </scm-code>
 
   样本类的默认构造函数有类型校验，但不做任何值校验。如果需要做值校验，那么需要使用同名的函数覆盖<scm|define-case-class>生成的默认实现。该同名函数可称为该样本类的伴生函数。
+
+  \;
+
+  <\strong>
+    功能
+  </strong>
+
+  <\enumerate>
+    <item><with|font-series|bold|字段访问>: 样本类的字段可以通过字段名直接访问，例如 (<scm|instance 'field-name>)。
+
+    <item><with|font-series|bold|方法调用>: 样本类支持实例方法和静态方法。实例方法通过 :<scm|method-name> 调用，静态方法通过 <scm|class-name :method-name> 调用。
+
+    <item><with|font-series|bold|链式操作>: 实例方法支持链式调用，例如 (<verbatim|instance :method1 :method2>)。
+
+    <item><with|font-series|bold|自动生成方法>: <verbatim|define-case-class> 会自动生成以下实例方法：
+
+    <\itemize-minus>
+      <item><verbatim|%equals>: 用于比较两个样本类实例是否相等。
+
+      <item><verbatim|%to-string>: 用于将样本类实例转换为字符串。
+
+      <item><verbatim|%apply>: 用于处理未命中的字段或方法调用。
+    </itemize-minus>
+
+    <item><with|font-series|bold|类型检查>: 样本类的构造函数会自动检查字段的类型，如果类型不匹配，会抛出类型错误。
+  </enumerate>
+
+  \;
+
+  <strong|设计意义>\ 
+
+  <\itemize-minus>
+    <item>不可变性: 样本类的实例是不可变的，确保了数据的一致性和线程安全。
+
+    <item>链式操作: 支持链式调用，使得代码更加简洁和易读。
+
+    <item>类型安全: 构造函数会自动进行类型检查，确保字段的类型正确。
+
+    <item>扩展性: 支持自定义静态方法和实例方法，可以根据需要扩展样本类的功能。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现细节>
+
+  <scm|define-case-class> 在宏展开时会生成样本类的构造函数、字段访问器、实例方法和静态方法。实例方法通过分发器（dispatcher）实现，支持链式调用和动态方法查找。
+
+  \;
+
+  <strong|实现函数>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-macro (define-case-class class-name fields . methods)
@@ -776,6 +932,8 @@
 
     \;
   </goldfish-chunk>
+
+  <strong|测试用例>
 
   测试：不带用户自定义方法的样本类person
 
