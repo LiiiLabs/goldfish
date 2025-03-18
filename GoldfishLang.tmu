@@ -529,6 +529,20 @@
 
   <section|样本类>
 
+  <paragraph|参考>
+
+  <\itemize-minus>
+    <item><scm|define-case-class>: 用于定义样本类的宏。
+
+    <item><scm|case-class?>: 用于判断某个对象是否为样本类。
+
+    <item><scm|==> 和 <scm|!=>: 样本类的相等性判断函数。
+
+    <item><scm|object-<textgreater|>string>: 样本类的字符串表示函数。
+  </itemize-minus>
+
+  \;
+
   <paragraph|define-case-class><index|define-case-class>
 
   \;
@@ -1141,7 +1155,83 @@
 
   <paragraph|case-class?>
 
-  case class的前两个方法必须是<scm|:is-instance-of>和<scm|:equals>。
+  <strong|概述>
+
+  <scm|case-class?> 是一个用于判断某个对象是否为 <with|font-series|bold|样本类（Case Class）> 的谓词函数。样本类是 Goldfish Scheme 中一种特殊的数据结构，类似于 Scala 中的 Case Class，主要用于表示不可变的数据对象。样本类对象通常由 <scm|define-case-class> 宏定义生成。
+
+  \;
+
+  <\strong>
+    函数签名
+  </strong>
+
+  <\scm>
+    (case-class? x) =\<gtr\> boolean?
+  </scm>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|参数>:
+
+    <\itemize-minus>
+      <item><scm|<with|font-family|tt|x>> : 任意类型的对象。
+    </itemize-minus>
+
+    <item><with|font-series|bold|返回值>:
+
+    <\itemize-minus>
+      <item>如果<scm|<verbatim| x>> 是一个样本类对象，返回 <scm|#t>。
+
+      <item>否则，返回 <scm|#f>。
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <scm|c<verbatim|ase-class?>> 通过检查对象的内部结构来判断其是否为样本类。样本类对象的前两个方法必须是 <scm|:is-instance-of> 和 <scm|<with|font-family|tt|:equals>>，这是样本类的标志性特征。
+
+  \;
+
+  <strong|实现机制>
+
+  <scm|case-class?> 的实现基于以下逻辑：\ 
+
+  <\enumerate>
+    <item>检查对象是否为过程（<scm|procedure?>）。\ 
+
+    <item>获取过程的源代码（<scm|procedure-source>）。\ 
+
+    <item>检查源代码的前两个条件分支是否为 <scm|:is-instance-of> 和 <scm|<with|font-family|tt|:equals>>。\ 
+
+    <item>如果满足上述条件，则判定为样本类。
+  </enumerate>
+
+  \;
+
+  <strong|注意事项>
+
+  <\itemize-minus>
+    <item><scm|case-class?> 仅适用于由 <scm|define-case-class> 宏生成的样本类对象。
+
+    <item>对于匿名函数、内置函数或普通自定义函数，<scm|case-class?> 会返回 <scm|#f>。
+  </itemize-minus>
+
+  \;
+
+  <strong|设计意义>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|类型安全>: 提供了一种类型检查机制，确保对象符合样本类的规范。
+
+    <item><with|font-series|bold|模式匹配支持>: 样本类通常用于模式匹配，<scm|case-class?> 可以帮助识别这些对象。
+
+    <item><with|font-series|bold|代码可读性>: 通过明确的谓词函数，增强代码的可读性和可维护性。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现函数>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (case-class? x)
@@ -1169,45 +1259,9 @@
     \;
   </goldfish-chunk>
 
-  匿名函数、内置函数、简单的自定义函数都不是case class，需要正确返回。
+  <strong|测试用例>
 
-  <\session|goldfish|default>
-    <\output>
-      Liii Scheme 17.11.8 Enterprise Edition by LiiiLabs
-
-      implemented on S7 Scheme (11.2, 30-Dec-2024)
-    </output>
-
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      (procedure-source (lambda (x) x))
-    <|unfolded-io>
-      <goldfish-result|(lambda (x) x)>
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      (procedure-source +)
-    <|unfolded-io>
-      <goldfish-result|()>
-    </unfolded-io>
-
-    <\unfolded-io>
-      \<gtr\>\ 
-    <|unfolded-io>
-      (procedure-source identity)
-    <|unfolded-io>
-      <goldfish-result|(lambda (x) x)>
-    </unfolded-io>
-
-    <\input>
-      \<gtr\>\ 
-    <|input>
-      \;
-    </input>
-  </session>
+  测试：匿名函数、内置函数或普通自定义函数会返回 <scm|#f>。
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check-false (case-class? (lambda (x) x)))
@@ -1219,19 +1273,97 @@
     \;
   </scm-chunk>
 
+  测试：样本类判断
+
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
-    (check-true (case-class? (person "Bob" 21)))
+    (let ((bob (person "Bob" 21)))
+
+    \ \ (check-true (case-class? bob))
+
+    \ \ (check-false (case-class? +))
+
+    \ \ (check-false (case-class? 42))
+
+    )
 
     \;
   </scm-chunk>
 
   <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
 
-  如果两个参数都是样本类，那么使用样本类的相等性判断；
+  <strong|概述>
 
-  如果某个参数为非样本类，我们使用box函数装箱，之后再进行比较；
+  <scm|==> 是一个用于判断两个对象是否相等的函数。它支持对 <with|font-series|bold|样本类（Case Class）>对象的特殊处理，同时也支持对普通对象的比较。如果两个对象都是样本类，则调用样本类的 <scm|:equals> 方法进行比较；如果其中一个对象是样本类，另一个不是，则会将非样本类对象装箱后再进行比较；如果两个对象都不是样本类，则使用 <scm|equal?> 进行比较。
 
-  如果两个样本都不是样本类，则使用<scm|equal?>判断。
+  \;
+
+  <strong|函数签名>
+
+  <\scm>
+    (== left right) =\<gtr\> boolean?
+  </scm>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|参数>:
+
+    <\itemize-minus>
+      <item><scm|left>: 任意类型的对象。
+
+      <item><scm|right>: 任意类型的对象。
+    </itemize-minus>
+
+    <item><with|font-series|bold|返回值>:
+
+    <\itemize>
+      <item>如果 <scm|left> 和 <scm|right> 相等，返回 <scm|#t>。
+
+      <item>否则，返回 <scm|#f>。
+    </itemize>
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <scm|==> 函数的比较逻辑如下：\ 
+
+  <\enumerate-numeric>
+    <item>如果 <with|font-family|tt|<scm|left>> 和 <scm|right> 都是样本类，则调用 <with|font-family|tt|<scm|left>> 的 <scm|:equals> 方法进行比较。
+
+    <item>如果 <with|font-family|tt|<scm|left>> 是样本类而 <with|font-family|tt|<scm|right>> 不是，则将 <with|font-family|tt|<scm|right>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|left>> 的 <with|font-family|tt|<scm|:equals>> 方法。
+
+    <item>如果 <with|font-family|tt|<scm|right>> 是样本类而 <with|font-family|tt|<scm|left>> 不是，则将 <with|font-family|tt|<scm|left>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|right>> 的 <scm|:equals> 方法。
+
+    <item>如果两个对象都不是样本类，则使用 <scm|equal?> 进行比较。
+  </enumerate-numeric>
+
+  \;
+
+  <strong|注意事项>
+
+  <\itemize-minus>
+    <item><scm|==> 函数对样本类对象的比较是基于 <scm|:equals> 方法的实现，因此样本类的相等性判断可以自定义。
+
+    <item>对于非样本类对象，<scm|==> 的行为与 <scm|equal?> 一致。
+
+    <item>装箱操作通过 <scm|box> 函数实现，将普通对象转换为样本类对象。
+  </itemize-minus>
+
+  \;
+
+  <strong|设计意义>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|统一比较接口>: 提供了一种统一的比较方式，无论是样本类还是普通对象，都可以使用 <scm|==> 进行比较。
+
+    <item><with|font-series|bold|扩展性>: 样本类可以通过实现自定义的 <scm|:equals> 方法来定义自己的相等性逻辑。
+
+    <item><with|font-series|bold|兼容性>: 支持对普通对象的比较，确保与现有代码的兼容性。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现函数>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define (== left right)
@@ -1257,7 +1389,7 @@
     \;
   </scm-chunk>
 
-  \;
+  <strong|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)
@@ -1279,7 +1411,79 @@
 
   <paragraph|!=><index|!=><scm|(x y) =\<gtr\> bool>
 
-  ==的布尔逻辑取反。
+  <strong|概述>
+
+  <scm|!=> 是一个用于判断两个对象是否不相等的函数。它是 <scm|==> 函数的逻辑取反，即如果 <scm|==> 返回 <scm|#t>，则 <scm|!=> 返回 <scm|#f>，反之亦然。<scm|!=> 支持对 <with|font-series|bold|样本类（Case Class）> 对象的特殊处理，同时也支持对普通对象的比较。
+
+  \;
+
+  <strong|函数签名>
+
+  <\scm>
+    (!= left right) =\<gtr\> boolean?
+  </scm>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|参数>:
+
+    <\itemize-minus>
+      <item><scm|left>: 任意类型的对象。
+
+      <item><scm|right>: 任意类型的对象。
+    </itemize-minus>
+
+    <item><with|font-series|bold|返回值>:
+
+    <\itemize-minus>
+      <item>如果 <scm|left> 和 <scm|right> 不相等，返回 <scm|#t>。
+
+      <item>否则，返回 <scm|#f>。
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <scm|!=> 函数的比较逻辑与 <scm|==> 完全相反：\ 
+
+  <\enumerate-numeric>
+    <item>如果 <with|font-family|tt|<scm|left>> 和 <scm|right> 都是样本类，则调用 <with|font-family|tt|<scm|left>> 的 <scm|:equals> 方法进行比较,并取反结果。
+
+    <item>如果 <with|font-family|tt|<scm|left>> 是样本类而 <with|font-family|tt|<scm|right>> 不是，则将 <with|font-family|tt|<scm|right>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|left>> 的 <with|font-family|tt|<scm|:equals>> 方法,并取反结果。
+
+    <item>如果 <with|font-family|tt|<scm|right>> 是样本类而 <with|font-family|tt|<scm|left>> 不是，则将 <with|font-family|tt|<scm|left>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|right>> 的 <scm|:equals> 方法,并取反结果。
+
+    <item>如果两个对象都不是样本类，则使用 <scm|equal?> 进行比较,并取反结果。
+  </enumerate-numeric>
+
+  \;
+
+  <paragraph|注意事项>
+
+  <\itemize-minus>
+    <item><scm|!=> 是 <scm|==> 的逻辑取反，因此其行为完全依赖于 <scm|==> 的实现。
+
+    <item>对于样本类对象，<with|font-family|tt|<scm|!=>> 的行为取决于样本类的 <scm|:equals> 方法的实现。
+
+    <item>对于非样本类对象，<with|font-family|tt|<scm|!=>> 的行为与 <scm|equal?> 的取反结果一致。
+  </itemize-minus>
+
+  \;
+
+  <paragraph|设计意义>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|逻辑完整性>: 提供了与 <scm|==> 对称的不等性判断函数，完善了比较操作的逻辑。
+
+    <item><with|font-series|bold|代码简洁性>: 通过 <with|font-family|tt|<scm|!=>> 可以更直观地表达不等性判断，避免使用 <scm|(not (== x y))> 的冗余写法。
+
+    <item><with|font-series|bold|一致性>: 与 <scm|==> 共享相同的比较逻辑，确保行为的一致性。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现函数>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define (!= left right)
@@ -1288,6 +1492,8 @@
 
     \;
   </scm-chunk>
+
+  <strong|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check (== (list 1 2) (list 1 2)) =\<gtr\> #t)

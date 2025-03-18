@@ -150,7 +150,11 @@
 (check-false (case-class? +))
 (check-false (case-class? identity))
 
-(check-true (case-class? (person "Bob" 21)))
+(let ((bob (person "Bob" 21)))
+  (check-true (case-class? bob))
+  (check-false (case-class? +))
+  (check-false (case-class? 42))
+)
 
 (check (== (list 1 2) (list 1 2)) => #t)
 (check (!= (list 1 2) (list 1 2)) => #f)
