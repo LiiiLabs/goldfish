@@ -146,14 +146,15 @@
 (define (zip . lists)
   (apply map list lists))
 
-(define (fold f initial l)
-  (when (not (procedure? f))
-    (error 'type-error "The first param must be a procedure"))
-  (if (null? l)
+(define (fold f initial . lists)
+  (unless (procedure? f)
+    (error 'type-error "expected procedure, got ~S" f))
+  (display lists)
+  (if (or (null? lists) (any null? lists))
       initial
-      (fold f
-            (f (car l) initial)
-            (cdr l))))
+      (apply fold f
+            (apply f (append (map car lists) (list initial)))
+            (map cdr lists))))
 
 (define (fold-right f initial . lists)
   (unless (procedure? f)

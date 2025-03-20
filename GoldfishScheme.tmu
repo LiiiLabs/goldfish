@@ -7632,21 +7632,23 @@
   <scm|fold>是一个高阶函数，它接受三个参数：一个函数、一个初始值和一个列表，将函数累积地应用到一个列表的所有元素上，从左到右，从而将列表折叠成一个单一的值。
 
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
-    (define (fold f initial l)
+    (define (fold f initial . lists)
 
-    \ \ (when (not (procedure? f))
+    \ \ (unless (procedure? f)
 
-    \ \ \ \ (error 'type-error "The first param must be a procedure"))
+    \ \ \ \ (error 'type-error "expected procedure, got ~S" f))
 
-    \ \ (if (null? l)
+    \ \ (display lists)
+
+    \ \ (if (or (null? lists) (any null? lists))
 
     \ \ \ \ \ \ initial
 
-    \ \ \ \ \ \ (fold f
+    \ \ \ \ \ \ (apply fold f
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (f (car l) initial)
+    \ \ \ \ \ \ \ \ \ \ \ \ (apply f (append (map car lists) (list initial)))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (cdr l))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (map cdr lists))))
 
     \;
   </scm-chunk>
