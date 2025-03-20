@@ -7638,8 +7638,6 @@
 
     \ \ \ \ (error 'type-error "expected procedure, got ~S" f))
 
-    \ \ (display lists)
-
     \ \ (if (or (null? lists) (any null? lists))
 
     \ \ \ \ \ \ initial
@@ -7713,6 +7711,22 @@
     \ \ \ \ \ \ \ \ '(a b 1 2 3 4))
 
     \ \ =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  对于多个列表：
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fold + 0 '(1 2 3) '(4 5 6)) =\<gtr\> 21)
+
+    (check (fold + 0 '(1 2 3 4) '(10 20 30)) =\<gtr\> 66)
+
+    (check (fold list '() '(1 2 3) '(a b c)) =\<gtr\> '(3 c (2 b (1 a ()))))
+
+    (check-catch 'type-error (fold 0 + '(1 2 3) 'a))
 
     \;
   </scm-chunk>

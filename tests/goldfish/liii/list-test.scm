@@ -189,6 +189,11 @@
         '(a b 1 2 3 4))
   => 2)
 
+(check (fold + 0 '(1 2 3) '(4 5 6)) => 21)
+(check (fold + 0 '(1 2 3 4) '(10 20 30)) => 66)
+(check (fold list '() '(1 2 3) '(a b c)) => '(3 c (2 b (1 a ()))))
+(check-catch 'type-error (fold 0 + '(1 2 3) 'a))
+
 (check (fold-right + 0 '(1 2 3 4)) => 10)
 
 (check (fold-right + 0 '()) => 0)

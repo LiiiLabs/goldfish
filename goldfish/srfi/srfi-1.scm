@@ -149,7 +149,6 @@
 (define (fold f initial . lists)
   (unless (procedure? f)
     (error 'type-error "expected procedure, got ~S" f))
-  (display lists)
   (if (or (null? lists) (any null? lists))
       initial
       (apply fold f
