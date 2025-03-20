@@ -175,31 +175,15 @@
             (f head (recur (car l) (cdr l)))
             head))))
 
-(define append-map
-  (lambda (proc . lists)
-    (unless (procedure? proc)
-      (error 'type-error "expected procedure, got ~S" proc))
-    (for-each 
-      (lambda (lst)
-        (unless (list? lst)
-          (error 'type-error "expected list, got ~S" lst)))
-      lists)
-
-    (define (append-reverse a b)
-      (let rev ((a a) (res b))
-        (if (null? a)
-            res
-            (rev (cdr a) (cons (car a) res)))))
-
-    (let loop ((lists lists)
-               (result '()))
-      (if (any null? lists)
-          (reverse result)
-          (let* ((current-elements (map car lists))
-                 (next-lists      (map cdr lists))
-                 (new-sublist     (apply proc current-elements)))
-            (loop next-lists
-                  (append-reverse new-sublist result)))))))
+(define (append-map proc . lists)
+  (unless (procedure? proc)
+    (error 'type-error "expected procedure, got ~S" proc))
+  (for-each 
+    (lambda (lst)
+      (unless (list? lst)
+        (error 'type-error "expected list, got ~S" lst)))
+    lists)
+  (apply append (apply map proc lists)))
 
 (define (filter pred l)
   (let recur ((l l))
