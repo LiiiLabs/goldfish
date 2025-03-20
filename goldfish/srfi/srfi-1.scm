@@ -155,13 +155,14 @@
             (f (car l) initial)
             (cdr l))))
 
-(define (fold-right f initial l)
-  (if (null? l)
-    initial
-    (f (car l)
-        (fold-right f
-                    initial
-                    (cdr l)))))
+(define (fold-right f initial . lists)
+  (unless (procedure? f)
+    (error 'type-error "expected procedure, got ~S" f))
+  (if (or (null? lists) (any null? lists))
+      initial
+      (apply f 
+            (append (map car lists)
+                    (list (apply fold-right f initial (map cdr lists)))))))
 
 (define (reduce f initial l)
   (if (null-list? l) initial

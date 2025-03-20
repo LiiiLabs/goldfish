@@ -7720,19 +7720,21 @@
   <scm|fold-right>与<scm|fold>类似，不同的是，<scm|fold-right>是从右到左折叠。
 
   <\scm-chunk|goldfish/srfi/srfi-1.scm|true|true>
-    (define (fold-right f initial l)
+    (define (fold-right f initial . lists)
 
-    \ \ (if (null? l)
+    \ \ (unless (procedure? f)
 
-    \ \ \ \ initial
+    \ \ \ \ (error 'type-error "expected procedure, got ~S" f))
 
-    \ \ \ \ (f (car l)
+    \ \ (if (or (null? lists) (any null? lists))
 
-    \ \ \ \ \ \ \ \ (fold-right f
+    \ \ \ \ \ \ initial
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ initial
+    \ \ \ \ \ \ (apply f\ 
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (cdr l)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (append (map car lists)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list (apply fold-right f initial (map cdr lists)))))))
 
     \;
   </scm-chunk>
