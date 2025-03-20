@@ -207,6 +207,11 @@
 
 (check (fold-right cons () '(1 2 3 4)) => '(1 2 3 4))
 
+(check (fold-right + 0 '(1 2 3) '(4 5 6)) => 21)
+(check (fold-right + 0 '(1 2 3 4) '(10 20 30)) => 66)
+(check (fold-right list '() '(1 2 3) '(a b c)) => '(1 a (2 b (3 c ()))))
+(check-catch 'type-error (fold-right 0 + '(1 2 3) 'a))
+
 (check (reduce + 0 '(1 2 3 4)) => 10)
 (check (reduce + 0 '()) => 0)
 

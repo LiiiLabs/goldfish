@@ -7815,6 +7815,22 @@
     \;
   </scm-chunk>
 
+  \;
+
+  对于多个列表：
+
+  <\scm-chunk|tests/goldfish/liii/list-test.scm|true|true>
+    (check (fold-right + 0 '(1 2 3) '(4 5 6)) =\<gtr\> 21)
+
+    (check (fold-right + 0 '(1 2 3 4) '(10 20 30)) =\<gtr\> 66)
+
+    (check (fold-right list '() '(1 2 3) '(a b c)) =\<gtr\> '(1 a (2 b (3 c ()))))
+
+    (check-catch 'type-error (fold-right 0 + '(1 2 3) 'a))
+
+    \;
+  </scm-chunk>
+
   <paragraph|reduce><index|reduce>
 
   <scm|reduce>与<scm|fold>类似，但有微妙且关键的不同。只有在列表为空列表时，才会使用这个初始值。在列表不是空列表时，则把列表的<scm|\<less\>car\<gtr\>>部分取出作为<scm|fold>的初始值，又把列表的<scm|\<less\>cdr\<gtr\>>部分取出作为<scm|fold>的列表。
