@@ -271,13 +271,14 @@
 
 (define (box x)
   (cond ((integer? x) (rich-integer x))
+        ((rational? x) (rich-rational x))
         ((float? x) (rich-float x))
         ((char? x) (rich-char (char->integer x)))
         ((string? x) (rich-string x))
         ((list? x) (rich-list x))
         ((vector? x) (rich-vector x))
         ((hash-table? x) (rich-hash-table x))
-        (else (type-error "box: x must be integer?, float?, char?, string?, list?, vector?, hash-table?"))))
+        (else (type-error "box: x must be integer?, rational?, float?, char?, string?, list?, vector?, hash-table?"))))
 
 (define ($ x . xs)
   (if (null? xs) (box x) (apply (box x) xs)))
@@ -313,6 +314,17 @@
         (format #f "sqrt of negative integer is undefined!         ** Got ~a **" data))
       (inexact->exact (floor (sqrt data)))))
 
+)
+
+(define-case-class rich-rational ((data rational?))
+
+(define (%get) data)
+
+(define (%abs) 
+  (if (< data 0)
+      (- 0 data)
+      data))
+  
 )
 
 (define-case-class rich-float ((data float?))

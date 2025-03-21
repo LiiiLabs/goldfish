@@ -237,6 +237,14 @@
 (check ($ (rich-integer :max-value) :sqrt) => 3037000499)
 (check-catch 'value-error ($ -1 :sqrt))
 
+(check ($ 1/3 :get) => 1/3)
+(check ($ 0 :get) => 0)
+(check ($ -1/3 :get) => -1/3)
+
+(check ($ 1/3 :abs) => 1/3)
+(check ($ 0.0 :abs) => 0.0)
+(check ($ -1/3 :abs) => 1/3)
+
 (check ($ 12.2 :get) => 12.2)
 
 (check ($ 1.1 :abs) => 1.1)
