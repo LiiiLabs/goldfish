@@ -192,6 +192,24 @@
       (display* "hello world" "\n")))
   => "hello world\n")
 
+(let1 bob (person "Bob" 21)
+  (check (object->string bob) => "(person :name \"Bob\" :age 21)"))
+
+(check (object->string 42) => "42")
+(check (object->string "hello") => "\"hello\"")
+(check (object->string #\a) => "#\\a")
+(check (object->string '(1 2 3)) => "(1 2 3)")
+(check (object->string #(1 2 3)) => "#(1 2 3)")
+
+(check (box 42) => (rich-integer 42))
+(check (box 3.14) => (rich-float 3.14))
+(check (box #\a) => (rich-char 97))
+(check (box "hello") => (rich-string "hello"))
+(check (box '(1 2 3)) => (rich-list '(1 2 3)))
+(check (box #(1 2 3)) => (rich-vector #(1 2 3)))
+(check (box (hash-table 'a 1 'b 2)) => (rich-hash-table (hash-table 'a 1 'b 2)))
+(check-catch 'type-error (box #t))
+
 (check ($ 1 :to 3) => '(1 2 3))
 (check ($ "hello world" :replace "world" "suger" :index-of "suger") => 6)
 (check ($ '(1 2 3) :empty?) => #f)

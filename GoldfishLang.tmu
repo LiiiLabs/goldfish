@@ -371,7 +371,7 @@
 
   \;
 
-  <strong|语法>
+  <strong|函数签名>
 
   <\goldfish-code>
     (typed-define (name (param1 type1? [default1]) (param2 type2? [default2]) ...) body ...)
@@ -538,7 +538,15 @@
 
     <item><scm|==> 和 <scm|!=>: 样本类的相等性判断函数。
 
+    <item><scm|chained-define>: 简化了在样本类中定义方法的语法，使方法可以链式调用。
+
+    <item><scm|display*>: 正确处理样本类对象
+
     <item><scm|object-<textgreater|>string>: 样本类的字符串表示函数。
+
+    <item><verbatim|box>: 将基础类型的值装箱为样本类的函数。
+
+    <item><scm|$>: 用于简化样本类的创建和操作。
   </itemize-minus>
 
   \;
@@ -555,7 +563,7 @@
 
   \;
 
-  <strong|语法>
+  <strong|函数签名>
 
   <\goldfish-code>
     (define-case-class class-name ((field1 type1?) (field2 type2?) ...)
@@ -1155,6 +1163,8 @@
 
   <paragraph|case-class?>
 
+  \;
+
   <strong|概述>
 
   <scm|case-class?> 是一个用于判断某个对象是否为 <with|font-series|bold|样本类（Case Class）> 的谓词函数。样本类是 Goldfish Scheme 中一种特殊的数据结构，类似于 Scala 中的 Case Class，主要用于表示不可变的数据对象。样本类对象通常由 <scm|define-case-class> 宏定义生成。
@@ -1173,13 +1183,13 @@
     <item><with|font-series|bold|参数>:
 
     <\itemize-minus>
-      <item><scm|<with|font-family|tt|x>> : 任意类型的对象。
+      <item><scm|x> : 任意类型的对象。
     </itemize-minus>
 
     <item><with|font-series|bold|返回值>:
 
     <\itemize-minus>
-      <item>如果<scm|<verbatim| x>> 是一个样本类对象，返回 <scm|#t>。
+      <item>如果 <scm|x> 是一个样本类对象，返回 <scm|#t>。
 
       <item>否则，返回 <scm|#f>。
     </itemize-minus>
@@ -1189,7 +1199,7 @@
 
   <strong|功能>
 
-  <scm|c<verbatim|ase-class?>> 通过检查对象的内部结构来判断其是否为样本类。样本类对象的前两个方法必须是 <scm|:is-instance-of> 和 <scm|<with|font-family|tt|:equals>>，这是样本类的标志性特征。
+  <scm|case-class?> 通过检查对象的内部结构来判断其是否为样本类。样本类对象的前两个方法必须是 <scm|:is-instance-of> 和 <scm|:equals>，这是样本类的标志性特征。
 
   \;
 
@@ -1202,7 +1212,7 @@
 
     <item>获取过程的源代码（<scm|procedure-source>）。\ 
 
-    <item>检查源代码的前两个条件分支是否为 <scm|:is-instance-of> 和 <scm|<with|font-family|tt|:equals>>。\ 
+    <item>检查源代码的前两个条件分支是否为 <scm|:is-instance-of> 和 <scm|:equals>。\ 
 
     <item>如果满足上述条件，则判定为样本类。
   </enumerate>
@@ -1289,7 +1299,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|==><index|==><scm|(x y) =\<gtr\> bool>
+  <paragraph|==><index|==>
+
+  \;
 
   <strong|概述>
 
@@ -1327,15 +1339,13 @@
 
   <scm|==> 函数的比较逻辑如下：\ 
 
-  <\enumerate-numeric>
-    <item>如果 <with|font-family|tt|<scm|left>> 和 <scm|right> 都是样本类，则调用 <with|font-family|tt|<scm|left>> 的 <scm|:equals> 方法进行比较。
+  <item>如果 <scm|left> 和 <scm|right> 都是样本类，则调用 <scm|left> 的 <scm|:equals> 方法进行比较。
 
-    <item>如果 <with|font-family|tt|<scm|left>> 是样本类而 <with|font-family|tt|<scm|right>> 不是，则将 <with|font-family|tt|<scm|right>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|left>> 的 <with|font-family|tt|<scm|:equals>> 方法。
+  <item>如果 <scm|left> 是样本类而 <scm|right> 不是，则将 <scm|right> 用 <scm|box> 函数装箱后调用 <scm|left> 的 <scm|:equals> 方法。
 
-    <item>如果 <with|font-family|tt|<scm|right>> 是样本类而 <with|font-family|tt|<scm|left>> 不是，则将 <with|font-family|tt|<scm|left>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|right>> 的 <scm|:equals> 方法。
+  <item>如果 <scm|right> 是样本类而 <scm|left> 不是，则将 <scm|left> 用 <scm|box> 函数装箱后调用 <scm|right> 的 <scm|:equals> 方法。
 
-    <item>如果两个对象都不是样本类，则使用 <scm|equal?> 进行比较。
-  </enumerate-numeric>
+  <item>如果两个对象都不是样本类，则使用 <scm|equal?> 进行比较。
 
   \;
 
@@ -1409,7 +1419,9 @@
     \;
   </scm-chunk>
 
-  <paragraph|!=><index|!=><scm|(x y) =\<gtr\> bool>
+  <paragraph|!=><index|!=>
+
+  \;
 
   <strong|概述>
 
@@ -1448,35 +1460,35 @@
   <scm|!=> 函数的比较逻辑与 <scm|==> 完全相反：\ 
 
   <\enumerate-numeric>
-    <item>如果 <with|font-family|tt|<scm|left>> 和 <scm|right> 都是样本类，则调用 <with|font-family|tt|<scm|left>> 的 <scm|:equals> 方法进行比较,并取反结果。
+    <item>如果 <scm|left> 和 <scm|right> 都是样本类，则调用 <scm|left> 的 <scm|:equals> 方法进行比较,并取反结果。
 
-    <item>如果 <with|font-family|tt|<scm|left>> 是样本类而 <with|font-family|tt|<scm|right>> 不是，则将 <with|font-family|tt|<scm|right>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|left>> 的 <with|font-family|tt|<scm|:equals>> 方法,并取反结果。
+    <item>如果 <scm|left> 是样本类而 <scm|right> 不是，则将 <scm|right> 用 <scm|box> 函数装箱后调用 <scm|left> 的 <scm|:equals> 方法,并取反结果。
 
-    <item>如果 <with|font-family|tt|<scm|right>> 是样本类而 <with|font-family|tt|<scm|left>> 不是，则将 <with|font-family|tt|<scm|left>> 用 <scm|box> 函数装箱后调用 <with|font-family|tt|<scm|right>> 的 <scm|:equals> 方法,并取反结果。
+    <item>如果 <scm|right> 是样本类而 <scm|left> 不是，则将 <scm|left> 用 <scm|box> 函数装箱后调用 <scm|right> 的 <scm|:equals> 方法,并取反结果。
 
     <item>如果两个对象都不是样本类，则使用 <scm|equal?> 进行比较,并取反结果。
   </enumerate-numeric>
 
   \;
 
-  <paragraph|注意事项>
+  <strong|注意事项>
 
   <\itemize-minus>
     <item><scm|!=> 是 <scm|==> 的逻辑取反，因此其行为完全依赖于 <scm|==> 的实现。
 
-    <item>对于样本类对象，<with|font-family|tt|<scm|!=>> 的行为取决于样本类的 <scm|:equals> 方法的实现。
+    <item>对于样本类对象，<scm|!=> 的行为取决于样本类的 <scm|:equals> 方法的实现。
 
-    <item>对于非样本类对象，<with|font-family|tt|<scm|!=>> 的行为与 <scm|equal?> 的取反结果一致。
+    <item>对于非样本类对象，<scm|!=> 的行为与 <scm|equal?> 的取反结果一致。
   </itemize-minus>
 
   \;
 
-  <paragraph|设计意义>
+  <strong|设计意义>
 
   <\itemize-minus>
     <item><with|font-series|bold|逻辑完整性>: 提供了与 <scm|==> 对称的不等性判断函数，完善了比较操作的逻辑。
 
-    <item><with|font-series|bold|代码简洁性>: 通过 <with|font-family|tt|<scm|!=>> 可以更直观地表达不等性判断，避免使用 <scm|(not (== x y))> 的冗余写法。
+    <item><with|font-series|bold|代码简洁性>: 通过 <scm|!=> 可以更直观地表达不等性判断，避免使用 <scm|(not (== x y))> 的冗余写法。
 
     <item><with|font-series|bold|一致性>: 与 <scm|==> 共享相同的比较逻辑，确保行为的一致性。
   </itemize-minus>
@@ -1507,6 +1519,40 @@
 
   <paragraph|chained-define><index|chained-define>
 
+  \;
+
+  <strong|概述>
+
+  <scm|chained-define> 是一个用于在 Goldfish Scheme 中定义支持链式调用的函数的宏。它简化了在样本类（case class）中定义方法的语法，使得方法可以返回当前对象（<scm|%this>），从而支持链式调用。
+
+  \;
+
+  <strong|函数签名>
+
+  <\scm>
+    (chained-define (method-name param1 param2 ...) body ...)
+  </scm>
+
+  <\itemize-minus>
+    <item><strong|参数>
+
+    <\itemize-minus>
+      <item><scm|method-name>: 方法名，通常以 <scm|%> 开头表示实例方法。
+
+      <item><scm|param1 param2 ...>: 方法的参数列表。
+
+      <item><scm|body ...>: 方法的主体部分。
+    </itemize-minus>
+
+    <item><strong|返回值>
+
+    <scm|chained-define> 生成的函数会自动返回当前对象（<scm|%this>），除非在方法主体中显式返回其他值。这使得方法调用可以链式进行。
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
   可以在 case class 中更方便地定义支持链式调用的函数。例如
 
   <\scm-code>
@@ -1521,7 +1567,7 @@
     \ \ \ \ \ \ (apply (%this) xs)))
   </scm-code>
 
-  可以用 chained-define 简化为
+  可以用 <scm|chained-define> 简化为
 
   <\scm-code>
     (chained-define (%set! index value)
@@ -1530,6 +1576,22 @@
 
     \ \ (%this))
   </scm-code>
+
+  \;
+
+  <strong|设计意义>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|链式调用>: <scm|chained-define> 使得方法调用可以链式进行，简化了代码的书写和阅读。
+
+    <item><with|font-series|bold|自动返回 <scm|%this>>: 在方法主体中不需要显式返回 <scm|%this>，<scm|chained-define> 会自动处理。
+
+    <item><with|font-series|bold|简化方法定义>: 通过 <scm|chained-define>，可以更简洁地定义支持链式调用的方法。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现函数>
 
   <\scm-chunk|goldfish/liii/lang.scm|true|true>
     (define-macro (chained-define head . body)
@@ -1550,6 +1612,8 @@
 
     \;
   </scm-chunk>
+
+  <strong|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (let ()
@@ -1589,7 +1653,57 @@
     \;
   </scm-chunk>
 
-  <paragraph|display*><index|display*><scm|(x y z ...) =\<gtr\> \<less\>#unspecified\<gtr\>>
+  <paragraph|display*><index|display*>
+
+  \;
+
+  <strong|概述>
+
+  <scm|display*> 是 Goldfish Scheme 中用于展示多个对象的函数。它是 <scm|display> 函数的增强版，能够正确处理样本类（case class）对象，并且可以接受多个参数。<scm|display*> 会依次展示每个参数，并且会自动处理样本类对象的展示格式。
+
+  \;
+
+  <strong|函数签名>
+
+  <\scm>
+    (display* x y z ...) =\<gtr\> \<less\>#unspecified\<gtr\>
+  </scm>
+
+  <\itemize-minus>
+    <item><strong|参数>
+
+    <\itemize-minus>
+      <item><scm|x>, <scm|y>, <scm|z>, ...：任意数量的参数，可以是任意类型的对象，包括样本类、字符串、数字等。
+    </itemize-minus>
+
+    <item><strong|返回值>
+
+    <\itemize-minus>
+      <item>返回 <scm|<textless|>#unspecified\<gtr\>>，表示该函数主要用于副作用（展示内容），不返回具体的值。
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <scm|display*> 函数会依次展示每个参数。如果参数是样本类对象，<scm|display*> 会调用样本类的 <scm|:to-string> 方法来获取其字符串表示形式，然后展示该字符串。如果参数不是样本类对象，则直接展示该对象。
+
+  \;
+
+  <\strong>
+    注意事项
+  </strong>
+
+  <\itemize-minus>
+    <item><scm|display*> 不会自动添加换行符，如果需要换行，可以手动添加 <scm|"\\n">。
+
+    <item><scm|display*> 适用于需要展示多个对象的场景，特别是当这些对象中包含样本类时。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现函数>
 
   <scm|display*>可以正确展示样本类，以及接受多个参数，是<scm|display>的加强版。
 
@@ -1609,7 +1723,7 @@
     \;
   </scm-chunk>
 
-  \;
+  <strong|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check
@@ -1627,7 +1741,67 @@
 
   <paragraph|object-\<gtr\>string>
 
-  基于S7的实现，新增对样本类的支持。
+  \;
+
+  <strong|概述>
+
+  <verbatim|object-<textgreater|>string> 是 Goldfish Scheme 中用于将任意对象转换为字符串表示的函数。它基于 S7 Scheme 的<scm| object-<textgreater|>string> 实现，并新增了对样本类（case class）的支持。如果对象是样本类，<scm|object-<textgreater|>string> 会调用样本类的 <scm|:to-string> 方法来获取其字符串表示；否则，直接调用 S7 的 <scm|object-<textgreater|>string> 函数。
+
+  \;
+
+  <strong|函数签名>
+
+  <\scm>
+    (object-\<gtr\>string x) =\<gtr\> string?
+  </scm>
+
+  <\itemize-minus>
+    <item><strong|参数>
+
+    <\itemize-minus>
+      <item><scm|x>：任意类型的对象，可以是样本类、字符串、数字、字符、列表、向量等。
+    </itemize-minus>
+
+    <item><strong|返回值>
+
+    <\itemize-minus>
+      <item>返回一个字符串，表示对象的字符串形式。
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <scm|object-<textgreater|>string> 函数用于将对象转换为字符串。它的行为如下：\ 
+
+  <\enumerate-numeric>
+    <item>如果对象是样本类（通过 <scm|case-class?> 判断），则调用样本类的 <scm|:to-string> 方法获取其字符串表示。
+
+    <item>如果对象不是样本类，则调用 S7 Scheme 的 <scm|object-<textgreater|>string> 函数来获取其字符串表示。
+  </enumerate-numeric>
+
+  \;
+
+  <\strong>
+    注意事项
+  </strong>
+
+  <\itemize-minus>
+    <item><scm|object-<textgreater|>string> 是通用的对象转换函数，适用于所有类型的对象。
+
+    <item>对于样本类，<scm|object-<textgreater|>string> 依赖于样本类实现的 <scm|:to-string> 方法，因此样本类需要正确实现该方法。
+  </itemize-minus>
+
+  \;
+
+  <strong|设计意义>
+
+  <verbatim|object-<textgreater|>string> 提供了一种统一的机制，用于将对象转换为字符串表示。它特别适用于调试、日志记录和展示对象内容的场景。通过支持样本类，<scm|object-<textgreater|>string> 能够更好地与 Goldfish Scheme 的样本类系统集成。
+
+  \;
+
+  <strong|实现函数>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define s7-object-\<gtr\>string object-\<gtr\>string)
@@ -1645,7 +1819,137 @@
     \;
   </goldfish-chunk>
 
+  <strong|测试用例>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (let1 bob (person "Bob" 21)
+
+    \ \ (check (object-\<gtr\>string bob) =\<gtr\> "(person :name \\"Bob\\" :age 21)"))
+
+    \;
+
+    (check (object-\<gtr\>string 42) =\<gtr\> "42")
+
+    (check (object-\<gtr\>string "hello") =\<gtr\> "\\"hello\\"")
+
+    (check (object-\<gtr\>string #\\a) =\<gtr\> "#\\\\a")
+
+    (check (object-\<gtr\>string '(1 2 3)) =\<gtr\> "(1 2 3)")
+
+    (check (object-\<gtr\>string #(1 2 3)) =\<gtr\> "#(1 2 3)")
+
+    \;
+  </goldfish-chunk>
+
   <paragraph|box>
+
+  \;
+
+  <strong|概述>
+
+  <scm|box> 是 Goldfish Scheme 中用于将基础类型的值装箱为样本类（case class）的函数。它将整数、浮点数、字符、字符串、列表、向量和哈希表等基础类型的值转换为对应的样本类对象。通过装箱，基础类型的值可以享受样本类的功能，例如链式调用、类型检查和丰富的操作方法。
+
+  \;
+
+  <strong|函数签名>
+
+  <\scm>
+    (box x) =\<gtr\> case-class?
+  </scm>
+
+  <\itemize-minus>
+    <item><strong|参数>
+
+    <\itemize-minus>
+      <item><scm|x>：需要装箱的值，支持以下类型：
+
+      <\itemize-minus>
+        <item>整数（<scm|integer?>）
+
+        <item>浮点数（<scm|float?>）
+
+        <item>字符（<scm|char?>）
+
+        <item>字符串（<scm|string?>）
+
+        <item>列表（<scm|list?>）
+
+        <item>向量（<scm|vector?>）
+
+        <item>哈希表（<scm|hash-table?>）
+      </itemize-minus>
+    </itemize-minus>
+
+    <item><strong|返回值>
+
+    <\itemize-minus>
+      <item>返回一个样本类对象，具体类型取决于输入值的类型：
+
+      <\itemize-minus>
+        <item>整数 \<rightarrow\> <scm|rich-integer>
+
+        <item>浮点数 \<rightarrow\> <scm|rich-float>
+
+        <item>字符 \<rightarrow\> <scm|rich-char>
+
+        <item>字符串 \<rightarrow\> <scm|rich-string>
+
+        <item>列表 \<rightarrow\> <scm|rich-list>
+
+        <item>向量 \<rightarrow\> <scm|rich-vector>
+
+        <item>哈希表 \<rightarrow\> <scm|rich-hash-table>
+      </itemize-minus>
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <scm|box> 函数根据输入值的类型，将其转换为对应的样本类对象。具体规则如下：\ 
+
+  <\enumerate-numeric>
+    <item>如果 <scm|x> 是整数，返回 <scm|rich-integer> 样本类。
+
+    <item>如果 <scm|x> 是浮点数，返回 <scm|rich-float> 样本类。
+
+    <item>如果 <scm|x> 是字符，返回 <scm|rich-char> 样本类。
+
+    <item>如果 <scm|x> 是字符串，返回 <scm|rich-string> 样本类。
+
+    <item>如果 <scm|x> 是列表，返回 <scm|rich-list> 样本类。
+
+    <item>如果 <scm|x> 是向量，返回 <scm|rich-vector> 样本类。
+
+    <item>如果 <scm|x> 是哈希表，返回 <scm|rich-hash-table> 样本类。
+
+    <item>如果 <scm|x> 是其他类型，抛出类型错误
+  </enumerate-numeric>
+
+  \;
+
+  <\strong>
+    注意事项
+  </strong>
+
+  <\itemize-minus>
+    <item><scm|box> 仅支持特定的基础类型，其他类型会抛出类型错误。
+
+    <item>装箱后的对象可以使用样本类的功能，例如链式调用和丰富的操作方法。
+
+    <item><scm|box> 是隐式类型转换的核心机制，常用于简化代码和增强表达力。
+  </itemize-minus>
+
+  \;
+
+  <strong|设计意义>
+
+  <scm|box> 提供了一种简单的方式，将基础类型的值转换为样本类对象，从而享受样本类的功能。它是 Goldfish Scheme 中隐式类型转换的核心机制，能够显著简化代码并增强表达力。通过 <scm|box>，开发者可以更方便地操作基础类型的数据。
+
+  \;
+
+  <strong|实现函数>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (box x)
@@ -1669,9 +1973,117 @@
     \;
   </goldfish-chunk>
 
-  <paragraph|$ 语法糖>
+  <strong|测试用例>
 
-  $语法糖将第一个参数装箱（boxing），得到一个样本类，并将剩下的参数作为样本类的参数。该语法糖简化了语法，同时避免了隐式转换。
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check (box 42) =\<gtr\> (rich-integer 42))
+
+    (check (box 3.14) =\<gtr\> (rich-float 3.14))
+
+    (check (box #\\a) =\<gtr\> (rich-char 97))
+
+    (check (box "hello") =\<gtr\> (rich-string "hello"))
+
+    (check (box '(1 2 3)) =\<gtr\> (rich-list '(1 2 3)))
+
+    (check (box #(1 2 3)) =\<gtr\> (rich-vector #(1 2 3)))
+
+    (check (box (hash-table 'a 1 'b 2)) =\<gtr\> (rich-hash-table (hash-table 'a 1 'b 2)))
+
+    (check-catch 'type-error (box #t))
+
+    \;
+  </goldfish-chunk>
+
+  <paragraph|$>
+
+  \;
+
+  <strong|概述>
+
+  <scm|$> 是 Goldfish Scheme 中的一个语法糖，用于简化样本类（case class）的创建和操作。它将第一个参数装箱（boxing）为样本类，并将剩余的参数作为样本类的方法调用参数。<scm|$> 语法糖的核心目的是简化代码，避免显式调用 <scm|box> 函数，同时支持链式调用。
+
+  \;
+
+  <strong|函数签名>
+
+  <\scm>
+    ($ x . xs) =\<gtr\> case-class?
+  </scm>
+
+  <\itemize-minus>
+    <item><strong|参数>
+
+    <\itemize-minus>
+      <item><scm|x>：需要装箱的值，支持以下类型：
+
+      <\itemize-minus>
+        <item>整数（<scm|integer?>）
+
+        <item>浮点数（<scm|float?>）
+
+        <item>字符（<scm|char?>）
+
+        <item>字符串（<scm|string?>）
+
+        <item>列表（<scm|list?>）
+
+        <item>向量（<scm|vector?>）
+
+        <item>哈希表（<scm|hash-table?>）
+      </itemize-minus>
+
+      <item><scm|xs>：可选参数，作为样本类的方法调用参数。
+    </itemize-minus>
+
+    <item><strong|返回值>
+
+    <\itemize-minus>
+      <item>返回一个样本类对象，具体类型取决于 <scm|x> 的类型。
+
+      <item>如果提供了 <scm|xs>，则返回调用样本类方法后的结果。
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <\strong>
+    功能
+  </strong>
+
+  <scm|$> 语法糖的行为如下：\ 
+
+  <\enumerate-numeric>
+    <item>将第一个参数 <scm|x> 装箱为样本类对象（通过 <scm|box> 函数）。
+
+    <item>如果提供了剩余参数 <scm|xs>，则将 <scm|xs> 作为样本类的方法调用参数，返回调用结果。
+
+    <item>如果没有提供 <scm|xs>，则直接返回装箱后的样本类对象。
+  </enumerate-numeric>
+
+  \;
+
+  <\strong>
+    注意事项
+  </strong>
+
+  <\itemize-minus>
+    <item><scm|$> 语法糖仅支持可以被 <scm|box> 函数处理的类型（整数、浮点数、字符、字符串、列表、向量、哈希表）。
+
+    <item><scm|$> 语法糖支持链式调用，可以在一行代码中完成多个操作。
+
+    <item>如果 <scm|x> 是样本类对象，<scm|$> 会直接使用该对象，而不会重新装箱。
+  </itemize-minus>
+
+  \;
+
+  <strong|设计意义>
+
+  <scm|$> 语法糖是 Goldfish Scheme 中隐式类型转换的核心机制之一。它通过简化样本类的创建和操作，显著提升了代码的简洁性和可读性。<scm|$> 语法糖特别适用于需要频繁操作样本类的场景，例如数据处理、字符串操作和集合操作。通过 <scm|$>，开发者可以更自然地表达复杂的操作逻辑。
+
+  \;
+
+  <strong|实现函数>
 
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define ($ x . xs)
@@ -1680,6 +2092,8 @@
 
     \;
   </goldfish-chunk>
+
+  <strong|测试用例>
 
   <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check ($ 1 :to 3) =\<gtr\> '(1 2 3))
