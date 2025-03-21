@@ -1551,6 +1551,28 @@
 
   <paragraph|inexact?>
 
+  判断一个数是否为不精确数。
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    (check-false (inexact? 42)) \ \ \ \ \ \ \ \ \ \ \ \ ;整数
+
+    (check-false (inexact? 3/4)) \ \ \ \ \ \ \ \ \ \ \ ;有理数
+
+    (check-true (inexact? 3.14)) \ \ \ \ \ \ \ \ \ \ \ ;浮点数
+
+    (check-true (inexact? 1.0e3)) \ \ \ \ \ \ \ \ \ \ ;指数
+
+    (check-true (inexact? 1+2i)) \ \ \ \ \ \ \ \ \ \ \ ;复数
+
+    (check-true (inexact? (+ 1.0 2.0))) \ \ \ \ ;运算
+
+    (check-true (inexact? +inf.0)) \ \ \ \ \ \ \ \ \ ;特殊数值
+
+    ;(check-false (inexact? e3)) \ \ \ \ \ \ \ \ \ \ \ \ ;前缀
+
+    \;
+  </scm-chunk>
+
   <paragraph|exact-integer?>
 
   <paragraph|exact>
