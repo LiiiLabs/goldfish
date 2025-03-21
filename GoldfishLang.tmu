@@ -1913,7 +1913,33 @@
     \;
   </goldfish-chunk>
 
-  \;
+  <chapter|rich-rational>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-case-class rich-rational ((data rational?))
+
+    \;
+  </goldfish-chunk>
+
+  <section|选择器>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%get) data)
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ (inexact(/ 1 3)) :get) =\<gtr\> (inexact(/ 1 3)))
+  </scm-chunk>
+
+  <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
 
   <chapter|rich-float>
 

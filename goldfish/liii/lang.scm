@@ -315,6 +315,12 @@
 
 )
 
+(define-case-class rich-rational ((data rational?))
+
+(define (%get) data)
+
+)
+
 (define-case-class rich-float ((data float?))
                    
 (define (%get) data)
