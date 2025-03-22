@@ -2125,6 +2125,66 @@
 
   <chapter|rich-integer>
 
+  <scm|rich-integer> 是 Goldfish Scheme 中的一个样本类（case class），用于封装整数并提供一系列操作和转换方法。该模块旨在增强 Scheme 中整数类型的功能，使其能够更方便地进行数值操作、类型转换和谓词判断。
+
+  <section|基本结构>
+
+  <paragraph|rich-integer>
+
+  \;
+
+  <strong|概述>
+
+  <scm|rich-integer> 是一个样本类，其构造函数接受一个整数作为参数，并将其封装在样本类中。通过样本类的机制，<scm|rich-integer> 提供了丰富的实例方法和静态方法。
+
+  \;
+
+  <strong|样本类定义>
+
+  <\verbatim>
+    (define-case-class rich-integer ((data integer?))
+  </verbatim>
+
+  <\itemize-minus>
+    <item><strong|关键点解析>
+
+    <\itemize-minus>
+      <item><strong|<scm|define-case-class>>: 这是 Goldfish Scheme 中用于定义样本类的宏。样本类是一种特殊的函数，它封装了数据，并提供了丰富的实例方法和静态方法。
+
+      <item><strong|<scm|data>>: 这是 <scm|rich-integer> 样本类的唯一字段，类型为 <scm|integer?>，表示封装在样本类中的整数值。
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <subparagraph|示例>
+
+  <\scm>
+    (let ((x ($ 42))) \ ; 创建一个 rich-integer 实例，封装整数 42
+
+    \ \ (x :get)) \ \ \ \ \ \ \ ; 返回 42
+  </scm>
+
+  \;
+
+  在这个示例中，<scm|$ 42> 创建了一个 <scm|rich-integer> 实例，封装了整数 <scm|42>。通过调用 <scm|:get> 方法，我们可以获取封装的整数值。
+
+  \;
+
+  <strong|样本类的特性>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|封装性>: <scm|rich-integer> 封装了一个整数 <scm|data>，并通过样本类的机制提供了对该整数的访问和操作方法。
+
+    <item><with|font-series|bold|扩展性>: 通过样本类的机制，<scm|rich-integer> 可以定义丰富的实例方法和静态方法，扩展了 Scheme 中整数类型的功能。
+
+    <item><with|font-series|bold|类型安全>: <scm|rich-integer> 的构造函数会自动进行类型检查，确保传入的参数是一个整数。
+  </itemize-minus>
+
+  \;
+
+  <strong|实现函数>
+
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define-case-class rich-integer ((data integer?))
 
@@ -2133,8 +2193,66 @@
 
   <section|选择器>
 
+  <paragraph|rich-integer%get>
+
+  \;
+
+  <strong|概述>
+
+  <scm|%get> 是 <scm|rich-integer> 中最基本的选择器，用于返回样本类中封装的整数值。由于<scm|rich-integer> 是一个样本类，封装了一个整数 <scm|data>，<scm|%get> 的作用就是直接返回这个 <scm|data> 的值。
+
+  \;
+
+  <strong|功能>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|返回值>: 返回样本类中封装的整数值 <scm|data>。
+
+    <item><with|font-series|bold|用途>: 当需要获取 <scm|rich-integer> 实例中存储的原始整数值时，可以使用 <scm|%get> 方法。
+  </itemize-minus>
+
+  \;
+
+  <strong|使用场景>
+
+  <scm|%get> 方法的主要使用场景包括：
+
+  <\itemize-minus>
+    <item><with|font-series|bold|获取原始值>: 当需要将 <scm|rich-integer> 实例转换回普通的 Scheme 整数时，可以使用 <scm|%get> 方法。
+
+    <item><with|font-series|bold|与其他函数结合使用>: 在需要对 <scm|rich-integer> 实例进行进一步操作时，可以先使用 <scm|%get> 获取原始值，然后传递给其他函数。
+  </itemize-minus>
+
+  \;
+
+  <strong|示例>
+
+  <\scm>
+    (let ((x ($ 42)))
+
+    \ \ (define y (x :get)) \ ; y 现在是普通的 Scheme 整数 42
+
+    \ \ (+ y 10)) \ ; 结果为 52
+  </scm>
+
+  \;
+
+  在这个示例中，<scm|x> 是一个 <scm|rich-integer> 实例，封装了整数 <scm|42>。通过调用 <scm|x :get>，我们获取了原始的整数值 <scm|42>，并将其赋值给 <scm|y>。然后，我们可以对 <scm|y> 进行普通的 Scheme 整数操作，如加法。
+
+  \;
+
+  <strong|实现函数>
+
   <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
     (define (%get) data)
+
+    \;
+  </goldfish-chunk>
+
+  <strong|测试用例>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 42 :get) =\<gtr\> 42)
 
     \;
   </goldfish-chunk>
@@ -2143,7 +2261,103 @@
 
   <paragraph|rich-integer%equals>
 
-  该函数由define-case-class自动生成。
+  \;
+
+  <strong|概述>
+
+  <scm|%equals> 是 <scm|rich-integer> 样本类中的一个谓词方法，用于判断两个 <scm|rich-integer> 实例是否相等。谓词方法是指返回布尔值（<scm|#t> 或 <scm|#f>）的函数或方法，通常用于条件判断或逻辑操作。<scm|%equals> 方法由 <scm|define-case-class> 宏自动生成，确保了样本类实例之间的相等性比较能够正确进行。
+
+  \;
+
+  <strong|方法定义>
+
+  <with|font-family|tt|%equals> 方法的定义如下：
+
+  <\scm>
+    (define (%equals that)
+
+    \ \ (== value (that 'value)))
+  </scm>
+
+  <\itemize-minus>
+    <item>关键点解析
+
+    <\itemize-minus>
+      <item><scm|that>: 这是 <scm|%equals> 方法的参数，表示要与当前 <scm|rich-integer> 实例进行比较的另一个 <scm|rich-integer> 实例。
+
+      <item><scm|==>: 这是 Goldfish Scheme 中的相等性比较函数，用于比较两个值是否相等。<scm|==> 函数支持样本类、普通 Scheme 值以及装箱（boxed）值之间的比较。
+
+      <item><scm|value>: 这是当前 <scm|rich-integer> 实例中封装的整数值。
+
+      <item><scm|(that 'value)>: 这是通过样本类的字段访问机制，获取 <scm|that> 实例中封装的整数值。
+    </itemize-minus>
+  </itemize-minus>
+
+  \;
+
+  <strong|功能>
+
+  <\itemize-minus>
+    <item><with|font-series|bold|返回值>: 返回一个布尔值 <scm|#t> 或 <scm|#f>，表示两个 <scm|rich-integer> 实例是否相等。
+
+    <item><with|font-series|bold|用途>: 用于比较两个 <scm|rich-integer> 实例中封装的整数值是否相等。
+  </itemize-minus>
+
+  \;
+
+  <strong|谓词特性>
+
+  <scm|%equals> 方法是一个典型的谓词方法，因为它满足以下特性：
+
+  <\enumerate>
+    <assign|labelenumi|<macro|<number|<enumi-nr>|arabic>.>><item><with|font-series|bold|返回布尔值>: 谓词方法的返回值必须是布尔值（<scm|#t> 或 <scm|#f>），而 <scm|%equals> 方法正是返回一个布尔值，表示两个实例是否相等。
+
+    <item><with|font-series|bold|用于条件判断>: 谓词方法通常用于条件判断（如 <scm|if>、<scm|cond> 等）或逻辑操作（如 <scm|and>、<scm|or> 等）。<scm|%equals> 方法可以用于判断两个 <scm|rich-integer> 实例是否相等，从而决定程序的执行路径。
+
+    <item><with|font-series|bold|与标准谓词一致>: <scm|%equals> 方法与 Scheme 标准库中的谓词（如 <scm|equal?>、<scm|eq?> 等）功能一致，都是通过比较返回布尔值。
+  </enumerate>
+
+  \;
+
+  <strong|使用场景>
+
+  <scm|%equals> 方法的主要使用场景包括：
+
+  <\itemize>
+    <item><with|font-series|bold|比较两个 <scm|rich-integer> 实例>: 当需要判断两个 <scm|rich-integer> 实例是否相等时，可以使用 <scm|%equals> 方法。
+
+    <item><with|font-series|bold|在集合操作中使用>: 在需要对 <scm|rich-integer> 实例进行集合操作（如去重、查找等）时，<scm|%equals> 方法可以用于判断实例是否相等。
+  </itemize>
+
+  \;
+
+  <strong|示例>
+
+  <\scm>
+    (let ((x ($ 42))
+
+    \ \ \ \ \ \ (y ($ 42))
+
+    \ \ \ \ \ \ (z ($ 43)))
+
+    \ \ (check-true (x :equals y)) \ ; x 和 y 相等，返回 #t
+
+    \ \ (check-false (x :equals z))) \ ; x 和 z 不相等，返回 #f
+  </scm>
+
+  \;
+
+  在这个示例中，<scm|x> 和 <scm|y> 是两个封装了相同整数值 <scm|42> 的 <scm|rich-integer> 实例，因此 <scm|x :equals y> 返回 <scm|#t>。而 <verbatim|x> 和 <scm|z> 封装的值不同，因此 <scm|x :equals z> 返回 <scm|#f>。
+
+  \;
+
+  <strong|实现函数>
+
+  <scm|%equals> 方法由 <scm|define-case-class> 宏自动生成。
+
+  \;
+
+  <strong|测试用例>
 
   <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
     (check-true ($ 42 :equals ($ 42)))

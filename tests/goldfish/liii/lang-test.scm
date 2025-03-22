@@ -222,6 +222,7 @@
   :collect)
   => '(102 104 106 108 110))
 
+(check ($ 42 :get) => 42)
 (check-true ($ 42 :equals ($ 42)))
 (check-false ($ 41 :equals ($ 42)))
 
