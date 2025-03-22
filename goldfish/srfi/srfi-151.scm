@@ -17,8 +17,8 @@
 (define-library (srfi srfi-151)
 (import (liii base))
 (export
-  bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand bit-count 
-  bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
+  bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-eqv bitwise-nor bitwise-nand 
+  bit-count bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
   arithmetic-shift
 )
 (begin
@@ -30,6 +30,9 @@
 (define bitwise-ior logior)
 
 (define bitwise-xor logxor)
+
+(define (bitwise-eqv a b)
+        (= (bitwise-xor a b) 0))
 
 (define (bitwise-nor a b)  
         (lognot (bitwise-ior a b)))

@@ -9382,7 +9382,7 @@
 
     \ \ ; from (srfi srfi-151)
 
-    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-or bitwise-nor bitwise-nand
+    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-eqv \ bitwise-or bitwise-nor bitwise-nand
 
     \ \ bit-count bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
 
@@ -9408,9 +9408,9 @@
 
     (export
 
-    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-nor bitwise-nand bit-count\ 
+    \ \ bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-eqv bitwise-nor bitwise-nand\ 
 
-    \ \ bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
+    \ \ bit-count bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
 
     \ \ arithmetic-shift
 
@@ -9567,6 +9567,42 @@
 
   \;
 
+  <value|srfi><paragraph|bitwise-eqv><index|bitwise-nor><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+
+  使用<scm|bitwise-xor>实现。如果两个数相等则返回值为0。
+
+  <\scm-chunk|goldfish/srfi/srfi-151.scm|true|true>
+    (define (bitwise-eqv a b)
+
+    \ \ \ \ \ \ \ \ (= (bitwise-xor a b) 0))
+
+    \;
+  </scm-chunk>
+
+  <subparagraph|测试>
+
+  <\scm-chunk|tests/goldfish/liii/bitwise-test.scm|true|true>
+    (check (bitwise-eqv 1 1) =\<gtr\> #t)
+
+    (check (bitwise-eqv 1 2) =\<gtr\> #f)
+
+    (check (bitwise-eqv -1 -1) =\<gtr\> #t)
+
+    (check (bitwise-eqv -1 -2) =\<gtr\> #f)
+
+    (check (bitwise-eqv 1 0) =\<gtr\> #f)
+
+    (check (bitwise-eqv -1 0) =\<gtr\> #f)
+
+    (check (bitwise-eqv #b1010 #b1010) =\<gtr\> #t) ; 10 eqv 10 = #t
+
+    (check (bitwise-eqv #b1010 #b0101) =\<gtr\> #f) ; 10 eqv 5 = #f
+
+    \;
+  </scm-chunk>
+
+  \;
+
   <paragraph|lognot><index|lognot>
 
   <value|srfi><paragraph|bitwise-nor><index|bitwise-nor><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
@@ -9628,6 +9664,8 @@
 
     \;
   </scm-chunk>
+
+  \;
 
   <value|srfi><paragraph|bit-count><index|bit-count><scm|((i integer?)) =\<gtr\> integer?>
 

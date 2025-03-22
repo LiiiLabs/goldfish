@@ -46,6 +46,15 @@
 (check (bitwise-xor #b1000 #b1001) => #b0001) ; 8 xor 9 = 1
 (check (bitwise-xor #b10010101 #b01111001) => #b11101100)
 
+(check (bitwise-eqv 1 1) => #t)
+(check (bitwise-eqv 1 2) => #f)
+(check (bitwise-eqv -1 -1) => #t)
+(check (bitwise-eqv -1 -2) => #f)
+(check (bitwise-eqv 1 0) => #f)
+(check (bitwise-eqv -1 0) => #f)
+(check (bitwise-eqv #b1010 #b1010) => #t) ; 10 eqv 10 = #t
+(check (bitwise-eqv #b1010 #b0101) => #f) ; 10 eqv 5 = #f
+
 (check (bitwise-nor 2 4) => -7)  
 (check (bitwise-nor 3 1) => -4)  
 (check (bitwise-nor #b111 #b011) => -8)  
