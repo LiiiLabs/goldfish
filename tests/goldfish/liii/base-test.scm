@@ -291,6 +291,15 @@
 (check-false (exact? 0.3))
 ; (check-true (exact? #e3.0))
 
+(check-false (inexact? 42))             ;整数
+(check-false (inexact? 3/4))            ;有理数
+(check-true (inexact? 3.14))            ;浮点数
+(check-true (inexact? 1.0e3))           ;指数
+(check-true (inexact? 1+2i))            ;复数
+(check-true (inexact? (+ 1.0 2.0)))     ;运算
+(check-true (inexact? +inf.0))          ;特殊数值
+;(check-false (inexact? e3))             ;前缀
+
 (let1 zero-int 0
   (check-true (and (integer? zero-int) (zero? zero-int))))
 (let1 zero-exact (- 1/2 1/2)
