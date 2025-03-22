@@ -1956,6 +1956,8 @@
 
     \ \ (cond ((integer? x) (rich-integer x))
 
+    \ \ \ \ \ \ \ \ ((rational? x) (rich-rational x))
+
     \ \ \ \ \ \ \ \ ((float? x) (rich-float x))
 
     \ \ \ \ \ \ \ \ ((char? x) (rich-char (char-\<gtr\>integer x)))
@@ -1968,7 +1970,7 @@
 
     \ \ \ \ \ \ \ \ ((hash-table? x) (rich-hash-table x))
 
-    \ \ \ \ \ \ \ \ (else (type-error "box: x must be integer?, float?, char?, string?, list?, vector?, hash-table?"))))
+    \ \ \ \ \ \ \ \ (else (type-error "box: x must be integer?, rational?, float?, char?, string?, list?, vector?, hash-table?"))))
 
     \;
   </goldfish-chunk>
@@ -2327,7 +2329,65 @@
     \;
   </goldfish-chunk>
 
-  \;
+  <chapter|rich-rational>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define-case-class rich-rational ((data rational?))
+
+    \;
+  </goldfish-chunk>
+
+  <section|选择器>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%get) data)
+
+    \;
+  </goldfish-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 1/3 :get) =\<gtr\> 1/3)
+
+    (check ($ 0 :get) =\<gtr\> 0)
+
+    (check ($ -1/3 :get) =\<gtr\> -1/3)
+
+    \;
+  </scm-chunk>
+
+  <section|谓词>
+
+  <paragraph|rich-float%abs>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    (define (%abs)\ 
+
+    \ \ (if (\<less\> data 0)
+
+    \ \ \ \ \ \ (- 0 data)
+
+    \ \ \ \ \ \ data))
+
+    \ \ 
+  </goldfish-chunk>
+
+  <\goldfish-chunk|tests/goldfish/liii/lang-test.scm|true|true>
+    (check ($ 1/3 :abs) =\<gtr\> 1/3)
+
+    (check ($ 0.0 :abs) =\<gtr\> 0.0)
+
+    (check ($ -1/3 :abs) =\<gtr\> 1/3)
+
+    \;
+  </goldfish-chunk>
+
+  <section|结尾>
+
+  <\goldfish-chunk|goldfish/liii/lang.scm|true|true>
+    )
+
+    \;
+  </goldfish-chunk>
 
   <chapter|rich-float>
 
