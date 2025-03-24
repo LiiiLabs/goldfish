@@ -1,4 +1,4 @@
-<TMU|<tuple|1.0.5|1.2.9.8>>
+<TMU|<tuple|1.0.5|1.2.9.7>>
 
 <style|<tuple|generic|chinese|goldfish|literate|reduced-margins>>
 
@@ -159,110 +159,182 @@
 
   <subsection|list-sorted?, vector-sorted?>
 
-  判断 list 或 vector 是否有序。<todo|<verbatim|vector-sorted?> 尚未实现可选参数 start 和 end。>
+  检查列表/向量是否按比较函数 less-p 排序。
+
+  list-sorted?
+
+  <\indent>
+    检查列表 <code*|lis> 是否已按比较函数 <code*|less-p> 排序。如果列表已排序，返回 <code*|#t>，否则返回 <code*|#f>。
+  </indent>
+
+  vector-sorted?
+
+  <\indent>
+    检查向量 <code*|v> 是否已按比较函数 <code*|less-p> 排序。如果向量已排序，返回 <code*|#t>，否则返回 <code*|#f>。支持可选参数 <code*|start> 和 <code*|end>，用于指定检查的范围。
+  </indent>
 
   <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
-    \ \ (define (list-sorted? less-p lis)
+    \;
 
-    \ \ \ \ (if (null? lis)
+    (define (list-sorted? less-p lis)
 
-    \ \ \ \ \ \ #t
+    \ \ (if (null? lis)
 
-    \ \ \ \ \ \ (do ((first lis (cdr first))
+    \ \ \ \ #t
 
-    \ \ \ \ \ \ \ \ \ \ \ (second (cdr lis) (cdr second))
+    \ \ \ \ (do ((first lis (cdr first))
 
-    \ \ \ \ \ \ \ \ \ \ \ (res #t (not (less-p (car second) (car first)))))
+    \ \ \ \ \ \ \ \ \ \ (second (cdr lis) (cdr second))
 
-    \ \ \ \ \ \ \ \ ((or (null? second) (not res)) res))))
+    \ \ \ \ \ \ \ \ \ \ (res #t (not (less-p (car second) (car first)))))
+
+    \ \ \ \ \ \ ((or (null? second) (not res)) res))))
 
     \;
 
-    \ \ ; TODO optional parameters
+    (define vector-sorted?
 
-    \ \ (define (vector-sorted? less-p v)
+    \ \ (case-lambda
 
-    \ \ \ \ (let ((start 0)
+    \ \ \ \ ((less-p v) (vector-sorted? less-p v 0 (vector-length v)))
 
-    \ \ \ \ \ \ \ \ \ \ (end (length v)))
+    \ \ \ \ ((less-p v start) (vector-sorted? less-p v start (vector-length v)))
 
-    \ \ \ \ \ \ (do ((first start (+ 1 first))
+    \ \ \ \ ((less-p v start end)
 
-    \ \ \ \ \ \ \ \ \ \ \ (second (+ 1 start) (+ 1 second))
+    \ \ \ \ \ \ (if (or (\<less\> start 0) (\<gtr\> end (vector-length v)) (\<gtr\> start end))
 
-    \ \ \ \ \ \ \ \ \ \ \ (res #t (not (less-p (vector-ref v second) (vector-ref v first)))))
+    \ \ \ \ \ \ \ \ (raise "Invalid start or end parameters") ; 使用 raise 抛出错误
 
-    \ \ \ \ \ \ \ \ ((or (\<gtr\>= second end) (not res)) res))))
+    \ \ \ \ \ \ \ \ (let loop ((i start))
+
+    \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= i (- end 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ #t
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (if (less-p (vector-ref v (+ i 1)) (vector-ref v i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ #f
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)))))))))
 
     \;
   </scm-chunk>
 
-  <subsection|list-merge, list-sort, list-stable-sort>
+  <subsection|list-merge, list-merge!, list-sort, list-stable-sort>
 
   归并排序。需要注意 <verbatim|list-sort!> 不必修改原 list，但 <verbatim|vector-sort!> 要保证修改原 vector。
 
+  list-merge
+
+  <\indent>
+    合并两个已排序的列表，返回一个新的已排序列表。
+  </indent>
+
+  list-merge!
+
+  <\indent>
+    合并两个已排序的列表，并直接修改 <code*|lis1> 和 <code*|lis2> 的 <code*|cdr> 指针，返回合并后的列表。这是一个就地操作。
+  </indent>
+
+  list-stable-sort
+
+  <\indent>
+    对列表进行稳定排序（相等元素相对顺序保持不变），返回一个新的已排序列表。
+  </indent>
+
   <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
-    \ \ (define (list-merge less-p lis1 lis2)
+    (define (list-merge less-p lis1 lis2)
 
-    \ \ \ \ (let loop
+    \ \ (let loop
 
-    \ \ \ \ \ \ ((res '())
+    \ \ \ \ ((res '())
 
-    \ \ \ \ \ \ \ (lis1 lis1)
+    \ \ \ \ \ \ (lis1 lis1)
 
-    \ \ \ \ \ \ \ (lis2 lis2))
+    \ \ \ \ \ \ (lis2 lis2))
 
-    \ \ \ \ \ \ (cond
+    \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ ((and (null? lis1) (null? lis2)) (reverse res))
+    \ \ \ \ \ \ ((and (null? lis1) (null? lis2)) (reverse res))
 
-    \ \ \ \ \ \ \ \ ((null? lis1) (loop (cons (car lis2) res) lis1 (cdr lis2)))
+    \ \ \ \ \ \ ((null? lis1) (loop (cons (car lis2) res) lis1 (cdr lis2)))
 
-    \ \ \ \ \ \ \ \ ((null? lis2) (loop (cons (car lis1) res) lis2 (cdr lis1)))
+    \ \ \ \ \ \ ((null? lis2) (loop (cons (car lis1) res) lis2 (cdr lis1)))
 
-    \ \ \ \ \ \ \ \ ((less-p (car lis2) (car lis1)) (loop (cons (car lis2) res) lis1 (cdr lis2)))
+    \ \ \ \ \ \ ((less-p (car lis2) (car lis1)) (loop (cons (car lis2) res) lis1 (cdr lis2)))
 
-    \ \ \ \ \ \ \ \ (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
-
-    \;
-
-    \ \ ; this list-merge! violates SRFI 132, since it does not satisfy the constant running space
-
-    \ \ ; constraint specified in SRFI 132, and does not work "in place"
-
-    \ \ (define list-merge! list-merge)
+    \ \ \ \ \ \ (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
 
     \;
 
-    \ \ (define (list-stable-sort less-p lis)
+    (define list-merge!
 
-    \ \ \ \ (define (sort l r)
+    \ \ (lambda (less-p lis1 lis2)
 
-    \ \ \ \ \ \ (cond
+    \ \ \ \ (define (merge! left right prev)
 
-    \ \ \ \ \ \ \ \ ((= l r) '())
+    \ \ \ \ \ \ (let loop ((left left) (right right) (prev prev))
 
-    \ \ \ \ \ \ \ \ ((= (+ l 1) r) (list (list-ref lis l)))
+    \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ \ \ ((null? left) (set-cdr! prev right))
 
-    \ \ \ \ \ \ \ \ \ \ (let* ((mid (quotient (+ l r) 2))
+    \ \ \ \ \ \ \ \ \ \ ((null? right) (set-cdr! prev left))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l-sorted (sort l mid))
+    \ \ \ \ \ \ \ \ \ \ ((less-p (car left) (car right))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (r-sorted (sort mid r)))
+    \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! prev left)
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (list-merge less-p l-sorted r-sorted)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr left) right left))
 
-    \ \ \ \ (sort 0 (length lis)))
+    \ \ \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! prev right)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop left (cdr right) right)))))
+
+    \ \ \ \ (let ((dummy (cons '() '())))
+
+    \ \ \ \ \ \ (merge! lis1 lis2 dummy)
+
+    \ \ \ \ \ \ (cdr dummy))))
 
     \;
 
-    \ \ (define list-sort list-stable-sort)
+    (define (list-stable-sort less-p lis)
 
-    \ \ (define list-sort! list-stable-sort)
+    \ \ (define (sort l r)
 
-    \ \ (define list-stable-sort! list-stable-sort)
+    \ \ \ \ (cond
+
+    \ \ \ \ \ \ ((= l r) '())
+
+    \ \ \ \ \ \ ((= (+ l 1) r) (list (list-ref lis l)))
+
+    \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ (let* ((mid (quotient (+ l r) 2))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (l-sorted (sort l mid))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (r-sorted (sort mid r)))
+
+    \ \ \ \ \ \ \ \ \ \ (list-merge less-p l-sorted r-sorted)))))
+
+    \ \ (sort 0 (length lis)))
+
+    \;
+
+    (define list-sort list-stable-sort)
+
+    \;
+
+    (define list-sort! list-stable-sort)
+
+    \;
+
+    (define list-stable-sort! list-stable-sort)
 
     \;
   </scm-chunk>
@@ -272,78 +344,84 @@
   无副作用时调用 list 相关函数实现。原地排序尚未实现。
 
   <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
-    \ \ (define vector-stable-sort
+    (define vector-stable-sort
 
-    \ \ \ \ (case-lambda
+    \ \ (case-lambda
 
-    \ \ \ \ \ \ ((less-p v)
+    \ \ \ \ ((less-p v)
 
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (vector-\<gtr\>list v))))
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (vector-\<gtr\>list v))))
 
-    \ \ \ \ \ \ ((less-p v start)
+    \ \ \ \ ((less-p v start)
 
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (subvector-\<gtr\>list v start (vector-length v)))))
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (subvector-\<gtr\>list v start (vector-length v)))))
 
-    \ \ \ \ \ \ ((less-p v start end)
+    \ \ \ \ ((less-p v start end)
 
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (subvector-\<gtr\>list v start end))))))
-
-    \;
-
-    \ \ (define vector-sort vector-stable-sort)
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-stable-sort less-p (subvector-\<gtr\>list v start end))))))
 
     \;
 
-    \ \ (define (vector-sort! . r) (???))
-
-    \ \ (define (vector-stable-sort! . r) (???))
+    (define vector-sort vector-stable-sort)
 
     \;
 
-    \ \ (define (subvector-\<gtr\>list v start end)
-
-    \ \ \ \ (do ((r '() (cons (vector-ref v p) r))
-
-    \ \ \ \ \ \ \ \ \ (p start (+ 1 p)))
-
-    \ \ \ \ \ \ ((\<gtr\>= p end) (reverse r))))
+    (define (vector-sort! . r) (???))
 
     \;
 
-    \ \ (define vector-merge
-
-    \ \ \ \ (case-lambda
-
-    \ \ \ \ \ \ ((less-p v1 v2)
-
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (vector-\<gtr\>list v1) (vector-\<gtr\>list v2))))
-
-    \ \ \ \ \ \ ((less-p v1 v2 start1)
-
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 (vector-length v1)) (vector-\<gtr\>list v2))))
-
-    \ \ \ \ \ \ ((less-p v1 v2 start1 end1)
-
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (vector-\<gtr\>list v2))))
-
-    \ \ \ \ \ \ ((less-p v1 v2 start1 end1 start2)
-
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (subvector-\<gtr\>list v2 start2 (vector-length v2)))))
-
-    \ \ \ \ \ \ ((less-p v1 v2 start1 end1 start2 end2)
-
-    \ \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (subvector-\<gtr\>list v2 start2 end2))))))
+    (define (vector-stable-sort! . r) (???))
 
     \;
 
-    \ \ (define (vector-merge! . r) (???))
+    (define (subvector-\<gtr\>list v start end)
+
+    \ \ (do ((r '() (cons (vector-ref v p) r))
+
+    \ \ \ \ \ \ \ \ (p start (+ 1 p)))
+
+    \ \ \ \ ((\<gtr\>= p end) (reverse r))))
+
+    \;
+
+    (define vector-merge
+
+    \ \ (case-lambda
+
+    \ \ \ \ ((less-p v1 v2)
+
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (vector-\<gtr\>list v1) (vector-\<gtr\>list v2))))
+
+    \ \ \ \ ((less-p v1 v2 start1)
+
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 (vector-length v1)) (vector-\<gtr\>list v2))))
+
+    \ \ \ \ ((less-p v1 v2 start1 end1)
+
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (vector-\<gtr\>list v2))))
+
+    \ \ \ \ ((less-p v1 v2 start1 end1 start2)
+
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (subvector-\<gtr\>list v2 start2 (vector-length v2)))))
+
+    \ \ \ \ ((less-p v1 v2 start1 end1 start2 end2)
+
+    \ \ \ \ \ \ (list-\<gtr\>vector (list-merge less-p (subvector-\<gtr\>list v1 start1 end1) (subvector-\<gtr\>list v2 start2 end2))))))
+
+    \;
+
+    (define (vector-merge! . r) (???))
+
+    \;
 
     \;
   </scm-chunk>
 
   <section|测试>
 
-  <\goldfish-chunk|tests/goldfish/liii/sort-test.scm|true|false>
+  <\goldfish-chunk|tests/goldfish/liii/sort-test.scm|true|true>
+    \;
+
     (import (liii check)
 
     \ \ \ \ \ \ \ \ (liii sort))
@@ -417,11 +495,75 @@
     \ \ \ \ \ \ \ =\<gtr\> #((1 . 3) (1 . 2) (1 . 1) (2 . 1) (3 . 2) (3 . 1) (4 . 1)))
 
     \;
+  </goldfish-chunk>
+
+  vector-sorted?和list-merge!测试
+
+  <\scm-chunk|tests/goldfish/liii/sort-test.scm|true|false>
+    ;
+
+    ;单元测试vector-sorted?新增支持可选参数功能、list-merge!实现原地合并功能
+
+    ;
+
+    (display "Testing vector-sorted?\\n")
+
+    (check-true (vector-sorted? \<less\> #(1 2 3 4 5)))
+
+    (check-false (vector-sorted? \<less\> #(1 3 2 4 5)))
+
+    (check-true (vector-sorted? \<less\> #(5 1 2 3 4) 1))
+
+    (check-false (vector-sorted? \<less\> #(5 1 3 2 4) 1))
+
+    (check-true (vector-sorted? \<less\> #(5 1 2 3 4) 1 3))
+
+    (check-false (vector-sorted? \<less\> #(5 1 3 2 4) 1 4))
+
+    (check-catch "Invalid start or end parameters" (vector-sorted? \<less\> #(1 2 3 4 5) 3 2))
+
+    \;
+
+    (display "Testing list-merge!\\n")
+
+    (define lis1 '(1 3 5))
+
+    (define lis2 '(2 4 6))
+
+    (test (list-merge! \<less\> lis1 lis2) '(1 2 3 4 5 6))
+
+    \;
+
+    (define lis3 '(1 1 3))
+
+    (define lis4 '(1 2 4))
+
+    (test (list-merge! \<less\> lis3 lis4) '(1 1 1 2 3 4))
+
+    \;
+
+    (define lis5 '())
+
+    (define lis6 '(1 2 3))
+
+    (test (list-merge! \<less\> lis5 lis6) '(1 2 3))
+
+    (test (list-merge! \<less\> lis6 lis5) '(1 2 3))
+
+    \;
+
+    (define lis7 '())
+
+    (define lis8 '())
+
+    (test (list-merge! \<less\> lis7 lis8) '())
+
+    \;
 
     (check-report)
 
     \;
-  </goldfish-chunk>
+  </scm-chunk>
 
   <section|结尾>
 
