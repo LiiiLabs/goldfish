@@ -9567,7 +9567,7 @@
 
   \;
 
-  <value|srfi><paragraph|bitwise-eqv><index|bitwise-nor><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
+  <value|srfi><paragraph|bitwise-eqv><index|bitwise-eqv><typehint|((a integer?) (b integer?)) =\<gtr\> boolean?>
 
   使用<scm|bitwise-xor>实现。如果两个数相等则返回值为0。
 
