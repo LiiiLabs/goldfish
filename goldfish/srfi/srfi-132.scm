@@ -23,55 +23,66 @@
         (scheme case-lambda))
 (begin
 
-  (define (list-sorted? less-p lis)
-    (if (null? lis)
-      #t
-      (do ((first lis (cdr first))
-           (second (cdr lis) (cdr second))
-           (res #t (not (less-p (car second) (car first)))))
-        ((or (null? second) (not res)) res))))
-
-  ; TODO optional parameters
-  (define (vector-sorted? less-p v)
-    (let ((start 0)
-          (end (length v)))
-      (do ((first start (+ 1 first))
-           (second (+ 1 start) (+ 1 second))
-           (res #t (not (less-p (vector-ref v second) (vector-ref v first)))))
-        ((or (>= second end) (not res)) res))))
-
-  (define (list-merge less-p lis1 lis2)
-    (let loop
-      ((res '())
-       (lis1 lis1)
-       (lis2 lis2))
-      (cond
-        ((and (null? lis1) (null? lis2)) (reverse res))
-        ((null? lis1) (loop (cons (car lis2) res) lis1 (cdr lis2)))
-        ((null? lis2) (loop (cons (car lis1) res) lis2 (cdr lis1)))
-        ((less-p (car lis2) (car lis1)) (loop (cons (car lis2) res) lis1 (cdr lis2)))
-        (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
-
-  ; this list-merge! violates SRFI 132, since it does not satisfy the constant running space
-  ; constraint specified in SRFI 132, and does not work "in place"
-  (define list-merge! list-merge)
-
-  (define (list-stable-sort less-p lis)
-    (define (sort l r)
-      (cond
-        ((= l r) '())
-        ((= (+ l 1) r) (list (list-ref lis l)))
-        (else
-          (let* ((mid (quotient (+ l r) 2))
-                 (l-sorted (sort l mid))
-                 (r-sorted (sort mid r)))
-            (list-merge less-p l-sorted r-sorted)))))
-    (sort 0 (length lis)))
-
-  (define list-sort list-stable-sort)
-  (define list-sort! list-stable-sort)
-  (define list-stable-sort! list-stable-sort)
-
+    (define (list-sorted? less-p lis)
+      (if (null? lis)
+        #t
+        (do ((first lis (cdr first))
+            (second (cdr lis) (cdr second))
+            (res #t (not (less-p (car second) (car first)))))
+          ((or (null? second) (not res)) res))))
+    (define vector-sorted?
+      (case-lambda
+        ((less-p v) (vector-sorted? less-p v 0 (vector-length v)))
+        ((less-p v start) (vector-sorted? less-p v start (vector-length v)))
+        ((less-p v start end)
+          (if (or (< start 0) (> end (vector-length v)) (> start end))
+            (raise "Invalid start or end parameters") ; 使用 raise 抛出错误
+            (let loop ((i start))
+              (if (>= i (- end 1))
+                #t
+                (if (less-p (vector-ref v (+ i 1)) (vector-ref v i))
+                  #f
+                  (loop (+ i 1)))))))))
+    (define (list-merge less-p lis1 lis2)
+      (let loop ((res '())
+          (lis1 lis1)
+          (lis2 lis2))
+        (cond
+          ((and (null? lis1) (null? lis2)) (reverse res))
+          ((null? lis1) (loop (cons (car lis2) res) lis1 (cdr lis2)))
+          ((null? lis2) (loop (cons (car lis1) res) lis2 (cdr lis1)))
+          ((less-p (car lis2) (car lis1)) (loop (cons (car lis2) res) lis1 (cdr lis2)))
+          (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
+    (define list-merge!
+      (lambda (less-p lis1 lis2)
+        (define (merge! left right prev)
+          (let loop ((left left) (right right) (prev prev))
+            (cond
+              ((null? left) (set-cdr! prev right))
+              ((null? right) (set-cdr! prev left))
+              ((less-p (car left) (car right))
+                (set-cdr! prev left)
+                (loop (cdr left) right left))
+              (else
+                (set-cdr! prev right)
+                (loop left (cdr right) right)))))
+        (let ((dummy (cons '() '())))
+          (merge! lis1 lis2 dummy)
+          (cdr dummy))))
+    (define (list-stable-sort less-p lis)
+      (define (sort l r)
+        (cond
+          ((= l r) '())
+          ((= (+ l 1) r) (list (list-ref lis l)))
+          (else
+            (let* ((mid (quotient (+ l r) 2))
+                (l-sorted (sort l mid))
+                (r-sorted (sort mid r)))
+              (list-merge less-p l-sorted r-sorted)))))
+      (sort 0 (length lis)))
+    (define list-sort list-stable-sort)
+    (define list-sort! list-stable-sort)
+    (define list-stable-sort! list-stable-sort)
   (define vector-stable-sort
     (case-lambda
       ((less-p v)
