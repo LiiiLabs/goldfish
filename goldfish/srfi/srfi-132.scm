@@ -36,11 +36,13 @@
         ((less-p v start) (vector-sorted? less-p v start (vector-length v)))
         ((less-p v start end)
           (if (or (< start 0) (> end (vector-length v)) (> start end))
-            (error "Invalid start or end parameters")
-            (do ((first start (+ 1 first))
-                (second (+ 1 start) (+ 1 second))
-                (res #t (not (less-p (vector-ref v second) (vector-ref v first)))))
-              ((or (>= second end) (not res)) res))))))
+            (raise "Invalid start or end parameters") ; 使用 raise 抛出错误
+            (let loop ((i start))
+              (if (>= i (- end 1))
+                #t
+                (if (less-p (vector-ref v (+ i 1)) (vector-ref v i))
+                  #f
+                  (loop (+ i 1)))))))))
     (define (list-merge less-p lis1 lis2)
       (let loop ((res '())
           (lis1 lis1)
@@ -51,21 +53,22 @@
           ((null? lis2) (loop (cons (car lis1) res) lis2 (cdr lis1)))
           ((less-p (car lis2) (car lis1)) (loop (cons (car lis2) res) lis1 (cdr lis2)))
           (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
-    (define list-merge! less-p lis1 lis2)
-    (define (merge! left right)
-      (let loop ((left left) (right right) (prev '()))
-        (cond
-          ((null? left) (set-cdr! prev right))
-          ((null? right) (set-cdr! prev left))
-          ((less-p (car left) (car right))
-            (set-cdr! prev left)
-            (loop (cdr left) right left))
-          (else
-            (set-cdr! prev right)
-            (loop left (cdr right) right)))))
-    (let ((dummy (cons '() '())))
-      (merge! lis1 lis2 dummy)
-      (cdr dummy))
+    (define list-merge!
+      (lambda (less-p lis1 lis2)
+        (define (merge! left right prev)
+          (let loop ((left left) (right right) (prev prev))
+            (cond
+              ((null? left) (set-cdr! prev right))
+              ((null? right) (set-cdr! prev left))
+              ((less-p (car left) (car right))
+                (set-cdr! prev left)
+                (loop (cdr left) right left))
+              (else
+                (set-cdr! prev right)
+                (loop left (cdr right) right)))))
+        (let ((dummy (cons '() '())))
+          (merge! lis1 lis2 dummy)
+          (cdr dummy))))
     (define (list-stable-sort less-p lis)
       (define (sort l r)
         (cond

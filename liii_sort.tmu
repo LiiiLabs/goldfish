@@ -200,15 +200,19 @@
 
     \ \ \ \ \ \ \ \ \ \ (if (or (\<less\> start 0) (\<gtr\> end (vector-length v)) (\<gtr\> start end))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (error "Invalid start or end parameters")
+    \ \ \ \ \ \ \ \ \ \ \ \ (raise "Invalid start or end parameters") ; 使用 raise 抛出错误
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (do ((first start (+ 1 first))
+    \ \ \ \ \ \ \ \ \ \ \ \ (let loop ((i start))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (second (+ 1 start) (+ 1 second))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (\<gtr\>= i (- end 1))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (res #t (not (less-p (vector-ref v second) (vector-ref v first)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #t
 
-    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((or (\<gtr\>= second end) (not res)) res))))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (less-p (vector-ref v (+ i 1)) (vector-ref v i))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #f
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (+ i 1)))))))))
   </scm-chunk>
 
   <subsection|list-merge, list-merge!, list-sort, list-stable-sort>
@@ -254,35 +258,37 @@
 
     \ \ \ \ \ \ \ \ \ \ (else (loop (cons (car lis1) res) (cdr lis1) lis2)))))
 
-    \ \ \ \ (define list-merge! less-p lis1 lis2)
+    \ \ \ \ (define list-merge!
 
-    \ \ \ \ (define (merge! left right)
+    \ \ \ \ \ \ (lambda (less-p lis1 lis2)
 
-    \ \ \ \ \ \ (let loop ((left left) (right right) (prev '()))
+    \ \ \ \ \ \ \ \ (define (merge! left right prev)
 
-    \ \ \ \ \ \ \ \ (cond
+    \ \ \ \ \ \ \ \ \ \ (let loop ((left left) (right right) (prev prev))
 
-    \ \ \ \ \ \ \ \ \ \ ((null? left) (set-cdr! prev right))
+    \ \ \ \ \ \ \ \ \ \ \ \ (cond
 
-    \ \ \ \ \ \ \ \ \ \ ((null? right) (set-cdr! prev left))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((null? left) (set-cdr! prev right))
 
-    \ \ \ \ \ \ \ \ \ \ ((less-p (car left) (car right))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((null? right) (set-cdr! prev left))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! prev left)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((less-p (car left) (car right))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr left) right left))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! prev left)
 
-    \ \ \ \ \ \ \ \ \ \ (else
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr left) right left))
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! prev right)
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (else
 
-    \ \ \ \ \ \ \ \ \ \ \ \ (loop left (cdr right) right)))))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! prev right)
 
-    \ \ \ \ (let ((dummy (cons '() '())))
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (loop left (cdr right) right)))))
 
-    \ \ \ \ \ \ (merge! lis1 lis2 dummy)
+    \ \ \ \ \ \ \ \ (let ((dummy (cons '() '())))
 
-    \ \ \ \ \ \ (cdr dummy))
+    \ \ \ \ \ \ \ \ \ \ (merge! lis1 lis2 dummy)
+
+    \ \ \ \ \ \ \ \ \ \ (cdr dummy))))
 
     \ \ \ \ (define (list-stable-sort less-p lis)
 
@@ -538,7 +544,9 @@
 
     ;
 
-    (import (srfi srfi-132))
+    (import (liii check)
+
+    \ \ (srfi srfi-132))
 
     (display "Testing vector-sorted?\\n")
 
@@ -546,43 +554,45 @@
 
     ; 测试用例 1：整个向量已排序
 
-    (check-true (vector-sorted? \<less\> # (1 2 3 4 5)))
+    (check-true (vector-sorted? \<less\> #(1 2 3 4 5)))
 
     \;
 
     ; 测试用例 2：整个向量未排序
 
-    (check-false (vector-sorted? \<less\> # (1 3 2 4 5)))
+    (check-false (vector-sorted? \<less\> #(1 3 2 4 5)))
 
     \;
 
     ; 测试用例 3：子向量已排序（从索引 1 开始）
 
-    (check-true (vector-sorted? \<less\> # (5 1 2 3 4) 1))
+    (check-true (vector-sorted? \<less\> #(5 1 2 3 4) 1))
 
     \;
 
     ; 测试用例 4：子向量未排序（从索引 1 开始）
 
-    (check-false (vector-sorted? \<less\> # (5 1 3 2 4) 1))
+    (check-false (vector-sorted? \<less\> #(5 1 3 2 4) 1))
 
     \;
 
     ; 测试用例 5：子向量已排序（从索引 1 到 3）
 
-    (check-true (vector-sorted? \<less\> # (5 1 2 3 4) 1 3))
+    (check-true (vector-sorted? \<less\> #(5 1 2 3 4) 1 3))
 
     \;
 
     ; 测试用例 6：子向量未排序（从索引 1 到 3）
 
-    (check-false (vector-sorted? \<less\> # (5 1 3 2 4) 1 3))
+    (check-false (vector-sorted? \<less\> #(5 1 3 2 4) 1 4))
 
     \;
 
     ; 测试用例 7：无效的起始和结束参数
 
-    (check-error (vector-sorted? \<less\> # (1 2 3 4 5) 3 2) "Invalid start or end parameters")
+    (check-catch "Invalid start or end parameters"
+
+    \ \ (vector-sorted? \<less\> #(1 2 3 4 5) 3 2))
 
     \;
 
@@ -598,7 +608,7 @@
 
     (define lis2 '(2 4 6))
 
-    (check-equal? (list-merge! \<less\> lis1 lis2) '(1 2 3 4 5 6))
+    (test (list-merge! \<less\> lis1 lis2) '(1 2 3 4 5 6))
 
     \;
 
@@ -608,7 +618,7 @@
 
     (define lis4 '(1 2 4))
 
-    (check-equal? (list-merge! \<less\> lis3 lis4) '(1 1 1 2 3 4))
+    (test (list-merge! \<less\> lis3 lis4) '(1 1 1 2 3 4))
 
     \;
 
@@ -618,9 +628,9 @@
 
     (define lis6 '(1 2 3))
 
-    (check-equal? (list-merge! \<less\> lis5 lis6) '(1 2 3))
+    (test (list-merge! \<less\> lis5 lis6) '(1 2 3))
 
-    (check-equal? (list-merge! \<less\> lis6 lis5) '(1 2 3))
+    (test (list-merge! \<less\> lis6 lis5) '(1 2 3))
 
     \;
 
@@ -630,7 +640,7 @@
 
     (define lis8 '())
 
-    (check-equal? (list-merge! \<less\> lis7 lis8) '())
+    (test (list-merge! \<less\> lis7 lis8) '())
 
     \;
 
