@@ -14,6 +14,7 @@
 ; under the License.
 ;
 
+
 (import (liii check)
         (liii sort))
 
@@ -50,6 +51,36 @@
                             (vector-merge pair-full-< #((1 . 2) (1 . 1) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))))
 (check (vector-merge pair-full-< #((1 . 2) (1 . 1) (3 . 1)) #((1 . 3) (2 . 1) (3 . 2) (4 . 1)))
        => #((1 . 3) (1 . 2) (1 . 1) (2 . 1) (3 . 2) (3 . 1) (4 . 1)))
+
+;
+;单元测试vector-sorted?新增支持可选参数功能、list-merge!实现原地合并功能
+;
+(display "Testing vector-sorted?\n")
+(check-true (vector-sorted? < #(1 2 3 4 5)))
+(check-false (vector-sorted? < #(1 3 2 4 5)))
+(check-true (vector-sorted? < #(5 1 2 3 4) 1))
+(check-false (vector-sorted? < #(5 1 3 2 4) 1))
+(check-true (vector-sorted? < #(5 1 2 3 4) 1 3))
+(check-false (vector-sorted? < #(5 1 3 2 4) 1 4))
+(check-catch "Invalid start or end parameters" (vector-sorted? < #(1 2 3 4 5) 3 2))
+
+(display "Testing list-merge!\n")
+(define lis1 '(1 3 5))
+(define lis2 '(2 4 6))
+(test (list-merge! < lis1 lis2) '(1 2 3 4 5 6))
+
+(define lis3 '(1 1 3))
+(define lis4 '(1 2 4))
+(test (list-merge! < lis3 lis4) '(1 1 1 2 3 4))
+
+(define lis5 '())
+(define lis6 '(1 2 3))
+(test (list-merge! < lis5 lis6) '(1 2 3))
+(test (list-merge! < lis6 lis5) '(1 2 3))
+
+(define lis7 '())
+(define lis8 '())
+(test (list-merge! < lis7 lis8) '())
 
 (check-report)
 
