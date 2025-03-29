@@ -228,19 +228,37 @@
   list-merge
 
   <\indent>
-    合并两个已排序的列表，返回一个新的已排序列表。
+    非破坏性合并。合并两个已排序的列表，返回一个新的已排序列表。
   </indent>
 
   list-merge!
 
   <\indent>
-    合并两个已排序的列表，并直接修改 <code*|lis1> 和 <code*|lis2> 的 <code*|cdr> 指针，返回合并后的列表。这是一个就地操作。
+    破坏性合并。合并两个已排序的列表，并直接修改 <code*|lis1> 和 <code*|lis2> 的 <code*|cdr> 指针，返回合并后的列表。使用 set-cdr! 进行原地操作，适用于内存敏感场景。
   </indent>
 
   list-stable-sort
 
   <\indent>
-    对列表进行稳定排序（相等元素相对顺序保持不变），返回一个新的已排序列表。
+    非破坏性归并排序。对列表进行稳定排序（相等元素相对顺序保持不变），返回一个新的已排序列表。
+  </indent>
+
+  list-sort
+
+  <\indent>
+    非破坏性快速排序。对列表进行不稳定排序，返回一个新的一排序列表。速度快但是牺牲稳定性。
+  </indent>
+
+  list-sort!
+
+  <\indent>
+    破坏性快速排序。对列表进行不稳定排序，原地进行操作，返回排序后的列表。
+  </indent>
+
+  list-stable-sort!
+
+  <\indent>
+    破坏性归并排序。对列表进行稳定排序，原地进行操作，返回排序后的列表。
   </indent>
 
   <\scm-chunk|goldfish/srfi/srfi-132.scm|true|true>
@@ -326,15 +344,123 @@
 
     \;
 
-    (define list-sort list-stable-sort)
+    (define (list-sort less-p lis)
+
+    \ \ (if (or (null? lis) (null? (cdr lis)))
+
+    \ \ \ \ \ \ lis
+
+    \ \ \ \ \ \ (let ((pivot (car lis))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (rest (cdr lis)))
+
+    \ \ \ \ \ \ \ \ (let ((smaller (filter (lambda (x) (less-p x pivot)) rest))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (larger (filter (lambda (x) (not (less-p x pivot))) rest)))
+
+    \ \ \ \ \ \ \ \ \ \ (append (list-sort less-p smaller)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list pivot)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list-sort less-p larger))))))
 
     \;
 
-    (define list-sort! list-stable-sort)
+    (define (list-sort! less-p lst)
+
+    \ \ ;; 辅助函数：返回列表的最后一个元素
+
+    \ \ (define (last-pair lst)
+
+    \ \ \ \ (if (null? (cdr lst))
+
+    \ \ \ \ \ \ \ \ lst
+
+    \ \ \ \ \ \ \ \ (last-pair (cdr lst))))
+
+    \ \ ;; 辅助函数：将列表分成小于和大于 pivot 的部分
+
+    \ \ (define (partition! lst pivot less-p)
+
+    \ \ \ \ (let loop ((lst lst) (less '()) (greater '()))
+
+    \ \ \ \ \ \ (cond
+
+    \ \ \ \ \ \ \ \ ((null? lst) (values (reverse less) (reverse greater))) \ ;; 返回小于和大于部分
+
+    \ \ \ \ \ \ \ \ ((less-p (car lst) pivot)
+
+    \ \ \ \ \ \ \ \ \ \ (loop (cdr lst) (cons (car lst) less) greater))
+
+    \ \ \ \ \ \ \ \ (else
+
+    \ \ \ \ \ \ \ \ \ \ (loop (cdr lst) less (cons (car lst) greater))))))
+
+    \ \ ;; 排序函数：原地排序
+
+    \ \ (if (or (null? lst) (null? (cdr lst))) \ ;; 如果列表为空或只有一个元素，已经排序好
+
+    \ \ \ \ \ \ lst
+
+    \ \ \ \ \ \ (let* ((pivot (car lst)))
+
+    \ \ \ \ \ \ \ \ (call-with-values\ 
+
+    \ \ \ \ \ \ \ \ \ \ (lambda () (partition! (cdr lst) pivot less-p)) \ ;; 调用 partition 并返回小于和大于部分
+
+    \ \ \ \ \ \ \ \ \ \ (lambda (less greater)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ ;; 对小于和大于部分递归排序
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let ((sorted-less (list-sort! less-p less))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (sorted-greater (list-sort! less-p greater)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;; 如果 sorted-less 是空，直接返回 sorted-greater
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (if (null? sorted-less)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sorted-greater
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (begin
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;; 原地连接两个部分和 pivot
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! (last-pair sorted-less) (cons pivot sorted-greater))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sorted-less)))))))) \ ;; 返回排序后的列表
 
     \;
 
-    (define list-stable-sort! list-stable-sort)
+    (define list-stable-sort!
+
+    \ \ (lambda (less-p lis)
+
+    \ \ \ \ (define (split! lis)
+
+    \ \ \ \ \ \ (let loop ((slow lis) (fast (cdr lis)))
+
+    \ \ \ \ \ \ \ \ (if (or (null? fast) (null? (cdr fast)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (let ((mid (cdr slow)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (set-cdr! slow '())
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (values lis mid))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ (loop (cdr slow) (cddr fast)))))
+
+    \ \ \ \ (if (or (null? lis) (null? (cdr lis)))
+
+    \ \ \ \ \ \ \ \ lis
+
+    \ \ \ \ \ \ \ \ (let-values (((left right) (split! lis)))
+
+    \ \ \ \ \ \ \ \ \ \ (list-merge! less-p
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list-stable-sort! less-p left)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (list-stable-sort! less-p right))))))
 
     \;
   </scm-chunk>
@@ -499,7 +625,7 @@
 
   vector-sorted?和list-merge!测试
 
-  <\scm-chunk|tests/goldfish/liii/sort-test.scm|true|false>
+  <\scm-chunk|tests/goldfish/liii/sort-test.scm|true|true>
     ;
 
     ;单元测试vector-sorted?新增支持可选参数功能、list-merge!实现原地合并功能
@@ -559,13 +685,85 @@
     (test (list-merge! \<less\> lis7 lis8) '())
 
     \;
+  </scm-chunk>
 
-    (check-report)
+  list-sort、list-sort!、list-stable-sort!测试
+
+  <\scm-chunk|tests/goldfish/liii/sort-test.scm|true|true>
+    ;
+
+    ;单元测试: 测试新增函数list-sort、list-sort!、list-stable-sort!
+
+    ;
+
+    ;; ================== 测试非破坏性快排 list-sort! ==================
+
+    (display "Testing list-sort\\n")
+
+    (define test-list '(3 1 4 1 5 9 2 6 5))
+
+    (define sorted-list (list-sort \<less\> test-list))
+
+    (check-true (list-sorted? \<less\> sorted-list))
+
+    (check (length sorted-list) =\<gtr\> (length test-list))
+
+    (check sorted-list =\<gtr\> '(1 1 2 3 4 5 5 6 9))
+
+    (check (equal? test-list '(3 1 4 1 5 9 2 6 5)) =\<gtr\> #t) \ ; 确保原列表未被修改
+
+    \;
+
+    ;; ================== 测试破坏性快排 list-sort! ==================
+
+    (display "Testing list-sort!\\n")
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '(1 5 1 0 -1 9 2 4 3)))) \ ;; 测试原地排序后的结果
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '(9 7 5 3 2 8 6 4 1)))) \ ;; 测试另一种顺序
+
+    (check-false (list-sorted? \<less\> '(1 5 1 0 -1 9 2 4 3))) \ ;; 原始未排序的列表
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '())))
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '(42))))
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '(1 2 3 4 5))))
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '(3 1 4 1 5 9 2 6 5 3 5))))
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '(0 -1 2 -2 3 1))))
+
+    (check-true (list-sorted? \<less\> (list-sort! \<less\> '(5 -3 0 2 1 -1 4))))
+
+    \;
+
+    ; ================== 测试非稳定堆排序 list-stable-sort! ==================
+
+    (display "Testing list-stable-sort!\\n")
+
+    (display "Testing list-stable-sort!\\n")
+
+    (check-true (list-sorted? \<less\> (list-stable-sort! \<less\> '(1 5 1 0 -1 1 5 1 0 1 1 5 9 2 4 3 4 9))))
+
+    (check-true (list-sorted? \<less\> (list-stable-sort! \<less\> '(9 7 5 3 2 8 6 4 1 4 6 8 9 7 5 3 5 9 7 9))))
+
+    (check-true (list-sorted? \<less\> (list-stable-sort! \<less\> '(3 1 4 1 5 9 2 6 5 3 5 5 9 2 6 9)))) \ ;; 验证排序是否正确
+
+    (check-true (list-sorted? \<less\> (list-stable-sort! \<less\> '(0 -1 2 -2 0 -1 0 2 3 1 3)))) \ ;; 验证排序是否正确
+
+    (check-true (list-sorted? \<less\> (list-stable-sort! \<less\> '(5 -3 0 2 1 -1 2 1 2 4 5 -3 0 5)))) \ ;; 验证排序是否正确
 
     \;
   </scm-chunk>
 
   <section|结尾>
+
+  <\scm-chunk|tests/goldfish/liii/sort-test.scm|true|false>
+    \;
+
+    (check-report)
+  </scm-chunk>
 
   <\scm-chunk|goldfish/srfi/srfi-132.scm|true|false>
     ) ; end of begin
