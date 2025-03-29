@@ -19,7 +19,7 @@
 (export
   bitwise-not bitwise-and bitwise-ior bitwise-xor bitwise-eqv bitwise-nor bitwise-nand 
   bit-count bitwise-orc1 bitwise-orc2 bitwise-andc1 bitwise-andc2
-  arithmetic-shift
+  arithmetic-shift integer-length
 )
 (begin
 
@@ -65,6 +65,14 @@
   (bitwise-and i (bitwise-not j)))
 
 (define arithmetic-shift ash)
+
+(define (integer-length n)
+  (if (zero? n)
+      0
+      (let loop ((value (abs n)) (count 1))
+           (if (<= value 1)
+               count
+               (loop (ash value -1) (+ count 1))))))
 
 ) ; end of begin
 ) ; end of define-library

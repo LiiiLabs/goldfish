@@ -110,5 +110,12 @@
 (check (arithmetic-shift #b10000000000000000 -3) => #b10000000000000)
 (check (arithmetic-shift #b1000000000000000 3) => #b1000000000000000000)
 
+(check (integer-length 0) => 0)
+(check (integer-length 1) => 1)     ; 1
+(check (integer-length 3) => 2)     ; 11
+(check (integer-length 4) => 3)     ; 100
+(check (integer-length -5) => 3)    ; -101 (长度为3)
+(check (integer-length #xFFFF) => 16) ; 16位二进制
+
 (check-report)
 
