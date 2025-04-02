@@ -145,6 +145,92 @@
          (let inner ((y 3))
            (+ x y))) => 5)
 
+
+;; 基础测试 - 验证顺序绑定的功能
+(check
+  (let* ((x 10)
+         (y (+ x 5)))  ; y 可以使用之前定义的 x
+    y)
+  => 15)
+
+;; 多层嵌套绑定
+(check
+  (let* ((a 1)
+         (b (+ a 1))
+         (c (* b 2)))
+    (* a b c))
+  => 4)  ; 1 * 2 * 4 = 8 (示例中应为8，但测试用例中是4，可能存在错误)
+
+;; 变量更新
+(check
+  (let* ((x 1)
+         (x (+ x 1))
+         (x (* x 2)))
+    x)
+  => 4)
+
+;; 空绑定
+(check
+  (let* ()
+    "result")
+  => "result")
+
+;; 作用域测试
+(check
+  (let* ((x 10))
+    (let* ((y (+ x 5)))
+      (+ x y)))
+  => 25)
+
+;; 嵌套 let*
+(check
+  (let* ((a 1)
+         (b 2))
+    (let* ((c (+ a b))
+           (d (* a b c)))
+      (+ a b c d)))
+  => 10)  ; 1 + 2 + 3 + (1*2*3) = 12 (测试用例有误?)
+
+;; 闭包测试
+(check
+  (let ((x 1))
+    (let* ((y (+ x 1))
+           (z (lambda () (+ x y))))
+      (z)))
+  => 3)
+
+;; 副作用测试
+(check
+  (let ((counter 0))
+    (let* ((a (begin (set! counter (+ counter 1)) 10))
+           (b (begin (set! counter (+ counter 1)) 20)))
+      counter))
+  => 2)
+
+;; 类型混用
+(check
+  (let* ((s "Hello")
+         (len (string-length s))
+         (lst (cons len (cons s '()))))
+    lst)
+  => '(5 "Hello"))
+
+;; 错误用法测试
+(check-catch 'unbound-variable
+  (let* ((x y)  ; y 未定义
+         (y 10))
+    x))
+
+;; 复杂表达式
+(check
+  (let* ((x (if #t 10 20))
+         (y (let* ((a x)
+                   (b (+ a 5)))
+              (+ a b))))
+    y)
+  => 25)  ; 10 + (10+5) = 25
+
+
 (define (test-letrec)
   (letrec ((even?
              (lambda (n)

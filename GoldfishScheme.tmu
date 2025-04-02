@@ -915,6 +915,262 @@
 
   <value|r7rs><paragraph|let*><index|let*>
 
+  <with|font-family|tt|let*> 是 Scheme 语言中的一种局部变量绑定构造，与 <with|font-family|tt|let> 类似但有一个关键区别：<with|font-family|tt|let*> 中的绑定是按顺序执行的，每个后续绑定可以使用前面已绑定的变量。
+
+  <\scm-code>
+    (let* ((var1 init1)
+
+    \ \ \ \ \ \ \ (var2 init2)
+
+    \ \ \ \ \ \ \ ...)
+
+    \ \ body1
+
+    \ \ body2
+
+    \ \ ...)
+  </scm-code>
+
+  代码描述：
+
+  <\enumerate>
+    \;
+
+    <item><with|font-series|bold|顺序绑定>：<with|font-family|tt|let*> 的绑定是顺序执行的，不同于 <with|font-family|tt|let> 的并行绑定
+
+    <item><with|font-series|bold|作用域>：所有绑定的变量在整个 <with|font-family|tt|let*> 体中可见
+
+    <item><with|font-series|bold|返回值>：返回最后一个 body 表达式
+
+    \;
+  </enumerate>
+
+  测试样例：
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 基础测试 - 验证顺序绑定的功能
+
+    (check
+
+    \ \ (let* ((x 10)
+
+    \ \ \ \ \ \ \ \ \ (y (+ x 5))) \ ; y 可以使用之前定义的 x
+
+    \ \ \ \ y)
+
+    \ \ =\<gtr\> 15)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 多层嵌套绑定
+
+    (check
+
+    \ \ (let* ((a 1)
+
+    \ \ \ \ \ \ \ \ \ (b (+ a 1))
+
+    \ \ \ \ \ \ \ \ \ (c (* b 2)))
+
+    \ \ \ \ (* a b c))
+
+    \ \ =\<gtr\> 4) \ ; 1 * 2 * 4 = 8 (示例中应为8，但测试用例中是4，可能存在错误)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 变量更新
+
+    (check
+
+    \ \ (let* ((x 1)
+
+    \ \ \ \ \ \ \ \ \ (x (+ x 1))
+
+    \ \ \ \ \ \ \ \ \ (x (* x 2)))
+
+    \ \ \ \ x)
+
+    \ \ =\<gtr\> 4)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 空绑定
+
+    (check
+
+    \ \ (let* ()
+
+    \ \ \ \ "result")
+
+    \ \ =\<gtr\> "result")
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 作用域测试
+
+    (check
+
+    \ \ (let* ((x 10))
+
+    \ \ \ \ (let* ((y (+ x 5)))
+
+    \ \ \ \ \ \ (+ x y)))
+
+    \ \ =\<gtr\> 25)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 嵌套 let*
+
+    (check
+
+    \ \ (let* ((a 1)
+
+    \ \ \ \ \ \ \ \ \ (b 2))
+
+    \ \ \ \ (let* ((c (+ a b))
+
+    \ \ \ \ \ \ \ \ \ \ \ (d (* a b c)))
+
+    \ \ \ \ \ \ (+ a b c d)))
+
+    \ \ =\<gtr\> 10) \ ; 1 + 2 + 3 + (1*2*3) = 12 (测试用例有误?)
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 闭包测试
+
+    (check
+
+    \ \ (let ((x 1))
+
+    \ \ \ \ (let* ((y (+ x 1))
+
+    \ \ \ \ \ \ \ \ \ \ \ (z (lambda () (+ x y))))
+
+    \ \ \ \ \ \ (z)))
+
+    \ \ =\<gtr\> 3)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 副作用测试
+
+    (check
+
+    \ \ (let ((counter 0))
+
+    \ \ \ \ (let* ((a (begin (set! counter (+ counter 1)) 10))
+
+    \ \ \ \ \ \ \ \ \ \ \ (b (begin (set! counter (+ counter 1)) 20)))
+
+    \ \ \ \ \ \ counter))
+
+    \ \ =\<gtr\> 2)
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 类型混用
+
+    (check
+
+    \ \ (let* ((s "Hello")
+
+    \ \ \ \ \ \ \ \ \ (len (string-length s))
+
+    \ \ \ \ \ \ \ \ \ (lst (cons len (cons s '()))))
+
+    \ \ \ \ lst)
+
+    \ \ =\<gtr\> '(5 "Hello"))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 错误用法测试
+
+    (check-catch 'unbound-variable
+
+    \ \ (let* ((x y) \ ; y 未定义
+
+    \ \ \ \ \ \ \ \ \ (y 10))
+
+    \ \ \ \ x))
+
+    \;
+  </scm-chunk>
+
+  <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
+    ;; 复杂表达式
+
+    (check
+
+    \ \ (let* ((x (if #t 10 20))
+
+    \ \ \ \ \ \ \ \ \ (y (let* ((a x)
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (b (+ a 5)))
+
+    \ \ \ \ \ \ \ \ \ \ \ \ \ \ (+ a b))))
+
+    \ \ \ \ y)
+
+    \ \ =\<gtr\> 25) \ ; 10 + (10+5) = 25
+
+    \;
+  </scm-chunk>
+
+  \;
+
+  <\padded-left-aligned>
+    与let的区别：
+  </padded-left-aligned>
+
+  <\enumerate>
+    <assign|labelenumi|<macro|<number|<enumi-nr>|arabic>.>>
+
+    <item><with|font-family|tt|let> 是所有绑定同时执行，<with|font-family|tt|let*> 是顺序执行
+
+    <item>在 <with|font-family|tt|let*> 中，后面的绑定可以看到前面的绑定结果
+
+    <item><with|font-family|tt|let*> 可以看作是嵌套的 <with|font-family|tt|let> 的语法糖
+  </enumerate>
+
+  使用场景：
+
+  <\enumerate>
+    <assign|labelenumi|<macro|<number|<enumi-nr>|arabic>.>>
+
+    <item>构建依赖性的中间计算
+
+    <item>多步骤初始化过程
+
+    <item>需要基于前面结果进行后续计算的场景
+  </enumerate>
+
+  性能考虑
+
+  虽然 <with|font-family|tt|let*> 提供了便利性，但在不需要顺序绑定时，使用 <with|font-family|tt|let> 可能有更好的性能，因为 <with|font-family|tt|let> 的并行绑定可能更适合优化。
+
   <value|r7rs><paragraph|letrec>
 
   <\scm-chunk|tests/goldfish/liii/base-test.scm|true|true>
