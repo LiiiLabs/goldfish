@@ -1,6 +1,6 @@
 version: '1.0'
-name: ci-ubuntu
-displayName: ci-ubuntu
+name: ci-ubuntu-gitee
+displayName: ci-ubuntu-gitee
 triggers:
   trigger: auto
   pr:
@@ -33,7 +33,6 @@ variables:
   XMAKE_BINARY_REPO: 'https://gitee.com/xmake-mirror/build-artifacts.git'
   XMAKE_ROOT: y
 
-
 stages:
   - name: build_and_test
     displayName: build_and_test
@@ -63,3 +62,4 @@ stages:
         strategy:
           retry: '0'
           stepTimeout: 15
+
